@@ -1,36 +1,30 @@
-import { useState, useEffect } from 'react'
-import initSqlJs from "sql.js"
+import { useState, useEffect, useMemo } from 'react'
 
-const SQL = await initSqlJs({
-    // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    // You can omit locateFile completely when running in node
-    locateFile: file => `https://sql.js.org/dist/${file}`
-})
-
-console.log(SQL)
-const db = new SQL.Database();
-
-
-
-let sqlstr = "CREATE TABLE hello (a int, b char); \
-INSERT INTO hello VALUES (0, 'hello'); \
-INSERT INTO hello VALUES (1, 'world');";
-db.run(sqlstr)
-window.db = db
-
-const stmt = db.prepare("SELECT * FROM hello WHERE a=:aval AND b=:bval")
-
-// Bind values to the parameters and fetch the results of the query
-const result = stmt.getAsObject({ ':aval': 1, ':bval': 'world' })
-
-console.log(db)
-console.log(result)
+import { useSQL } from './components'
 
 export function DatabaseTest({ query }) {
     const [error, setError] = useState()
     const [result, setResult] = useState()
+    const SQL = useSQL()
 
+    // Set up a database as soon as SQL.JS loads.
+    const db = useMemo(() => {
+        console.log(SQL)
+        if (!SQL)
+            return
+        const db = new SQL.Database()
+        const sqlstr = "CREATE TABLE users (id int, name char); \
+INSERT INTO users VALUES (0, 'Polina'); \
+INSERT INTO users VALUES (1, 'Tushar'); \
+INSERT INTO users VALUES (2, 'Hildo');"
+        db.run(sqlstr)
+        return db
+    }, [SQL])
+
+    // When the query changes, rerun it on the database.
     useEffect(() => {
+        if (!db)
+            return
         try {
             const result = db.exec(query)
             setResult(result)
@@ -39,14 +33,22 @@ export function DatabaseTest({ query }) {
             setError(error)
             setResult()
         }
-    }, [query])
-    console.log(error, result)
-    window.error = error
-    window.result = result
+    }, [db, query])
 
+    // Render the query and its result.
+    if (!query)
+        return <p>No query has been provided yet.</p>
+    return <>
+        <p>Your query is: <em>{query}</em></p>
+        <QueryResults {...{ error, result }} />
+    </>
+}
+
+function QueryResults({ error, result }) {
+    console.log(result)
     if (error)
-        return <p>There was an error: {error.message}.</p>
+        return <p>There was an error: <em>{error.message}</em>.</p>
     if (result)
-        return <p>Valid query: {JSON.stringify(result[0].values)}</p>
+        return <p>Your query gave data:<br/>{JSON.stringify(result[0]?.values) || '[]'}</p>
     return <p>No data yet...</p>
 }
