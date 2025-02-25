@@ -1,10 +1,24 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+import React from 'react';
+import CodeMirror from '@uiw/react-codemirror'
+import {sql} from '@codemirror/lang-sql'
+import {basicSetup} from 'codemirror'
+
+import { DatabaseTest } from './DatabaseTest'
+
 function App() {
   const [count, setCount] = useState(0)
+
+
+  const [value, setValue] = useState("SELECT * FROM users");
+  const onChange = useCallback((val, viewUpdate) => {
+    console.log('val:', val);
+    setValue(val);
+  }, []);
 
   return (
     <>
@@ -16,6 +30,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
+      <DatabaseTest query={value} />
       <h1>SQL-Tutor</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
@@ -28,6 +43,8 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
+      <p>Your input is: {value}</p>
     </>
   )
 }
