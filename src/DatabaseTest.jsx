@@ -9,7 +9,6 @@ export function DatabaseTest({ query }) {
 
     // Set up a database as soon as SQL.JS loads.
     const db = useMemo(() => {
-        console.log(SQL)
         if (!SQL)
             return
         const db = new SQL.Database()
@@ -45,7 +44,6 @@ INSERT INTO users VALUES (2, 'Hildo');"
 }
 
 function QueryResults({ error, result }) {
-    console.log(result)
     if (error)
         return <p>There was an error: <em>{error.message}</em>.</p>
     if (result)
