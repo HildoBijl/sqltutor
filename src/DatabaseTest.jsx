@@ -1,38 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useDatabase, useQuery } from './components'
 
-import { useSQLJS } from './components'
+const initialData = `CREATE TABLE users (id int, name char);
+INSERT INTO users VALUES (0, 'Polina');
+INSERT INTO users VALUES (1, 'Tushar');
+INSERT INTO users VALUES (2, 'Hildo');`
 
 export function DatabaseTest({ query }) {
-    const [error, setError] = useState()
-    const [result, setResult] = useState()
-    const SQL = useSQLJS()
-
-    // Set up a database as soon as SQL.JS loads.
-    const db = useMemo(() => {
-        if (!SQL)
-            return
-        const db = new SQL.Database()
-        const sqlstr = "CREATE TABLE users (id int, name char); \
-INSERT INTO users VALUES (0, 'Polina'); \
-INSERT INTO users VALUES (1, 'Tushar'); \
-INSERT INTO users VALUES (2, 'Hildo');"
-        db.run(sqlstr)
-        return db
-    }, [SQL])
-
-    // When the query changes, rerun it on the database.
-    useEffect(() => {
-        if (!db)
-            return
-        try {
-            const result = db.exec(query)
-            setResult(result)
-            setError()
-        } catch (error) {
-            setError(error)
-            setResult()
-        }
-    }, [db, query])
+    const [db] = useDatabase(initialData)
+    const { result, error } = useQuery(db, query)
 
     // Render the query and its result.
     if (!query)
