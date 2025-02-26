@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import initSqlJs from 'sql.js'
 
-import { DatabaseContext } from './context'
+import { SQLJSContext } from './context'
 
-export function DatabaseProvider({ children }) {
+export function SQLJSProvider({ children }) {
 	const [error, setError] = useState()
-	const [SQL, setSQL] = useState()
+	const [SQLJS, setSQL] = useState()
 
 	// On rendering, initialize SQL.JS.
 	useEffect(() => {
@@ -21,7 +21,7 @@ export function DatabaseProvider({ children }) {
 	})
 
 	// Set up the context with its contents.
-	return <DatabaseContext.Provider value={{ SQL, error }}>
+	return <SQLJSContext.Provider value={{ SQLJS, error }}>
 		{children}
-	</DatabaseContext.Provider>
+	</SQLJSContext.Provider>
 }

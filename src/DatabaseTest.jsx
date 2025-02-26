@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 
-import { useSQL } from './components'
+import { useSQLJS } from './components'
 
 export function DatabaseTest({ query }) {
     const [error, setError] = useState()
     const [result, setResult] = useState()
-    const SQL = useSQL()
+    const SQL = useSQLJS()
 
     // Set up a database as soon as SQL.JS loads.
     const db = useMemo(() => {
