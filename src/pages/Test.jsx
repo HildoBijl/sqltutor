@@ -3,21 +3,21 @@ import CodeMirror from '@uiw/react-codemirror'
 import { sql } from '@codemirror/lang-sql'
 import { basicSetup } from 'codemirror'
 
-import { useDatabase, useQuery } from 'components'
+import { Subpage, useDatabase, useQuery } from 'components'
 
 export function Test() {
 	const initialValue = 'SELECT * FROM users'
 	const [value, setValue] = useState(initialValue)
 	const onChange = useCallback(value => setValue(value), [])
 
-	return <>
-	<p>This is the test page. Enter a query in the input field below and watch it being run on a real database.</p>
+	return <Subpage>
+		<p>This is the test page. Enter a query in the input field below and watch it being run on a real database.</p>
 
-	<CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
+		<CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
 
-	<h4>Results</h4>
-	<DatabaseResults query={value} />
-	</>
+		<h4>Results</h4>
+		<DatabaseResults query={value} />
+	</Subpage>
 }
 
 const initialData = `CREATE TABLE users (id int, name char);

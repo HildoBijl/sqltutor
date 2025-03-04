@@ -10,22 +10,22 @@ export const routes = [
 			{
 				path: '/',
 				element: <Home />,
-				tabIndex: 0,
+				header: false,
 			},
 			{
 				path: '/test',
 				element: <Test />,
-				tabIndex: 1,
+				title: 'Test Page',
 			},
 			{
 				path: '/overview',
 				element: <Overview />,
-				tabIndex: 1,
+				title: 'Tutorial Overview',
 			},
 			{
 				path: '*',
 				element: <Home />,
-				tabIndex: 0,
+				header: false,
 			},
 		],
 	},
