@@ -1,5 +1,5 @@
 import { Page } from 'components'
-import { ErrorPage, Home, Test } from 'pages'
+import { ErrorPage, Home, Test, Overview } from 'pages'
 
 export const routes = [
 	{
@@ -15,6 +15,11 @@ export const routes = [
 			{
 				path: '/test',
 				element: <Test />,
+				tabIndex: 1,
+			},
+			{
+				path: '/overview',
+				element: <Overview />,
 				tabIndex: 1,
 			},
 			{

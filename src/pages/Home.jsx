@@ -1,31 +1,18 @@
-import { useState, useCallback } from 'react'
-import CodeMirror from '@uiw/react-codemirror'
-import { sql } from '@codemirror/lang-sql'
-import { basicSetup } from 'codemirror'
+import { Link } from 'react-router-dom'
 
 import reactLogo from 'assets/react.svg'
 import viteLogo from '/vite.svg'
 
-import { DatabaseTest } from './DatabaseTest'
-
 export function Home() {
-	const initialValue = 'SELECT * FROM users'
-	const [value, setValue] = useState(initialValue)
-	const onChange = useCallback(value => setValue(value), [])
-
 	return <>
-	<div>
-		<a href="https://vite.dev" target="_blank">
-			<img src={viteLogo} className="logo" alt="Vite logo" />
-		</a>
-		<a href="https://react.dev" target="_blank">
-			<img src={reactLogo} className="logo react" alt="React logo" />
-		</a>
-	</div>
-
-	<CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
-
-	<h4>Results</h4>
-	<DatabaseTest query={value} />
+		<div>
+			<a href="https://vite.dev" target="_blank">
+				<img src={viteLogo} className="logo" alt="Vite logo" />
+			</a>
+			<a href="https://react.dev" target="_blank">
+				<img src={reactLogo} className="logo react" alt="React logo" />
+			</a>
+			<p>Check out the <Link to="/test">test page</Link> for the database input field, or the <Link to="/overview">overview page</Link> for the skill overview.</p>
+		</div>
 	</>
 }
