@@ -3,10 +3,10 @@ import CodeMirror from '@uiw/react-codemirror'
 import { sql } from '@codemirror/lang-sql'
 import { basicSetup } from 'codemirror'
 
-import { DatabaseTest } from '../DatabaseTest'
-
-import reactLogo from '../assets/react.svg'
+import reactLogo from 'assets/react.svg'
 import viteLogo from '/vite.svg'
+
+import { DatabaseTest } from './DatabaseTest'
 
 export function Home() {
 	const initialValue = 'SELECT * FROM users'
@@ -23,7 +23,6 @@ export function Home() {
 		</a>
 	</div>
 
-	<h1>SQL-Tutor</h1>
 	<CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
 
 	<h4>Results</h4>

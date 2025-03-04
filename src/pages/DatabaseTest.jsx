@@ -1,4 +1,4 @@
-import { useDatabase, useQuery } from './components'
+import { useDatabase, useQuery } from '../components'
 
 const initialData = `CREATE TABLE users (id int, name char);
 INSERT INTO users VALUES (0, 'Polina');

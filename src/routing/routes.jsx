@@ -1,5 +1,5 @@
-import { Page } from '../components'
-import { ErrorPage, Home, Test } from '../pages'
+import { Page } from 'components'
+import { ErrorPage, Home, Test } from 'pages'
 
 export const routes = [
 	{
