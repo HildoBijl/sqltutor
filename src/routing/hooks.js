@@ -1,10 +1,12 @@
 import { useMatches } from 'react-router-dom'
 
+import { lastOf } from 'util'
+
 import { routes } from './routes'
 
 export function useCurrentRoutes() {
 	const matches = useMatches()
-	const path = matches[matches.length - 1].id.split('-')
+	const path = lastOf(matches).id.split('-')
 	const currentRoutes = []
 	let currentRoute
 	path.forEach((child, index) => {
@@ -19,5 +21,5 @@ export function useCurrentRoutes() {
 
 export function useCurrentRoute() {
 	const currentRoutes = useCurrentRoutes()
-	return currentRoutes[currentRoutes.length - 1]
+	return lastOf(currentRoutes)
 }
