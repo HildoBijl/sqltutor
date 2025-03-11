@@ -9,6 +9,7 @@ export default defineConfig({
       src: '/src',
       assets: '/src/assets',
       components: '/src/components',
+      edu: '/src/edu',
       pages: '/src/pages',
       routing: '/src/routing',
       settings: '/src/settings',
