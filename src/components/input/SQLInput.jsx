@@ -3,9 +3,9 @@ import { sql } from '@codemirror/lang-sql'
 import { basicSetup } from 'codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 
-// Override specific theme colors.
+// Override specific one-dark theme colors.
 oneDark[1][1].value.rules = [
-	".ͼp {color: #c81919; font-weight: 600;}", // Turn keywords into the theme color.
+	".ͼp {color: #c81919; font-weight: 600;}", // Turn keywords into the web-app theme color.
 	".ͼq {color: #abb2bf}",
 	".ͼr {color: #61afef;}",
 	".ͼs {color: #d19a66;}",
