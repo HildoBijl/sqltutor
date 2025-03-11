@@ -1,9 +1,6 @@
 import { useState, useCallback } from 'react'
-import CodeMirror from '@uiw/react-codemirror'
-import { sql } from '@codemirror/lang-sql'
-import { basicSetup } from 'codemirror'
 
-import { Subpage, useDatabase, useQuery } from 'components'
+import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
 
 export function Test() {
 	const initialValue = 'SELECT * FROM users'
@@ -13,7 +10,7 @@ export function Test() {
 	return <Subpage>
 		<p>This is the test page. Enter a query in the input field below and watch it being run on a real database.</p>
 
-		<CodeMirror value={value} height="200px" extensions={[basicSetup, sql()]} onChange={onChange} />
+		<SQLInput value={value} onChange={onChange} height="200px" />
 
 		<h4>Results</h4>
 		<DatabaseResults query={value} />
