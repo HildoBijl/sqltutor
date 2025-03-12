@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Subpage } from 'components'
 
 import { concepts, skills } from 'edu'
+console.log(concepts)
 
 export function Overview() {
 	return <Subpage>

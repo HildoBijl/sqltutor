@@ -159,9 +159,10 @@ export const contents = {
 export const components = {}, concepts = {}, skills = {}
 
 // First preprocess the whole content tree, preparing all objects for further processing.
-const preprocessComponent = (component, id) => {
+const preprocessComponent = (component, id, path = []) => {
 	// Run some basic processing for each component.
 	component.id = id
+	component.path = path
 	if (!component.prerequisites)
 		component.prerequisites = []
 	component.followUps = []
@@ -176,13 +177,13 @@ const preprocessComponent = (component, id) => {
 	// Return the result if needed.
 	return component
 }
-const preprocessFolder = (folder, id) => {
+const preprocessFolder = (folder, id, path = []) => {
 	// If it's a component (it has a type) then process it as specified.
 	if (folder.type)
-		return preprocessComponent(folder, id)
+		return preprocessComponent(folder, id, path)
 
 	// It's a folder. Process all the folder contents.
-	Object.keys(folder).forEach(id => preprocessFolder(folder[id], id))
+	Object.keys(folder).forEach(id => preprocessFolder(folder[id], id, [...path, id]))
 
 	// Return the result if needed.
 	return folder
