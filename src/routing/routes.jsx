@@ -26,6 +26,7 @@ export const routes = [
 				path: '/c/:componentId',
 				element: <Component />,
 				title: <ComponentTitle />,
+				back: '/overview',
 			},
 			{
 				path: '*',
