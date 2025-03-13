@@ -1,1 +1,1 @@
-export const siteTitle = 'SQL-Tutor'
+export const siteTitle = 'SQL Valley'
