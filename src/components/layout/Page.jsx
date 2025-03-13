@@ -22,11 +22,11 @@ function MetaTitle() {
 	const hiddenTitleRef = useRef()
 	const [headerTitle, setHeaderTitle] = useState()
 	
-	// When the route changes, update the title.
+	// When the route or the title in it changes, update the title.
+	const currentTitle = hiddenTitleRef.current?.innerText
 	useEffect(() => {
 		setHeaderTitle(hiddenTitleRef.current?.innerText)
-	}, [route, hiddenTitleRef])
-	window.r = hiddenTitleRef
+	}, [route, currentTitle, hiddenTitleRef])
 	
 	// Determine the tab title and show it.
 	const tabTitle = `${(headerTitle ? `${headerTitle} | ` : '')}${siteTitle}`

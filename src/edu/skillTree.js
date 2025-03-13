@@ -51,12 +51,10 @@ export const contents = {
 			},
 		},
 		queryLanguages: {
-			fundamentals: {
-				queryLanguage: {
-					type: 'concept',
-					name: 'Query language',
-					prerequisites: ['database'],
-				},
+			queryLanguage: {
+				type: 'concept',
+				name: 'Query language',
+				prerequisites: ['database'],
 			},
 			sql: {
 				sql: {
