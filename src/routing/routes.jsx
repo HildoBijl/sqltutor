@@ -27,6 +27,14 @@ export const routes = [
 				element: <Component />,
 				title: <ComponentTitle />,
 				back: '/overview',
+				children: [
+					{
+						path: ':page',
+						element: <Component />,
+						title: <ComponentTitle />,
+						back: '/overview',
+					},
+				],
 			},
 			{
 				path: '*',
