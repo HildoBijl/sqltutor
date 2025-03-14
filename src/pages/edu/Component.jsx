@@ -72,7 +72,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	// Render the contents, with the tabs first and the page after.
 	return <>
 		<Box sx={{ background: theme.palette.secondary.main }}>
-			<Container maxWidth="xl">
+			<Container>
 				<Tabs value={tabIndex} onChange={updateTab} variant="fullWidth">
 					{shownTabs.map(tab => <Tab key={tab.url} label={tab.title} sx={{ color: theme.palette.secondary.contrastText }} />)}
 				</Tabs>
