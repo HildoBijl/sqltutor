@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
-import AppBar from '@mui/material/AppBar'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 
 import { firstOf } from 'util'
 import { Subpage, Container } from 'components'
@@ -28,24 +26,21 @@ export function Component() {
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
 export function ComponentFromModule({ component, module }) {
-
-	// Determine the tabs contained in this module.
+	// Filter the tabs contained in this module.
 	const shownTabs = tabs.filter(tab => module[tab.component])
 
 	// When the module is empty, show a note.
 	if (shownTabs.length === 0)
-		return <Subpage><p>Content for the {component.type} {component.name} is still under development. Come back later!</p></Subpage>
+		return <Subpage><p>Content for the {component.type} <strong>{component.name}</strong> is still under development. Come back later!</p></Subpage>
 
-	// If there is only one tab present in the module, show it without showing tabs.
+	// If there is only one tab present in the module, show this page without showing tabs.
 	if (shownTabs.length === 1) {
 		const Content = module[firstOf(shownTabs).component]
 		return <Subpage><Content /></Subpage>
 	}
 
-	// Show tabs that manage the component within it.
-	return <>
-		<TabbedComponent {...{ component, module, shownTabs }} />
-	</>
+	// When there are multiple pages, show tabs that manage the component within it.
+	return <TabbedComponent {...{ component, module, shownTabs }} />
 }
 
 // TabbedComponent takes a component and shows tabs above it.
@@ -53,9 +48,10 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	const theme = useTheme()
 	const navigate = useNavigate()
 
-	// Check the URL and set up the tab based on it. We store the URL of the tab as indicator.
+	// Check the URL and set up the active tab based on it. (The URL of the tab is used as indicator.)
 	const urlTab = useUrlTab()
 	const [tab, setTab] = useState(shownTabs.find(tab => tab.url === urlTab)?.url || firstOf(shownTabs).url)
+	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL changes, update the tab accordingly.
 	useEffect(() => {
@@ -68,9 +64,6 @@ export function TabbedComponent({ component, module, shownTabs }) {
 			navigate(`/c/${component.id}/${tab}`, { replace: true })
 	}, [navigate, urlTab, tab, component])
 
-	// When a tab is clicked, update parameters accordingly.
-	const handleChange = (event, newTab) => setTab(shownTabs[newTab].url)
-
 	// Determine info about what needs to be shown.
 	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
 	const tabIndex = shownTabs.indexOf(currTab)
@@ -80,7 +73,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	return <>
 		<Box sx={{ background: theme.palette.secondary.main }}>
 			<Container maxWidth="xl">
-				<Tabs value={tabIndex} onChange={handleChange} variant="fullWidth">
+				<Tabs value={tabIndex} onChange={updateTab} variant="fullWidth">
 					{shownTabs.map(tab => <Tab key={tab.url} label={tab.title} sx={{ color: theme.palette.secondary.contrastText }} />)}
 				</Tabs>
 			</Container>
