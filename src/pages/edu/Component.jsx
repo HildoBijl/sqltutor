@@ -1,9 +1,17 @@
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTheme } from '@mui/material/styles'
+import AppBar from '@mui/material/AppBar'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
-import { Subpage } from 'components'
+import { firstOf } from 'util'
+import { Subpage, Container } from 'components'
 import * as content from 'content'
 
-import { tabs, useComponent, usePage } from './util'
+import { tabs, useComponent, useUrlTab } from './util'
 
 // Component shows an educational component like a concept or a skill. This includes the tabs for "Theory", "Exercise" etcetera. It loads the contents dynamically.
 export function Component() {
@@ -20,22 +28,67 @@ export function Component() {
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
 export function ComponentFromModule({ component, module }) {
-	// Determine the tab matching the URL.
-	const page = usePage()
-	const tab = tabs.find(tab => tab.url === page)
-	if (!page || !tab)
-		return <Subpage><p>No tab has been defined yet in the URL. Specifically, try the <Link to={`/c/${component.id}/story`}>Story</Link> and the <Link to={`/c/${component.id}/theory`}>Theory</Link> pages.</p></Subpage>
 
-	// Determine the content component to be displayed.
-	const Content = module[tab.component]
-	if (!Content)
-		return <Subpage><p>The given page has not been defined yet.</p></Subpage>
+	// Determine the tabs contained in this module.
+	const shownTabs = tabs.filter(tab => module[tab.component])
 
-	// Render the respective component.
-	return <Subpage>
-		<p>This will be a page for concepts/skills. Specifically, this is the page for the {component.type} {component.name}, tab {tab.title}.</p>
-		<Content />
-	</Subpage>
+	// When the module is empty, show a note.
+	if (shownTabs.length === 0)
+		return <Subpage><p>Content for the {component.type} {component.name} is still under development. Come back later!</p></Subpage>
+
+	// If there is only one tab present in the module, show it without showing tabs.
+	if (shownTabs.length === 1) {
+		const Content = module[firstOf(shownTabs).component]
+		return <Subpage><Content /></Subpage>
+	}
+
+	// Show tabs that manage the component within it.
+	return <>
+		<TabbedComponent {...{ component, module, shownTabs }} />
+	</>
+}
+
+// TabbedComponent takes a component and shows tabs above it.
+export function TabbedComponent({ component, module, shownTabs }) {
+	const theme = useTheme()
+	const navigate = useNavigate()
+
+	// Check the URL and set up the tab based on it. We store the URL of the tab as indicator.
+	const urlTab = useUrlTab()
+	const [tab, setTab] = useState(shownTabs.find(tab => tab.url === urlTab)?.url || firstOf(shownTabs).url)
+
+	// When the URL changes, update the tab accordingly.
+	useEffect(() => {
+		setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
+	}, [urlTab, shownTabs, setTab])
+
+	// When the tab does not reflect the URL, update the URL.
+	useEffect(() => {
+		if (urlTab !== tab)
+			navigate(`/c/${component.id}/${tab}`, { replace: true })
+	}, [navigate, urlTab, tab, component])
+
+	// When a tab is clicked, update parameters accordingly.
+	const handleChange = (event, newTab) => setTab(shownTabs[newTab].url)
+
+	// Determine info about what needs to be shown.
+	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
+	const tabIndex = shownTabs.indexOf(currTab)
+	const Content = module[currTab.component]
+
+	// Render the contents, with the tabs first and the page after.
+	return <>
+		<Box sx={{ background: theme.palette.secondary.main }}>
+			<Container maxWidth="xl">
+				<Tabs value={tabIndex} onChange={handleChange} variant="fullWidth">
+					{shownTabs.map(tab => <Tab key={tab.url} label={tab.title} sx={{ color: theme.palette.secondary.contrastText }} />)}
+				</Tabs>
+			</Container>
+		</Box>
+		<Subpage>
+			<Content />
+		</Subpage>
+	</>
 }
 
 // ComponentTitle shows the title for a given educational component. It can be used in the Header bar.

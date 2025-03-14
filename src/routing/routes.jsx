@@ -29,7 +29,7 @@ export const routes = [
 				back: '/overview',
 				children: [
 					{
-						path: ':page',
+						path: ':tab',
 						element: <Component />,
 						title: <ComponentTitle />,
 						back: '/overview',

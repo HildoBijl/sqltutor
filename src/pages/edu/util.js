@@ -34,8 +34,8 @@ export function useComponent() {
 	return components[componentId]
 }
 
-// usePage gets the page from the URL if it is given. It enforces it to be lower case.
-export function usePage() {
-	const { page } = useParams()
-	return page?.toLowerCase()
+// useUrlTab gets the tab from the URL if it is given. It enforces it to be lower case.
+export function useUrlTab() {
+	const { tab } = useParams()
+	return tab?.toLowerCase()
 }
