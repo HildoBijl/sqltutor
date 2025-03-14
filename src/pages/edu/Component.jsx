@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
-
 import { Subpage } from 'components'
+import * as content from 'content'
 
 import { useComponent, usePage } from './util'
 
@@ -8,42 +7,13 @@ import { useComponent, usePage } from './util'
 export function Component() {
 	const component = useComponent()
 
-	// Create a state for the dynamically loaded contents to be rendered.
-	const [importedComponentId, setImportedComponentId] = useState()
-	const [importedComponent, setImportedComponent] = useState()
-	const [error, setError] = useState()
-
-	// On a change in the component, reload its contents.
-	useEffect(() => {
-		const importComponent = async () => {
-			try {
-				const module = await import(/* @vite-ignore */ `./${component.path.join('/')}/`)
-				console.log(module)
-				window.m = module
-				setImportedComponent(module)
-				setImportedComponentId(component.id)
-			} catch (error) {
-				console.log(error)
-				window.e = error
-				setError(error)
-			}
-		}
-		importComponent()
-	}, [component])
-
-	// If there was an error while loading the module, show it.
-	if (error)
-		return <Subpage>
-			<p>Oops ... something went long while load the page contents.</p>
-			<p>Please check your connection and/or refresh the page to see if that fixes the issue.</p>
-		</Subpage>
-
-	// If the module hasn't loaded yet, or is outdated, show a loading message.
-	if (!importedComponent || importedComponentId !== component.id)
-		return <Subpage><p>Loading contents...</p></Subpage>
+	// Extract the corresponding module.
+	const module = content[component.id]
+	if (!module)
+		throw new Error(`Missing component contents: the component "${component.id}" does not seem to have contents yet. Make sure this concept/skill has its parts properly exported.`)
 
 	// Render the component using the given module.
-	return <ComponentFromModule {...{ component, module: importedComponent }} />
+	return <ComponentFromModule {...{ component, module }} />
 }
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
