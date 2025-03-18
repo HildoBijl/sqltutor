@@ -55,16 +55,16 @@ function QueryResults({ error, result }) {
 	window.r = result
 
 	// On an empty result show a note.
-	if (result.length === 0)
-		return <p>Zeros rows returned</p>
+	const table = result[0]
+	if (!table)
+		return <p>Zeros rows returned.</p>
 
 	// There is a table. Render it.
-	const table = result[0]
 	return <TableContainer component={Paper}>
 		<Table>
 			<TableHead>
 				<TableRow>
-					{table.columns.map((columnName) => <TableCell key={columnName} sx={{color: theme.palette.primary.main}}>{columnName}</TableCell>)}
+					{table.columns.map((columnName) => <TableCell key={columnName} sx={{ color: theme.palette.primary.main }}>{columnName}</TableCell>)}
 				</TableRow>
 			</TableHead>
 			<TableBody>

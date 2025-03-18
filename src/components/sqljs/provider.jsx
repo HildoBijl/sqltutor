@@ -11,7 +11,7 @@ export function SQLJSProvider({ children }) {
 	useEffect(() => {
 		const initialize = async () => {
 			try {
-				const SQLJS = await initSqlJs({ locateFile: file => `sqljsDist/${file}` })
+				const SQLJS = await initSqlJs({ locateFile: file => `sqljsDist/${file}` }) // Obtain the WASM file. (This is placed here by viteStaticCopy in the Vite config file.)
 				setSQLJS(SQLJS)
 			} catch (error) {
 				setError(error)
