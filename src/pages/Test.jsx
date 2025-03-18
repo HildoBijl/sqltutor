@@ -2,6 +2,10 @@ import { useState, useCallback } from 'react'
 
 import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
 
+// Import of table from materials UI
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material';
+
+
 export function Test() {
 	const initialValue = 'SELECT * FROM users'
 	const [value, setValue] = useState(initialValue)
@@ -26,6 +30,11 @@ function DatabaseResults({ query }) {
 	const [db] = useDatabase(initialData)
 	const { result, error } = useQuery(db, query)
 
+	// verification of the query and its result.
+	console.log('Query:', query);
+	console.log('Result:', result);
+	console.log('Error:', error);
+
 	// Render the query and its result.
 	if (!query)
 		return <p>No query has been provided yet.</p>
@@ -38,7 +47,29 @@ function DatabaseResults({ query }) {
 function QueryResults({ error, result }) {
 	if (error)
 		return <p>There was an error: <em>{error.message}</em>.</p>
-	if (result)
-		return <p>Your query gave data:<br />{JSON.stringify(result[0]?.values) || '[]'}</p>
+	if (result) {
+		return (
+			<TableContainer component={Paper}>
+				<Table>
+					<TableHead>
+						<TableRow>
+							<TableCell>id</TableCell>
+							<TableCell>name</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{result.map((row, index) => (
+							<TableRow key={index}>
+								<TableCell>{row.values.id}</TableCell>
+								<TableCell>{row.values.name}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
+		)
+	}
 	return <p>No data yet...</p>
 }
+
+
