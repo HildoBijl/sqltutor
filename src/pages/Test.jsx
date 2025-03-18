@@ -1,10 +1,7 @@
 import { useState, useCallback } from 'react'
+import { useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material'
 
 import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
-
-// Import of table from materials UI
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material';
-
 
 export function Test() {
 	const initialValue = 'SELECT * FROM users'
@@ -45,31 +42,36 @@ function DatabaseResults({ query }) {
 }
 
 function QueryResults({ error, result }) {
+	const theme = useTheme()
+	console.log(theme)
+
+	// On a faulty query, show an error.
 	if (error)
-		return <p>There was an error: <em>{error.message}</em>.</p>
-	if (result) {
-		return (
-			<TableContainer component={Paper}>
-				<Table>
-					<TableHead>
-						<TableRow>
-							<TableCell>id</TableCell>
-							<TableCell>name</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{result.map((row, index) => (
-							<TableRow key={index}>
-								<TableCell>{row.values.id}</TableCell>
-								<TableCell>{row.values.name}</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
-		)
-	}
-	return <p>No data yet...</p>
+		return <p style={{ color: '#00ff00', fontWeight: 'bold', marginLeft: 2, marginRight: 2 }}>There was an error: <em>{error.message}</em>.</p>
+
+	// On a loading query, show a note.
+	if (!result)
+		return <p>No data yet...</p>
+	window.r = result
+
+	// On an empty result show a note.
+	if (result.length === 0)
+		return <p>Zeros rows returned</p>
+
+	// There is a table. Render it.
+	const table = result[0]
+	return <TableContainer component={Paper}>
+		<Table>
+			<TableHead>
+				<TableRow>
+					{table.columns.map((columnName) => <TableCell key={columnName} sx={{color: theme.palette.primary.main}}>{columnName}</TableCell>)}
+				</TableRow>
+			</TableHead>
+			<TableBody>
+				{table.values.map((row, rowIndex) => <TableRow key={rowIndex}>
+					{row.map((value, colIndex) => <TableCell key={table.columns[colIndex]}>{value}</TableCell>)}
+				</TableRow>)}
+			</TableBody>
+		</Table>
+	</TableContainer>
 }
-
-
