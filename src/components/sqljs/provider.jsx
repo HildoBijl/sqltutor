@@ -11,7 +11,7 @@ export function SQLJSProvider({ children }) {
 	useEffect(() => {
 		const initialize = async () => {
 			try {
-				const SQLJS = await initSqlJs({ locateFile: file => `https://sql.js.org/dist/${file}` }) // ToDo: check if the locatefile can be removed in Node, as promised.
+				const SQLJS = await initSqlJs({ locateFile: file => console.log(file) || `./node_modules/sql.js/dist/${file}` })
 				setSQLJS(SQLJS)
 			} catch (error) {
 				setError(error)

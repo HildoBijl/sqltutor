@@ -24,7 +24,7 @@ export function Header() {
 		<AppBar position="static" enableColorOnDark>
 			<Container>
 				<Toolbar disableGutters={true} sx={{ px: 1 }}>
-					<IconButton edge="start" color="inherit" sx={{ mr: 2 }} onClick={() => navigate('/')}>
+					<IconButton edge="start" color="inherit" sx={{ mr: 2 }} onClick={() => navigate(route.back || '/')}>
 						<ArrowBack />
 					</IconButton>
 					<Typography variant="h6" color="inherit" component="div">

@@ -13,7 +13,7 @@ export const createCustomTheme = () => createTheme({
 			main: '#c81919',
 		},
 		secondary: {
-			main: '#666666',
+			main: '#262626',
 		},
 	},
 })
