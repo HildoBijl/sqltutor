@@ -18,10 +18,25 @@ export function Test() {
 	</Subpage>
 }
 
-const initialData = `CREATE TABLE users (id int, name char);
-INSERT INTO users VALUES (0, 'Polina');
-INSERT INTO users VALUES (1, 'Tushar');
-INSERT INTO users VALUES (2, 'Hildo');`
+const initialData = `CREATE TABLE users (id int, company_name char, country char);
+INSERT INTO users VALUES (1, 'LinkedIn', 'United States');
+INSERT INTO users VALUES (2, 'Meta', 'United States');
+INSERT INTO users VALUES (3, 'ING', 'Netherlands');
+INSERT INTO users VALUES (4, 'KPMG', 'Netherlands');
+INSERT INTO users VALUES (5, 'PwC', 'Netherlands');
+INSERT INTO users VALUES (6, 'Deloitte', 'Netherlands');
+INSERT INTO users VALUES (7, 'EY', 'Netherlands');
+INSERT INTO users VALUES (8, 'TikTok', 'United States');
+INSERT INTO users VALUES (9, 'Twitter', 'United States');
+INSERT INTO users VALUES (10, 'Google', 'United States');
+INSERT INTO users VALUES (11, 'Apple', 'United States');
+INSERT INTO users VALUES (12, 'Microsoft', 'United States');
+INSERT INTO users VALUES (13, 'Rabobank', 'Netherlands');
+INSERT INTO users VALUES (14, 'ASML', 'Netherlands');
+INSERT INTO users VALUES (15, 'Philips', 'Netherlands');
+INSERT INTO users VALUES (16, 'NXP', 'Netherlands');
+INSERT INTO users VALUES (17, 'Unilever', 'United Kingdom');
+INSERT INTO users VALUES (18, 'Shell', 'Netherlands');`
 
 function DatabaseResults({ query }) {
 	const [db] = useDatabase(initialData)
