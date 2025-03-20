@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 
-import { components } from 'edu'
+import { components } from 'content'
 
 // tabs indicates which tabs can be shown and which corresponding Module component should be rendered for it.
 export const tabs = [
