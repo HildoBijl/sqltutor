@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import Box from '@mui/material/Box'
+import { useMediaQuery, Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf } from 'util'
 import { Subpage, Container } from 'components'
@@ -70,11 +68,17 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	const Content = module[currTab.component]
 
 	// Render the contents, with the tabs first and the page after.
+	const tinyScreen = useMediaQuery('(max-width:400px)')
+	const smallScreen = useMediaQuery('(max-width:600px)')
 	return <>
 		<Box sx={{ background: theme.palette.secondary.main }}>
 			<Container>
 				<Tabs value={tabIndex} onChange={updateTab} variant="fullWidth">
-					{shownTabs.map(tab => <Tab key={tab.url} label={tab.title} sx={{ color: theme.palette.secondary.contrastText }} />)}
+					{shownTabs.map(tab => {
+						const showText = tab.title && (!tab.icon || !tinyScreen) // On a tiny screen don't render text (unless it's the only thing we have).
+						const showIcon = tab.icon && (!showText || !smallScreen) // Render an icon when there's no text, or when there's enough space.
+						return <Tab key={tab.url} label={showText && tab.title} icon={showIcon && <tab.icon />} iconPosition="start" sx={{ color: theme.palette.secondary.contrastText, minHeight: '48px', minWidth: '48px' }} />
+					})}
 				</Tabs>
 			</Container>
 		</Box>
