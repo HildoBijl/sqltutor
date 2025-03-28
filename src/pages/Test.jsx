@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
 
 export function Test() {
-	const initialValue = 'SELECT * FROM users'
+	const initialValue = 'SELECT * FROM companies'
 	const [value, setValue] = useState(initialValue)
 	const onChange = useCallback(value => setValue(value), [])
 
@@ -19,25 +19,25 @@ export function Test() {
 	</Subpage>
 }
 
-const initialData = `CREATE TABLE users (id int, company_name char, country char);
-INSERT INTO users VALUES (1, 'LinkedIn', 'United States');
-INSERT INTO users VALUES (2, 'Meta', 'United States');
-INSERT INTO users VALUES (3, 'ING', 'Netherlands');
-INSERT INTO users VALUES (4, 'KPMG', 'Netherlands');
-INSERT INTO users VALUES (5, 'PwC', 'Netherlands');
-INSERT INTO users VALUES (6, 'Deloitte', 'Netherlands');
-INSERT INTO users VALUES (7, 'EY', 'Netherlands');
-INSERT INTO users VALUES (8, 'TikTok', 'United States');
-INSERT INTO users VALUES (9, 'Twitter', 'United States');
-INSERT INTO users VALUES (10, 'Google', 'United States');
-INSERT INTO users VALUES (11, 'Apple', 'United States');
-INSERT INTO users VALUES (12, 'Microsoft', 'United States');
-INSERT INTO users VALUES (13, 'Rabobank', 'Netherlands');
-INSERT INTO users VALUES (14, 'ASML', 'Netherlands');
-INSERT INTO users VALUES (15, 'Philips', 'Netherlands');
-INSERT INTO users VALUES (16, 'NXP', 'Netherlands');
-INSERT INTO users VALUES (17, 'Unilever', 'United Kingdom');
-INSERT INTO users VALUES (18, 'Shell', 'Netherlands');`
+const initialData = `CREATE TABLE companies (id int, company_name char, country char);
+INSERT INTO companies VALUES (1, 'LinkedIn', 'United States');
+INSERT INTO companies VALUES (2, 'Meta', 'United States');
+INSERT INTO companies VALUES (3, 'ING', 'Netherlands');
+INSERT INTO companies VALUES (4, 'KPMG', 'Netherlands');
+INSERT INTO companies VALUES (5, 'PwC', 'Netherlands');
+INSERT INTO companies VALUES (6, 'Deloitte', 'Netherlands');
+INSERT INTO companies VALUES (7, 'EY', 'Netherlands');
+INSERT INTO companies VALUES (8, 'TikTok', 'United States');
+INSERT INTO companies VALUES (9, 'Twitter', 'United States');
+INSERT INTO companies VALUES (10, 'Google', 'United States');
+INSERT INTO companies VALUES (11, 'Apple', 'United States');
+INSERT INTO companies VALUES (12, 'Microsoft', 'United States');
+INSERT INTO companies VALUES (13, 'Rabobank', 'Netherlands');
+INSERT INTO companies VALUES (14, 'ASML', 'Netherlands');
+INSERT INTO companies VALUES (15, 'Philips', 'Netherlands');
+INSERT INTO companies VALUES (16, 'NXP', 'Netherlands');
+INSERT INTO companies VALUES (17, 'Unilever', 'United Kingdom');
+INSERT INTO companies VALUES (18, 'Shell', 'Netherlands');`
 
 const oneDarkTheme = createTheme({
 	palette: {
