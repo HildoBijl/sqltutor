@@ -107,11 +107,11 @@ function QueryResults({ error, result }) {
 	window.r = result
 
 	// On an empty result show a note.
-	if (result.length === 0)
-		return <p>Zeros rows returned</p>
+	const table = result[0]
+	if (!table)
+		return <p>Zeros rows returned.</p>
 
 	// There is a table. Render it.
-	const table = result[0]
 	return (
 		<ThemeProvider theme={oneDarkTheme}>
 		  <TableContainer component={Paper}>

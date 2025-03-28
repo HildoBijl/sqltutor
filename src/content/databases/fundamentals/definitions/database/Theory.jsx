@@ -1,3 +1,8 @@
+import { TheoryWarning } from 'components'
+
 export function Theory() {
-	return <p>Some theory will appear here.</p>
+	return <>
+		<TheoryWarning />
+		<p>A database is basically a collection of tables. A database (officially database management system) also encompasses the tooling around it, to store and extract data.</p>
+	</>
 }
