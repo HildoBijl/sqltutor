@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
 
@@ -38,6 +39,42 @@ INSERT INTO users VALUES (16, 'NXP', 'Netherlands');
 INSERT INTO users VALUES (17, 'Unilever', 'United Kingdom');
 INSERT INTO users VALUES (18, 'Shell', 'Netherlands');`
 
+const oneDarkTheme = createTheme({
+	palette: {
+	  mode: 'dark',
+	  background: {
+		default: '#282C34', 
+		paper: '#21252B',   
+	  },
+	  primary: {
+		main: '#61AFEF', 
+	  },
+	  text: {
+		primary: '#ABB2BF', 
+	  },
+	  divider: '#3E4451',  
+	},
+	components: {
+	  MuiTableCell: {
+		styleOverrides: {
+		  root: {
+			borderColor: '#3E4451', // Border color to match theme
+		  },
+		  // header of the table
+		  head: {
+			backgroundColor: '#282C34', 
+			color: '#c81919',
+			fontWeight: 'bold',
+		  },
+		  // body text in the row #ABB2BF - alternative color
+		  body: {
+			color: '#eaecf1', 
+		  }
+		}
+	  },
+	}
+  });
+  
 function DatabaseResults({ query }) {
 	const [db] = useDatabase(initialData)
 	const { result, error } = useQuery(db, query)
@@ -75,18 +112,25 @@ function QueryResults({ error, result }) {
 
 	// There is a table. Render it.
 	const table = result[0]
-	return <TableContainer component={Paper}>
-		<Table>
-			<TableHead>
+	return (
+		<ThemeProvider theme={oneDarkTheme}>
+		  <TableContainer component={Paper}>
+			<Table>
+			  <TableHead>
 				<TableRow>
-					{table.columns.map((columnName) => <TableCell key={columnName} sx={{color: theme.palette.primary.main}}>{columnName}</TableCell>)}
+				  {table.columns.map((columnName) => <TableCell key={columnName}>{columnName}</TableCell>)}
 				</TableRow>
-			</TableHead>
-			<TableBody>
-				{table.values.map((row, rowIndex) => <TableRow key={rowIndex}>
+			  </TableHead>
+			  <TableBody>
+				{table.values.map((row, rowIndex) => (
+				  <TableRow key={rowIndex}>
 					{row.map((value, colIndex) => <TableCell key={table.columns[colIndex]}>{value}</TableCell>)}
-				</TableRow>)}
-			</TableBody>
-		</Table>
-	</TableContainer>
+				  </TableRow>
+				))}
+			  </TableBody>
+			</Table>
+		  </TableContainer>
+		</ThemeProvider>
+	  );
 }
+
