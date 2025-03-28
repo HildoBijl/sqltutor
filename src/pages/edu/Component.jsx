@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
 import { useMediaQuery, Tabs, Tab, Box } from '@mui/material'
 
-import { firstOf } from 'util'
+import { firstOf, useWindowSize } from 'util'
 import { Subpage, Container } from 'components'
 import * as content from 'content'
 
@@ -68,8 +68,10 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	const Content = module[currTab.component]
 
 	// Render the contents, with the tabs first and the page after.
-	const tinyScreen = useMediaQuery('(max-width:400px)')
-	const smallScreen = useMediaQuery('(max-width:600px)')
+	const windowSize = useWindowSize()
+	const sizePerTab = windowSize.width/shownTabs.length
+	const tinyScreen = sizePerTab < 100
+	const smallScreen = sizePerTab < 150
 	return <>
 		<Box sx={{ background: theme.palette.secondary.main }}>
 			<Container>
