@@ -1,5 +1,6 @@
 
-import { ensureInt, ensureNumber, isNumber, compareNumbers, isNumberArray, isBasicObject } from '../numbers'
+import { ensureInt, ensureNumber, isNumber, compareNumbers, isNumberArray } from '../numbers'
+import { isBasicObject } from '../objects'
 
 export class Vector {
 	/*
