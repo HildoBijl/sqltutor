@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
-import { useMediaQuery, Tabs, Tab, Box } from '@mui/material'
+import { Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf, useWindowSize } from 'util'
 import { Subpage, Container } from 'components'
