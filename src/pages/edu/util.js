@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
+import { AutoStories as Book, Lightbulb, Edit as Pencil, TableChart as Table } from '@mui/icons-material'
 
-import { components } from 'edu'
+import { components } from 'content'
 
 // tabs indicates which tabs can be shown and which corresponding Module component should be rendered for it.
 export const tabs = [
@@ -8,21 +9,25 @@ export const tabs = [
 		url: 'story',
 		component: 'Story',
 		title: 'Story',
+		icon: Book,
 	},
 	{
 		url: 'theory',
 		component: 'Theory',
 		title: 'Theory',
+		icon: Lightbulb,
 	},
 	{
 		url: 'exercises',
 		component: 'Exercises',
 		title: 'Exercises',
+		icon: Pencil,
 	},
 	{
 		url: 'dataExplorer',
 		component: 'DataExplorer',
 		title: 'Data explorer',
+		icon: Table,
 	},
 ]
 
