@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { AutoStories as Book, Lightbulb, Edit as Pencil, TableChart as Table } from '@mui/icons-material'
+import { AutoStories as Book, Lightbulb, Edit as Pencil, TableChart as Table, Bolt } from '@mui/icons-material'
 
 import { components } from 'content'
 
@@ -28,6 +28,12 @@ export const tabs = [
 		component: 'DataExplorer',
 		title: 'Data explorer',
 		icon: Table,
+	},
+	{
+		url: 'reference',
+		component: 'Reference',
+		title: 'SQL Reference',
+		icon: Bolt,
 	},
 ]
 
