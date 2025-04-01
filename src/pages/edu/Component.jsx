@@ -67,7 +67,6 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
 	const tabIndex = shownTabs.indexOf(currTab)
 	const Content = module[currTab.component] || (currTab.url === 'exercises' && ExercisePage)
-	console.log(ExercisePage)
 
 	// Render the contents, with the tabs first and the page after.
 	const windowSize = useWindowSize()
