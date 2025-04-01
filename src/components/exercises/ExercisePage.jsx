@@ -1,15 +1,34 @@
+import { useEffect } from 'react'
+
 import { useLocalStorageState } from 'util'
 import { useComponent } from 'edu'
 import * as content from 'content'
 
+import { selectAndGenerateExercise } from './util'
+import { Exercises } from './Exercises'
+
 export function ExercisePage() {
 	// Extract data needed to render the exercise page.
 	const skill = useComponent()
-	const module = content[skill.id]
+	const skillModule = content[skill.id]
 	const [skillState, setSkillState] = useLocalStorageState(`component-${skill.id}`, {})
 
-	// ToDo: render the component.
-	console.log(module, skillState)
-	return <p>This will be the exercise page for skill {skill.id}. The state is: {JSON.stringify(skillState)}</p>
-}
+	// Whenever there are no exercises, initialize the first exercise.
+	useEffect(() => {
+		if ((skillState.exerciseHistory || []).length !== 0)
+			return
+		setSkillState(skillState => {
+			if ((skillState.exerciseHistory || []).length !== 0)
+				return skillState
+			return { ...skillState, exerciseHistory: [selectAndGenerateExercise(skillModule.exercises, skillState.exercises || [])] }
+		})
+	}, [skillModule, skillState, setSkillState])
 
+	// When no exercises are in the state yet, we are most likely initializing one. For now, show a loading note.
+	const history = skillState.exerciseHistory || []
+	if (history.length === 0)
+		return <p>Generating exercise...</p>
+
+	// Show the exercises that have been done so far.
+	return <Exercises skill={skill} history={history} />
+}

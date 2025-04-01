@@ -5,3 +5,7 @@ export function firstOf(array) {
 export function lastOf(array) {
 	return array[array.length - 1]
 }
+
+export function selectRandomly(array) {
+	return array[Math.floor(Math.random()*array.length)]
+}
