@@ -11,7 +11,6 @@ export function generateExercise(exerciseData) {
 
 // generateExerciseState takes the data of an exercise (whatever is exported from its folder) and sets up a state for this exercise.
 export function generateExerciseState(exerciseData) {
-	console.log(exerciseData)
 	// Check that the exercise is well-defined.
 	if (!exerciseData.generateState)
 		throw new Error(`Missing generateState function: the exercise with id "${exerciseData.id}" does not export a generateState function.`)
@@ -21,7 +20,6 @@ export function generateExerciseState(exerciseData) {
 	if (!exerciseState)
 		throw new Error(`Invalid exercise state: the generateState function for the exercise with id "${exerciseData.id}" was falsy. This is not allowed. Did you forget to export the state from the function? If you do want an empty state, just return an empty object.`)
 
-	console.log(exerciseState)
 	// Return the state.
 	return exerciseState
 }

@@ -3,5 +3,5 @@ export const meta = {
 }
 
 export function generateState() {
-	return { test: Math.round(Math.random() * 20 + 20) }
+	return { number: Math.round(Math.random() * 20 + 20) }
 }

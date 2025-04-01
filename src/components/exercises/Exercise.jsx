@@ -1,11 +1,14 @@
 import * as content from 'content'
 
-export function Exercise({ skill, exercise }) {
-	// Check that the exercise exists and is not outdated.
+export function Exercise(props) {
+	const { exercise, skill } = props
+	// Check that the exercise exists.
 	const skillModule = content[skill.id]
 	const exerciseModule = skillModule.exercises[exercise.id]
 	if (!exerciseModule)
 		throw new Error(`Invalid exercise ID: tried to render an exercise for skill "${skill.id}" and exercise "${exercise.id}" but this exercise could not be found at the given skill.`)
+
+	// Check that the exercise is not outdated: it has a version number, and it's the same as what the generated exercise was based on.
 	if (!exerciseModule.meta?.version)
 		throw new Error(`Invalid exercise definition: no version number has been provided. Every exercise should export a "meta" object with information about the exercise, including a version number.`)
 	if (exerciseModule.meta.version !== exercise.version)
@@ -17,5 +20,5 @@ export function Exercise({ skill, exercise }) {
 		throw new Error(`Invalid exercise definition: the exercise at skill "${skill.id}" and exercise "${exercise.id}" does not seem to export an Exercise component. Check the exercise definition to make sure an Exercise component is exported properly.`)
 
 	// Render the component of the exercise.
-	return <ExerciseComponent state={exercise.state} />
+	return <ExerciseComponent state={exercise.state} {...props} />
 }

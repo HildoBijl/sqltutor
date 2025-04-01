@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useLocalStorageState } from 'util'
 import { useComponent } from 'edu'
 import * as content from 'content'
 
-import { selectAndGenerateExercise } from './util'
+import { selectAndGenerateExercise, useSkillStateHandlers } from './util'
 import { Exercises } from './Exercises'
 
 export function ExercisePage() {
@@ -12,6 +12,8 @@ export function ExercisePage() {
 	const skill = useComponent()
 	const skillModule = content[skill.id]
 	const [skillState, setSkillState] = useLocalStorageState(`component-${skill.id}`, {})
+
+	// ToDo: filter exercises based on whether they exist and have a valid version.
 
 	// Whenever there are no exercises, initialize the first exercise.
 	useEffect(() => {
@@ -24,11 +26,14 @@ export function ExercisePage() {
 		})
 	}, [skillModule, skillState, setSkillState])
 
+	// Set up handlers for manipulating the skillState.
+	const handlers = useSkillStateHandlers(skillState, setSkillState)
+
 	// When no exercises are in the state yet, we are most likely initializing one. For now, show a loading note.
-	const history = skillState.exerciseHistory || []
+	const history = useMemo(() => skillState.exerciseHistory || [], [skillState])
 	if (history.length === 0)
 		return <p>Generating exercise...</p>
 
 	// Show the exercises that have been done so far.
-	return <Exercises skill={skill} history={history} />
+	return <Exercises {...{ skill, history, ...handlers }} />
 }
