@@ -1,6 +1,7 @@
-import { Box, Button } from '@mui/material'
+import { Button } from '@mui/material'
 import { Close as Cross, Check, ArrowForward } from '@mui/icons-material'
 
+import { ButtonContainer } from 'components'
 import * as content from 'content'
 
 export function Exercise(props) {
@@ -42,8 +43,4 @@ export function Exercise(props) {
 			</ButtonContainer>
 		</>}
 	</>
-}
-
-function ButtonContainer({ children }) {
-	return <Box sx={{ display: 'flex', flexFlow: 'row', justifyContent: 'flex-end', gap: 2, my: 2 }}>{children}</Box>
 }
