@@ -16,6 +16,11 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 		return extractSkillId(skillStateRef.current)
 	}, [skillStateRef])
 
+	// additionalDataRef is a reference object that will be passed to functions like generateState and checkInput.
+	const [smallDatabase, resetSmallDatabase] = useSkillDatabase(getSkillId(), true, false)
+	const [largeDatabase, resetLargeDatabase] = useSkillDatabase(getSkillId(), true, true)
+	const additionalDataRef = useLatest({ smallDatabase, resetSmallDatabase, largeDatabase, resetLargeDatabase, database: smallDatabase, resetDatabase: resetSmallDatabase })
+
 	// getExerciseHistory gives the full exercise history of the skill.
 	const getExerciseHistory = useCallback(() => {
 		return extractExerciseHistory(skillStateRef.current)
@@ -97,8 +102,6 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 	}, [setInput])
 
 	// submitInput will take the current input and grade it. Based on the outcome, it will then end the exercise (when done correctly) or add a new input entry for another try.
-	const [database, resetDatabase] = useSkillDatabase(getSkillId(), true, true)
-	const databaseRef = useLatest(database)
 	const submitInput = useCallback(() => {
 		// Get the current state and input.
 		const state = getState()
@@ -113,7 +116,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 		const { checkInput } = exerciseModule
 		if (!checkInput)
 			throw new Error(`Invalid checkInput function: for the skill "${getSkillId()}" the exercise "${getExercise().id}" has no proper checkInput function. The input cannot be checked.`)
-		const correct = checkInput(state, input, { database: databaseRef.current, resetDatabase })
+		const correct = checkInput(state, input, additionalDataRef.current)
 
 		// On an incorrect input, add a new input to the input list to start editing that.
 		if (!correct)
@@ -121,7 +124,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 
 		// On a correct input, note that the exercise is done.
 		return setExercise(exercise => ({ ...exercise, done: true, solved: true }))
-	}, [getState, getInput, getSkillId, getExercise, setInputs, setExercise, databaseRef, resetDatabase])
+	}, [getState, getInput, getSkillId, getExercise, setInputs, setExercise, additionalDataRef])
 
 	// giveUp will take the current exercise and end it, with a note that the user gave up.
 	const giveUp = useCallback(() => {
@@ -143,8 +146,8 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 
 		// Add a new exercise.
 		const skillModule = content[getSkillId()]
-		setExerciseHistory(exerciseHistory => [...exerciseHistory, selectAndGenerateExercise(skillModule.exercises, exerciseHistory)])
-	}, [getExercise, getSkillId, setExerciseHistory])
+		setExerciseHistory(exerciseHistory => [...exerciseHistory, selectAndGenerateExercise(skillModule.exercises, exerciseHistory, additionalDataRef.current)])
+	}, [getExercise, getSkillId, setExerciseHistory, additionalDataRef])
 
 	// Return an object with all the defined handlers.
 	return { getSkillId, getExerciseHistory, setExerciseHistory, getExercise, setExercise, getState, getInputs, setInputs, getInput, setInput, getInputParameter, setInputParameter, submitInput, giveUp, startNewExercise }
