@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 
+import { useLatest } from 'util'
+
 import { useSQLJSContext } from './context'
 
 // useSQLJS returns the SQLJS object if it's been loaded and otherwise gives undefined.
@@ -7,9 +9,25 @@ export function useSQLJS() {
 	return useSQLJSContext().SQLJS
 }
 
+// useSQLJSRef returns a ref object with SQLJS in it.
+export function useSQLJSRef() {
+	const SQLJS = useSQLJS
+	return useLatest(SQLJS)
+}
+
 // useSQLJSError returns the error that occurred on loading SQL.JS and otherwise (on no error) returns undefined.
 export function useSQLJSError() {
 	return useSQLJSContext().error
+}
+
+// getDatabase takes the SQLJS object and a database setup query and returns a database object with the given setup.
+export function getDatabase(SQLJS, setup) {
+	if (!SQLJS)
+		throw new Error(`Invalid getDatabase call: tried to get a database for a given set-up query, but SQLJS was either not provided or not ready yet. Check whether SQLJS is ready before calling getDatabase.`)
+	const database = new SQLJS.Database()
+	if (setup)
+		database.run(setup)
+	return database
 }
 
 // useDatabase gives [database, resetDatabase] where database is an SQL.JS database object. It initializes it with the given set-up query. It also provides a reset function, which (when called) will throw out the database and generate a new one.
@@ -19,12 +37,8 @@ export function useDatabase(setup) {
 
 	// Set up a handler that sets up and stores a new database (possibly overwriting an existing one).
 	const resetDatabase = useCallback(() => {
-		if (SQLJS) {
-			const database = new SQLJS.Database()
-			if (setup)
-				database.run(setup)
-			setDatabase(database)
-		}
+		if (SQLJS)
+			setDatabase(getDatabase(SQLJS, setup))
 	}, [SQLJS, setup])
 
 	// When the SQLJS object first loads, set up the database.

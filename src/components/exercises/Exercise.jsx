@@ -6,6 +6,7 @@ import * as content from 'content'
 
 export function Exercise(props) {
 	const { exercise, skill } = props
+
 	// Check that the exercise exists.
 	const skillModule = content[skill.id]
 	const exerciseModule = skillModule.exercises[exercise.id]

@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 
 import { lastOf, useLatest } from 'util'
+import { useSkillDatabase } from 'components'
 import * as content from 'content'
 
 import { selectAndGenerateExercise } from './generation'
@@ -95,6 +96,8 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 	}, [setInput])
 
 	// submitInput will take the current input and grade it. Based on the outcome, it will then end the exercise (when done correctly) or add a new input entry for another try.
+	const [database, resetDatabase] = useSkillDatabase(getSkillId(), true, true)
+	const databaseRef = useLatest(database)
 	const submitInput = useCallback(() => {
 		// Get the current state and input.
 		const state = getState()
@@ -109,7 +112,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 		const { checkInput } = exerciseModule
 		if (!checkInput)
 			throw new Error(`Invalid checkInput function: for the skill "${getSkillId()}" the exercise "${getExercise().id}" has no proper checkInput function. The input cannot be checked.`)
-		const correct = checkInput(state, input)
+		const correct = checkInput(state, input, { database: databaseRef.current, resetDatabase })
 
 		// On an incorrect input, add a new input to the input list to start editing that.
 		if (!correct)
@@ -117,7 +120,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 
 		// On a correct input, note that the exercise is done.
 		return setExercise(exercise => ({ ...exercise, done: true, solved: true }))
-	}, [getState, getInput, getSkillId, getExercise, setInputs, setExercise])
+	}, [getState, getInput, getSkillId, getExercise, setInputs, setExercise, databaseRef, resetDatabase])
 
 	// giveUp will take the current exercise and end it, with a note that the user gave up.
 	const giveUp = useCallback(() => {

@@ -1,4 +1,5 @@
 export * from './sqljs'
+export * from './skillDatabase'
 export * from './styling'
 export * from './layout'
 export * from './input'
