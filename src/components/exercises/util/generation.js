@@ -25,6 +25,6 @@ export function generateExerciseState(exerciseData) {
 }
 
 // selectAndGenerateExercise combines the selectExercise and the generateExercise functions: it selects an exercise based on a list of exercises and a history object. It then sets up a state for this exercise.
-export function selectAndGenerateExercise(exercises, history) {
-	return generateExercise(selectExercise(exercises, history))
+export function selectAndGenerateExercise(exercises, exerciseHistory) {
+	return generateExercise(selectExercise(exercises, exerciseHistory))
 }

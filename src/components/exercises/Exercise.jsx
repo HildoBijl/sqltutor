@@ -1,3 +1,6 @@
+import { Box, Button } from '@mui/material'
+import { Close as Cross, Check, ArrowForward } from '@mui/icons-material'
+
 import * as content from 'content'
 
 export function Exercise(props) {
@@ -18,7 +21,29 @@ export function Exercise(props) {
 	const ExerciseComponent = exerciseModule.Exercise
 	if (!ExerciseComponent)
 		throw new Error(`Invalid exercise definition: the exercise at skill "${skill.id}" and exercise "${exercise.id}" does not seem to export an Exercise component. Check the exercise definition to make sure an Exercise component is exported properly.`)
+	const SolutionComponent = exerciseModule.Solution
+	if (!SolutionComponent)
+		throw new Error(`Invalid exercise definition: the exercise at skill "${skill.id}" and exercise "${exercise.id}" does not seem to export a Solution component. Check the exercise definition to make sure a Solution component is exported properly.`)
 
 	// Render the component of the exercise.
-	return <ExerciseComponent state={exercise.state} {...props} />
+	const { getState, submitInput, giveUp, startNewExercise } = props
+	const state = getState()
+	return <>
+		<ExerciseComponent state={state} {...props} />
+		{!exercise.done ? <>
+			<ButtonContainer>
+				<Button variant="contained" onClick={submitInput} startIcon={<Check />}>Check input</Button>
+				<Button variant="contained" onClick={giveUp} color="secondary" startIcon={<Cross />}>Give up</Button>
+			</ButtonContainer>
+		</> : <>
+			<SolutionComponent state={state} {...props} />
+			<ButtonContainer>
+				<Button variant="contained" onClick={startNewExercise} endIcon={<ArrowForward />}>Start new exercise</Button>
+			</ButtonContainer>
+		</>}
+	</>
+}
+
+function ButtonContainer({ children }) {
+	return <Box sx={{ display: 'flex', flexFlow: 'row', justifyContent: 'flex-end', gap: 2, my: 2 }}>{children}</Box>
 }
