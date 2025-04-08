@@ -4,9 +4,10 @@ import { useTheme } from '@mui/material/styles'
 import { Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf, useWindowSize } from 'util'
-import { Subpage, Container, ExercisePage } from 'components'
-import * as content from 'content'
+import { Subpage, Container } from 'components'
 import { useComponent } from 'edu'
+import * as content from 'content'
+import { ExercisePage } from 'eduComponents'
 
 import { tabs, useUrlTab } from './util'
 
@@ -70,7 +71,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// Render the contents, with the tabs first and the page after.
 	const windowSize = useWindowSize()
-	const sizePerTab = windowSize.width/shownTabs.length
+	const sizePerTab = windowSize.width / shownTabs.length
 	const tinyScreen = sizePerTab < 100
 	const smallScreen = sizePerTab < 150
 	return <>

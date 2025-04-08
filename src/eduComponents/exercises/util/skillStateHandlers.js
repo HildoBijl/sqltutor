@@ -1,8 +1,9 @@
 import { useCallback } from 'react'
 
 import { lastOf, useLatest } from 'util'
-import { useSkillDatabase } from 'components'
 import * as content from 'content'
+
+import { useSkillDatabase } from '../../skillDatabase'
 
 import { selectAndGenerateExercise } from './generation'
 

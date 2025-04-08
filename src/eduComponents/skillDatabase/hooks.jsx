@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react'
 import { useLatest } from 'util'
 import * as content from 'content'
 
-import { useSQLJS, getDatabase } from '../sqljs'
+import { useSQLJS, getDatabase } from '../../components/sqljs'
 
 import { useSkillDatabaseContext } from './context'
 
