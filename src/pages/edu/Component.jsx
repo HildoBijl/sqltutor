@@ -9,7 +9,7 @@ import { useComponent } from 'edu'
 import * as content from 'content'
 import { ExercisePage } from 'eduComponents'
 
-import { tabs, useUrlTab } from './util'
+import { tabs, useUrlTab } from './tabs'
 
 // Component shows an educational component like a concept or a skill. This includes the tabs for "Theory", "Exercise" etcetera. It loads the contents dynamically.
 export function Component() {
