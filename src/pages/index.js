@@ -1,4 +1,5 @@
 export * from './ErrorPage'
 export * from './Home'
 export * from './Test'
+export * from './Test2'
 export * from './edu'
