@@ -15,14 +15,14 @@ export function ExercisePage() {
 
 	// Set up handlers for manipulating the skillState.
 	const handlers = useSkillStateHandlers(skillState, setSkillState)
-	const { getExercise, startNewExercise } = handlers
+	const { databaseReady, getExercise, startNewExercise } = handlers
 
-	// Whenever there are no exercises, initialize the first exercise. (When there is an exercise, display its solution still.)
+	// Whenever there are no exercises, and SQLJS is ready, initialize the first exercise. (When there is an exercise, display its solution still.)
 	useEffect(() => {
 		const exercise = getExercise()
-		if (!exercise)
+		if (!exercise && databaseReady)
 			startNewExercise()
-	}, [getExercise, startNewExercise])
+	}, [getExercise, startNewExercise, databaseReady])
 
 	// When no exercises are in the state yet, we are most likely initializing one. For now, show a loading note.
 	const history = useMemo(() => skillState.exerciseHistory || [], [skillState])

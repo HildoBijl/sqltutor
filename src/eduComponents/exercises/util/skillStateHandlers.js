@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { lastOf, useLatest } from 'util'
 import * as content from 'content'
@@ -20,6 +20,12 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 	const [smallDatabase, resetSmallDatabase] = useSkillDatabase(getSkillId(), true, false)
 	const [largeDatabase, resetLargeDatabase] = useSkillDatabase(getSkillId(), true, true)
 	const additionalDataRef = useLatest({ smallDatabase, resetSmallDatabase, largeDatabase, resetLargeDatabase, database: smallDatabase, resetDatabase: resetSmallDatabase })
+
+	// isDatabaseReady is a support function that indicates whether or not a database has properly loaded.
+	const databaseReady = useMemo(() => {
+		const databaseSetup = content[getSkillId()]?.database
+		return !databaseSetup || !!(smallDatabase && largeDatabase)
+	}, [getSkillId, smallDatabase, largeDatabase])
 
 	// getExerciseHistory gives the full exercise history of the skill.
 	const getExerciseHistory = useCallback(() => {
@@ -150,7 +156,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 	}, [getExercise, getSkillId, setExerciseHistory, additionalDataRef])
 
 	// Return an object with all the defined handlers.
-	return { getSkillId, getExerciseHistory, setExerciseHistory, getExercise, setExercise, getState, getInputs, setInputs, getInput, setInput, getInputParameter, setInputParameter, submitInput, giveUp, startNewExercise }
+	return { getSkillId, databaseReady, getExerciseHistory, setExerciseHistory, getExercise, setExercise, getState, getInputs, setInputs, getInput, setInput, getInputParameter, setInputParameter, submitInput, giveUp, startNewExercise }
 }
 
 export function extractSkillId(skillState) {
