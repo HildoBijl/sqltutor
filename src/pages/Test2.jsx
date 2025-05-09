@@ -1,22 +1,32 @@
-import { useState, useCallback } from 'react'
-import { useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material'
+import { useState } from 'react';
+import { Button, ButtonGroup, Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { SQLInput, Subpage, useDatabase, useQuery } from 'components'
-
 export function Test2() {
-	const initialValue = 'SELECT * FROM companies'
-	const [value, setValue] = useState(initialValue)
-	const onChange = useCallback(value => setValue(value), [])
+    const [selectedTable, setSelectedTable] = useState('companies'); // State to track selected table
 
-	return <Subpage>
-		<p>This is the test page. Enter a query in the input field below and watch it being run on a real database.</p>
+    // Function to handle table selection
+    const handleTableSelect = (tableName) => {
+        setSelectedTable(tableName);
+    };
 
-		<SQLInput value={value} onChange={onChange} height="200px" />
+    return (
+        <ThemeProvider theme={oneDarkTheme}>
+            <div style={{ padding: '16px', maxWidth: '1200px', margin: '0 auto' }}>
+                <h2>Database Explorer</h2>
 
-		<h4>Results</h4>
-		<DatabaseResults query={value} />
-	</Subpage>
+                {/* Buttons to select the table */}
+                <ButtonGroup variant="contained" color="primary" style={{ marginBottom: '16px' }}>
+                    <Button onClick={() => handleTableSelect('companies')}>Companies</Button>
+                    <Button onClick={() => handleTableSelect('positions')}>Positions</Button>
+                </ButtonGroup>
+
+                {/* Data Table */}
+                <DataTable selectedTable={selectedTable} />
+            </div>
+        </ThemeProvider>
+    );
 }
 
 const initialData = `CREATE TABLE companies (id int, company_name char, country char);
@@ -39,6 +49,48 @@ INSERT INTO companies VALUES (16, 'NXP', 'Netherlands');
 INSERT INTO companies VALUES (17, 'Unilever', 'United Kingdom');
 INSERT INTO companies VALUES (18, 'Shell', 'Netherlands');`
 
+
+const initialData2 = `CREATE TABLE positions (id int, company_name char, country char, cite char, position char, salary int);
+INSERT INTO positions VALUES (1, 'LinkedIn', 'United States', 'San Francisco', 'ML Engineer', 140000);
+INSERT INTO positions VALUES (1, 'LinkedIn', 'United States', 'New York' ,'ML Engineer', 100000);
+INSERT INTO positions VALUES (1, 'LinkedIn', 'United States', 'Sunnyvale' ,'Data Engineer', 110000);
+INSERT INTO positions VALUES (2, 'Meta', 'United States', 'New York' , 'Data Analyst', 130000);
+INSERT INTO positions VALUES (2, 'Meta', 'United States', 'San Francisco' ,'Data Engineer', 130000);
+INSERT INTO positions VALUES (2, 'Meta', 'United Kingdom', 'London' ,'Data Engineer', 130000);
+INSERT INTO positions VALUES (3, 'ING', 'Netherlands', 'Amsterdam' ,'Data Engineer', 80000);
+INSERT INTO positions VALUES (3, 'ING', 'Netherlands', 'Amsterdam' ,'Data Analyst', 80000);
+INSERT INTO positions VALUES (3, 'ING', 'Netherlands', 'Amsterdam' ,'Data Scientist', 82000);
+INSERT INTO positions VALUES (4, 'KPMG', 'Netherlands', 'Amsterdam' ,'Data Engineer', 87000);
+INSERT INTO positions VALUES (4, 'KPMG', 'Netherlands', 'Rotterdam' ,'Data Analyst', 80000);
+INSERT INTO positions VALUES (4, 'KPMG', 'Netherlands', 'Amsterdam' ,'Data Scientist', 80000);
+INSERT INTO positions VALUES (5, 'PwC', 'Netherlands', 'Amsterdam' ,'Data Engineer', 83000);
+INSERT INTO positions VALUES (5, 'PwC', 'Netherlands', 'Amsterdam' ,'Data Analyst', 80000);
+INSERT INTO positions VALUES (6, 'Deloitte', 'Netherlands', 'Amsterdam' ,'Data Engineer', 95000);
+INSERT INTO positions VALUES (6, 'Deloitte', 'Netherlands', 'Amsterdam' ,'AI Consultant', 90000);
+INSERT INTO positions VALUES (6, 'Deloitte', 'Netherlands', 'Amsterdam' ,'Data Scientist', 95000);
+INSERT INTO positions VALUES (7, 'EY', 'Netherlands', 'Amsterdam' ,'Data Engineer', 85000);
+INSERT INTO positions VALUES (7, 'EY', 'Netherlands', 'Rotterdam' ,'Data Scientist', 84000);
+INSERT INTO positions VALUES (8, 'TikTok', 'United States', 'Los Angeles' ,'Data Engineer', 125000);
+INSERT INTO positions VALUES (8, 'TikTok', 'United States', 'New York' ,'ML Engineer', 120000);
+INSERT INTO positions VALUES (8, 'TikTok', 'United States', 'Los Angeles' ,'Data Scientist', 122000);
+INSERT INTO positions VALUES (9, 'Twitter', 'United States', 'San Francisco' ,'Data Engineer', 130000);
+INSERT INTO positions VALUES (9, 'Twitter', 'United States', 'New York' ,'Data Analyst', 120000);
+INSERT INTO positions VALUES (9, 'Twitter', 'United States', 'San Francisco' ,'Data Scientist', 125000);
+INSERT INTO positions VALUES (10, 'Google', 'United States', 'Mountain View' ,'Data Engineer', 140000);
+INSERT INTO positions VALUES (10, 'Google', 'United States', 'New York' ,'Data Analyst', 130000);
+INSERT INTO positions VALUES (10, 'Google', 'United States', 'Mountain View' ,'Data Scientist', 135000);
+INSERT INTO positions VALUES (11, 'Apple', 'United States', 'Cupertino' ,'Data Engineer', 145000);
+INSERT INTO positions VALUES (11, 'Apple', 'United States', 'New York' ,'Data Analyst', 135000);
+INSERT INTO positions VALUES (11, 'Apple', 'United States', 'Cupertino' ,'Data Scientist', 140000);
+INSERT INTO positions VALUES (12, 'Microsoft', 'United States', 'Redmond' ,'Data Engineer', 150000);
+INSERT INTO positions VALUES (12, 'Microsoft', 'United States', 'New York' ,'Data Analyst', 140000);
+INSERT INTO positions VALUES (12, 'Microsoft', 'United States', 'Redmond' ,'Data Scientist', 145000);
+INSERT INTO positions VALUES (13, 'Rabobank', 'Netherlands', 'Utrecht' ,'Data Engineer', 80000);
+INSERT INTO positions VALUES (13, 'Rabobank', 'Netherlands', 'Amsterdam' ,'Data Analyst', 80000);`
+
+
+
+// Create a custom theme for the table to match the One Dark Pro theme.
 const oneDarkTheme = createTheme({
 	palette: {
 	  mode: 'dark',
@@ -47,7 +99,7 @@ const oneDarkTheme = createTheme({
 		paper: '#21252B',   
 	  },
 	  primary: {
-		main: '#61AFEF', 
+		main: '#c81919', 
 	  },
 	  text: {
 		primary: '#ABB2BF', 
@@ -74,63 +126,59 @@ const oneDarkTheme = createTheme({
 	  },
 	}
   });
+
+  function parseSQLData(sqlData) {
+    const lines = sqlData.split('\n').map(line => line.trim()).filter(line => line);
+    const createTableLine = lines.find(line => line.startsWith('CREATE TABLE'));
+    const insertLines = lines.filter(line => line.startsWith('INSERT INTO'));
+
+    // Extract column definitions
+    const columnDefinitions = createTableLine
+        .match(/\(([^)]+)\)/)[1]
+        .split(',')
+        .map(col => col.trim().split(' ')[0]);
+
+    const columns = columnDefinitions.map(col => ({
+        field: col,
+        headerName: col.charAt(0).toUpperCase() + col.slice(1),
+        flex: 1,
+    }));
+
+    // Extract rows
+    const rows = insertLines.map((line, index) => {
+        const values = line.match(/\(([^)]+)\)/)[1].split(',').map(val => val.trim().replace(/'/g, ''));
+        const row = {};
+        columnDefinitions.forEach((col, i) => {
+            row[col] = values[i];
+        });
+        row.id = index + 1; // Add unique ID for DataGrid
+        return row;
+    });
+
+    return { columns, rows };
+}
   
-function DatabaseResults({ query }) {
-	const [db] = useDatabase(initialData)
-	const { result, error } = useQuery(db, query)
+function DataTable({ selectedTable }) {
+    // Parse the SQL data
+    const tableData = {
+        companies: parseSQLData(initialData),
+        positions: parseSQLData(initialData2),
+    };
 
-	// verification of the query and its result.
-	console.log('Query:', query);
-	console.log('Result:', result);
-	console.log('Error:', error);
+    // Get the data for the selected table
+    const { columns, rows } = tableData[selectedTable];
 
-	// Render the query and its result.
-	if (!query)
-		return <p>No query has been provided yet.</p>
-	return <>
-		<p>Your query is: <em>{query}</em></p>
-		<QueryResults {...{ error, result }} />
-	</>
+    return (
+        <Paper style={{ height: 600, width: '100%', padding: '16px', boxSizing: 'border-box' }}>
+            <DataGrid
+                rows={rows}
+                columns={columns}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10, 20]}
+                checkboxSelection
+                disableSelectionOnClick
+                sortingOrder={['asc', 'desc']}
+            />
+        </Paper>
+    );
 }
-
-function QueryResults({ error, result }) {
-	const theme = useTheme()
-	console.log(theme)
-
-	// On a faulty query, show an error.
-	if (error)
-		return <p style={{ color: '#00ff00', fontWeight: 'bold', marginLeft: 2, marginRight: 2 }}>There was an error: <em>{error.message}</em>.</p>
-
-	// On a loading query, show a note.
-	if (!result)
-		return <p>No data yet...</p>
-	window.r = result
-
-	// On an empty result show a note.
-	const table = result[0]
-	if (!table)
-		return <p>Zeros rows returned.</p>
-
-	// There is a table. Render it.
-	return (
-		<ThemeProvider theme={oneDarkTheme}>
-		  <TableContainer component={Paper}>
-			<Table>
-			  <TableHead>
-				<TableRow>
-				  {table.columns.map((columnName) => <TableCell key={columnName}>{columnName}</TableCell>)}
-				</TableRow>
-			  </TableHead>
-			  <TableBody>
-				{table.values.map((row, rowIndex) => (
-				  <TableRow key={rowIndex}>
-					{row.map((value, colIndex) => <TableCell key={table.columns[colIndex]}>{value}</TableCell>)}
-				  </TableRow>
-				))}
-			  </TableBody>
-			</Table>
-		  </TableContainer>
-		</ThemeProvider>
-	  );
-}
-
