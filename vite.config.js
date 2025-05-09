@@ -10,7 +10,7 @@ export default defineConfig({
       targets: [
         {
           src: './node_modules/sql.js/dist/sql-wasm.wasm',
-          dest: 'sqljsDist'
+          dest: 'sqljs'
         }
       ]
     })
@@ -22,6 +22,7 @@ export default defineConfig({
       components: '/src/components',
       content: '/src/content',
       edu: '/src/edu',
+      eduComponents: '/src/eduComponents',
       pages: '/src/pages',
       routing: '/src/routing',
       settings: '/src/settings',

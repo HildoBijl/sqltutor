@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import Box from '@mui/material/Box'
+import { Tabs, Tab, Box } from '@mui/material'
 
-import { firstOf } from 'util'
+import { firstOf, useWindowSize } from 'util'
 import { Subpage, Container } from 'components'
+import { useComponent } from 'edu'
 import * as content from 'content'
+import { ExercisePage } from 'eduComponents'
 
-import { tabs, useComponent, useUrlTab } from './util'
+import { tabs, useUrlTab } from './tabs'
 
 // Component shows an educational component like a concept or a skill. This includes the tabs for "Theory", "Exercise" etcetera. It loads the contents dynamically.
 export function Component() {
@@ -26,8 +26,8 @@ export function Component() {
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
 export function ComponentFromModule({ component, module }) {
-	// Filter the tabs contained in this module.
-	const shownTabs = tabs.filter(tab => module[tab.component])
+	// Filter the tabs contained in this module. Deal with the exercises separately.
+	const shownTabs = tabs.filter(tab => module[tab.component] || (tab.url === 'exercises' && module.exercises))
 
 	// When the module is empty, show a note.
 	if (shownTabs.length === 0)
@@ -67,14 +67,22 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	// Determine info about what needs to be shown.
 	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
 	const tabIndex = shownTabs.indexOf(currTab)
-	const Content = module[currTab.component]
+	const Content = module[currTab.component] || (currTab.url === 'exercises' && ExercisePage)
 
 	// Render the contents, with the tabs first and the page after.
+	const windowSize = useWindowSize()
+	const sizePerTab = windowSize.width / shownTabs.length
+	const tinyScreen = sizePerTab < 100
+	const smallScreen = sizePerTab < 150
 	return <>
 		<Box sx={{ background: theme.palette.secondary.main }}>
 			<Container>
 				<Tabs value={tabIndex} onChange={updateTab} variant="fullWidth">
-					{shownTabs.map(tab => <Tab key={tab.url} label={tab.title} sx={{ color: theme.palette.secondary.contrastText }} />)}
+					{shownTabs.map(tab => {
+						const showText = tab.title && (!tab.icon || !tinyScreen) // On a tiny screen don't render text (unless it's the only thing we have).
+						const showIcon = tab.icon && (!showText || !smallScreen) // Render an icon when there's no text, or when there's enough space.
+						return <Tab key={tab.url} label={showText && tab.title} icon={showIcon && <tab.icon />} iconPosition="start" sx={{ color: theme.palette.secondary.contrastText, minHeight: '48px', minWidth: '48px' }} />
+					})}
 				</Tabs>
 			</Container>
 		</Box>

@@ -9,6 +9,7 @@ import './main.css'
 
 export const createCustomTheme = () => createTheme({
 	palette: {
+		mode: 'dark',
 		primary: {
 			main: '#c81919',
 		},
