@@ -167,6 +167,7 @@ function DataTable({ selectedTable }) {
 
     // Get the data for the selected table
     const { columns, rows } = tableData[selectedTable];
+    console.log(columns, rows)
 
     return (
         <Paper style={{ height: 600, width: '100%', padding: '16px', boxSizing: 'border-box' }}>

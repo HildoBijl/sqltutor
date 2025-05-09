@@ -1,4 +1,5 @@
+export { database } from '../../projection/chooseColumns'
 export * from './Theory'
 export * from './Story'
-export { database } from '../../projection/chooseColumns'
+export { DataExplorer } from 'eduComponents'
 export * as exercises from './exercises'

@@ -79,3 +79,11 @@ export function useQuery(database, query) {
 	const loading = !result && !error
 	return { result, error, loading, update }
 }
+
+// useTableNames is a hook that takes a database and returns the names of all the tables in that database. Upon loading it still returns an empty list.
+export function useTableNames(database) {
+	const result = useQuery(database, 'SELECT tbl_name FROM sqlite_master WHERE type="table"')
+	if (!result.result)
+		return []
+	return result.result[0].values.map(x => x[0])
+}

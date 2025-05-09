@@ -16,5 +16,32 @@ export const createCustomTheme = () => createTheme({
 		secondary: {
 			main: '#262626',
 		},
+		background: {
+			default: '#282C34',
+			paper: '#21252B',
+		},
+		text: {
+			primary: '#ABB2BF',
+		},
+		divider: '#3E4451',
+	},
+	components: {
+		MuiTableCell: {
+			styleOverrides: {
+				root: {
+					borderColor: '#3E4451', // Border color to match theme
+				},
+				// header of the table
+				head: {
+					backgroundColor: '#282C34',
+					color: '#c81919',
+					fontWeight: 'bold',
+				},
+				// body text in the row #ABB2BF - alternative color
+				body: {
+					color: '#eaecf1',
+				}
+			}
+		},
 	},
 })
