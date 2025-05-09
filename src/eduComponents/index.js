@@ -1,3 +1,3 @@
 export * from './skillDatabase'
 export * from './exercises'
-export * from './dataExplorer'
+export * from './DataExplorer'

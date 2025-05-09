@@ -7,6 +7,7 @@ import { useQuery, useTableNames } from 'components'
 import { useComponent } from 'edu'
 import { useSkillDatabase } from 'eduComponents'
 
+// DataExplorer takes the skill that is given in the URL, gets its database and shows an explorer tool for it.
 export function DataExplorer() {
 	// Load the skillId and the corresponding database.
 	const skillId = useComponent()?.id
