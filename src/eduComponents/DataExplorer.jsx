@@ -21,15 +21,16 @@ export function DataExplorer() {
 
 // DataExplorerWithDatabase renders the data explorer for the given database.
 function DataExplorerWithDatabase({ database }) {
+	// Set up a state for the table to show, using defaults when not defined yet.
 	const [table, setTable] = useState()
 	const tableNames = useTableNames(database)
 	const tableToShow = table || firstOf(tableNames)
-	return (
-		<>
-			{tableNames.length >= 2 ? <TableTabs {...{ table: tableToShow, setTable, database }} /> : null}
-			{tableToShow ? <DataTable key={tableToShow} database={database} table={tableToShow} /> : null}
-		</>
-	)
+
+	// Show the explorer, with buttons (if needed) and a table to show (if known).
+	return <>
+		{tableNames.length >= 2 ? <TableTabs {...{ table: tableToShow, setTable, database }} /> : null}
+		{tableToShow ? <DataTable key={tableToShow} database={database} table={tableToShow} /> : <p>Loading table list...</p>}
+	</>
 }
 
 // TableTabs shows the buttons for all the possible tables in the database.
@@ -44,7 +45,7 @@ function TableTabs({ table, setTable, database }) {
 function DataTable({ database, table }) {
 	const result = useQuery(database, `SELECT * FROM ${table}`)
 	if (!result.result)
-		return <p>Loading table...</p>
+		return <p>Loading {table} table...</p>
 	return <DataTableWithData data={result.result[0]} />
 }
 
