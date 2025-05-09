@@ -50,7 +50,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// Check the URL and set up the active tab based on it. (The URL of the tab is used as indicator.)
 	const urlTab = useUrlTab()
-	const [tab, setTab] = useState(shownTabs.find(tab => tab.url === urlTab)?.url || firstOf(shownTabs).url)
+	const [tab, setTab] = useState(shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url)
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL changes, update the tab accordingly.
