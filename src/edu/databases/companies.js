@@ -1,4 +1,4 @@
-export const database = `
+export const companies = `
 CREATE TABLE companies (id int, company_name char, country char);
 
 INSERT INTO companies VALUES (1, 'LinkedIn', 'United States');
