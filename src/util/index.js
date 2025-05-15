@@ -1,6 +1,7 @@
 export * from './numbers'
 export * from './arrays'
 export * from './objects'
+export * from './functions'
 export * from './geometry'
 export * from './react'
 export * from './localStorage'

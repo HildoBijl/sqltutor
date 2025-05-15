@@ -1,5 +1,6 @@
 export * from './sqljs'
 export * from './styling'
 export * from './layout'
+export * from './figures'
 export * from './input'
 export * from './TheoryWarning'
