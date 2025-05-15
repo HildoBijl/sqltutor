@@ -1,5 +1,6 @@
 import { useRef, forwardRef, useImperativeHandle } from 'react'
 import { Box } from '@mui/material'
+import clsx from 'clsx'
 
 import { processOptions, filterProperties, resolveFunctions } from 'util'
 
@@ -37,6 +38,8 @@ export const Figure = forwardRef((options, ref) => {
 		},
 	}))
 
+	// Render the figure.
+	options.className = clsx('figure', options.className)
 	return (
 		<Box ref={figureOuter} sx={{ ...resolveFunctions(figureStyle, styleOptions), ...options.style }}>
 			<Box ref={figureInner} sx={{ ...resolveFunctions(innerFigureStyle, styleOptions) }}>
