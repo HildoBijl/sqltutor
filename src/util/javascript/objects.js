@@ -1,3 +1,10 @@
+// ensureBoolean makes sure a parameter is boolean.
+export function ensureBoolean(param) {
+	if (typeof param !== 'boolean')
+		throw new Error(`Invalid input: expected a boolean parameter but received something of type "${typeof param}".`)
+	return param
+}
+
 // isObject checks if a variable is an object.
 export function isObject(obj) {
 	return typeof obj === 'object' && obj !== null
@@ -11,6 +18,13 @@ export function isBasicObject(obj) {
 // isEmptyObject checks if the object equals {}.
 export function isEmptyObject(obj) {
 	return isBasicObject(obj) && Object.keys(obj).length === 0
+}
+
+// ensureObject makes sure an object is an object and otherwise throws an error.
+export function ensureObject(obj) {
+	if (!isObject(obj))
+		throw new Error(`Invalid input: expected an object but received a parameter of type "${typeof obj}".`)
+	return obj
 }
 
 // deepEquals checks whether two objects are equal. It does this iteratively: if the parameters are objects or arrays, these are recursively checked. It tracks references of objects to prevent infinite loops.

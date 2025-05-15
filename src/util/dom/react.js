@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useReducer } from 'react'
+import { useState, useCallback, useEffect, useRef, useReducer, isValidElement } from 'react'
 import { createPortal } from 'react-dom'
 import useResizeObserver from '@react-hook/resize-observer'
 
@@ -24,10 +24,24 @@ export function useLatest(value, initialValue = value) {
 	return ref
 }
 
+// useEnsureRef takes a ref object that comes in and assume that it actually is a ref. This is useful when using forwardRef and wanting to make sure you get an existing ref right at the start.
+export function useEnsureRef(ref) {
+	const backupRef = useRef()
+	return ref || backupRef
+}
+
 // useConsistentValue will check if the given value is the same as previously. If the reference changes, but a deepEquals check still results in the same object, the same reference will be maintained.
 export function useConsistentValue(value) {
 	const ref = useRef()
 	ref.current = ensureConsistency(value, ref.current)
+	return ref.current
+}
+
+// useEqualRefOnEquality will check if a value equals its previous value. If so, the reference is maintained. The difference between useConsistentValue and this function is that this has its own equality check.
+export function useEqualRefOnEquality(value, equalityCheck = (a, b) => a && a.equals(b)) {
+	const ref = useRef()
+	if (value !== ref.current && !equalityCheck(value, ref.current))
+		ref.current = value
 	return ref.current
 }
 
@@ -135,6 +149,12 @@ export function useMousePosition() {
 	return useMouseData().position
 }
 
+// useResizeListener checks when the window or the app field resizes and calls the given callback function then.
+export function useResizeListener(callbackFunc, element = document.querySelector('#root')) {
+	useResizeObserver(element, () => callbackFunc())
+	useEventListener('resize', () => callbackFunc())
+}
+
 // useBoundingClientRect takes an element and tracks the BoundingClientRect. It only updates it on changes to the element and on scrolls, improving efficiency.
 export function useBoundingClientRect(element) {
 	const [rect, setRect] = useState(null)
@@ -147,8 +167,7 @@ export function useBoundingClientRect(element) {
 
 	// Listen for updates to the rect.
 	useEffect(() => updateElementPosition(), [element, updateElementPosition]) // Changes in the rectangle.
-	useResizeObserver(window?.document?.body, updateElementPosition) // Window/body resize.
-	useResizeObserver(element, updateElementPosition) // Element resize.
+	useResizeListener(element, updateElementPosition) // Element/window resize.
 	useEventListener('scroll', updateElementPosition) // Window scrolling.
 	useEventListener('swipe', updateElementPosition) // Swiper swiping.
 	useEventListener('swipeEnd', updateElementPosition) // Swiper swiping.
@@ -173,6 +192,13 @@ export function useForceUpdate() {
 export function useForceUpdateEffect() {
 	const forceUpdate = useForceUpdate()
 	useEffect(() => forceUpdate(), [forceUpdate])
+}
+
+// ensureReactElement ensures that the given parameter is a React-type element. If not, it throws an error. On success it returns the element.
+export function ensureReactElement(element, allowString = true, allowNumber = true) {
+	if (!isValidElement(element) && (!allowString || typeof element !== 'string') && (!allowNumber || typeof element !== 'number'))
+		throw new Error(`Invalid React element: expected a valid React element but received something of type "${typeof element}".`)
+	return element
 }
 
 // Portal takes a target parameter - a DOM object - and then renders the children in there. It checks when the target changes and rerenders when that happens.

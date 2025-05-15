@@ -1,8 +1,7 @@
 import { useRef, useMemo, forwardRef, useImperativeHandle, useId } from 'react'
 import clsx from 'clsx'
 
-import { processOptions, filterOptions, resolveFunctions, getEventPosition, useForceUpdateEffect, Rectangle, Vector } from 'util'
-import { notSelectable } from 'components'
+import { processOptions, filterOptions, resolveFunctions, getEventPosition, useForceUpdateEffect, Rectangle, Vector, notSelectable } from 'util'
 
 import { Figure, defaultFigureOptions } from '../Figure'
 

@@ -1,6 +1,6 @@
 import { TheoryWarning } from 'components'
 
-import { Drawing, SvgPortal } from 'components'
+import { Drawing, SvgPortal, Element } from 'components'
 
 export function Theory() {
 	return <>
@@ -11,6 +11,9 @@ export function Theory() {
 			<SvgPortal>
 				<rect width="360" height="260" x="20" y="20" rx="20" ry="20" fill="blue" />
 			</SvgPortal>
+			<Element position={[200, 100]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
+			<Element position={[200, 150]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
+			<Element position={[200, 200]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
 		</Drawing>
 	</>
 }
