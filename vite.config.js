@@ -21,6 +21,8 @@ export default defineConfig({
       assets: '/src/assets',
       components: '/src/components',
       content: '/src/content',
+      edu: '/src/edu',
+      eduComponents: '/src/eduComponents',
       pages: '/src/pages',
       routing: '/src/routing',
       settings: '/src/settings',

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 // getWindowSize returns the size of the window at the current moment.
 export function getWindowSize() {
@@ -20,4 +20,11 @@ export function useWindowSize() {
 	}, [updateWindowSize])
 
 	return windowSize
+}
+
+// useLatest gives a ref object whose value always equals the given value.
+export function useLatest(value, initialValue = value) {
+	const ref = useRef(initialValue)
+	ref.current = value
+	return ref
 }

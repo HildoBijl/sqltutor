@@ -5,9 +5,11 @@ import { Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf, useWindowSize } from 'util'
 import { Subpage, Container } from 'components'
+import { useComponent } from 'edu'
 import * as content from 'content'
+import { ExercisePage } from 'eduComponents'
 
-import { tabs, useComponent, useUrlTab } from './util'
+import { tabs, useUrlTab } from './tabs'
 
 // Component shows an educational component like a concept or a skill. This includes the tabs for "Theory", "Exercise" etcetera. It loads the contents dynamically.
 export function Component() {
@@ -24,8 +26,8 @@ export function Component() {
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
 export function ComponentFromModule({ component, module }) {
-	// Filter the tabs contained in this module.
-	const shownTabs = tabs.filter(tab => module[tab.component])
+	// Filter the tabs contained in this module. Deal with the exercises separately.
+	const shownTabs = tabs.filter(tab => module[tab.component] || (tab.url === 'exercises' && module.exercises))
 
 	// When the module is empty, show a note.
 	if (shownTabs.length === 0)
@@ -48,7 +50,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// Check the URL and set up the active tab based on it. (The URL of the tab is used as indicator.)
 	const urlTab = useUrlTab()
-	const [tab, setTab] = useState(shownTabs.find(tab => tab.url === urlTab)?.url || firstOf(shownTabs).url)
+	const [tab, setTab] = useState(shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url)
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL changes, update the tab accordingly.
@@ -65,11 +67,11 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	// Determine info about what needs to be shown.
 	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
 	const tabIndex = shownTabs.indexOf(currTab)
-	const Content = module[currTab.component]
+	const Content = module[currTab.component] || (currTab.url === 'exercises' && ExercisePage)
 
 	// Render the contents, with the tabs first and the page after.
 	const windowSize = useWindowSize()
-	const sizePerTab = windowSize.width/shownTabs.length
+	const sizePerTab = windowSize.width / shownTabs.length
 	const tinyScreen = sizePerTab < 100
 	const smallScreen = sizePerTab < 150
 	return <>

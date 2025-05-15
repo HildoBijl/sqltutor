@@ -1,5 +1,5 @@
 import { Page } from 'components'
-import { ErrorPage, Home, Test, Overview, Component, ComponentTitle } from 'pages'
+import { ErrorPage, Home, Test, Test2, Overview, Component, ComponentTitle } from 'pages'
 
 export const routes = [
 	{
@@ -16,6 +16,11 @@ export const routes = [
 				path: '/test',
 				element: <Test />,
 				title: 'Test Page',
+			},
+			{
+				path: '/test2',
+				element: <Test2 />,
+				title: 'Test2 Page',
 			},
 			{
 				path: '/overview',

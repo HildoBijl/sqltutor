@@ -12,3 +12,12 @@ export function isBasicObject(obj) {
 export function isEmptyObject(obj) {
 	return isBasicObject(obj) && Object.keys(obj).length === 0
 }
+
+// keysToObject takes a list of array keys and turns it into an object with those keys, where the provided function (key, index) => value provides the values.
+export function keysToObject(keys, func) {
+	const result = {}
+	keys.forEach((key, index) => {
+		result[key] = func(key, index)
+	})
+	return result
+}
