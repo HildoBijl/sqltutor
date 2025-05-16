@@ -1,37 +1,46 @@
 import { forwardRef, useCallback, useLayoutEffect } from 'react'
 import clsx from 'clsx'
 
-import { ensureNumber, ensureBoolean, ensureObject, processOptions, ensureVector, useEnsureRef, ensureReactElement, useEqualRefOnEquality, useResizeListener, notSelectable } from 'util'
+import { ensureNumber, ensureBoolean, ensureObject, processOptions, Vector, ensureVector, useEnsureRef, ensureReactElement, useEqualRefOnEquality, useResizeListener, notSelectable } from 'util'
 
-import { useDrawingData, HtmlPortal } from '../../../DrawingContext'
-
-import { defaultElement } from './settings'
+import { useDrawingData, HtmlPortal } from '../../DrawingContext'
 
 const elementStyle = {
 	left: 0,
-	...notSelectable,
 	position: 'absolute',
 	top: 0,
 	transformOrigin: '0% 0%',
 	zIndex: 0,
 }
 
+const defaultElement = {
+	children: null,
+	position: undefined,
+	graphicalPosition: undefined,
+	rotate: 0, // Radians.
+	scale: 1,
+	anchor: new Vector(0.5, 0.5), // Use 0 for left/top and 1 for right/bottom.
+	passive: false, // When set to true, the element ignores all mouse events like selecting and pointer events.
+	style: {},
+	className: undefined,
+}
+
 export const Element = forwardRef((props, ref) => {
 	ref = useEnsureRef(ref)
 
 	// Check input.
-	let { children, position, rotate, scale, anchor, ignoreMouse, style } = processOptions(props, defaultElement)
+	let { children, position, rotate, scale, anchor, passive, style } = processOptions(props, defaultElement)
 	children = ensureReactElement(children)
 	position = ensureVector(position, 2)
 	rotate = ensureNumber(rotate)
 	scale = ensureNumber(scale)
 	anchor = ensureVector(anchor, 2)
-	ignoreMouse = ensureBoolean(ignoreMouse)
-	style = { ...defaultElement.style, ...ensureObject(style) }
+	passive = ensureBoolean(passive)
+	style = { ...defaultElement.style, ...elementStyle, ...ensureObject(style) }
 
 	// Check if mouse events should be ignored.
-	if (ignoreMouse)
-		style.pointerEvents = 'none'
+	if (passive)
+		style = { ...style, ...notSelectable, pointerEvents: 'none' }
 
 	// Make sure the vector references remain consistent.
 	position = useEqualRefOnEquality(position)
@@ -67,8 +76,13 @@ export const Element = forwardRef((props, ref) => {
 	useResizeListener(updateElementPosition)
 
 	// Render the children inside the Drawing HTML contents container.
-	return <HtmlPortal><div ref={ref} className={clsx('drawingElement', props.className)} style={{ ...elementStyle, ...style }}>{children}</div></HtmlPortal>
+	return <HtmlPortal>
+		<div ref={ref} className={clsx('drawingElement', props.className)} style={style}>
+			{children}
+		</div>
+	</HtmlPortal>
 })
 Element.displayName = 'Element'
 Element.defaultProps = defaultElement
+Element.defaultStyle = elementStyle
 export default Element

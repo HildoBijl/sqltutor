@@ -23,15 +23,15 @@ export function Theory() {
 
 			<Element position={[250, 100]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef1} style={{ color: 'yellow', border: '1px solid yellow' }}>first</span> test</span></Element>
 			<Element position={[250, 150]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef2} style={{ color: 'green', border: '1px solid green' }}>second</span> test</span></Element>
-			<Element position={[250, 200]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
+			<Element position={[250, 200]} passive={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
 
 			<Text position={[250, 250]}>This is an SVG test</Text>
 
 			{elBounds1 && <Rectangle dimensions={elBounds1} style={{ fill: 'green' }} />}
 			{elBounds2 && <Rectangle dimensions={elBounds2} style={{ fill: 'yellow' }} />}
 
-			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomLeft, elBounds2.topRight]} style={{ stroke: 'orange', strokeWidth: 1 }} />}
-			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomRight, elBounds2.topLeft]} style={{ stroke: 'orange', strokeWidth: 1 }} />}
+			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomLeft, elBounds2.bottomRight]} style={{ stroke: 'orange', strokeWidth: 1 }} />}
+			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomRight, elBounds2.bottomLeft]} style={{ stroke: 'orange', strokeWidth: 1 }} />}
 		</Drawing>
 	</>
 }
