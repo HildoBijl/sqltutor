@@ -1,4 +1,4 @@
-import { Vector, ensureVector, Span, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement } from 'util'
+import { Vector, ensureVector, Rectangle, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement } from 'util'
 
 import { useDrawingData } from './DrawingContext'
 
@@ -59,7 +59,7 @@ export function useElementBounds(element, drawingRef) {
 	// Transform the rectangle.
 	const start = getCoordinates({ x: clientRect.left, y: clientRect.top }, bounds, figure)
 	const end = getCoordinates({ x: clientRect.right, y: clientRect.bottom }, bounds, figure)
-	return new Span({ start, end })
+	return new Rectangle({ start, end })
 }
 
 // useBoundingDrawingRect is like useBoundingClientRect in that it returns a rectangle for the given element. However, it does so in drawing coordinates.

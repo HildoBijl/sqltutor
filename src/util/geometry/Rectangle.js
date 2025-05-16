@@ -2,7 +2,7 @@ import { ensureNumber, compareNumbers, boundTo, numberArray, findOptimumIndex, r
 
 import { Vector, ensureVector } from './Vector'
 import { Span, ensureSpan } from './Span'
-import { Line, ensureLine } from './Line'
+import { ensureLine } from './Line'
 
 export class Rectangle {
 	/*
@@ -60,20 +60,7 @@ export class Rectangle {
 	}
 
 	get line() {
-		if (this.vector.isZero())
-			throw new Error(`Invalid line request: cannot give the line of a Span with zero magnitude.`)
-		return new Line(this.start, this.vector)
-	}
-
-	get width() {
-		if (this.dimension !== 2)
-			throw new Error(`Invalid width request: cannot give the width of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
-		return this.getSize(0)
-	}
-	get height() {
-		if (this.dimension !== 2)
-			throw new Error(`Invalid height request: cannot give the height of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
-		return this.getSize(1)
+		return this.span.line
 	}
 
 	// getBounds gives the bounds of this rectangle along a certain axis. It is sorted to ensure the lower value is mentioned first.
@@ -100,6 +87,48 @@ export class Rectangle {
 	// middle gives the vector that's exactly in the middle of the Rectangle.
 	get middle() {
 		return this.span.middle
+	}
+
+	get width() {
+		if (this.dimension !== 2)
+			throw new Error(`Invalid width request: cannot give the width of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
+		return this.getSize(0)
+	}
+	get height() {
+		if (this.dimension !== 2)
+			throw new Error(`Invalid height request: cannot give the height of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
+		return this.getSize(1)
+	}
+
+	get max() {
+		return new Vector(this.start.coordinates.map((_, index) => Math.max(this.start.coordinates[index], this.end.coordinates[index])))
+	}
+
+	get min() {
+		return new Vector(this.start.coordinates.map((_, index) => Math.min(this.start.coordinates[index], this.end.coordinates[index])))
+	}
+
+	get left() {
+		return this.min.x
+	}
+
+	get right() {
+		return this.max.x
+	}
+
+	get top() {
+		return this.min.y
+	}
+
+	get bottom() {
+		return this.max.y
+	}
+
+	// getReferencePoint returns a point related on the given anchor. If given [0, 0] (or in whatever dimension the rectangle is) then the middle is returned. For [1, 1] the end is returned and for [-1, -1] the start is returned. Optionally, the useMinMax flag can be turned on, in which case [1, 1] is the max-point and [-1, -1] is the min-point.
+	getReferencePoint(anchor, useMinMax = false) {
+		anchor = ensureVector(anchor, this.dimension)
+		const [start, end] = useMinMax ? [this.min, this.max] : [this.start, this.end]
+		return new Vector(this.middle.coordinates.map((mid, index) => mid + anchor.coordinates[index] * (end.coordinates[index] - start.coordinates[index]) / 2))
 	}
 
 	/*

@@ -13,3 +13,8 @@ export function useDrawingData(drawingRef) {
 export function useDrawingId() {
 	return useDrawingData()?.id
 }
+
+// Get the bounds of the Drawing.
+export function useDrawingBounds() {
+	return useDrawingData()?.bounds
+}
