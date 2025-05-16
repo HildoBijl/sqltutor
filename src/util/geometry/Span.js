@@ -21,9 +21,13 @@ export class Span {
 		if (typeof span !== 'object')
 			throw new Error(`Invalid Span value: expected to receive some kind of object, but instead received something of type "${typeof span}".`)
 
-		// Check if it already is a Span.
+		// If it is already a span, keep it.
 		if (span instanceof Span)
 			return span
+
+		// If it is an array of length two, use the two elements as start and end.
+		if (Array.isArray(span) && span.length === 2)
+			span = { start: span[0], end: span[1] }
 
 		// Process the Span.
 		span = processOptions(span, defaultSpan)

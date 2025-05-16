@@ -89,39 +89,99 @@ export class Rectangle {
 		return this.span.middle
 	}
 
+	// width, height and depth are the sizes in dimensions x, y and z.
 	get width() {
-		if (this.dimension !== 2)
-			throw new Error(`Invalid width request: cannot give the width of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
 		return this.getSize(0)
 	}
 	get height() {
-		if (this.dimension !== 2)
-			throw new Error(`Invalid height request: cannot give the height of a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
 		return this.getSize(1)
 	}
+	get depth() {
+		return this.getSize(2)
+	}
 
+	// min and max are the smallest and largest values for each coordinate.
+	get min() {
+		return new Vector(this.start.coordinates.map((_, index) => Math.min(this.start.coordinates[index], this.end.coordinates[index])))
+	}
 	get max() {
 		return new Vector(this.start.coordinates.map((_, index) => Math.max(this.start.coordinates[index], this.end.coordinates[index])))
 	}
 
-	get min() {
-		return new Vector(this.start.coordinates.map((_, index) => Math.min(this.start.coordinates[index], this.end.coordinates[index])))
-	}
-
+	// left, right, top and bottom are the four sides of the two-dimensional rectangle.
 	get left() {
 		return this.min.x
 	}
-
 	get right() {
 		return this.max.x
 	}
-
 	get top() {
 		return this.min.y
 	}
-
 	get bottom() {
 		return this.max.y
+	}
+
+	// topLeft, topMiddle, topRight, rightMiddle, bottomRight, bottomMiddle, bottomLeft and leftMiddle are the vectors representing each of these points for the rectangle.
+	get topLeft() {
+		this.runNamedPointCheck()
+		return this.min
+	}
+	get topMiddle() {
+		this.runNamedPointCheck()
+		return new Vector(this.middle.x, this.min.y)
+	}
+	get topRight() {
+		this.runNamedPointCheck()
+		return new Vector(this.max.x, this.min.y)
+	}
+	get middleRight() {
+		this.runNamedPointCheck()
+		return new Vector(this.max.x, this.middle.y)
+	}
+	get bottomRight() {
+		this.runNamedPointCheck()
+		return this.max
+	}
+	get bottomMiddle() {
+		this.runNamedPointCheck()
+		return new Vector(this.middle.x, this.max.y)
+	}
+	get bottomLeft() {
+		this.runNamedPointCheck()
+		return new Vector(this.min.x, this.max.y)
+	}
+	get middleLeft() {
+		this.runNamedPointCheck()
+		return new Vector(this.min.x, this.middle.y)
+	}
+	runNamedPointCheck() {
+		if (this.dimension !== 2)
+			throw new Error(`Invalid point request: cannot use named points (like top-left, bottom-right) for a ${this.dimension}D rectangle. This is only possible for 2D rectangles.`)
+	}
+	get leftTop() {
+		return this.topLeft
+	}
+	get middleTop() {
+		return this.topMiddle
+	}
+	get rightTop() {
+		return this.topRight
+	}
+	get rightMiddle() {
+		return this.middleRight
+	}
+	get rightBottom() {
+		return this.bottomRight
+	}
+	get middleBottom() {
+		return this.bottomMiddle
+	}
+	get leftBottom() {
+		return this.bottomLeft
+	}
+	get leftMiddle() {
+		return this.middleLeft
 	}
 
 	// getReferencePoint returns a point related on the given anchor. If given [0, 0] (or in whatever dimension the rectangle is) then the middle is returned. For [1, 1] the end is returned and for [-1, -1] the start is returned. Optionally, the useMinMax flag can be turned on, in which case [1, 1] is the max-point and [-1, -1] is the min-point.
