@@ -19,7 +19,6 @@ const defaultLine = {
 	className: 'line',
 }
 
-// Line draws a line from the given points array and an optional style object.
 export const Line = forwardRef((props, ref) => {
 	// Process the input.
 	let { points, close, className, style } = processOptions(props, defaultLine)
@@ -33,6 +32,6 @@ export const Line = forwardRef((props, ref) => {
 	const path = getLinePath(points, close)
 	return <SvgPortal><path ref={ref} className={className} style={{...defaultStyle, ...style}} d={path} {...filterEventHandlers(props)} /></SvgPortal>
 })
-Line.defaultProps = defaultLine
 Line.defaultStyle = defaultStyle
+Line.defaultProps = defaultLine
 Line.displayName = 'Line'

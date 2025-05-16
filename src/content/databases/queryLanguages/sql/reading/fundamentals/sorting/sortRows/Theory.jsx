@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-import { TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle } from 'components'
+import { TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve } from 'components'
 
 export function Theory() {
 	const drawingRef = useRef()
@@ -10,12 +10,18 @@ export function Theory() {
 	const [blockRef, blockBounds] = useRefWithBounds(drawingRef)
 	const height = blockBounds?.height || 0
 
+	const points = [[100, 30], [30, 30], [100, 160], [30, 160]]
+
 	return <>
 		<TheoryWarning />
 		<p>You can sort rows in a table by adding an "ORDER BY" clause at the end. You can order by one column, multiple columns, ascending or descending. In case of Null values you can add NULLS LAST as add-on. It is also possible to limit the rows in various ways.</p>
 		<p style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</p>
 		<Drawing maxWidth={600} width={400} height={height || 300} ref={drawingRef}>
 			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue' }} />
+			<Circle center={[70, 70]} radius={30} style={{ fill: 'green' }} />
+
+			{points.map((point, index) => <Circle center={point} radius={2} key={index} style={{ fill: 'black' }} />)}
+			<Curve points={points} through={false} spread={16} />
 
 			<Element position={[350, height / 2]}><div ref={blockRef} style={{ background: 'pink', width: 20, height: 400 }}>This is a test</div></Element>
 
