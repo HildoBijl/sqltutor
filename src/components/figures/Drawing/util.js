@@ -1,4 +1,4 @@
-import { Vector, ensureVector, useMouseData as useClientMouseData, useBoundingClientRect } from 'util'
+import { Vector, ensureVector, Span, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement } from 'util'
 
 import { useDrawingData } from './DrawingContext'
 
@@ -16,7 +16,7 @@ export function getCoordinates(clientCoordinates, bounds, figure, figureRect) {
 		figureRect = figureInner.getBoundingClientRect()
 	}
 
-	// Calculate the position.
+	// Calculate the position. Add an extra check to deal with NaN values and similar.
 	clientCoordinates = ensureVector(clientCoordinates, 2)
 	return new Vector([
 		(clientCoordinates.x - figureRect.x) * bounds.width / figureRect.width,
@@ -24,11 +24,12 @@ export function getCoordinates(clientCoordinates, bounds, figure, figureRect) {
 	])
 }
 
-// useMouseData tracks the position of the mouse in various coordinate systems. It returns its data in the form { clientPosition: ..., position: ..., keys: {...} }.
-export function useMouseData() {
-	// Acquire data.
-	let { figure, transformationSettings } = useDrawingData()
+// useDrawingMouseData tracks the position of the mouse in various coordinate systems. It returns its data in the form { clientPosition: ..., position: ..., keys: {...} }. It may be provided with the reference to a Drawing. If not, it will try to get the data from the context it is in.
+export function useDrawingMouseData(drawingRef) {
 	const { position: clientPosition, keys } = useClientMouseData()
+
+	// Acquire data on the drawing, either from the given parameter if it exists, or from the context if not.
+	const { figure, bounds } = useDrawingData(drawingRef)
 	const figureRect = useBoundingClientRect(figure?.inner)
 
 	// Return an empty object on missing data.
@@ -36,10 +37,49 @@ export function useMouseData() {
 		return {}
 
 	// Transform to graphical coordinates.
-	const position = getCoordinates(clientPosition, transformationSettings, figure, figureRect)
+	const position = getCoordinates(clientPosition, bounds, figure, figureRect)
 	return { clientPosition, position, keys }
 }
 
-export function useMousePosition() {
-	return useMouseData().position
+// useDrawingMousePosition returns the position of the mouse within the drawing. It only returns the position (a Vector) and not other data, like the useDrawingMouseData function.
+export function useDrawingMousePosition() {
+	return useDrawingMouseData().position
+}
+
+// useElementBounds takes an element in a drawing and returns its bounds (as a Span) in drawing coordinates.
+export function useElementBounds(element, drawingRef) {
+	const clientRect = useBoundingClientRect(element)
+	const drawingData = useDrawingData(drawingRef)
+	const { figure, bounds } = drawingData
+
+	// On no rectangle, return nothing either.
+	if (!clientRect)
+		return clientRect
+
+	// Transform the rectangle.
+	const start = getCoordinates({ x: clientRect.left, y: clientRect.top }, bounds, figure)
+	const end = getCoordinates({ x: clientRect.right, y: clientRect.bottom }, bounds, figure)
+	return new Span({ start, end })
+}
+
+// useBoundingDrawingRect is like useBoundingClientRect in that it returns a rectangle for the given element. However, it does so in drawing coordinates.
+export function useBoundingDrawingRect(element, drawingRef) {
+	const bounds = useElementBounds(element, drawingRef)
+	return bounds && {
+		x: bounds.start.x,
+		y: bounds.start.y,
+		left: bounds.start.x,
+		top: bounds.start.y,
+		right: bounds.end.x,
+		bottom: bounds.end.y,
+		width: bounds.vector.x,
+		height: bounds.vector.y,
+	}
+}
+
+// useRefWithBounds gives an array with [ref, bounds, element] where ref is a react Ref that should be attached to a DOM object, and bounds are the respective bounds for said object. Optionally, the function may be given a ref to a drawing for the coordinate transformations. If not, the context is attempted.
+export function useRefWithBounds(drawingRef) {
+	const [ref, element] = useRefWithElement()
+	const bounds = useElementBounds(element, drawingRef)
+	return [ref, bounds, element]
 }

@@ -44,21 +44,24 @@ export const Drawing = forwardRef((options, ref) => {
 	// Determine figure size parameters to use for rendering.
 	const { width, height } = options
 	const bounds = useMemo(() => new Rectangle({ start: new Vector(0, 0), end: new Vector(width, height) }), [width, height])
+	if (width === 0)
+		throw new Error(`Invalid Drawing width: cannot have a width being 0 or negative. Received was ${width}.`)
+	if (height === 0)
+		throw new Error(`Invalid Drawing height: cannot have a height being 0 or negative. Received was ${height}.`)
 	options.aspectRatio = height / width // This must be passed on to the Figure object.
 	options.maxWidth = options.maxWidth === 'fill' ? undefined : resolveFunctions(options.maxWidth, bounds)
 
 	// Set up refs and make them accessible to any implementing component.
 	useImperativeHandle(ref, () => ({
 		// Basic getters.
+		get bounds() { return bounds },
 		get figure() { return figureRef.current },
 		get svg() { return svgRef.current },
+		get svgDefs() { return svgDefsRef.current },
+		get htmlContents() { return htmlContentsRef.current },
 		get canvas() { return canvasRef.current },
-		get context() { return canvasRef.current.getContext('2d') },
-		get bounds() { return bounds },
-		get width() { return bounds.width },
-		get height() { return bounds.height },
 
-		// Coordinate manipulation functions. Note the distinction between client points, graphical points and drawing points, all in different coordinate systems.
+		// Coordinate manipulation functions. Note the distinction between client points and drawing points, all in different coordinate systems.
 		getCoordinates(cPoint, figureRect) {
 			return getCoordinates(cPoint, bounds, figureRef.current, figureRect)
 		},

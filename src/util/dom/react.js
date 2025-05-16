@@ -24,6 +24,13 @@ export function useLatest(value, initialValue = value) {
 	return ref
 }
 
+// useRefWithElement will return the element of a ref. Special is that it also forces the component to update once the ref has been established. It returns an array [elementRef, element], where the ref must be inserted into the respective DOM element. The ref is actually a function used to update the element.
+export function useRefWithElement() {
+	const [element, setElement] = useState()
+	const onRefChange = useCallback(node => setElement(node), [])
+	return [onRefChange, element]
+}
+
 // useEnsureRef takes a ref object that comes in and assume that it actually is a ref. This is useful when using forwardRef and wanting to make sure you get an existing ref right at the start.
 export function useEnsureRef(ref) {
 	const backupRef = useRef()
@@ -167,7 +174,7 @@ export function useBoundingClientRect(element) {
 
 	// Listen for updates to the rect.
 	useEffect(() => updateElementPosition(), [element, updateElementPosition]) // Changes in the rectangle.
-	useResizeListener(element, updateElementPosition) // Element/window resize.
+	useResizeListener(updateElementPosition, element) // Element/window resize.
 	useEventListener('scroll', updateElementPosition) // Window scrolling.
 	useEventListener('swipe', updateElementPosition) // Swiper swiping.
 	useEventListener('swipeEnd', updateElementPosition) // Swiper swiping.

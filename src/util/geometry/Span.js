@@ -1,6 +1,6 @@
 import { processOptions } from 'util'
 
-import { ensureVector } from './Vector'
+import { Vector, ensureVector } from './Vector'
 import { Line, ensureLine } from './Line'
 
 const defaultSpan = {
@@ -85,6 +85,38 @@ export class Span {
 
 	get middle() {
 		return this.start.interpolate(this.end)
+	}
+
+	get max() {
+		return new Vector(this.start.coordinates.map((_, index) => Math.max(this.start.coordinates[index], this.end.coordinates[index])))
+	}
+
+	get min() {
+		return new Vector(this.start.coordinates.map((_, index) => Math.min(this.start.coordinates[index], this.end.coordinates[index])))
+	}
+
+	get width() {
+		return this.vector.x
+	}
+
+	get height() {
+		return this.vector.y
+	}
+
+	get left() {
+		return this.min.x
+	}
+
+	get right() {
+		return this.max.x
+	}
+
+	get top() {
+		return this.min.y
+	}
+
+	get bottom() {
+		return this.max.y
 	}
 
 	/*
