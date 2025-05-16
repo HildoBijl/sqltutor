@@ -7,11 +7,7 @@ import { SvgPortal } from '../../DrawingContext'
 import { useRefWithEventHandlers, filterEventHandlers, getCurvePathThrough, getCurvePathAlong } from './util'
 import { Line } from './Line'
 
-const defaultStyle = {
-	fill: 'none',
-	stroke: 'black',
-	'stroke-width': 1,
-}
+const defaultStyle = Line.defaultStyle
 
 const defaultCurve = {
 	...Line.defaultProps,
