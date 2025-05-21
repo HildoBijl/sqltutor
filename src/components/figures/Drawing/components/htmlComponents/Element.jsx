@@ -21,6 +21,7 @@ const defaultElement = {
 	scale: 1,
 	anchor: new Vector(0.5, 0.5), // Use 0 for left/top and 1 for right/bottom.
 	passive: false, // When set to true, the element ignores all mouse events like selecting and pointer events.
+	behind: false, // When set to true, the element is placed in the div behind the SVG and not in front.
 	style: {},
 	className: undefined,
 }
@@ -29,14 +30,15 @@ export const Element = forwardRef((props, ref) => {
 	ref = useEnsureRef(ref)
 
 	// Check input.
-	let { children, position, rotate, scale, anchor, passive, style } = processOptions(props, defaultElement)
+	let { children, position, rotate, scale, anchor, passive, behind, style } = processOptions(props, defaultElement)
 	children = ensureReactElement(children)
 	position = ensureVector(position, 2)
 	rotate = ensureNumber(rotate)
 	scale = ensureNumber(scale)
 	anchor = ensureVector(anchor, 2)
 	passive = ensureBoolean(passive)
-	style = { ...defaultElement.style, ...elementStyle, ...ensureObject(style) }
+	behind = ensureBoolean(behind)
+	style = { ...defaultElement.style, ...elementStyle, zIndex: behind ? -1 : 3, ...ensureObject(style) }
 
 	// Check if mouse events should be ignored.
 	if (passive)
