@@ -1,0 +1,28 @@
+/* This file overrides the standard style of the CodeMirror element. */
+.cm-editor { /* General editor styling. */
+	background: #282c34;
+	color: #cceeffaf;
+}
+
+.ͼ2 .cm-gutters { /* Gutter styling. */
+	background: #282c34;
+	border-right: 0;
+	color: #ffffff4c;
+}
+
+.ͼ2 .cm-activeLine, .ͼ2 .cm-activeLineGutter { /* Active line styling. */
+	background: #cceeff11;
+}
+
+.ͼb { /* Keywords: SELECT, FROM, ... */
+	color: #c81919;
+	font-weight: 600;
+}
+
+.ͼe { /* String values */
+	color: #98bc37;
+}
+
+.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor { /* Cursor */
+	border-left-color: #528bff;
+}

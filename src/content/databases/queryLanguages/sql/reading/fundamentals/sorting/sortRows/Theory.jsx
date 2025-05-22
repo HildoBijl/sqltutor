@@ -1,19 +1,28 @@
-import { useRef } from 'react'
+import { useState, useRef } from 'react'
 
-import { TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve, Text } from 'components'
+import { SQL, SQLInput, TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve, Text } from 'components'
+
+const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
 
 export function Theory() {
 	const drawingRef = useRef()
-	window.drawingRef = drawingRef
 	const [subRef1, elBounds1] = useRefWithBounds(drawingRef)
 	const [subRef2, elBounds2] = useRefWithBounds(drawingRef)
 
 	const points = [[100, 30], [30, 30], [100, 160], [30, 160]]
 
+	const [readOnly, setReadOnly] = useState(false)
+
 	return <>
 		<TheoryWarning />
-		<p>You can sort rows in a table by adding an "ORDER BY" clause at the end. You can order by one column, multiple columns, ascending or descending. In case of Null values you can add NULLS LAST as add-on. It is also possible to limit the rows in various ways.</p>
+		<p onClick={() => setReadOnly(v => !v)}>You can sort rows in a table by adding an "ORDER BY" clause at the end. You can order by one column, multiple columns, ascending or descending. In case of Null values you can add NULLS LAST as add-on. It is also possible to limit the rows in various ways.</p>
 		<p style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</p>
+
+		<div style={{ width: 600 }}>
+			<SQLInput foldGutter={false} lineNumbers={false} value={query} readOnly={readOnly} editable={!readOnly} highlightActiveLine={!readOnly} />
+			<SQL>{query}</SQL>
+		</div>
+
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
 			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.4 }} />
 			<Circle center={[70, 70]} radius={30} style={{ fill: 'green' }} />
