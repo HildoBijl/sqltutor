@@ -21,3 +21,12 @@ export function getWindowSize() {
 		height: window.innerHeight,
 	}
 }
+
+// getTextNodes takes a DOM object and finds all text nodes in it.
+export function getTextNodes(element) {
+	if (!element)
+		return []
+	if (element.nodeType === 3)
+		return [element]
+	return [...element.childNodes].map(child => getTextNodes(child)).flat()
+}

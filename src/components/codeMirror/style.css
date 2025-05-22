@@ -1,6 +1,6 @@
 /* This file overrides the standard style of the CodeMirror element. */
 .cm-editor { /* General editor styling. */
-	background: #282c34;
+	background: #c5b1ff11;
 	color: #cceeffaf;
 }
 

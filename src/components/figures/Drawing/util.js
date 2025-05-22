@@ -1,4 +1,4 @@
-import { Vector, ensureVector, Rectangle, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement } from 'util'
+import { Vector, ensureVector, Rectangle, useMouseData as useClientMouseData, useBoundingClientRect, useBoundingClientRects, useRefWithElement, useTextNode } from 'util'
 
 import { useDrawingData } from './DrawingContext'
 
@@ -50,16 +50,13 @@ export function useDrawingMousePosition() {
 export function useElementBounds(element, drawingRef) {
 	const clientRect = useBoundingClientRect(element)
 	const drawingData = useDrawingData(drawingRef)
-	const { figure, bounds } = drawingData
+	return clientRect && transformRectangle(clientRect, drawingData)
+}
 
-	// On no rectangle, return nothing either.
-	if (!clientRect)
-		return clientRect
-
-	// Transform the rectangle.
-	const start = getCoordinates({ x: clientRect.left, y: clientRect.top }, bounds, figure)
-	const end = getCoordinates({ x: clientRect.right, y: clientRect.bottom }, bounds, figure)
-	return new Rectangle({ start, end })
+// useTextNodeBounds takes a container, finds all text nodes and filters them based on a string (which they must contain) or otherwise a filtering function.
+export function useTextNodeBounds(container, condition, drawingRef, index = 0) {
+	const textNode = useTextNode(container, condition, index)
+	return useElementBounds(textNode, drawingRef)
 }
 
 // useBoundingDrawingRect is like useBoundingClientRect in that it returns a rectangle for the given element. However, it does so in drawing coordinates.
@@ -82,4 +79,25 @@ export function useRefWithBounds(drawingRef) {
 	const [ref, element] = useRefWithElement()
 	const bounds = useElementBounds(element, drawingRef)
 	return [ref, bounds, element]
+}
+
+// useIndividualChildrenBounds takes an element, finds its children and returns the bounds for those children. The result is an array of Rectangle objects.
+export function useIndividualChildrenBounds(element, drawingRef) {
+	const clientRects = useBoundingClientRects([...(element?.childNodes || [])])
+	const drawingData = useDrawingData(drawingRef)
+	return clientRects.map(clientRect => clientRect && transformRectangle(clientRect, drawingData))
+}
+
+// transformRectangle takes a Rectangle object (like bounds) in Client coordinates and turns it into Drawing coordinates.
+export function transformRectangle(rectangle, drawingData) {
+	const { figure, bounds } = drawingData
+
+	// On no rectangle, return nothing either.
+	if (!rectangle)
+		return rectangle
+
+	// Transform the rectangle.
+	const start = getCoordinates({ x: rectangle.left, y: rectangle.top }, bounds, figure)
+	const end = getCoordinates({ x: rectangle.right, y: rectangle.bottom }, bounds, figure)
+	return start && end && new Rectangle({ start, end })
 }

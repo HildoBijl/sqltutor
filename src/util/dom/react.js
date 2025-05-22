@@ -4,7 +4,7 @@ import useResizeObserver from '@react-hook/resize-observer'
 
 import { ensureConsistency } from '../javascript'
 
-import { getWindowSize, getEventPosition, getUtilKeys } from './dom'
+import { getWindowSize, getEventPosition, getUtilKeys, getTextNodes } from './dom'
 
 // useWindowSize is a hook that gives the window size and updates it when changed.
 export function useWindowSize() {
@@ -162,32 +162,55 @@ export function useResizeListener(callbackFunc, element = document.querySelector
 	useEventListener('resize', () => callbackFunc())
 }
 
-// useBoundingClientRect takes an element and tracks the BoundingClientRect. It only updates it on changes to the element and on scrolls, improving efficiency.
-export function useBoundingClientRect(element) {
-	const [rect, setRect] = useState(null)
+// useBoundingClientRect takes an array of elements and tracks their BoundingClientRect. It only updates it on changes to the element and on scrolls, improving efficiency.
+export function useBoundingClientRects(elements) {
+	// Check the input.
+	if (!Array.isArray(elements))
+		throw new Error(`Invalid elements received: expected an array, but received something of type "${typeof elements}".`)
+
+	const [rects, setRects] = useState()
+	elements = useConsistentValue(elements)
+
+	// Create a handler that calculates the rects.
+	const getRects = () => elements.map(element => {
+		if (!element)
+			return element
+		if (element.nodeType === 3) {
+			const range = document.createRange()
+			range.selectNode(element)
+			const rect = range.getBoundingClientRect()
+			range.detach() // For efficiency.
+			return rect
+		}
+		return element.getBoundingClientRect()
+	})
 
 	// Create a handler that updates the rect.
 	const updateElementPosition = useStaggeredFunction(() => {
-		if (element)
-			setRect(element.getBoundingClientRect())
-	}, [element, setRect])
+		setRects(getRects())
+	})
 
 	// Listen for updates to the rect.
-	useEffect(() => updateElementPosition(), [element, updateElementPosition]) // Changes in the rectangle.
-	useResizeListener(updateElementPosition, element) // Element/window resize.
+	useEffect(() => updateElementPosition(), [elements, updateElementPosition]) // Changes in the elements.
+	useResizeListener(updateElementPosition, elements.find(element => element?.nodeType === 1)) // Element/window resize. Only the first Element is used, since the resize observer cannot handle multiple elements.
 	useEventListener('scroll', updateElementPosition) // Window scrolling.
 	useEventListener('swipe', updateElementPosition) // Swiper swiping.
 	useEventListener('swipeEnd', updateElementPosition) // Swiper swiping.
 
 	// On a first run the rect may not be known yet. Calculate it directly.
-	if (element && !rect) {
-		const actualRect = element.getBoundingClientRect()
-		setRect(actualRect)
+	if (!rects) {
+		const actualRect = getRects()
+		setRects(actualRect)
 		return actualRect
 	}
 
 	// Normal case: return the rectangle.
-	return rect
+	return rects
+}
+
+// useBoundingClientRect takes an element and tracks the BoundingClientRect. It only updates it on changes to the element and on scrolls, improving efficiency.
+export function useBoundingClientRect(element) {
+	return useBoundingClientRects([element])[0]
 }
 
 // useForceUpdate gives you a force update function, which is useful in some extreme cases.
@@ -211,4 +234,16 @@ export function ensureReactElement(element, allowString = true, allowNumber = tr
 // Portal takes a target parameter - a DOM object - and then renders the children in there. It checks when the target changes and rerenders when that happens.
 export function Portal({ target, children }) {
 	return target ? createPortal(children, target) : null
+}
+
+// useTextNode takes an element (a container) and finds the text node in it satisfying a given condition. Optionally, an offset can be given if multiple elements satisfy that condition. If the condition is a string, it finds the text node containing that string.
+export function useTextNode(container, condition, offset = 0) {
+	// On a string condition, turn it into a function that filters based on whether the content contains that string.
+	if (typeof condition === 'string') {
+		const text = condition
+		condition = node => node.textContent.includes(text)
+	}
+
+	// Get and filter the text nodes.
+	return getTextNodes(container).filter(condition)[offset]
 }
