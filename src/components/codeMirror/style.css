@@ -5,7 +5,7 @@
 }
 
 .ͼ2 .cm-gutters { /* Gutter styling. */
-	background: #282c34;
+	background: transparent; /* Default to editor background. */
 	border-right: 0;
 	color: #ffffff4c;
 }
