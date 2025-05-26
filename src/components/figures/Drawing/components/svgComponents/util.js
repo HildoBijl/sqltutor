@@ -16,6 +16,7 @@ export const useRefWithEventHandlers = (props, ref) => {
 export const defaultObject = {
 	...defaultEventHandlers,
 	type: undefined,
+	ref: undefined,
 	className: '',
 	style: {},
 }

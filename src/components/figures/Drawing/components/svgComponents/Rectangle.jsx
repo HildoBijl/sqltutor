@@ -1,5 +1,3 @@
-import { forwardRef } from 'react'
-
 import { ensureNumber, ensureString, ensureObject, processOptions, ensureRectangle as ensureGeometryRectangle } from 'util'
 
 import { SvgPortal } from '../../DrawingContext'
@@ -13,9 +11,9 @@ const defaultRectangle = {
 	graphicalCornerRadius: 0,
 }
 
-export const Rectangle = forwardRef((props, ref) => {
+export function Rectangle(props) {
 	// Process the input.
-	let { dimensions, cornerRadius, className, style } = processOptions(props, defaultRectangle)
+	let { dimensions, cornerRadius, className, style, ref } = processOptions(props, defaultRectangle)
 	dimensions = ensureGeometryRectangle(dimensions, 2)
 	cornerRadius = ensureNumber(cornerRadius)
 	className = ensureString(className)
@@ -27,6 +25,5 @@ export const Rectangle = forwardRef((props, ref) => {
 	return <SvgPortal>
 		<rect ref={ref} x={Math.min(start.x, end.x)} y={Math.min(start.y, end.y)} width={Math.abs(vector.x)} height={Math.abs(vector.y)} rx={cornerRadius} className={className} style={style} {...filterEventHandlers(props)} />
 	</SvgPortal>
-})
+}
 Rectangle.defaultProps = defaultRectangle
-Rectangle.displayName = 'Rectangle'

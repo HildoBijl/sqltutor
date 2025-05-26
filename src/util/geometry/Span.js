@@ -91,6 +91,10 @@ export class Span {
 		return this.start.interpolate(this.end)
 	}
 
+	get angle() {
+		return this.line.angle
+	}
+
 	/*
 	 * Manipulation and calculation methods.
 	 */

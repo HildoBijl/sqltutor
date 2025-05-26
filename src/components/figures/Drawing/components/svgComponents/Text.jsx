@@ -1,5 +1,3 @@
-import { forwardRef } from 'react'
-
 import { ensureString, ensureObject, processOptions, ensureVector } from 'util'
 
 import { SvgPortal } from '../../DrawingContext'
@@ -14,9 +12,9 @@ const defaultText = {
 	children: undefined,
 }
 
-export const Text = forwardRef((props, ref) => {
+export function Text(props) {
 	// Process the input.
-	let { position, anchor, className, style, children } = processOptions(props, defaultText)
+	let { position, anchor, className, style, children, ref } = processOptions(props, defaultText)
 	position = ensureVector(position, 2)
 	anchor = ensureString(anchor)
 	className = ensureString(className)
@@ -31,6 +29,5 @@ export const Text = forwardRef((props, ref) => {
 	return <SvgPortal>
 		<text ref={ref} textAnchor={anchor} className={className} style={style} x={position.x} y={position.y} {...filterEventHandlers(props)}>{children}</text>
 	</SvgPortal>
-})
+}
 Text.defaultProps = defaultText
-Text.displayName = 'Text'

@@ -1,16 +1,18 @@
 import { useState, useRef } from 'react'
 
-import { SQL, TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds } from 'components'
+import { SQL, TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
 
 const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
 
 export function Theory() {
 	const drawingRef = useRef()
+	const testRef = useRef()
 	const [sqlElement, setSqlElement] = useState()
 	const [subRef1, elBounds1] = useRefWithBounds(drawingRef)
 	const [subRef2, elBounds2] = useRefWithBounds(drawingRef)
 
-	const points = [[100, 30], [30, 30], [100, 160], [30, 160]]
+	window.r = testRef
+	const points = [[100, 30], [30, 30], [100, 160], [30, 190]]
 
 	const b1 = useTextNodeBounds(sqlElement, '*', drawingRef)
 	const b2 = useTextNodeBounds(sqlElement, 'Netherlands', drawingRef)
@@ -25,7 +27,8 @@ export function Theory() {
 			<Circle center={[70, 70]} radius={30} style={{ fill: 'green' }} />
 
 			{points.map((point, index) => <Circle center={point} radius={2} key={index} style={{ fill: 'black' }} />)}
-			<Curve points={points} through={false} spread={16} />
+			<Line ref={testRef} points={points} startArrow={true} color="red" size={3} />
+			{/* <Curve ref={testRef} points={points} through={false} spread={16} arrow={true} /> */}
 
 			{b2 && <Circle center={b2.leftTop} radius={2} style={{ fill: 'teal' }} />}
 			{b2 && <Circle center={b2.rightTop} radius={2} style={{ fill: 'teal' }} />}
@@ -38,13 +41,17 @@ export function Theory() {
 
 			<Text position={[250, 250]}>This is an SVG test</Text>
 			<Element position={[50, 190]} anchor={[0, 0]}><SQL onCreateEditor={view => setSqlElement(view?.contentDOM)}>{query}</SQL></Element>
-			{b1 && b2 && <Curve points={[b1.rightTop, [b2.middleTop.x, b1.rightTop.y], b2.middleTop]} style={{ strokeWidth: 4, stroke: 'yellow' }} />}
 
 			{elBounds1 && <Rectangle dimensions={elBounds1} style={{ fill: 'green' }} />}
 			{elBounds2 && <Rectangle dimensions={elBounds2} style={{ fill: 'yellow', opacity: 0.3 }} />}
 
 			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomLeft, elBounds2.bottomRight]} style={{ stroke: 'orange', strokeWidth: 2 }} />}
 			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomRight, elBounds2.bottomLeft]} style={{ stroke: 'orange', strokeWidth: 2 }} />}
+
+			<ArrowHead position={[300, 60]} color="yellow" />
+
+			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x, b1.rightTop.y], b2.middleTop]} style={{ strokeWidth: 2, stroke: 'yellow' }} />}
+			{b2 && <ArrowHead position={b2.middleTop.add([-1.5, 5])} color="yellow" angle={Math.PI * 0.6} />}
 		</Drawing>
 	</>
 }

@@ -1,5 +1,3 @@
-import { forwardRef } from 'react'
-
 import { ensureNumber, ensureString, ensureBoolean, ensureObject, processOptions, Vector, ensureVector } from 'util'
 
 import { useDrawingId, SvgPortal } from '../../DrawingContext'
@@ -16,9 +14,9 @@ const defaultGroup = {
 }
 
 // Group sets up a groups with a given position, rotation and scale. (In that order: it's first translated, then rotated and then scaled.)
-export const Group = forwardRef((props, ref) => {
+export function Group(props) {
 	// Process the input.
-	let { position, rotate, scale, overflow, className, style, children } = processOptions(props, defaultGroup)
+	let { position, rotate, scale, overflow, className, style, children, ref } = processOptions(props, defaultGroup)
 	position = ensureVector(position, 2)
 	rotate = ensureNumber(rotate)
 	scale = ensureNumber(scale)
@@ -38,6 +36,5 @@ export const Group = forwardRef((props, ref) => {
 			{children}
 		</g>
 	</SvgPortal>
-})
+}
 Group.defaultProps = defaultGroup
-Group.displayName = 'Group'

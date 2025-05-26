@@ -113,6 +113,16 @@ export function filterProperties(obj, allowedKeys, removeUndefined = true) {
 	return res
 }
 
+// removeProperties removes the properties of an object given by an array of keys. All other properties are kept. The original object is not adjusted: a new object is returned.
+export function removeProperties(obj, keysToRemove) {
+	keysToRemove = Array.isArray(keysToRemove) ? keysToRemove : [keysToRemove]
+	const res = { ...obj }
+	keysToRemove.forEach(key => {
+		delete res[key]
+	})
+	return res
+}
+
 // filterOptions takes two options objects and filters the properties of the first based on what's in the second. This is useful if only some of the properties need to be passed on to a child object.
 export function filterOptions(allOptions, allowedOptions, removeUndefined) {
 	return filterProperties(allOptions, Object.keys(allowedOptions), removeUndefined)

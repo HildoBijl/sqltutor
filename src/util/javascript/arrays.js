@@ -1,13 +1,13 @@
 import { isNumber, ensureInt } from './numbers'
 
 // firstOf returns the first element of a given array.
-export function firstOf(array) {
-	return array[0]
+export function firstOf(array, offset = 0) {
+	return array[0 + offset]
 }
 
 // lastOf returns the last element of a given array.
-export function lastOf(array) {
-	return array[array.length - 1]
+export function lastOf(array, offset = 0) {
+	return array[array.length - 1 - offset]
 }
 
 // selectRandomly returns a random element out of a given array.

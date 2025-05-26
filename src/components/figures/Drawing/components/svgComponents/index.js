@@ -1,5 +1,6 @@
 export * from './util'
 export * from './Group'
+export * from './ArrowHead'
 export * from './Text'
 export * from './Line'
 export * from './Rectangle'
