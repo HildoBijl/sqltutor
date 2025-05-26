@@ -12,7 +12,7 @@ const defaultStyle = Line.defaultStyle
 const defaultCurve = {
 	...Line.defaultProps,
 	className: 'curve',
-	through: true,
+	through: false,
 	part: 1,
 	spread: undefined,
 }
@@ -42,7 +42,8 @@ Curve.defaultProps = defaultCurve
 // CurveWithoutArrowHead is a regular SVG curve without any arrows at the ends.
 export function CurveWithoutArrowHead(props) {
 	// Process the input.
-	let { points, spread, part, through, close, size, color, className, style, ref } = processOptions(props, defaultCurve)
+	props = processOptions(props, defaultCurve)
+	let { points, spread, part, through, close, size, color, className, style, ref } = props
 	points = ensureVectorArray(points, 2)
 	spread = (spread === undefined ? spread : ensureNumber(spread, true))
 	part = ensureNumber(part)

@@ -46,7 +46,7 @@ export function getCurvePathAlong(points, close, part, spread) {
 		const end = points[index + 1]
 		if (spread !== undefined) {
 			const distance = start.subtract(end).magnitude
-			const factor = Math.min(spread / distance, 0.5)
+			const factor = Math.min(spread / distance, (!close && (index === 0 || index === points.length - 2)) ? 1 : 0.5) // Allow the first/last line to curve fully, otherwise curve only halfway.
 			return [start.interpolate(end, factor), end.interpolate(start, factor)]
 		}
 		return [start.interpolate(end, part / 2), end.interpolate(start, part / 2)]
@@ -84,7 +84,23 @@ export function getCurvePathThrough(points, close, part, spread) {
 	points = points.filter((point, index) => index === 0 || !point.equals(points[index - 1]))
 
 	// For each point, calculate control points.
-	const controlPoints = points.map((point, index) => {
+	const controlPoints = getControlPoints(points, close, part, spread)
+
+	// Apply the control points: walk through the line segments and use them one by one.
+	let svg = `M${getPointSvg(firstOf(points))}`
+	repeat(points.length - (close ? 0 : 1), index => {
+		const nextIndex = mod(index + 1, points.length)
+		const controlPoint1 = controlPoints[index][1]
+		const controlPoint2 = controlPoints[nextIndex][0]
+		const endPoint = points[nextIndex]
+		svg += `C${getPointSvg(controlPoint1)} ${getPointSvg(controlPoint2)} ${getPointSvg(endPoint)}`
+	})
+	return svg
+}
+
+// getControlPoints takes an array of points, with a few settings, and calculates the corresponding control points for a curve. It will be an array of two-element arrays, each containing the two control points for the corresponding point in the original array.
+export function getControlPoints(points, close, part, spread) {
+	return points.map((point, index) => {
 		// For the starting/ending point, do not add control points.
 		if (!close && (index === 0 || index === points.length - 1))
 			return [point, point]
@@ -110,17 +126,6 @@ export function getCurvePathThrough(points, close, part, spread) {
 		// On a part, project the relative vector onto the control direction vector.
 		return [point.add(prevRelative.getProjectionOn(controlDirection).multiply(part / 2)), point.add(nextRelative.getProjectionOn(controlDirection).multiply(part / 2))]
 	})
-
-	// Apply the control points: walk through the line segments and use them one by one.
-	let svg = `M${getPointSvg(firstOf(points))}`
-	repeat(points.length - (close ? 0 : 1), index => {
-		const nextIndex = mod(index + 1, points.length)
-		const controlPoint1 = controlPoints[index][1]
-		const controlPoint2 = controlPoints[nextIndex][0]
-		const endPoint = points[nextIndex]
-		svg += `C${getPointSvg(controlPoint1)} ${getPointSvg(controlPoint2)} ${getPointSvg(endPoint)}`
-	})
-	return svg
 }
 
 // getArcPath takes a circle center (a Vector), a radius, a start angle and an end angle, and gives the SVG path string that makes this path. For angles, mathematical notation is used: the right (point [1, 0]) is taken as zero and clockwise is taken as positive.
@@ -143,13 +148,17 @@ export function preprocessPoints(props, startArrow, endArrow, arrowHeadPullIn) {
 	let { points, size, color } = props
 	points = ensureVectorArray(points, 2)
 	if (points.length < 2)
-		throw new Error(`Invalid Curve properties: cannot add arrow heads to curves consisting of less than two points.`)
+		throw new Error(`Invalid Line properties: cannot add arrow heads to lines consisting of less than two points.`)
 	size = ensureNumber(size, true)
 	color = ensureString(color)
 
+	// Find the control points, which are the points prior to the endpoints, so we can determine the direction of the last line. (We do this for all points, which is a bit overkill. But then we can use the default function.)
+	let { through, close, part, spread } = props
+	const controlPoints = through ? getControlPoints(points, close, part, spread) : points.map(point => [point, point])
+
 	// Prepare the start arrow.
 	if (startArrow) {
-		const startSpan = new Span({ start: firstOf(points, 1), end: firstOf(points) })
+		const startSpan = new Span({ start: firstOf(controlPoints, 1)[0], end: firstOf(points) })
 		startArrow = { position: startSpan.end, angle: startSpan.angle, size, color, ...startArrow }
 		const arrowSize = ensureNumber(startArrow.size, true)
 		const lineStart = startSpan.end.subtract(startSpan.vector.normalize().multiply(arrowHeadPullIn * arrowSize))
@@ -158,7 +167,7 @@ export function preprocessPoints(props, startArrow, endArrow, arrowHeadPullIn) {
 
 	// Prepare the end arrow.
 	if (endArrow) {
-		const endSpan = new Span({ start: lastOf(points, 1), end: lastOf(points) })
+		const endSpan = new Span({ start: lastOf(controlPoints, 1)[1], end: lastOf(points) })
 		endArrow = { position: endSpan.end, angle: endSpan.angle, size, color, ...endArrow }
 		const arrowSize = ensureNumber(endArrow.size, true)
 		const lineEnd = endSpan.end.subtract(endSpan.vector.normalize().multiply(arrowHeadPullIn * arrowSize))

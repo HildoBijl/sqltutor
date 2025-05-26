@@ -6,12 +6,10 @@ const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
 
 export function Theory() {
 	const drawingRef = useRef()
-	const testRef = useRef()
 	const [sqlElement, setSqlElement] = useState()
 	const [subRef1, elBounds1] = useRefWithBounds(drawingRef)
 	const [subRef2, elBounds2] = useRefWithBounds(drawingRef)
 
-	window.r = testRef
 	const points = [[100, 30], [30, 30], [100, 160], [30, 190]]
 
 	const b1 = useTextNodeBounds(sqlElement, '*', drawingRef)
@@ -24,11 +22,11 @@ export function Theory() {
 
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
 			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.4 }} />
-			<Circle center={[70, 70]} radius={30} style={{ fill: 'green' }} />
+			<Circle center={[130, 80]} radius={30} style={{ fill: 'green' }} />
 
 			{points.map((point, index) => <Circle center={point} radius={2} key={index} style={{ fill: 'black' }} />)}
-			<Line ref={testRef} points={points} startArrow={true} color="red" size={3} />
-			{/* <Curve ref={testRef} points={points} through={false} spread={16} arrow={true} /> */}
+			<Line points={points} startArrow={true} color="red" size={3} />
+			<Curve points={points} through={false} part={1} arrow={true} />
 
 			{b2 && <Circle center={b2.leftTop} radius={2} style={{ fill: 'teal' }} />}
 			{b2 && <Circle center={b2.rightTop} radius={2} style={{ fill: 'teal' }} />}
@@ -37,9 +35,9 @@ export function Theory() {
 
 			<Element position={[250, 100]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef1} style={{ color: 'yellow', border: '1px solid yellow' }}>first</span> test</span></Element>
 			<Element position={[250, 150]} behind={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef2} style={{ color: 'green', border: '1px solid green', background: 'red' }}>second</span> test</span></Element>
-			<Element position={[250, 200]} passive={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
+			<Element position={[250, 190]} passive={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
 
-			<Text position={[250, 250]}>This is an SVG test</Text>
+			<Text position={[250, 270]}>This is an SVG test</Text>
 			<Element position={[50, 190]} anchor={[0, 0]}><SQL onCreateEditor={view => setSqlElement(view?.contentDOM)}>{query}</SQL></Element>
 
 			{elBounds1 && <Rectangle dimensions={elBounds1} style={{ fill: 'green' }} />}
@@ -50,7 +48,9 @@ export function Theory() {
 
 			<ArrowHead position={[300, 60]} color="yellow" />
 
-			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x, b1.rightTop.y], b2.middleTop]} size={2} color="yellow" arrow={true} />}
+			<Curve points={[[200, 40], [350, 40], [350, 100]]} color="red" arrow={true} through={false} spread={50} />
+
+			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x - 16, b1.rightTop.y + 3], b2.middleTop.add([0, 1])]} size={2} color="#c81919" arrow={true} through={true} part={1.5} />}
 			{/* {b2 && <ArrowHead position={b2.middleTop.add([-1.5, 5])} color="yellow" angle={Math.PI * 0.6} />} */}
 		</Drawing>
 	</>
