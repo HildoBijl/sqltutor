@@ -1,4 +1,4 @@
-import { mod, firstOf, lastOf, repeat, filterProperties, Vector, useEnsureRef, useEventListeners } from 'util'
+import { mod, firstOf, lastOf, repeat, ensureNumber, ensureString, filterProperties, Vector, ensureVectorArray, Span, useEnsureRef, useEventListeners } from 'util'
 
 // Define event handlers that objects can use.
 export const defaultEventHandlers = {}
@@ -135,4 +135,36 @@ export function getArcPath(center, radius, startAngle, endAngle) {
 
 	// Set up the path.
 	return `M${start.x} ${start.y} A${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`
+}
+
+// preprocessPoints takes a props object (of a Line or Curve) with points, arrow data and similar. It then preprocesses the points by pulling them in to account for the arrow heads. General color and size data is also passed on to the arrow heads.
+export function preprocessPoints(props, startArrow, endArrow, arrowHeadPullIn) {
+	// Extract and check some properties.
+	let { points, size, color } = props
+	points = ensureVectorArray(points, 2)
+	if (points.length < 2)
+		throw new Error(`Invalid Curve properties: cannot add arrow heads to curves consisting of less than two points.`)
+	size = ensureNumber(size, true)
+	color = ensureString(color)
+
+	// Prepare the start arrow.
+	if (startArrow) {
+		const startSpan = new Span({ start: firstOf(points, 1), end: firstOf(points) })
+		startArrow = { position: startSpan.end, angle: startSpan.angle, size, color, ...startArrow }
+		const arrowSize = ensureNumber(startArrow.size, true)
+		const lineStart = startSpan.end.subtract(startSpan.vector.normalize().multiply(arrowHeadPullIn * arrowSize))
+		points = [lineStart, ...points.slice(1)]
+	}
+
+	// Prepare the end arrow.
+	if (endArrow) {
+		const endSpan = new Span({ start: lastOf(points, 1), end: lastOf(points) })
+		endArrow = { position: endSpan.end, angle: endSpan.angle, size, color, ...endArrow }
+		const arrowSize = ensureNumber(endArrow.size, true)
+		const lineEnd = endSpan.end.subtract(endSpan.vector.normalize().multiply(arrowHeadPullIn * arrowSize))
+		points = [...points.slice(0, -1), lineEnd]
+	}
+
+	// Return the results in one object.
+	return { points, startArrow, endArrow }
 }

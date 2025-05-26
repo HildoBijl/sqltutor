@@ -50,8 +50,8 @@ export function Theory() {
 
 			<ArrowHead position={[300, 60]} color="yellow" />
 
-			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x, b1.rightTop.y], b2.middleTop]} style={{ strokeWidth: 2, stroke: 'yellow' }} />}
-			{b2 && <ArrowHead position={b2.middleTop.add([-1.5, 5])} color="yellow" angle={Math.PI * 0.6} />}
+			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x, b1.rightTop.y], b2.middleTop]} size={2} color="yellow" arrow={true} />}
+			{/* {b2 && <ArrowHead position={b2.middleTop.add([-1.5, 5])} color="yellow" angle={Math.PI * 0.6} />} */}
 		</Drawing>
 	</>
 }
