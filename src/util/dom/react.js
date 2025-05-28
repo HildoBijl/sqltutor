@@ -247,3 +247,35 @@ export function useTextNode(container, condition, offset = 0) {
 	// Get and filter the text nodes.
 	return getTextNodes(container).filter(condition)[offset]
 }
+
+// useAnimation takes an animation function and calls it several times per second with both (1) the time since mounting, and (2) the time difference dt since the last call. On the first call dt is undefined.
+export function useAnimation(animationFunc) {
+	const startTimeRef = useRef()
+	const previousTimeRef = useRef()
+	const requestRef = useRef()
+	const animationFuncRef = useLatest(animationFunc)
+
+	// Set up an animate function that keeps calling itself.
+	const animate = useCallback(pageTime => {
+		// Calculate all relevant times.
+		let dt, time
+		if (startTimeRef.current === undefined) {
+			startTimeRef.current = pageTime // Remember the starting time.
+			time = 0
+		} else {
+			time = pageTime - startTimeRef.current
+			dt = pageTime - previousTimeRef.current
+		}
+		previousTimeRef.current = pageTime
+
+		// Call the given animation function, and then call itself a tiny bit later.
+		animationFuncRef.current(time, dt)
+		requestRef.current = requestAnimationFrame(animate)
+	}, [startTimeRef, previousTimeRef, animationFuncRef])
+
+	// Start the animation cycle upon mounting.
+	useEffect(() => {
+		requestRef.current = requestAnimationFrame(animate)
+		return () => cancelAnimationFrame(requestRef.current)
+	}, [requestRef, animate])
+}
