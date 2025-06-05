@@ -10,5 +10,6 @@ export function SQL({ lineNumbers = false, foldGutter = false, highlightActiveLi
 		basicSetup={{ lineNumbers, foldGutter, highlightActiveLine, highlightActiveLineGutter: highlightActiveLine, }}
 		{...{ readOnly: true, editable: false, value, ...props }}
 		extensions={[sql(), ...extensions]}
+		style={{ display: 'inline-block' }}
 	/>
 }

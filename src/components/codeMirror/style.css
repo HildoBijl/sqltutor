@@ -26,3 +26,15 @@
 .ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor { /* Cursor */
 	border-left-color: #528bff;
 }
+
+.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor { /* Cursor */
+	border-left-color: #528bff;
+}
+
+.ͼ1 .cm-line {
+	padding: 0 4px;
+}
+
+.ͼ1 .cm-content {
+	padding: 2px 0;
+}

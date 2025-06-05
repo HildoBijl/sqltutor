@@ -16,8 +16,21 @@ export function Theory() {
 	const b2 = useTextNodeBounds(sqlElement, 'Netherlands', drawingRef)
 
 	return <>
+		<p>When receiving a table filled with data from a query, you might want to order the rows in a certain way. For instance alphabetically by name, sorted by number of employees, or similar. How can you use SQL to sort rows in a table?</p>
+
+		<h3>Sorting on a single column</h3>
+		<p>To instruct SQL to sort rows, you add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the column name that should be ordered by.</p>
+
+		<p>ToDo: example image.</p>
+
+		<p>By adding the <SQL>ASC</SQL> (ascending) or <SQL>DESC</SQL> (descending) classifiers, we indicate the sorting direction.</p>
+		
+		
+		<p style={{ fontWeight: 'bold', color: 'red' }}>The parts below are meta descriptions of this theory page.</p>
+
 		<TheoryWarning />
 		<p>You can sort rows in a table by adding an "ORDER BY" clause at the end. You can order by one column, multiple columns, ascending or descending. In case of Null values you can add NULLS LAST as add-on. It is also possible to limit the rows in various ways.</p>
+
 		<p style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</p>
 
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
