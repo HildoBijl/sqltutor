@@ -4,4 +4,5 @@ export const defaultFigureOptions = {
 	className: '',
 	style: {},
 	children: null, // What is placed inside the figure.
+	ref: undefined,
 }

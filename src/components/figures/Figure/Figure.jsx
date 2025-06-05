@@ -1,8 +1,8 @@
-import { useRef, forwardRef, useImperativeHandle } from 'react'
+import { useRef, useImperativeHandle } from 'react'
 import { Box } from '@mui/material'
 import clsx from 'clsx'
 
-import { processOptions, filterProperties, resolveFunctions } from 'util'
+import { processOptions, filterProperties, resolveFunctions, useEnsureRef } from 'util'
 
 import { defaultFigureOptions } from './settings'
 
@@ -22,11 +22,12 @@ const innerFigureStyle = {
 	width: '100%',
 }
 
-export const Figure = forwardRef((options, ref) => {
+export function Figure(options) {
 	options = processOptions(options, defaultFigureOptions)
 	const styleOptions = filterProperties(options, ['maxWidth', 'aspectRatio'])
 
 	// Define refs and make them accessible to calling elements.
+	const ref = useEnsureRef(options.ref)
 	const figureInner = useRef()
 	const figureOuter = useRef()
 	useImperativeHandle(ref, () => ({
@@ -47,5 +48,4 @@ export const Figure = forwardRef((options, ref) => {
 			</Box>
 		</Box>
 	)
-})
-Figure.displayName = 'Figure'
+}

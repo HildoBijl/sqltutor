@@ -1,7 +1,7 @@
-import { useRef, useMemo, forwardRef, useImperativeHandle, useId } from 'react'
+import { useRef, useMemo, useImperativeHandle, useId } from 'react'
 import clsx from 'clsx'
 
-import { processOptions, filterOptions, resolveFunctions, getEventPosition, useForceUpdateEffect, Rectangle, Vector, notSelectable } from 'util'
+import { processOptions, filterOptions, resolveFunctions, getEventPosition, useEnsureRef, useForceUpdateEffect, Rectangle, Vector, notSelectable } from 'util'
 
 import { Figure, defaultFigureOptions } from '../Figure'
 
@@ -26,7 +26,7 @@ const canvasStyle = {
 }
 
 // Set up the component with an imperative handle.
-export const Drawing = forwardRef((options, ref) => {
+export function Drawing(options) {
 	// Process and check the options.
 	options = processOptions(options, defaultDrawingOptions)
 	if (!options.useSvg && !options.useCanvas)
@@ -34,6 +34,7 @@ export const Drawing = forwardRef((options, ref) => {
 
 	// Set up styles and references.
 	const id = useId()
+	const ref = useEnsureRef(options.ref)
 	const figureRef = useRef()
 	const htmlContentsRef = useRef()
 	const svgRef = useRef()
@@ -83,7 +84,7 @@ export const Drawing = forwardRef((options, ref) => {
 	options.className = clsx('drawing', options.className)
 	return (
 		<DrawingContext.Provider value={{ id, bounds, figure: figureRef.current, svg: svgRef.current, svgDefs: svgDefsRef.current, htmlContents: htmlContentsRef.current, canvas: canvasRef.current }}>
-			<Figure ref={figureRef} {...filterOptions(options, defaultFigureOptions)}>
+			<Figure {...{ ...filterOptions(options, defaultFigureOptions), ref: figureRef }}>
 				{options.useSvg ? (
 					<svg ref={svgRef} style={svgStyle} viewBox={`0 0 ${width} ${height}`}>
 						<defs ref={svgDefsRef} />
@@ -102,5 +103,4 @@ export const Drawing = forwardRef((options, ref) => {
 			</Figure>
 		</DrawingContext.Provider>
 	)
-})
-Drawing.displayName = 'Drawing'
+}

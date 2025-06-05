@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useLayoutEffect } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
 import clsx from 'clsx'
 
 import { ensureNumber, ensureBoolean, ensureObject, processOptions, Vector, ensureVector, useEnsureRef, ensureReactElement, useEqualRefOnEquality, useResizeListener, notSelectable } from 'util'
@@ -26,11 +26,9 @@ const defaultElement = {
 	className: undefined,
 }
 
-export const Element = forwardRef((props, ref) => {
-	ref = useEnsureRef(ref)
-
+export function Element(props) {
 	// Check input.
-	let { children, position, rotate, scale, anchor, passive, behind, style } = processOptions(props, defaultElement)
+	let { children, position, rotate, scale, anchor, passive, behind, style, ref } = processOptions(props, defaultElement)
 	children = ensureReactElement(children)
 	position = ensureVector(position, 2)
 	rotate = ensureNumber(rotate)
@@ -39,6 +37,7 @@ export const Element = forwardRef((props, ref) => {
 	passive = ensureBoolean(passive)
 	behind = ensureBoolean(behind)
 	style = { ...defaultElement.style, ...elementStyle, zIndex: behind ? -1 : 3, ...ensureObject(style) }
+	ref = useEnsureRef(ref)
 
 	// Check if mouse events should be ignored.
 	if (passive)
@@ -83,8 +82,6 @@ export const Element = forwardRef((props, ref) => {
 			{children}
 		</div>
 	</HtmlPortal>
-})
-Element.displayName = 'Element'
+}
 Element.defaultProps = defaultElement
 Element.defaultStyle = elementStyle
-export default Element

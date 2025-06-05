@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 
-import { SQL, TheoryWarning, Drawing, Element, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
+import { SQL, TheoryWarning, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
 
 const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
 
@@ -21,7 +21,7 @@ export function Theory() {
 		<p style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</p>
 
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
-			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.4 }} />
+			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.2 }} />
 			<Circle center={[130, 80]} radius={30} style={{ fill: 'green' }} />
 
 			{points.map((point, index) => <Circle center={point} radius={2} key={index} style={{ fill: 'black' }} />)}
@@ -32,6 +32,9 @@ export function Theory() {
 			{b2 && <Circle center={b2.rightTop} radius={2} style={{ fill: 'teal' }} />}
 			{b2 && <Circle center={b2.leftBottom} radius={2} style={{ fill: 'teal' }} />}
 			{b2 && <Circle center={b2.rightBottom} radius={2} style={{ fill: 'teal' }} />}
+
+			<Glyph name="Database" position={[360, 80]} width={60} />
+			<Glyph name="Database" position={[380, 180]} behind={false} />
 
 			<Element position={[250, 100]}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef1} style={{ color: 'yellow', border: '1px solid yellow' }}>first</span> test</span></Element>
 			<Element position={[250, 150]} behind={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a <span ref={subRef2} style={{ color: 'green', border: '1px solid green', background: 'red' }}>second</span> test</span></Element>
