@@ -8,7 +8,8 @@ console.log(glyphs)
 
 const defaultGlyph = {
 	...Element.defaultProps,
-	behind: true,
+	passive: true, // Override Element's defaults.
+	behind: true, // Override Element's defaults.
 	name: undefined,
 	height: undefined,
 	width: 100,
