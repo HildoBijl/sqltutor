@@ -1,37 +1,15 @@
 import { useState, useRef } from 'react'
+import { useTheme } from '@mui/material'
 
-import { Head, Par, Warning, SQL, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
-
-const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
-const enter = `\n`
-console.log(enter)
+import { Head, Par, Warning, SQL, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds } from 'components'
 
 export function Theory() {
-	const drawingRef = useRef()
-	const [sqlElement, setSqlElement] = useState()
-	const [subRef1, elBounds1] = useRefWithBounds(drawingRef)
-	const [subRef2, elBounds2] = useRefWithBounds(drawingRef)
-
-	const points = [[100, 30], [30, 30], [100, 160], [30, 190]]
-
-	const b1 = useTextNodeBounds(sqlElement, '*', drawingRef)
-	const b2 = useTextNodeBounds(sqlElement, 'Netherlands', drawingRef)
-
 	return <>
 		<Par>When receiving a table filled with data from a query, we might want to order the rows in a certain way. For instance alphabetically by name, sorted by number of employees, or similar. How can we use SQL to sort rows in a table?</Par>
 
 		<Head>Sorting on a single column</Head>
-		<Par>To instruct SQL to sort rows, we add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the column name that should be ordered by.</Par>
-		<Drawing width={800} height={200}>
-			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
-			<Element position={[50, 50]} anchor={[0, 0]}>
-				<SQL>{`
-SELECT *
-FROM companies
-ORDER BY name DESC
-			`}</SQL>
-			</Element>
-		</Drawing>
+		<Par>To instruct SQL to sort rows, we add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the name of the column by which it should be ordered.</Par>
+		<FigureSingleColumnSorting />
 		<Par>By adding the <SQL>ASC</SQL> (ascending) or <SQL>DESC</SQL> (descending) classifiers, we indicate the sorting direction.</Par>
 
 		<Head>Sorting based on multiple columns</Head>
@@ -48,7 +26,7 @@ ORDER BY country ASC, name DESC
 		</Drawing>
 
 		<Head>Limiting the number of rows</Head>
-		<Par>If only the first (for example) two rows are needed, then you can limit the number of rows that are given. To do so, add a <SQL>LIMIT</SQL> command after the <SQL>ORDER BY</SQL> command and specify how many rows you need.</Par>
+		<Par>If not the whole table is needed, but only the first few rows, then we can limit the number of rows that are given. To do so, we add a <SQL>LIMIT</SQL> command after the <SQL>ORDER BY</SQL> command and specify how many rows we need.</Par>
 		<Drawing width={800} height={200}>
 			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
 			<Element position={[50, 50]} anchor={[0, 0]}>
@@ -88,8 +66,51 @@ ORDER BY country ASC NULLS FIRST
 		</Drawing>
 		<Par>By default, NULL values are "larger" than any other value. So when using ascending sorting <SQL>NULLS LAST</SQL> is default, while when using descending sorting <SQL>NULLS FIRST</SQL> is default.</Par>
 
+		{/* <Test /> */}
+	</>
+}
 
+function FigureSingleColumnSorting() {
+	const theme = useTheme()
+	const drawingRef = useRef()
+	const [element, setElement] = useState()
+	const bounds = useTextNodeBounds(element, 'DESC', drawingRef)
 
+	return <Drawing width={900} height={200} ref={drawingRef}>
+		{/* <Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} /> */}
+
+		<Element position={[20, 20]} anchor={[0, 0]}>
+			<SQL setElement={setElement}>{`
+SELECT *
+FROM companies
+ORDER BY name DESC
+			`}</SQL>
+		</Element>
+
+		<Rectangle dimensions={[[280, 20], [440, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+		<Rectangle dimensions={[[450, 20], [610, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+		<Rectangle dimensions={[[620, 20], [780, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+
+		{bounds && <>
+			<Curve points={[bounds.topRight.add([0, 0]), [260, 0], [410, 0], [450, 20]]} color={theme.palette.primary.main} endArrow={true} />
+			{/* <Rectangle dimensions={bounds} style={{ fill: 'white', opacity: 0.5 }} /> */}
+		</>}
+	</Drawing>
+}
+
+const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
+function Test() {
+	const drawingRef = useRef()
+	const [sqlElement, setSqlElement] = useState()
+	const [subRef1, elBounds1] = useRefWithBounds(drawingRef)
+	const [subRef2, elBounds2] = useRefWithBounds(drawingRef)
+
+	const points = [[100, 30], [30, 30], [100, 160], [30, 190]]
+
+	const b1 = useTextNodeBounds(sqlElement, '*', drawingRef)
+	const b2 = useTextNodeBounds(sqlElement, 'Netherlands', drawingRef)
+
+	return <>
 		<Head>Testing section</Head>
 		<Par style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</Par>
 

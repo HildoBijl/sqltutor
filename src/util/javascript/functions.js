@@ -1,6 +1,9 @@
 import { ensureInt } from './numbers'
 import { isBasicObject, applyMapping, ensureConsistency } from './objects'
 
+// noop is literally a function that does nothing (no-operation).
+export function noop() { }
+
 // repeat will repeat the given function the given number of times. The function is passed the index (0, 1, ..., (times-1)) as parameter. Using a negative times will throw an error. Returned is an array of all outcomes.
 export function repeat(times, func) {
 	times = ensureInt(times, true)

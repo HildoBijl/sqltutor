@@ -121,14 +121,14 @@ export function useStableCallback(func, dependencies) {
 	return useCallback((...args) => funcRef.current(...args), [funcRef, dependencies])
 }
 
-// useStaggeredFunction turns a function into a staggered function. First of all, when calling the function, it's not called directly, but on a zero-timeout. Second of all, if it is called multiple times before being executed, it's only executed once.
+// useStaggeredFunction turns a function into a staggered function. First of all, when calling the function, it's not called directly, but on a zero-timeout. Second of all, if it is called multiple times before being executed, it's only executed once. (And then the last given function is executed.)
 export function useStaggeredFunction(func) {
 	const funcRef = useLatest(func)
 	const timeoutRef = useRef()
 	return useStableCallback((...args) => {
 		if (timeoutRef.current === undefined) {
 			timeoutRef.current = setTimeout(() => {
-				func(...args)
+				funcRef.current(...args)
 				timeoutRef.current = undefined
 			}, [timeoutRef])
 		}

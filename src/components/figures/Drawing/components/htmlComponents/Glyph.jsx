@@ -4,8 +4,6 @@ import * as glyphs from 'assets/glyphs'
 
 import { Element } from './Element'
 
-console.log(glyphs)
-
 const defaultGlyph = {
 	...Element.defaultProps,
 	passive: true, // Override Element's defaults.

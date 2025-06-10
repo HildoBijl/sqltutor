@@ -7,33 +7,36 @@ import '@fontsource/roboto/700.css'
 
 import './main.css'
 
+export const themeColor = '#c81919'
+export const secondaryColor = '#262626'
+
 export const createCustomTheme = () => createTheme({
 	palette: {
 		mode: 'dark',
 		primary: {
-			main: '#c81919',
+			main: themeColor,
 		},
 		secondary: {
-			main: '#262626',
+			main: secondaryColor,
 		},
 		background: {
-			default: '#282C34',
-			paper: '#21252B',
+			default: '#282c34',
+			paper: '#21252b',
 		},
 		text: {
-			primary: '#ABB2BF',
+			primary: '#abb2bf',
 		},
-		divider: '#3E4451',
+		divider: '#3e4451',
 	},
 	components: {
 		MuiTableCell: {
 			styleOverrides: {
 				root: {
-					borderColor: '#3E4451', // Border color to match theme
+					borderColor: '#3e4451', // Border color to match theme
 				},
 				// header of the table
 				head: {
-					backgroundColor: '#282C34',
+					backgroundColor: '#282c34',
 					color: '#c81919',
 					fontWeight: 'bold',
 				},

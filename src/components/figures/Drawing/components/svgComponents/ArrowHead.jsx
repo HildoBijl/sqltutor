@@ -34,7 +34,7 @@ export function ArrowHead(props) {
 	return <SvgPortal>
 		<polygon
 			ref={ref}
-			points="0 0, -8 -4, -6 0, -8 4"
+			points="0 0, -12 -6, -9 0, -12 6"
 			className={className}
 			style={{
 				fill: color,
