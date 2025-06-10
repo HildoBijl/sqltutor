@@ -1,3 +1,8 @@
 export function Par({ children, ...props }) {
-	return <p {...props}>{children}</p>
+	props.style = {
+		display: 'block',
+		margin: '1em 0',
+		...(props.style || {})
+	}
+	return <div {...props}>{children}</div> // Turn paragraphs into divs, so they may contain a larger variety of elements without getting hydration errors.
 }
