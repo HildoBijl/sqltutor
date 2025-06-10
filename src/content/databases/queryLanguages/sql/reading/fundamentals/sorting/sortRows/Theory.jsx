@@ -66,7 +66,7 @@ ORDER BY country ASC NULLS FIRST
 			`}</SQL>
 			</Element>
 		</Drawing>
-		<Par>By default, NULL values are "larger" than any other value. So when using ascending sorting <SQL>NULLS LAST</SQL> is default, while when using descending sorting <SQL>NULLS FIRST</SQL> is default.</Par>
+		<Par>By default, NULL values are "larger" than any other value. So the default for ascending sorting is <SQL>NULLS LAST</SQL>, while the default for descending sorting is <SQL>NULLS FIRST</SQL>.</Par>
 	</>
 }
 
