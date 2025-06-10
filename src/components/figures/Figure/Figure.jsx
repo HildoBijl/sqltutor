@@ -10,7 +10,7 @@ const figureStyle = {
 	boxSizing: 'content-box',
 	margin: '1rem auto',
 	maxWidth: ({ maxWidth }) => maxWidth !== undefined ? `${maxWidth}px` : '',
-	padding: '0 1rem',
+	padding: '0',
 	position: 'relative',
 }
 
