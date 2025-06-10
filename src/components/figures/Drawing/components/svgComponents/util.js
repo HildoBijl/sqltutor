@@ -49,7 +49,7 @@ export function getCurvePathAlong(points, close, part, spread) {
 			const factor = Math.min(spread / distance, (!close && (index === 0 || index === points.length - 2)) ? 1 : 0.5) // Allow the first/last line to curve fully, otherwise curve only halfway.
 			return [start.interpolate(end, factor), end.interpolate(start, factor)]
 		}
-		return [start.interpolate(end, part / 2), end.interpolate(start, part / 2)]
+		return [start.interpolate(end, part * (!close && index === points.length - 2 ? 0.9 : 0.5)), end.interpolate(start, part * (!close && index === 0 ? 0.9 : 0.5))] // Allow the first/last line to curve fully, otherwise curve only halfway. Use 0.9 instead of 1 to prevent weird skews in case of arrow heads.
 	})
 
 	// For a non-closed curve, ensure that the first and last points are the starting and ending points.

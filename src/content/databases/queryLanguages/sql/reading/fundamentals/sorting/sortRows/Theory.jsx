@@ -5,6 +5,8 @@ import { Head, Par, Warning, SQL, Drawing, Element, Glyph, useRefWithBounds, Lin
 
 export function Theory() {
 	return <>
+		{/* <Test /> */}
+
 		<Par>When receiving a table filled with data from a query, we might want to order the rows in a certain way. For instance alphabetically by name, sorted by number of employees, or similar. How can we use SQL to sort rows in a table?</Par>
 
 		<Head>Sorting on a single column</Head>
@@ -65,8 +67,6 @@ ORDER BY country ASC NULLS FIRST
 			</Element>
 		</Drawing>
 		<Par>By default, NULL values are "larger" than any other value. So when using ascending sorting <SQL>NULLS LAST</SQL> is default, while when using descending sorting <SQL>NULLS FIRST</SQL> is default.</Par>
-
-		{/* <Test /> */}
 	</>
 }
 
@@ -116,11 +116,13 @@ function Test() {
 
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
 			<Rectangle dimensions={[[20, 20], [380, 280]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.2 }} />
-			<Circle center={[130, 80]} radius={30} style={{ fill: 'green' }} />
+			{/* <Circle center={[130, 80]} radius={30} style={{ fill: 'green' }} /> */}
 
 			{points.map((point, index) => <Circle center={point} radius={2} key={index} style={{ fill: 'black' }} />)}
 			<Line points={points} startArrow={true} color="red" size={3} />
 			<Curve points={points} through={false} part={1} arrow={true} />
+
+			<Curve points={[[100, 100], [100, 70], [250, 70], [250, 100]]} part={1} arrow={true} color="green" />
 
 			{b2 && <Circle center={b2.leftTop} radius={2} style={{ fill: 'teal' }} />}
 			{b2 && <Circle center={b2.rightTop} radius={2} style={{ fill: 'teal' }} />}
