@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 
-import { Head, Par, SQL, TheoryWarning, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
+import { Head, Par, Warning, SQL, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
 
 const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
 
@@ -16,21 +16,32 @@ export function Theory() {
 	const b2 = useTextNodeBounds(sqlElement, 'Netherlands', drawingRef)
 
 	return <>
-		<Par>When receiving a table filled with data from a query, you might want to order the rows in a certain way. For instance alphabetically by name, sorted by number of employees, or similar. How can you use SQL to sort rows in a table?</Par>
+		<Par>When receiving a table filled with data from a query, we might want to order the rows in a certain way. For instance alphabetically by name, sorted by number of employees, or similar. How can we use SQL to sort rows in a table?</Par>
 
 		<Head>Sorting on a single column</Head>
-		<Par>To instruct SQL to sort rows, you add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the column name that should be ordered by.</Par>
+		<Par>To instruct SQL to sort rows, we add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the column name that should be ordered by.</Par>
+		<Par>ToDo: example image.</Par>
+		<Par>By adding the <SQL>ASC</SQL> (ascending) or <SQL>DESC</SQL> (descending) classifiers, we indicate the sorting direction.</Par>
 
+		<Head>Sorting based on multiple columns</Head>
+		<Par>If the sorting column has many equal values, it is helpful to add a second (or even a third and fourth) sorting column. When rows have the same value within the first column, the second column is used for comparison.</Par>
 		<Par>ToDo: example image.</Par>
 
-		<Par>By adding the <SQL>ASC</SQL> (ascending) or <SQL>DESC</SQL> (descending) classifiers, we indicate the sorting direction.</Par>
-		
-		
-		<Par style={{ fontWeight: 'bold', color: 'red' }}>The parts below are meta descriptions of this theory page.</Par>
+		<Head>Limiting the number of rows</Head>
+		<Par>If only the first (for example) two rows are needed, then you can limit the number of rows that are given. To do so, add a <SQL>LIMIT</SQL> command after the <SQL>ORDER BY</SQL> command and specify how many rows you need.</Par>
+		<Par>ToDo: example image.</Par>
+		<Par>It is also possible to first skip a few rows. This is done through the <SQL>OFFSET</SQL> command. It specifies how many rows should first be skipped.</Par>
+		<Par>ToDo: example image.</Par>
+		<Warning>Though most database management systems use the <SQL>LIMIT</SQL> and <SQL>OFFSET</SQL> commands, there are a few DBMs that do not stick to this convention yet. If the usual commands do not work, even on simple queries, check out the specifications for your own DBM.</Warning>
 
-		<TheoryWarning />
-		<Par>You can sort rows in a table by adding an "ORDER BY" clause at the end. You can order by one column, multiple columns, ascending or descending. In case of Null values you can add NULLS LAST as add-on. It is also possible to limit the rows in various ways.</Par>
+		<Head>Dealing with NULL values</Head>
+		<Par>If there are NULL values in the sorted column, we can indicate manually if we want them at the start or at the end. For this we use the <SQL>NULLS FIRST</SQL> or <SQL>NULLS LAST</SQL> additions.</Par>
+		<Par>ToDo: example image.</Par>
+		<Par>By default, NULL values are "larger" than any other value. So when using ascending sorting <SQL>NULLS LAST</SQL> is default, while when using descending sorting <SQL>NULLS FIRST</SQL> is default.</Par>
 
+
+
+		<Head>Testing section</Head>
 		<Par style={{ fontWeight: 'bold', color: 'red' }}>The parts below are test elements for the new Theory pages.</Par>
 
 		<Drawing maxWidth={600} width={400} height={300} ref={drawingRef}>
