@@ -3,6 +3,8 @@ import { useState, useRef } from 'react'
 import { Head, Par, Warning, SQL, Drawing, Element, Glyph, useRefWithBounds, Line, Rectangle, Circle, Curve, Text, useTextNodeBounds, ArrowHead } from 'components'
 
 const query = "SELECT *\nFROM companies\nWHERE country='Netherlands'"
+const enter = `\n`
+console.log(enter)
 
 export function Theory() {
 	const drawingRef = useRef()
@@ -20,23 +22,70 @@ export function Theory() {
 
 		<Head>Sorting on a single column</Head>
 		<Par>To instruct SQL to sort rows, we add an <SQL>ORDER BY</SQL> command to the end of the query, followed by the column name that should be ordered by.</Par>
-		<Par>ToDo: example image.</Par>
+		<Drawing width={800} height={200}>
+			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
+			<Element position={[50, 50]} anchor={[0, 0]}>
+				<SQL>{`
+SELECT *
+FROM companies
+ORDER BY name DESC
+			`}</SQL>
+			</Element>
+		</Drawing>
 		<Par>By adding the <SQL>ASC</SQL> (ascending) or <SQL>DESC</SQL> (descending) classifiers, we indicate the sorting direction.</Par>
 
 		<Head>Sorting based on multiple columns</Head>
-		<Par>If the sorting column has many equal values, it is helpful to add a second (or even a third and fourth) sorting column. When rows have the same value within the first column, the second column is used for comparison.</Par>
-		<Par>ToDo: example image.</Par>
+		<Par>If the sorting column has many equal values, it is helpful to add a second (or even a third and fourth) sorting column. We can do this by giving a list of column sortings, separated by commas. When rows have the same value within the first column, then the second column is used for comparison, and then the third, and so forth.</Par>
+		<Drawing width={800} height={200}>
+			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
+			<Element position={[50, 50]} anchor={[0, 0]}>
+				<SQL>{`
+SELECT *
+FROM companies
+ORDER BY country ASC, name DESC
+			`}</SQL>
+			</Element>
+		</Drawing>
 
 		<Head>Limiting the number of rows</Head>
 		<Par>If only the first (for example) two rows are needed, then you can limit the number of rows that are given. To do so, add a <SQL>LIMIT</SQL> command after the <SQL>ORDER BY</SQL> command and specify how many rows you need.</Par>
-		<Par>ToDo: example image.</Par>
+		<Drawing width={800} height={200}>
+			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
+			<Element position={[50, 50]} anchor={[0, 0]}>
+				<SQL>{`
+SELECT *
+FROM companies
+ORDER BY name DESC
+LIMIT 2
+			`}</SQL>
+			</Element>
+		</Drawing>
 		<Par>It is also possible to first skip a few rows. This is done through the <SQL>OFFSET</SQL> command. It specifies how many rows should first be skipped.</Par>
-		<Par>ToDo: example image.</Par>
-		<Warning>Though most database management systems use the <SQL>LIMIT</SQL> and <SQL>OFFSET</SQL> commands, there are a few DBMs that do not stick to this convention yet. If the usual commands do not work, even on simple queries, check out the specifications for your own DBM.</Warning>
+		<Drawing width={800} height={200}>
+			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
+			<Element position={[50, 50]} anchor={[0, 0]}>
+				<SQL>{`
+SELECT *
+FROM companies
+ORDER BY name DESC
+LIMIT 2 OFFSET 1
+			`}</SQL>
+			</Element>
+		</Drawing>
+		<Warning>Though most database management systems use the <SQL>LIMIT</SQL> and <SQL>OFFSET</SQL> commands, there are a few DBMs that do not stick to this convention. If the usual commands do not work, even on simple queries, check out the specifications for your own DBM.</Warning>
 
 		<Head>Dealing with NULL values</Head>
 		<Par>If there are NULL values in the sorted column, we can indicate manually if we want them at the start or at the end. For this we use the <SQL>NULLS FIRST</SQL> or <SQL>NULLS LAST</SQL> additions.</Par>
-		<Par>ToDo: example image.</Par>
+		<Drawing width={800} height={200}>
+			<Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} />
+			<Element position={[50, 50]} anchor={[0, 0]}>
+				<SQL>{`
+SELECT *
+FROM companies
+ORDER BY country ASC NULLS FIRST
+			`}</SQL>
+			</Element>
+		</Drawing>
 		<Par>By default, NULL values are "larger" than any other value. So when using ascending sorting <SQL>NULLS LAST</SQL> is default, while when using descending sorting <SQL>NULLS FIRST</SQL> is default.</Par>
 
 
@@ -65,7 +114,9 @@ export function Theory() {
 			<Element position={[250, 190]} passive={true}><span style={{ fontWeight: 'bold', color: 'red' }}>This is a test</span></Element>
 
 			<Text position={[250, 270]}>This is an SVG test</Text>
-			<Element position={[50, 190]} anchor={[0, 0]}><SQL onCreateEditor={view => setSqlElement(view?.contentDOM)}>{query}</SQL></Element>
+			<Element position={[50, 190]} anchor={[0, 0]}>
+				<SQL onCreateEditor={view => setSqlElement(view?.contentDOM)}>{query}</SQL>
+			</Element>
 
 			{elBounds1 && <Rectangle dimensions={elBounds1} style={{ fill: 'green' }} />}
 			{elBounds2 && <Rectangle dimensions={elBounds2} style={{ fill: 'yellow', opacity: 0.3 }} />}
@@ -73,12 +124,9 @@ export function Theory() {
 			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomLeft, elBounds2.bottomRight]} style={{ stroke: 'orange', strokeWidth: 2 }} />}
 			{elBounds1 && elBounds2 && <Line points={[elBounds1.bottomRight, elBounds2.bottomLeft]} style={{ stroke: 'orange', strokeWidth: 2 }} />}
 
-			<ArrowHead position={[300, 60]} color="yellow" />
-
 			<Curve points={[[200, 40], [350, 40], [350, 100]]} color="red" arrow={true} through={false} spread={50} />
 
 			{b1 && b2 && <Curve points={[b1.rightTop.add([1, 3]), [b2.middleTop.x - 16, b1.rightTop.y + 3], b2.middleTop.add([0, 1])]} size={2} color="#c81919" arrow={true} through={true} part={1.5} />}
-			{/* {b2 && <ArrowHead position={b2.middleTop.add([-1.5, 5])} color="yellow" angle={Math.PI * 0.6} />} */}
 		</Drawing>
 	</>
 }
