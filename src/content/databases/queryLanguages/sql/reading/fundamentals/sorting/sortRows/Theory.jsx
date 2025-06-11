@@ -73,26 +73,26 @@ ORDER BY country ASC NULLS FIRST
 function FigureSingleColumnSorting() {
 	const theme = useTheme()
 	const drawingRef = useRef()
-	const [element, setElement] = useState()
-	const bounds = useTextNodeBounds(element, 'DESC', drawingRef)
+	const [queryElement, setQueryElement] = useState()
+	const bounds = useTextNodeBounds(queryElement, 'DESC', drawingRef)
 
-	return <Drawing width={900} height={200} ref={drawingRef}>
+	return <Drawing width={800} height={200} ref={drawingRef}>
 		{/* <Rectangle dimensions={[[0, 0], [800, 200]]} style={{ fill: 'blue', opacity: 0.1 }} /> */}
 
-		<Element position={[20, 20]} anchor={[0, 0]}>
-			<SQL setElement={setElement}>{`
+		<Element position={[0, 20]} anchor={[0, 0]}>
+			<SQL setElement={setQueryElement}>{`
 SELECT *
 FROM companies
 ORDER BY name DESC
 			`}</SQL>
 		</Element>
 
-		<Rectangle dimensions={[[280, 20], [440, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
-		<Rectangle dimensions={[[450, 20], [610, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
-		<Rectangle dimensions={[[620, 20], [780, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+		<Rectangle dimensions={[[300, 20], [460, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+		<Rectangle dimensions={[[470, 20], [630, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
+		<Rectangle dimensions={[[640, 20], [800, 180]]} style={{ fill: theme.palette.primary.main, opacity: 0.2 }} />
 
 		{bounds && <>
-			<Curve points={[bounds.topRight.add([0, 0]), [260, 0], [410, 0], [450, 20]]} color={theme.palette.primary.main} endArrow={true} />
+			<Curve points={[bounds.topRight.add([0, 0]), [260, 0], [440, 0], [490, 40]]} color={theme.palette.primary.main} endArrow={true} />
 			{/* <Rectangle dimensions={bounds} style={{ fill: 'white', opacity: 0.5 }} /> */}
 		</>}
 	</Drawing>
