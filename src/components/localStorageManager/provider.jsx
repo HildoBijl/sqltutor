@@ -13,12 +13,12 @@ export function LocalStorageManager({ children }) {
 	useEffect(() => {
 		if (!initialized) {
 			setInitialized(true)
-			setLocalStorage(localStorage => ({ ...getLocalStorage(), ...(localStorage || {}) }))
+			setLocalStorage(localStorage => ({ ...(localStorage || {}), ...getLocalStorage() }))
 		}
 	}, [initialized, setInitialized, setLocalStorage])
 
 	// Set up the context with its contents.
-	return <LocalStorageContext.Provider value={{ localStorage: localStorage || {}, setLocalStorage }}>
+	return <LocalStorageContext.Provider value={{ initialized, localStorage: localStorage || {}, setLocalStorage }}>
 		{children}
 	</LocalStorageContext.Provider>
 }

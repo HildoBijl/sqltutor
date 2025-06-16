@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 
-import { Subpage } from 'components'
+import { Subpage, useLocalStorageValue } from 'components'
 import { concepts, skills } from 'edu'
 
 export function Overview() {
+	const localStorage = useLocalStorageValue()
+
 	return <Subpage>
 		<p>Contents are split up into small modular blocks. We distinguish between:</p>
 		<ul>
@@ -13,7 +15,7 @@ export function Overview() {
 		<p>You find the full list of the contents below.</p>
 		<h4>Concepts</h4>
 		<ul>
-			{Object.values(concepts).map(concept => <li key={concept.id}><Link to={`/c/${concept.id}`}>{concept.name}</Link></li>)}
+			{Object.values(concepts).map(concept => <li key={concept.id}><Link to={`/c/${concept.id}`}>{concept.name}</Link>{localStorage[`component-${concept.id}`]?.completed ? ' (completed)' : ''}</li>)}
 		</ul>
 		<h4>Skills</h4>
 		<ul>

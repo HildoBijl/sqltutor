@@ -1,11 +1,17 @@
+import { applyMapping } from '../javascript'
+
 // getLocalStorage returns the full localStorage object.
 export function getLocalStorage() {
-	return { ...localStorage }
+	return applyMapping({ ...localStorage }, value => processLocalStorageValue(value))
 }
 
 // getLocalStorageValue reads an item from localStorage and attempts to parse it. A back-up value can be given to be used upon no entry.
 export function getLocalStorageValue(key, backup) {
-	const value = localStorage.getItem(key)
+	return processLocalStorageValue(localStorage.getItem(key), backup)
+}
+
+// processLocalStorageValue takes a value from localStorage and puts it back into Javascript form.
+export function processLocalStorageValue(value, backup) {
 	if (value === undefined || value === null)
 		return backup !== undefined ? backup : undefined
 	return JSON.parse(value)

@@ -34,13 +34,13 @@ export function useLocalStorageValue(keys) {
 
 // useLocalStorageState is like useState, but it then tracks the property in localStorage too. Upon saving, it stores to localStorage. Upon initializing, it tries to get the value back from localStorage.
 export function useLocalStorageState(key, initialValue) {
-	const { localStorage, setLocalStorage } = useLocalStorageContext()
+	const { initialized, localStorage, setLocalStorage } = useLocalStorageContext()
 
 	// Set up a setter that sends the new value to the appropriate places.
 	const setState = useCallback(newState => {
 		setLocalStorage(oldLocalStorage => {
 			// Find the new state value.
-			const oldState = oldLocalStorage && oldLocalStorage[key]
+			let oldState = oldLocalStorage && oldLocalStorage[key]
 			if (typeof newState === 'function')
 				newState = newState(oldState)
 
@@ -56,9 +56,9 @@ export function useLocalStorageState(key, initialValue) {
 
 	// Upon loading, when the initial value is not yet in the localStorage, put it in there.
 	useEffect(() => {
-		if (initialValue !== undefined && localStorage && !localStorage[key])
+		if (initialized && localStorage[key] === undefined && initialValue !== undefined)
 			setState(initialValue)
-	}, [key, initialValue, localStorage, setState])
+	}, [initialized, localStorage, key, initialValue, setState])
 
 	// Return the appropriate tuple.
 	let state = (localStorage && localStorage[key])

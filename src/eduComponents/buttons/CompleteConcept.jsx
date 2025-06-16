@@ -9,12 +9,12 @@ export function CompleteConcept() {
 	const [skillState, setSkillState] = useLocalStorageState(`component-${skill.id}`, { skillId: skill.id })
 
 	// Don't show this button if the concept has already been completed.
-	if (skillState.complete)
+	if (!skillState || skillState.completed)
 		return null
 
 	// Render the button.
 	return <Box sx={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'flex-end' }}>
-		<Button variant="contained" startIcon={<Check />} onClick={() => setSkillState(skillState => ({ ...skillState, understood: true, complete: true }))}>
+		<Button variant="contained" startIcon={<Check />} onClick={() => setSkillState(skillState => ({ ...skillState, understood: true, completed: true }))}>
 			I understand this concept
 		</Button>
 	</Box>
