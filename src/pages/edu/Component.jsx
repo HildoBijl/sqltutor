@@ -7,7 +7,7 @@ import { firstOf, useWindowSize } from 'util'
 import { Subpage, Container } from 'components'
 import { useComponent } from 'edu'
 import * as content from 'content'
-import { ExercisePage } from 'eduComponents'
+import { ExercisePage, CompleteConcept } from 'eduComponents'
 
 import { tabs, useUrlTab } from './tabs'
 
@@ -88,6 +88,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 		</Box>
 		<Subpage>
 			<Content />
+			{component.type === 'concept' && ['theory', 'summary'].includes(tab) && <CompleteConcept />}
 		</Subpage>
 	</>
 }

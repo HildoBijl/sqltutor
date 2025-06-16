@@ -30,7 +30,7 @@ function MainFigure() {
 	const tableHeight = 160
 
 	// Render the figuire.
-	return <Drawing width={1000} height={600} ref={drawingRef}>
+	return <Drawing width={1000} height={300} ref={drawingRef}>
 
 		{/* Query. */}
 		<Element position={[150, 0]} anchor={[0, 0]}>
