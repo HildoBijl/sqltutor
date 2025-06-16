@@ -5,10 +5,8 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
+import { themeColor, secondaryColor } from './settings'
 import './main.css'
-
-export const themeColor = '#c81919'
-export const secondaryColor = '#262626'
 
 export const createCustomTheme = () => createTheme({
 	palette: {

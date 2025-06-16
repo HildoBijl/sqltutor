@@ -1,4 +1,5 @@
 import { ensureNumber, ensureString, ensureBoolean, ensureObject, processOptions, removeProperties, ensureVectorArray } from 'util'
+import { themeColor } from 'components'
 
 import { SvgPortal } from '../../DrawingContext'
 
@@ -17,7 +18,7 @@ const defaultLine = {
 	points: undefined,
 	close: false,
 	size: 2,
-	color: 'black',
+	color: themeColor,
 	arrow: undefined,
 	startArrow: undefined,
 	endArrow: undefined,

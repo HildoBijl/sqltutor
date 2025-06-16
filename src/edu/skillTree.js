@@ -156,7 +156,7 @@ export const contents = {
 // Set up extra parameters that will be filled up.
 export const components = {}, concepts = {}, skills = {}
 
-// First preprocess the whole content tree, preparing all objects for further processing.
+// First preprocess the whole skill tree, preparing all objects for further processing.
 const preprocessComponent = (component, id, path = []) => {
 	// Run some basic processing for each component.
 	component.id = id
