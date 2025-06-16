@@ -5,7 +5,7 @@ import { themeColor, Par, SQL, Drawing, Element, Line, Rectangle, Curve, useText
 
 export function Summary() {
 	return <>
-		<Par>SQL has a variety of options to sort rows in the requested tables and/or limit the number of given rows.</Par>
+		<Par>To sort rows in tables, and/or limit the number of given rows, there is a variety of options we can add to the end of an SQL query.</Par>
 		<MainFigure />
 	</>
 }
@@ -22,7 +22,7 @@ function MainFigure() {
 
 	// Define position data.
 	const offset = 28 // Between text lines.
-	const b1 = new Vector([460, 16])
+	const b1 = new Vector([450, 16])
 	const b2 = new Vector([b1.x, b1.y + offset])
 	const b3 = new Vector([b2.x, b2.y + offset])
 	const b4 = new Vector([b3.x, b3.y + offset])
@@ -33,7 +33,7 @@ function MainFigure() {
 	return <Drawing width={1000} height={600} ref={drawingRef}>
 
 		{/* Query. */}
-		<Element position={[200, 0]} anchor={[0, 0]}>
+		<Element position={[150, 0]} anchor={[0, 0]}>
 			<SQL setElement={setQueryElement}>{`
 SELECT *
 FROM companies
@@ -53,8 +53,8 @@ OFFSET 1
 		{/* Arrows to explainer text. */}
 		{ascBounds && <Curve points={[ascBounds.middleRight.add([8, 0]), ascBounds.middleRight.add([28, 0]), b1.add([-22, 0]), b1.add([-2, 0])]} endArrow={true} />}
 		{descBounds && <Curve points={[descBounds.middleRight.add([2, 0]), descBounds.middleRight.add([22, 0]), b2.add([-22, 0]), b2.add([-2, 0])]} endArrow={true} />}
-		{limitBounds && <Curve points={[limitBounds.middleRight.add([3, 1]), limitBounds.middleRight.add([53, 1]), b3.add([-2, 0])]} endArrow={true} />}
-		{offsetBounds && <Curve points={[offsetBounds.middleRight.add([3, 1]), offsetBounds.middleRight.add([53, 1]), b4.add([-22, 0]), b4.add([-2, 0])]} endArrow={true} />}
+		{limitBounds && <Curve points={[limitBounds.middleRight.add([3, 1]), limitBounds.middleRight.add([123, 1]), b3.add([-22, 0]), b3.add([-2, 0])]} endArrow={true} />}
+		{offsetBounds && <Curve points={[offsetBounds.middleRight.add([3, 1]), offsetBounds.middleRight.add([123, 1]), b4.add([-22, 0]), b4.add([-2, 0])]} endArrow={true} />}
 
 		{/* Dummy table 1. */}
 		<Rectangle dimensions={[[0, tableBase], [140, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
@@ -68,6 +68,6 @@ OFFSET 1
 		<Rectangle dimensions={[[560, tableBase], [700, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
 		<Rectangle dimensions={[[710, tableBase], [850, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
 		<Rectangle dimensions={[[860, tableBase], [1000, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
-		
+
 	</Drawing>
 }
