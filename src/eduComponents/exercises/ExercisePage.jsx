@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
-import { useLocalStorageState } from 'util'
+import { useLocalStorageState } from 'components'
 import { useComponent } from 'edu'
 
 import { useSkillStateHandlers } from './util'
