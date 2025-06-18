@@ -65,3 +65,24 @@ export function useLocalStorageState(key, initialValue) {
 	state = (state !== undefined ? state : initialValue)
 	return [state, setState]
 }
+
+// useLocalStorageStateParameter is like useState, but it uses one parameter within a localStorage object.
+export function useLocalStorageStateParameter(key, objectKey, initialValue, initialObjectValue = {}) {
+	const [state, setState] = useLocalStorageState(key, { ...initialObjectValue, [objectKey]: initialValue })
+
+	// Set up a setter for the respective parameter.
+	const setParameter = useCallback(newParameter => {
+		setState(state => {
+			let oldParameter = state && state[objectKey]
+			if (typeof newParameter === 'function')
+				newParameter = newParameter(oldParameter)
+			if (deepEquals(oldParameter, newParameter))
+				return state
+			return { ...state, [objectKey]: newParameter }
+		})
+	}, [objectKey, setState])
+	
+	// Return the value and the setter as a tuple, as usual.
+	const parameter = state[objectKey]
+	return [parameter, setParameter]
+}

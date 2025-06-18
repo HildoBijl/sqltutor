@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
 import { Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf, useWindowSize } from 'util'
-import { Subpage, Container } from 'components'
+import { Subpage, Container, useLocalStorageStateParameter } from 'components'
 import { useComponent } from 'edu'
 import * as content from 'content'
 import { ExercisePage, CompleteConcept } from 'eduComponents'
@@ -50,7 +50,8 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// Check the URL and set up the active tab based on it. (The URL of the tab is used as indicator.)
 	const urlTab = useUrlTab()
-	const [tab, setTab] = useState(shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url)
+	const initialTab = shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url
+	const [tab, setTab] = useLocalStorageStateParameter(`component-${component.id}`, 'tab', initialTab, { id: component.id })
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL changes, update the tab accordingly.

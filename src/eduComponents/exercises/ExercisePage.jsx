@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
-import { useLocalStorageState } from 'components'
-import { useComponent } from 'edu'
+import { useComponent, useComponentState } from 'edu'
 
 import { useSkillStateHandlers } from './util'
 import { Exercises } from './Exercises'
@@ -9,7 +8,7 @@ import { Exercises } from './Exercises'
 export function ExercisePage() {
 	// Extract data needed to render the exercise page.
 	const skill = useComponent()
-	const [skillState, setSkillState] = useLocalStorageState(`component-${skill.id}`, { skillId: skill.id })
+	const [skillState, setSkillState] = useComponentState(skill.id)
 
 	// ToDo: filter exercises based on whether they exist and have a valid version.
 
