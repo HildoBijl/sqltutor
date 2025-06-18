@@ -45,10 +45,10 @@ OFFSET 1
 		</Element>
 
 		{/* Explainer text. */}
-		<Element position={b1} anchor={[0, 0.5]}><span>First sort ascending by country ...</span></Element>
-		<Element position={b2} anchor={[0, 0.5]}><span>... and on equal country, sort descending by numEmployees.</span></Element>
-		<Element position={b3} anchor={[0, 0.5]}><span>Only pick the first three rows ...</span></Element>
-		<Element position={b4} anchor={[0, 0.5]}><span>... after skipping the first row.</span></Element>
+		<Element position={b1} anchor={[0, 0.5]}><span style={{ textWrap: 'nowrap' }}>First sort ascending by country ...</span></Element>
+		<Element position={b2} anchor={[0, 0.5]}><span style={{ textWrap: 'nowrap' }}>... and on equal country, sort descending by numEmployees.</span></Element>
+		<Element position={b3} anchor={[0, 0.5]}><span style={{ textWrap: 'nowrap' }}>Only pick the first three rows ...</span></Element>
+		<Element position={b4} anchor={[0, 0.5]}><span style={{ textWrap: 'nowrap' }}>... after skipping the first row.</span></Element>
 
 		{/* Arrows to explainer text. */}
 		{ascBounds && <Curve points={[ascBounds.middleRight.add([8, 0]), ascBounds.middleRight.add([28, 0]), b1.add([-22, 0]), b1.add([-2, 0])]} endArrow={true} />}
