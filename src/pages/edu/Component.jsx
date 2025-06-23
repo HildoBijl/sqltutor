@@ -66,7 +66,9 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	}, [navigate, urlTab, tab, component])
 
 	// Determine info about what needs to be shown.
-	const currTab = shownTabs.find(shownTab => shownTab.url === tab)
+	let currTab = shownTabs.find(shownTab => shownTab.url === tab)
+	if (!currTab)
+		currTab = firstOf(shownTabs) // Fallback that usually never happens, except perhaps when the tab stored in localStorage has for instance been removed in an update of the web-app.
 	const tabIndex = shownTabs.indexOf(currTab)
 	const Content = module[currTab.component] || (currTab.url === 'exercises' && ExercisePage)
 
