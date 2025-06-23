@@ -10,6 +10,8 @@ import { selectAndGenerateExercise } from './generation'
 // useSkillStateHandlers defines various handlers that can be used to adjust the skill state. The tricky part is to keep the data structure of the skill state intact.
 export function useSkillStateHandlers(skillState, setSkillState) {
 	const skillStateRef = useLatest(skillState)
+	if (!skillState)
+		throw new Error(`Invalid skill state: expected at least an empty object, but received "${skillState}".`)
 
 	// getSkillId retrieves the skillID from the skillState.
 	const getSkillId = useCallback(() => {
@@ -152,7 +154,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 
 		// Add a new exercise.
 		const skillModule = content[getSkillId()]
-		setExerciseHistory(exerciseHistory => [...exerciseHistory, selectAndGenerateExercise(skillModule.exercises, exerciseHistory, additionalDataRef.current)])
+		setExerciseHistory(exerciseHistory => [...(exerciseHistory || []), selectAndGenerateExercise(skillModule.exercises, exerciseHistory, additionalDataRef.current)])
 	}, [getExercise, getSkillId, setExerciseHistory, additionalDataRef])
 
 	// Return an object with all the defined handlers.
@@ -160,7 +162,7 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 }
 
 export function extractSkillId(skillState) {
-	return skillState.skillId
+	return skillState.id
 }
 
 export function extractExerciseHistory(skillState) {

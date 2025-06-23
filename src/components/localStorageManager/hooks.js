@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react'
 
-import { keysToObject, deepEquals, ensureConsistency, setLocalStorageValue, useConsistentValue } from 'util'
+import { keysToObject, deepEquals, ensureConsistency, setLocalStorageValue, useLatest, useConsistentValue } from 'util'
 
 import { useLocalStorageContext } from './context'
 
@@ -35,12 +35,13 @@ export function useLocalStorageValue(keys) {
 // useLocalStorageState is like useState, but it then tracks the property in localStorage too. Upon saving, it stores to localStorage. Upon initializing, it tries to get the value back from localStorage.
 export function useLocalStorageState(key, initialValue) {
 	const { initialized, localStorage, setLocalStorage } = useLocalStorageContext()
+	const initialValueRef = useLatest(initialValue)
 
 	// Set up a setter that sends the new value to the appropriate places.
 	const setState = useCallback(newState => {
 		setLocalStorage(oldLocalStorage => {
 			// Find the new state value.
-			let oldState = oldLocalStorage && oldLocalStorage[key]
+			let oldState = oldLocalStorage && oldLocalStorage[key] || initialValueRef.current
 			if (typeof newState === 'function')
 				newState = newState(oldState)
 
@@ -52,7 +53,7 @@ export function useLocalStorageState(key, initialValue) {
 			setLocalStorageValue(key, newState)
 			return { ...(oldLocalStorage || {}), [key]: ensureConsistency(newState, oldState) }
 		})
-	}, [key, setLocalStorage])
+	}, [key, setLocalStorage, initialValueRef])
 
 	// Upon loading, when the initial value is not yet in the localStorage, put it in there.
 	useEffect(() => {
