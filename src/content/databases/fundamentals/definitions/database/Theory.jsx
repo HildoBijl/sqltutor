@@ -1,4 +1,4 @@
-import { Head, Par, List, Info, Warning, Term, Link } from 'components'
+import { Head, Par, List, Info, Warning, Term, Link, Drawing, Element, Curve, Glyph } from 'components'
 
 export function Theory() {
 	return <>
@@ -21,8 +21,40 @@ export function Theory() {
 
 		<Head>The database management system</Head>
 		<Par>The "database" is the collection of all the data that's stored somewhere. To get this data stored in the desired way, we use a specialized program called a <Term>Database Management System</Term> (DBMS), or sometimes a <Term>database engine</Term>. Examples of DBMSs that use tables are <Link to="https://www.postgresql.org/">PostgreSQL</Link>, <Link to="https://www.mysql.com/">MySQL</Link>, <Link to="https://www.oracle.com/database/">Oracle</Link>, <Link to="https://sqlite.org/">SQLite</Link> and dozens more. The DBMS handles all functionalities around the database, allowing users to read and write data.</Par>
-		<Par>ToDo: add image to show the flow of the database requests.</Par>
+		<FigureDatabaseUsage />
 		<Par>Every DBMS has its own specific way of how exactly it stores its data. As a result, a DBMS and a database are inextricably linked. You cannot just take a database and couple it to a different DBMS. It is possible (and common) that a single DBMS has multiple different databases on the same machine, for instance for different applications.</Par>
 		<Warning>Because a database and its DBMS are so linked, people often use the word "database" when they actually mean DBMS. "Hey, which database are you using at SQL Valley? Oh, we're using SQLite!"</Warning>
 	</>
+}
+
+export function FigureDatabaseUsage() {
+	const h = 210
+	const w = 800
+	const y = h / 2 + 32
+	const xUser = 60
+	const xServer = w / 2
+	const xDatabase = w - 60
+
+	return <Drawing width={w} height={h}>
+		<Glyph name="User" position={[xUser, y - 25]} width={100} />
+		<Element position={[xUser, y + 38]}><span style={{ fontSize: '1em', fontWeight: 500 }}>User</span></Element>
+
+		<Glyph name="Server" position={[xServer, y - 25]} width={60} />
+		<Element position={[xServer, y + 50]}><span style={{ fontSize: '1em', fontWeight: 500 }}>DBMS</span></Element>
+
+		<Glyph name="Database" position={[xDatabase, y - 25]} width={100} />
+		<Element position={[xDatabase, y + 38]}><span style={{ fontSize: '1em', fontWeight: 500 }}>Database</span></Element>
+
+		<Curve points={[[xUser + 26, y - 70], [(xUser + xServer) / 2, y - 120], [xServer - 35, y - 70]]} endArrow={true} />
+		<Element position={[(xUser + xServer) / 2, y - 96]} anchor={[0.5, 1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500 }}>"Get me the country with the<br />most Data Science vacancies"</p></Element>
+
+		<Curve points={[[xServer + 35, y - 70], [(xServer + xDatabase) / 2, y - 120], [xDatabase - 50, y - 70]]} endArrow={true} />
+		<Element position={[(xServer + xDatabase) / 2, y - 96]} anchor={[0.5, 1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500 }}>Pull up all relevant records</p></Element>
+
+		<Curve points={[[xDatabase - 50, y + 20], [(xServer + xDatabase) / 2, y + 70], [xServer + 35, y + 20]]} endArrow={true} />
+		<Element position={[(xServer + xDatabase) / 2, y + 42]} anchor={[0.5, 0]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500 }}>Give all requested records</p></Element>
+
+		<Curve points={[[xServer - 35, y + 20], [(xUser + xServer) / 2, y + 70], [xUser + 50, y + 20]]} endArrow={true} />
+		<Element position={[(xUser + xServer) / 2, y + 42]} anchor={[0.5, 0]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500 }}>"The Netherlands"</p></Element>
+	</Drawing>
 }

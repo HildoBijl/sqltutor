@@ -1,11 +1,13 @@
 import { themeColor, Par, Term, Link, Drawing, Element, Rectangle } from 'components'
 
+import { FigureDatabaseUsage } from './Theory'
+
 export function Summary() {
 	return <>
 		<Par>In its essence, a <Term>database</Term> is a collection of tables, each filled with data. There may be millions of records that are constantly being updated my multiple applications at the same time.</Par>
 		<FigureTwoTables /> {/* ToDo: add actual tables here. */}
 		<Par>A database is always accompanied by tools (software) used to enter, update and read the data. All these tools together are known as the <Term>Database Management System</Term> (DBMS). Popular examples are <Link to="https://www.postgresql.org/">PostgreSQL</Link>, <Link to="https://www.mysql.com/">MySQL</Link>, <Link to="https://www.oracle.com/database/">Oracle</Link> and <Link to="https://sqlite.org/">SQLite</Link>.</Par>
-		<Par>ToDo: copy glyph picture from the theory page.</Par>
+		<FigureDatabaseUsage />
 	</>
 }
 
