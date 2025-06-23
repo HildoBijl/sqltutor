@@ -12,7 +12,7 @@ export function CompleteConcept() {
 		return null
 
 	// Render the button.
-	return <Box sx={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'flex-end' }}>
+	return <Box sx={{ my: 2, display: 'flex', flexFlow: 'row wrap', justifyContent: 'flex-end' }}>
 		<Button variant="contained" startIcon={<Check />} onClick={() => setComponentState(skillState => ({ ...skillState, understood: true }))}>
 			Yes, makes sense!
 		</Button>

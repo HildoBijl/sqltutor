@@ -1,4 +1,7 @@
 export * from './Head'
 export * from './Par'
+export * from './Term'
+export * from './Link'
+export * from './List'
 export * from './Info'
 export * from './Warning'
