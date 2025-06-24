@@ -57,10 +57,8 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// When the URL tab changes, update the tab accordingly.
 	const [processedUrlTab, setProcessedUrlTab] = useState()
-	console.log('Current tabs:', urlTab, tab, processedUrlTab)
 	useEffect(() => {
 		if (isLocalStorageInitialized) {
-			console.log('Updating tab to URL', urlTab)
 			setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
 			setProcessedUrlTab(urlTab)
 		}
@@ -68,11 +66,8 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// When the tab does not reflect the URL, then update the URL. (We do check whether the urlTab is the same as what we've seen before. After all, if the URL tab suddenly changes, then we should adjust the tab, and not put the URL back to what the tab is.)
 	useEffect(() => {
-		console.log('Checking', urlTab, tab, processedUrlTab, urlTab === processedUrlTab && urlTab !== tab)
-		if (isLocalStorageInitialized && urlTab === processedUrlTab && urlTab !== tab) {
-			console.log('Adjusting URL to the used tab', tab)
+		if (isLocalStorageInitialized && urlTab === processedUrlTab && urlTab !== tab)
 			navigate(`/c/${component.id}/${tab}`, { replace: true })
-		}
 	}, [isLocalStorageInitialized, urlTab, processedUrlTab, tab, navigate, component])
 
 	// Determine info about what needs to be shown.
