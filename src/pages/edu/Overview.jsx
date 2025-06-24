@@ -19,7 +19,11 @@ export function Overview() {
 		</ul>
 		<h4>Skills</h4>
 		<ul>
-			{Object.values(skills).map(skill => <li key={skill.id}><Link to={`/c/${skill.id}`}>{skill.name}</Link></li>)}
+			{Object.values(skills).map(skill => {
+				const numSolved = localStorage[`component-${skill.id}`]?.numSolved || 0
+				const message = numSolved === 0 ? '' : (numSolved >= 3 ? ' (completed)' : ` (progress: ${numSolved}/3)`)
+				return <li key={skill.id}><Link to={`/c/${skill.id}`}>{skill.name}</Link>{message}</li>
+			})}
 		</ul>
 	</Subpage >
 }

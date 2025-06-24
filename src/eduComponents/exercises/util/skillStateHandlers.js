@@ -131,8 +131,9 @@ export function useSkillStateHandlers(skillState, setSkillState) {
 			return setInputs(inputs => [...inputs, lastOf(inputs)])
 
 		// On a correct input, note that the exercise is done.
+		setSkillState(skillState => ({ ...skillState, numSolved: (skillState.numSolved || 0) + 1 }))
 		return setExercise(exercise => ({ ...exercise, done: true, solved: true }))
-	}, [getState, getInput, getSkillId, getExercise, setInputs, setExercise, additionalDataRef])
+	}, [getState, getInput, getSkillId, getExercise, setInputs, setSkillState, setExercise, additionalDataRef])
 
 	// giveUp will take the current exercise and end it, with a note that the user gave up.
 	const giveUp = useCallback(() => {
