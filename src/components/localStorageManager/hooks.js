@@ -48,10 +48,11 @@ export function useLocalStorageState(key, initialValue) {
 			// On no change, ignore.
 			if (deepEquals(oldState, newState))
 				return oldLocalStorage
+			newState = ensureConsistency(newState, oldState)
 
 			// On a change, set it in the localStorage and in our own state (by returning the appropriate assembled object).
 			setLocalStorageValue(key, newState)
-			return { ...(oldLocalStorage || {}), [key]: ensureConsistency(newState, oldState) }
+			return { ...(oldLocalStorage || {}), [key]: newState }
 		})
 	}, [key, setLocalStorage, initialValueRef])
 
@@ -82,8 +83,9 @@ export function useLocalStorageStateParameter(key, objectKey, initialValue, init
 			return { ...state, [objectKey]: newParameter }
 		})
 	}, [objectKey, setState])
-	
+
 	// Return the value and the setter as a tuple, as usual.
-	const parameter = state[objectKey]
+	let parameter = state[objectKey]
+	parameter = (parameter !== undefined ? parameter : initialValue)
 	return [parameter, setParameter]
 }
