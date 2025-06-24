@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import { Par, Head, Term, List, SQL, Drawing, Element, Glyph, Curve } from 'components'
 
 export function Theory() {
@@ -19,9 +21,9 @@ export function Theory() {
 		<SQL>{`
 SELECT *
 FROM TechCompanies
-WHERE country="The Netherlands"
+WHERE country="The Netherlands";
 		`}</SQL>
-		<Par>There is a large variety of query languages, each requiring its queries to be set up differently. Some would say that every DBMS has its own query language. However, in an effort to make this more uniform, most table-based databases have agreed to use a command standard: the SQL query language, of which the above query is an example. As a result, SQL is by far the most often-used query language for databases.</Par>
+		<Par>There is a large variety of query languages, each requiring its queries to be set up differently. Some would say that every DBMS has its own query language. However, in an effort to make this more uniform, most table-based databases have agreed to use a command standard: the <Link to="/c/sql">SQL query language</Link>, of which the above query is an example. As a result, SQL is by far the most often-used query language for databases.</Par>
 	</>
 }
 
