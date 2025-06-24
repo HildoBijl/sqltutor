@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
 import { Tabs, Tab, Box } from '@mui/material'
@@ -56,19 +56,21 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	console.log('Using tab', tab)
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
-	// When the URL changes, update the tab accordingly.
+	// When the URL tab changes, update the tab accordingly.
+	const [processedUrlTab, setProcessedUrlTab] = useState(false)
 	useEffect(() => {
 		console.log('Updating tab to URL', urlTab)
 		setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
+		setProcessedUrlTab(urlTab)
 	}, [urlTab, shownTabs, setTab])
 
-	// When the tab does not reflect the URL, update the URL.
+	// When the tab does not reflect the URL, then update the URL. (We do check whether the urlTab is the same as what we've seen before. After all, if the URL Tab suddenly changes, then we should adjust the tab, and not put the URL back to what the tab is.)
 	useEffect(() => {
-		if (urlTab !== tab)
+		if (urlTab === processedUrlTab && urlTab !== tab)
 			console.log('Adjusting URL to the used tab')
-		if (urlTab !== tab)
+		if (urlTab === processedUrlTab && urlTab !== tab)
 			navigate(`/c/${component.id}/${tab}`, { replace: true })
-	}, [navigate, urlTab, tab, component])
+	}, [navigate, urlTab, processedUrlTab, tab, component])
 
 	// Determine info about what needs to be shown.
 	let currTab = shownTabs.find(shownTab => shownTab.url === tab)
