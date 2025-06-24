@@ -16,7 +16,7 @@ FROM TechCompanies;
 		<Head>Properties of queries</Head>
 		<Par>SQL is a very forgiving query language: if you write a query differently, it often still works. We could have also written the above query as</Par>
 		<SQL>select * from TechCompanies;</SQL>
-		<Par>In SQL extra white space has no effect, and the commands like "select" and "from" are also not case sensitive. (Table names usually are case sensitive, although this varies per DBMS.) Despite having this freedom, it is considered good practice to put keywords in upper case to make them easy to find, and to use line breaks to make queries easier to read.</Par>
+		<Par>In SQL extra whitespace (spaces, tabs, linebreaks) has no effect. As a result, this is often used to clean up the query, improving the overview and readability. Fundamental SQL commands like "select" and "from" are not case sensitive. They are usually written in upper case to make them easier to recognize, and we will also adhere to this standard. Table names usually are case sensitive, although this varies per DBMS.</Par>
 		<Par>Also note that queries are usually closed off by a semi-colon. The semi-colon means "end of query". In case of multiple queries, it is an important separator. If you only write one query, it's often omitted.</Par>
 
 		<Head>History of SQL</Head>
