@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles'
 import { Tabs, Tab, Box } from '@mui/material'
 
 import { firstOf, useWindowSize } from 'util'
-import { Subpage, Container, useLocalStorageStateParameter } from 'components'
+import { Subpage, Container, useLocalStorageStateParameter, useIsLocalStorageInitialized } from 'components'
 import { useComponent } from 'edu'
 import * as content from 'content'
 import { ExercisePage, CompleteConcept } from 'eduComponents'
@@ -52,25 +52,28 @@ export function TabbedComponent({ component, module, shownTabs }) {
 	const urlTab = useUrlTab()
 	const initialTab = shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url
 	const [tab, setTab] = useLocalStorageStateParameter(`component-${component.id}`, 'tab', initialTab, { id: component.id })
+	const isLocalStorageInitialized = useIsLocalStorageInitialized()
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL tab changes, update the tab accordingly.
 	const [processedUrlTab, setProcessedUrlTab] = useState()
 	console.log('Current tabs:', urlTab, tab, processedUrlTab)
 	useEffect(() => {
-		console.log('Updating tab to URL', urlTab)
-		setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
-		setProcessedUrlTab(urlTab)
-	}, [urlTab, shownTabs, setTab])
+		if (isLocalStorageInitialized) {
+			console.log('Updating tab to URL', urlTab)
+			setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
+			setProcessedUrlTab(urlTab)
+		}
+	}, [isLocalStorageInitialized, urlTab, shownTabs, setTab])
 
 	// When the tab does not reflect the URL, then update the URL. (We do check whether the urlTab is the same as what we've seen before. After all, if the URL tab suddenly changes, then we should adjust the tab, and not put the URL back to what the tab is.)
 	useEffect(() => {
 		console.log('Checking', urlTab, tab, processedUrlTab, urlTab === processedUrlTab && urlTab !== tab)
-		if (urlTab === processedUrlTab && urlTab !== tab) {
+		if (isLocalStorageInitialized && urlTab === processedUrlTab && urlTab !== tab) {
 			console.log('Adjusting URL to the used tab', tab)
 			navigate(`/c/${component.id}/${tab}`, { replace: true })
 		}
-	}, [navigate, urlTab, processedUrlTab, tab, component])
+	}, [isLocalStorageInitialized, urlTab, processedUrlTab, tab, navigate, component])
 
 	// Determine info about what needs to be shown.
 	let currTab = shownTabs.find(shownTab => shownTab.url === tab)

@@ -89,3 +89,8 @@ export function useLocalStorageStateParameter(key, objectKey, initialValue, init
 	parameter = (parameter !== undefined ? parameter : initialValue)
 	return [parameter, setParameter]
 }
+
+// useIsLocalStorageInitialized returns true or false: whether the localStorage has been initialized already.
+export function useIsLocalStorageInitialized() {
+	return useLocalStorageContext().initialized
+}
