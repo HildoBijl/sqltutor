@@ -10,8 +10,8 @@ export function Theory() {
 SELECT *
 FROM TechCompanies;
 		`}</SQL>
-		<Par>Here the asterisk * means "everything" (or "all rows"). So this query reads as "Select all rows from the table table TechCompanies." It retrieves the entire table.</Par>
-		<Par>We can append a large amount of extra options and specifications to a query. This allows us to select and process the data in any way that we want. Since SQL is a very mature query language, developed through various decades, there are usually dozens of ways to do anything we want to do.</Par>
+		<Par>Here the asterisk * means "everything" (or "all rows"). So this query reads as "Select all rows from the table TechCompanies." It retrieves the entire table. It's a query that is very often used in practice.</Par>
+		<Par>We can append a large amount of extra options and specifications to a query. This allows us to select and process the data in any desired way. Since SQL is a very mature query language, developed through various decades, there are usually dozens of ways to do whatever it is that we want to do.</Par>
 
 		<Head>Properties of queries</Head>
 		<Par>SQL is a very forgiving query language: if you write a query differently, it often still works. We could have also written the above query as</Par>
