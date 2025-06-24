@@ -50,17 +50,22 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// Check the URL and set up the active tab based on it. (The URL of the tab is used as indicator.)
 	const urlTab = useUrlTab()
+	console.log('Found URL tab', urlTab)
 	const initialTab = shownTabs.find(tab => urlTab && tab.url.toLowerCase() === urlTab.toLowerCase())?.url || firstOf(shownTabs).url
 	const [tab, setTab] = useLocalStorageStateParameter(`component-${component.id}`, 'tab', initialTab, { id: component.id })
+	console.log('Using tab', tab)
 	const updateTab = (event, newTab) => setTab(shownTabs[newTab].url)
 
 	// When the URL changes, update the tab accordingly.
 	useEffect(() => {
+		console.log('Updating tab to URL', urlTab)
 		setTab(oldTab => shownTabs.find(tab => tab.url === urlTab)?.url || oldTab)
 	}, [urlTab, shownTabs, setTab])
 
 	// When the tab does not reflect the URL, update the URL.
 	useEffect(() => {
+		if (urlTab !== tab)
+			console.log('Adjusting URL to the used tab')
 		if (urlTab !== tab)
 			navigate(`/c/${component.id}/${tab}`, { replace: true })
 	}, [navigate, urlTab, tab, component])
