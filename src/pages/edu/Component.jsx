@@ -65,6 +65,7 @@ export function TabbedComponent({ component, module, shownTabs }) {
 
 	// When the tab does not reflect the URL, then update the URL. (We do check whether the urlTab is the same as what we've seen before. After all, if the URL Tab suddenly changes, then we should adjust the tab, and not put the URL back to what the tab is.)
 	useEffect(() => {
+		console.log('Checking', urlTab, tab, processedUrlTab, urlTab === processedUrlTab && urlTab !== tab)
 		if (urlTab === processedUrlTab && urlTab !== tab)
 			console.log('Adjusting URL to the used tab', tab)
 		if (urlTab === processedUrlTab && urlTab !== tab)
