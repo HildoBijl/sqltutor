@@ -10,12 +10,12 @@ export function Theory() {
 SELECT *
 FROM TechCompanies;
 		`}</SQL>
-		<Par>Here the asterisk * means "everything" (or "all rows"). So this query reads as "Select all rows from the table TechCompanies." It retrieves the entire table. It's a query that is very often used in practice.</Par>
+		<Par>Here the asterisk * means "all columns". So this query reads as "Select everything from the table TechCompanies." It retrieves the entire table. It's a query that is very often used in practice.</Par>
 		<Par>We can append a large amount of extra options and specifications to a query. This allows us to select and process the data in any desired way. Since SQL is a very mature query language, developed through various decades, there are usually dozens of ways to do whatever it is that we want to do.</Par>
 
 		<Head>Properties of queries</Head>
 		<Par>SQL is a very forgiving query language: if you write a query differently, it often still works. We could have also written the above query as</Par>
-		<SQL>select * from TechCompanies;</SQL>
+		<SQL>select * from TechCompanies</SQL>
 		<Par>In SQL extra whitespace (spaces, tabs, linebreaks) has no effect. As a result, this is often used to clean up the query, improving the overview and readability. Fundamental SQL commands like "select" and "from" are not case sensitive. They are usually written in upper case to make them easier to recognize, and we will also adhere to this standard. Table names usually are case sensitive, although this varies per DBMS.</Par>
 		<Par>Also note that queries are usually closed off by a semi-colon. The semi-colon means "end of query". In case of multiple queries, it is an important separator. If you only write one query, it's often omitted.</Par>
 
