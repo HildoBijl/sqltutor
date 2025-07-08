@@ -1,9 +1,9 @@
-import { Head, Par, List, Info, Warning, Term, Link, Drawing, Element, Curve, Glyph } from 'components'
+import { themeColor, Head, Par, List, Info, Warning, Term, Link, Drawing, Element, Rectangle, Curve, Glyph } from 'components'
 
 export function Theory() {
 	return <>
 		<Par>Suppose that we have a list of all the tech companies in the world, including a large number of properties of each. How would we store this data? Could we just put it in something like an Excel file?</Par>
-		<Par>ToDo: add table</Par>
+		<FirstTable />
 
 		<Head>Why databases? A list of requirements</Head>
 		<Par>For many small-scale use cases, storing data in a single file would work. When scaling up, there are various reasons why this fails.</Par>
@@ -16,7 +16,7 @@ export function Theory() {
 
 		<Head>Database: a collection of tables</Head>
 		<Par>A <Term>database</Term> stores data. Most databases do so purely in table form. The easiest way to picture a database is therefore as a collection of tables, each filled with potentially large amounts of entries. A small database consists of a few small tables, but bigger databases can have dozens of enormous tables that are all linked to each other in some way.</Par>
-		<Par>ToDo: add second table, that is somehow linked to the first.</Par>
+		<SecondTable />
 		<Info>There are a few databases that deviate from this set-up and don't use tables. They for example store objects (like <Link to="https://www.mongodb.com/">MongoDB</Link>), graphs (like <Link to="https://neo4j.com/">Neo4j</Link>) or key-value pairs (like <Link to="https://redis.io/">Redis</Link>). Since this only involves a small subset of all databases, we focus on table-based databases for now.</Info>
 
 		<Head>The database management system</Head>
@@ -25,6 +25,19 @@ export function Theory() {
 		<Par>Every DBMS has its own specific way of how exactly it stores its data. As a result, a DBMS and a database are inextricably linked. You cannot just take a database and couple it to a different DBMS. It is possible (and common) that a single DBMS has multiple different databases on the same machine, for instance for different applications.</Par>
 		<Warning>Because a database and its DBMS are so linked, people often use the word "database" when they actually mean DBMS. "Hey, which database are you using at SQL Valley? Oh, we're using SQLite!"</Warning>
 	</>
+}
+
+function FirstTable() {
+	return <Drawing width={800} height={200}>
+		<Element position={[50, 0]} anchor={[0, 0]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example Table (ToDo: add it)</span></Element>
+		<Rectangle dimensions={[[50, 25], [270, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
+		<Rectangle dimensions={[[290, 25], [510, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
+		<Rectangle dimensions={[[530, 25], [750, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
+	</Drawing>
+}
+
+function SecondTable() {
+	return <FirstTable />
 }
 
 export function FigureDatabaseUsage() {
