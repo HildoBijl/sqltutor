@@ -5,7 +5,8 @@ import { DataGrid } from '@mui/x-data-grid'
 import { firstOf, keysToObject } from 'util'
 import { useQuery, useTableNames } from 'components'
 import { useComponent } from 'edu'
-import { useSkillDatabase } from 'eduComponents'
+
+import { useSkillDatabase } from './skillDatabase'
 
 // DataExplorer takes the skill that is given in the URL, gets its database and shows an explorer tool for it.
 export function DataExplorer() {
