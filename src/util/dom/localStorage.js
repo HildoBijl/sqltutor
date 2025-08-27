@@ -14,7 +14,11 @@ export function getLocalStorageValue(key, backup) {
 export function processLocalStorageValue(value, backup) {
 	if (value === undefined || value === null)
 		return backup !== undefined ? backup : undefined
-	return JSON.parse(value)
+	try {
+		return JSON.parse(value)
+	} catch {
+		return value // When it cannot be parsed, keep as a string.
+	}
 }
 
 // setLocalStorageValue saves an item to localStorage as JSON.
