@@ -1,75 +1,43 @@
 import { Link  } from 'react-router-dom'    
 import { Subpage } from 'components'
+import { Rectangle, Drawing, Element} from 'components'
+import { Vector } from 'util'
 
-import { Rectangle } from '../components/figures/Drawing/components/svgComponents/Rectangle'
-import {Text} from '../components/figures/Drawing/components/svgComponents/Text'
-import {Drawing} from '../components/figures/Drawing/Drawing'
-import { ArrowHead } from '../components/figures/Drawing/components/svgComponents/ArrowHead'
-import { Line } from '../components/figures/Drawing/components/svgComponents/Line'
+function Skill({position, title}) {
+        const skillPos = new Vector(position)
+
+        const width = 150; 
+        const height = 50;
+        const rectStart = skillPos.subtract(new Vector(width/2, height/2))
+        const rectEnd = skillPos.add(new Vector(width/2, height/2))
+
+        return <>
+        <Rectangle
+        dimensions={{start: rectStart, end: rectEnd}}
+        cornerRadius={10}
+        style={{fill: '#f0f0f0', stroke: '#ccc', strokeWidth: 2}}
+        />
+        <Element position={skillPos}>
+            <span style={{
+                color: '#333',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                display: 'block',
+                fontSize: '18px'
+            }}>{title}</span>
+            </Element>
+        </>        
+    }
+
 
 export function Design() {
-    // Coordinates for rectangles 
-    const rect1 = { start: { x: 50, y: 50 }, end: { x: 250, y: 150 } }
-    const rect2 = { start: { x: 300, y: 50 }, end: { x: 500, y: 150 } }
-
-
-    // Coordinates for text
-    const textPosition = { x: 150, y: 100 }; 
-    const textPosition2 = { x: 400, y: 100 };
-
-
-    // Coordinates for arrow
-    const arrowStart = { x: 250, y: 100 };
-    const arrowEnd = { x: 300, y: 100 };
-
-    // Arrow calculations
-    const dx = arrowEnd.x - arrowStart.x;
-    const dy = arrowEnd.y - arrowStart.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx);
-
+    
     return <Subpage>
-        <h1>Skill Tree Design</h1>
-        <Drawing width={400} height={300}>
-        <Rectangle
-            dimensions={rect1}
-            cornerRadius={12}
-            style={{ fill: '#e0e0e0', stroke: '#888', strokeWidth: 2 }}
-        />
-        <Rectangle
-            dimensions={rect2}
-            cornerRadius={12}
-            style={{ fill: '#c0c0c0', stroke: '#888', strokeWidth: 2 }}
-        />
-        <Text
-            position={textPosition}
-            anchor="middle"
-            style={{ fontSize: 28, fill: '#333' }}
-        >
-            Test
-        </Text>
-        <Text
-            position={textPosition2}
-            anchor="middle"
-            style={{ fontSize: 20, fill: '#333' }}
-        >
-            Alexandra is cool
-        </Text>
-
-
-        <Line
-    points={[arrowStart, arrowEnd]}
-    size={3}
-    color="#ffffffff"
-    style={{ stroke: '#ffffffff' }}
-/>
-
-<ArrowHead
-    position={arrowEnd}
-    angle={angle} // just pass angle, do NOT multiply by Math.PI/180
-    size={3}
-    color="#ffffffff"
-/>
+        <Drawing width={400} height={400}>
+            <Skill position={{x: 200, y: 100}} title="Database" />
         </Drawing>
+            
     </Subpage>  
 }
+
+export default Design
