@@ -1,0 +1,8 @@
+{
+  "id": "join-and-decomposition",
+  "type": "concept",
+  "name": "Join and Decomposition",
+  "description": "Split tables to remove duplication; recombine with joins",
+  "prerequisites": ["database-keys", "projection-and-filtering"]
+}
+

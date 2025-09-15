@@ -1,0 +1,10 @@
+Aggregate functions summarize groups of rows. Use GROUP BY to define groups and apply COUNT, SUM, AVG, MIN, or MAX.
+
+Example:
+
+```sql
+SELECT country, COUNT(*) AS total
+FROM positions
+GROUP BY country;
+```
+

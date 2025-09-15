@@ -1,0 +1,21 @@
+A database can hold large amounts of data that help answer complex questions. To work with it, you send a query to the database management system (DBMS).
+
+## Queries: commands for the DBMS
+A query is a request/command for the DBMS, such as:
+- Find all Tech Companies from "The Netherlands".
+- Count the number of Tech Companies per country.
+- Update the country for a specific company.
+
+Queries can read data (read queries) or modify data (write queries), including create, update, and delete operations.
+
+## Query language: how to write queries
+DBMSs don’t understand natural language; they need commands in a specific format called a query language. Most table‑based databases adopt the SQL standard, so many queries look like small pieces of code:
+
+```sql
+SELECT *
+FROM TechCompanies
+WHERE country = "The Netherlands";
+```
+
+Because SQL is widely adopted, it’s the most commonly used query language for databases.
+

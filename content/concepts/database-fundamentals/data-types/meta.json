@@ -1,0 +1,8 @@
+{
+  "id": "data-types",
+  "type": "concept",
+  "name": "Data Types",
+  "description": "Different types of data that can be stored in database columns",
+  "prerequisites": ["database-table"]
+}
+

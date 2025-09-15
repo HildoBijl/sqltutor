@@ -1,0 +1,8 @@
+{
+  "id": "projection-and-filtering",
+  "type": "concept",
+  "name": "Projection and Filtering",
+  "description": "Select subsets of columns (projection) and rows (filtering)",
+  "prerequisites": ["database-table"]
+}
+

@@ -1,0 +1,8 @@
+{
+  "id": "inner-and-outer-join",
+  "type": "concept",
+  "name": "Inner and Outer Join",
+  "description": "Understand inner joins vs. left/right/full outer joins",
+  "prerequisites": ["join-and-decomposition", "data-types"]
+}
+

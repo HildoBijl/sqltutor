@@ -1,0 +1,7 @@
+{
+  "id": "database-table",
+  "type": "concept",
+  "name": "Database Tables",
+  "description": "Learn about rows, columns, and how data is structured in tables",
+  "prerequisites": ["database"]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "pivot-table",
+  "type": "concept",
+  "name": "Pivot Table",
+  "description": "Reshape key-value data across multiple parameters into a pivot table",
+  "prerequisites": ["database-table"]
+}
+

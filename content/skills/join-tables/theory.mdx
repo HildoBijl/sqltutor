@@ -1,0 +1,10 @@
+Use JOIN to combine rows from related tables based on key relationships.
+
+Example:
+
+```sql
+SELECT p.position, c.company_name
+FROM positions p
+JOIN companies c ON p.company_id = c.id;
+```
+

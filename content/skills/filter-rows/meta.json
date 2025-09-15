@@ -1,0 +1,8 @@
+{
+  "id": "filter-rows",
+  "type": "skill",
+  "name": "Filter Rows",
+  "description": "Use WHERE clause to filter data based on conditions",
+  "prerequisites": ["sql", "data-types"],
+  "database": "companies"
+}

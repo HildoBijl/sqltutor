@@ -1,0 +1,12 @@
+Filter rows before grouping with WHERE, and filter groups after aggregation with HAVING.
+
+Example:
+
+```sql
+SELECT company_name, COUNT(*) AS openings
+FROM positions
+WHERE salary > 100000
+GROUP BY company_name
+HAVING COUNT(*) >= 2;
+```
+

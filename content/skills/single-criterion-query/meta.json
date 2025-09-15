@@ -1,0 +1,8 @@
+{
+  "id": "single-criterion-query",
+  "type": "skill",
+  "name": "Write Single-Criterion Query",
+  "description": "Combine projection and simple filtering",
+  "prerequisites": ["choose-columns", "filter-rows"],
+  "database": "companies"
+}
