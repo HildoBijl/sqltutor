@@ -6,14 +6,14 @@ import { Vector } from 'util'
 
 
 // Component to represent a skill as a rectangle with a title. The skill can be clicked to navigate to its theory page.
-function Skill({position, title, to}) {
+function Skill({position, title, to, concept = false}) {
         // The position of the rectangle is a vector
         const skillPos = new Vector(position)
         // Use navigate hook to enable redirect on double click to theory page
         const navigate = useNavigate();
 
         // Define the rectangle dimensions
-        const width = 150; 
+        const width = concept ? 150 : 180; 
         const height = 50;
         const rectStart = skillPos.subtract(new Vector(width/2, height/2))
         const rectEnd = skillPos.add(new Vector(width/2, height/2))
@@ -28,7 +28,7 @@ function Skill({position, title, to}) {
             <>
               <Rectangle
                   dimensions={{start: rectStart, end: rectEnd}}
-                  cornerRadius={10}
+                  cornerRadius={concept ? 0 : 10}
                   style={{fill: '#f0f0f0', stroke: '#ccc', strokeWidth: 2}}
               />
               <Element position={skillPos}>
@@ -40,7 +40,11 @@ function Skill({position, title, to}) {
                           textAlign: 'center',
                           display: 'block',
                           fontSize: '18px',
-                          cursor : to ? 'pointer' : 'default'
+                          cursor : to ? 'pointer' : 'default',
+                          wordWrap: 'break-word',
+                          whiteSpace: 'normal',
+                          width: `${width - 10}px`,
+                          lineHeight: '1.2'
                       }}>{title}</span>
               </Element>
           </>
@@ -63,11 +67,12 @@ function Skill({position, title, to}) {
     const points = [fromVector, cornerPoint, cornerPoint2, toVector];
     
     return (
-        <Line 
+        <Curve 
             points={points}
             endArrow={true}
+            spread={20}
+            color="#666"
             style={{
-                stroke: '#666',
                 strokeWidth: 2,
                 fill: 'none',
                 ...style
@@ -79,25 +84,48 @@ function Skill({position, title, to}) {
 
 export function Design() {
     
+    // Render the skill diagram for the Design page
     return <Subpage>
         <Drawing width={400} height={400}>
-            <Skill position={{x: 200, y: 100}} title="Database" to="/c/database" />
-            <Skill position={{x: 200, y:230}} title="Database Table" to="/c/databaseTable" />
-            <Skill position={{x: -100, y: 230}} title="Query language" to="/c/queryLanguage" />
+            {/* Level one */}
+            <Skill position={{x: 0, y: 100}} title="Database" to="/c/database" concept={true} />
+            
+            {/* Level two */}
+            <Skill position={{x: 0, y:230}} title="Database Table" to="/c/databaseTable" concept={true} />
+            <Skill position={{x: -300, y: 230}} title="Query language" to="/c/queryLanguage" concept={true} />
 
+            {/* Level three */}
+            <Skill position={{x: -300, y: 340}} title="SQL" to="/c/sql" concept={true} />
+            <Skill position={{x: -100, y:340}} title="Data Types" to="/c/dataTypes" concept={true} />
+            <Skill position={{x: 100, y: 340}} title="Projection and Filtering" to="/c/projectionAndFiltering" concept={true} />
+            <Skill position={{x: 300, y: 340}} title="Database Keys" to="/c/databaseKeys" concept={true} />
 
+            {/* Arrows connecting skills */}
             <SkillArrow 
-                from={{x: 200, y: 125}}  
-                to={{x: 200, y: 205}}    
-                curvature={0.1} 
+                from={{x: 0, y: 125}}  
+                to={{x: 0, y: 205}}    
             />
             <SkillArrow 
-                from={{x: 200, y: 125}}  
-                to={{x: -100, y: 205}}    
-                curvature={0.2} 
+                from={{x: 0, y: 125}}  
+                to={{x: -300, y: 205}}    
+            />
+            <SkillArrow
+                from ={{x: -300, y: 255}}
+                to ={{x: -300, y: 315}}
+            />
+            <SkillArrow 
+                from={{x: 0, y: 255}}  
+                to={{x: -100, y: 315}}    
+            />
+            <SkillArrow 
+                from={{x: 0, y: 255}}  
+                to={{x: 100, y: 315}}    
+            />
+            <SkillArrow 
+                from={{x: 0, y: 255}}  
+                to={{x: 300, y: 315}}    
             />
         </Drawing>
-            
     </Subpage>  
 }
 
