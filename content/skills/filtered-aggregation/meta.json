@@ -1,8 +1,0 @@
-{
-  "id": "filtered-aggregation",
-  "type": "skill",
-  "name": "Use Filtered Aggregation",
-  "description": "Apply WHERE and HAVING clauses with aggregation",
-  "prerequisites": ["aggregate-columns", "filter-rows-multiple", "process-columns"],
-  "database": "companiesAndPositions"
-}

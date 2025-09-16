@@ -1,8 +1,0 @@
-{
-  "id": "database-keys",
-  "type": "concept",
-  "name": "Database Keys",
-  "description": "Primary keys, foreign keys, and unique identifiers",
-  "prerequisites": ["database-table"]
-}
-

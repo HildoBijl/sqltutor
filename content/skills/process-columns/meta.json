@@ -1,8 +1,0 @@
-{
-  "id": "process-columns",
-  "type": "skill",
-  "name": "Create Processed Columns",
-  "description": "Use arithmetic and functions to create calculated columns",
-  "prerequisites": ["choose-columns", "data-types"],
-  "database": "positions"
-}

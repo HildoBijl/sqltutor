@@ -1,8 +1,0 @@
-{
-  "id": "aggregation",
-  "type": "concept",
-  "name": "Aggregation",
-  "description": "Group rows and compute summary values (min, max, avg, etc.)",
-  "prerequisites": ["data-types", "projection-and-filtering"]
-}
-

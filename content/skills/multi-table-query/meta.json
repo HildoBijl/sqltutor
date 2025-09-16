@@ -1,8 +1,0 @@
-{
-  "id": "multi-table-query",
-  "type": "skill",
-  "name": "Write Multi-Table Query",
-  "description": "Complex queries spanning multiple tables with joins and subqueries",
-  "prerequisites": ["join-tables", "single-criterion-query"],
-  "database": "companiesAndPositions"
-}

@@ -1,8 +1,0 @@
-{
-  "id": "sql",
-  "type": "concept",
-  "name": "Introduction to SQL",
-  "description": "Structured Query Language basics and syntax",
-  "prerequisites": ["query-language"]
-}
-

@@ -1,8 +1,0 @@
-{
-  "id": "query-language",
-  "type": "concept",
-  "name": "Query Languages",
-  "description": "How to communicate with databases using query languages",
-  "prerequisites": ["database"]
-}
-

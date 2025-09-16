@@ -1,8 +1,0 @@
-{
-  "id": "join-tables",
-  "type": "skill",
-  "name": "Join Tables",
-  "description": "Combine data from multiple tables using JOIN",
-  "prerequisites": ["database-keys", "choose-columns", "filter-rows-multiple"],
-  "database": "companiesAndPositions"
-}

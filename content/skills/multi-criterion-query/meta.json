@@ -1,8 +1,0 @@
-{
-  "id": "multi-criterion-query",
-  "type": "skill",
-  "name": "Write Multi-Criterion Query",
-  "description": "Complex queries with multiple filters, calculations, and sorting",
-  "prerequisites": ["process-columns", "filter-rows-multiple", "sort-rows"],
-  "database": "companiesAndPositions"
-}

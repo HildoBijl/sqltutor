@@ -1,8 +1,0 @@
-{
-  "id": "aggregate-columns",
-  "type": "skill",
-  "name": "Aggregate Columns",
-  "description": "Use SUM, COUNT, AVG, MIN, MAX with GROUP BY",
-  "prerequisites": ["choose-columns"],
-  "database": "positions"
-}

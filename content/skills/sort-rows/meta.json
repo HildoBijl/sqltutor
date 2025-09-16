@@ -1,8 +1,0 @@
-{
-  "id": "sort-rows",
-  "type": "skill",
-  "name": "Sort Rows",
-  "description": "Order results using ORDER BY and limit with LIMIT",
-  "prerequisites": ["sql", "data-types"],
-  "database": "companies"
-}

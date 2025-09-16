@@ -1,7 +1,0 @@
-{
-  "id": "database",
-  "type": "concept",
-  "name": "What is a Database?",
-  "description": "Understanding databases, tables, and database management systems",
-  "prerequisites": []
-}

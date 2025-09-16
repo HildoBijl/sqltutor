@@ -1,8 +1,0 @@
-{
-  "id": "filter-rows-multiple",
-  "type": "skill",
-  "name": "Filter Rows on Multiple Criteria",
-  "description": "Combine multiple conditions with AND, OR, and NOT",
-  "prerequisites": ["filter-rows"],
-  "database": "companiesAndPositions"
-}

@@ -1,8 +1,0 @@
-{
-  "id": "multi-layered-query",
-  "type": "skill",
-  "name": "Write Multi-Layered Query",
-  "description": "CTEs, subqueries, and complex nested queries",
-  "prerequisites": ["filtered-aggregation", "multi-criterion-query", "multi-table-query"],
-  "database": "positions"
-}

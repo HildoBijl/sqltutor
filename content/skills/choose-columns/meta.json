@@ -1,8 +1,0 @@
-{
-  "id": "choose-columns",
-  "type": "skill",
-  "name": "Choose Columns",
-  "description": "Select specific columns and rename them with aliases",
-  "prerequisites": ["sql"],
-  "database": "companies"
-}
