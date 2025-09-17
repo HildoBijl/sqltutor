@@ -1,0 +1,518 @@
+/* Import fonts */
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+@import '@fontsource/fira-code/400.css';
+@import '@fontsource/fira-code/500.css';
+
+/* CSS Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color palette */
+  --color-primary: #c8102e;
+  --color-primary-light: #ff4444;
+  --color-primary-dark: #960000;
+
+  --color-secondary: #262626;
+  --color-secondary-light: #3e3e3e;
+  --color-secondary-dark: #0f0f0f;
+
+  --color-background: #181818;
+  --color-surface: #21252b;
+  --color-surface-light: #282c34;
+
+  --color-text-primary: #eaecf1;
+  --color-text-secondary: #abb2bf;
+  --color-text-disabled: #5c6370;
+
+  --color-success: #98bc37;
+  --color-warning: #e5c07b;
+  --color-error: #e73636;
+  --color-info: #61afef;
+
+  --color-divider: #3e4451;
+
+  /* Typography */
+  --font-family-base: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-family-code: 'Fira Code', 'Courier New', monospace;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme overrides (applied when data-theme="light" on <html>) */
+:root[data-theme='light'] {
+  --color-background: #f7f7f7;
+  --color-surface: #ffffff;
+  --color-surface-light: #f0f0f0;
+
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #4a4a4a;
+  --color-text-disabled: #9e9e9e;
+
+  --color-divider: #e0e0e0;
+
+  /* Shadows for light theme */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+  /* Scrollbar for light theme */
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #c4c4c4;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography defaults */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
+
+/* Code styling */
+code {
+  font-family: var(--font-family-code);
+  font-size: 0.875em;
+  padding: 0.2em 0.4em;
+  background-color: var(--color-surface);
+  border-radius: 4px;
+  border: 1px solid var(--color-divider);
+}
+
+pre {
+  font-family: var(--font-family-code);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-divider);
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--color-surface));
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--color-secondary-light));
+  border-radius: 6px;
+  border: 2px solid var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal);
+}
+
+/* Slide animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp var(--transition-normal);
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: var(--spacing-sm);
+}
+
+.gap-4 {
+  gap: var(--spacing-md);
+}
+
+/* Component-specific styles */
+
+/* SQL Editor specific */
+.sql-editor {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-divider);
+}
+
+.sql-editor .cm-content {
+  padding: var(--spacing-md);
+}
+
+.sql-editor .cm-focused .cm-cursor {
+  border-left-color: var(--color-primary);
+}
+
+.sql-editor .cm-focused .cm-selectionBackground,
+.sql-editor ::selection {
+  background-color: rgba(200, 25, 25, 0.2);
+}
+
+/* Data table specific */
+.data-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.data-table .MuiTableCell-head {
+  background-color: var(--color-surface-light);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.data-table .MuiTableRow-root:hover {
+  background-color: var(--color-surface);
+}
+
+/* Card hover effects */
+.hover-card {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Error states */
+.error-text {
+  color: var(--color-error);
+}
+
+.success-text {
+  color: var(--color-success);
+}
+
+.warning-text {
+  color: var(--color-warning);
+}
+
+.info-text {
+  color: var(--color-info);
+}
+
+/* Progress indicators */
+.progress-bar {
+  height: 4px;
+  background-color: var(--color-surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  transition: width var(--transition-normal);
+}
+
+/* Responsive design helpers */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  .sql-editor .cm-content {
+    padding: var(--spacing-sm);
+  }
+
+  pre {
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 12px;
+  }
+
+  .sql-editor .cm-content {
+    padding: var(--spacing-xs);
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .sql-editor,
+  .data-table {
+    border: 1px solid #ccc;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #ff0000;
+    --color-background: #000000;
+    --color-surface: #111111;
+    --color-text-primary: #ffffff;
+    --color-divider: #666666;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-pulse,
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none;
+  }
+}
