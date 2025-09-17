@@ -100,30 +100,81 @@ export function Design() {
             <Skill position={{x: 100, y: 340}} title="Projection and Filtering" to="/c/projectionAndFiltering" concept={true} />
             <Skill position={{x: 300, y: 340}} title="Database Keys" to="/c/databaseKeys" concept={true} />
 
+            {/* Level four */}
+            <Skill position={{x: -300, y: 450}} title="Filter Rows" to  ="/c/filterRows" />
+            <Skill position={{x: 0, y: 450}} title="Choose Columns" to="/c/chooseColumns" />
+            <Skill position={{x: 300, y:450}} title="Join and Decomposition" to ="/c/joinAndDecomposition" concept={true}/>
+
             {/* Arrows connecting skills */}
+            {/* Database to Database Table */}
             <SkillArrow 
                 from={{x: 0, y: 125}}  
                 to={{x: 0, y: 205}}    
             />
+            {/* Database to Query language */}
             <SkillArrow 
                 from={{x: 0, y: 125}}  
                 to={{x: -300, y: 205}}    
             />
+            {/* Query language to SQL */}
             <SkillArrow
                 from ={{x: -300, y: 255}}
                 to ={{x: -300, y: 315}}
             />
+            {/* Database Table to Data Types */}
             <SkillArrow 
                 from={{x: 0, y: 255}}  
                 to={{x: -100, y: 315}}    
             />
+            {/* Database Table to Projection and Filtering */}
             <SkillArrow 
                 from={{x: 0, y: 255}}  
                 to={{x: 100, y: 315}}    
             />
+            {/* Database Table to Database Keys */}
             <SkillArrow 
                 from={{x: 0, y: 255}}  
                 to={{x: 300, y: 315}}    
+            />
+            {/* SQL to Filter Rows */}
+            <SkillArrow 
+                from={{x: -300, y: 365}}  
+                to={{x: -300, y: 425}}    
+            />
+            {/* SQL to Choose Columns */}
+            <SkillArrow 
+                from={{x: -300, y: 365}}  
+                to={{x: 0, y: 425}}    
+            />
+            {/* Data Types to Filter Rows */}
+            <SkillArrow 
+                from={{x: -100, y: 365}}  
+                to={{x: -300, y: 425}}    
+            />
+            {/* Data Types to Join and Decomposition */}
+            <SkillArrow 
+                from={{x: -100, y: 365}}  
+                to={{x: 300, y: 425}}    
+            />
+            {/* Projection and Filtering to Filter Rows */}
+            <SkillArrow 
+                from={{x: 100, y: 365}}  
+                to={{x: -300, y: 425}}    
+            />
+            {/* Projection and Filtering to Choose Columns */}
+            <SkillArrow 
+                from={{x: 100, y: 365}}  
+                to={{x: 0, y: 425}}    
+            />
+            {/* Projection and Filtering to Join and Decomposition */}
+            <SkillArrow 
+                from={{x: 100, y: 365}}  
+                to={{x: 300, y: 425}}    
+            />
+            {/* Database Keys to Join and Decomposition */}
+            <SkillArrow 
+                from={{x: 300, y: 365}}  
+                to={{x: 300, y: 425}}    
             />
         </Drawing>
     </Subpage>  
