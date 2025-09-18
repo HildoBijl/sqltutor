@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import initSqlJs from 'sql.js';
+import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 
 interface SQLJSContextType {
   SQLJS: any | null;
@@ -33,7 +34,9 @@ export function SQLJSProvider({ children }: SQLJSProviderProps) {
         setError(null);
 
         const SQLJSInstance = await initSqlJs({
-          locateFile: (file: string) => `/sqljs/${file}`,
+          locateFile: (file: string) => (
+            file === 'sql-wasm.wasm' ? sqlWasmUrl : `/sqljs/${file}`
+          ),
         });
 
         setSQLJS(SQLJSInstance);
