@@ -13,10 +13,10 @@ function Skill({position, title, to, concept = false}) {
         const navigate = useNavigate();
 
         // Define the rectangle dimensions
-        const width = concept ? 150 : 180; 
+        const width = concept ? 150 : 180;
         const height = 50;
-        const rectStart = skillPos.subtract(new Vector(width/2, height/2))
-        const rectEnd = skillPos.add(new Vector(width/2, height/2))
+        const rectStart = skillPos.subtract([width/2, height/2])
+        const rectEnd = skillPos.add([width/2, height/2])
 
         // Navigate to the skill theory page on double click
         const handleDoubleClick = () => {
@@ -83,101 +83,119 @@ function Skill({position, title, to, concept = false}) {
 
 
 export function Design() {
-    
+
     // Render the skill diagram for the Design page
     return <Subpage>
-        <Drawing width={400} height={400}>
+        <div style={{
+            width: '100%',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden'
+        }}>
+            <div style={{
+                width: '90vw',
+                height: '90vh',
+                maxWidth: '800px',
+                maxHeight: '800px',
+                minWidth: '400px',
+                minHeight: '400px'
+            }}>
+                <Drawing width={800} height={600}>
             {/* Level one */}
-            <Skill position={{x: 0, y: 100}} title="Database" to="/c/database" concept={true} />
-            
+            <Skill position={{x: 400, y: 100}} title="Database" to="/c/database" concept={true} />
+
             {/* Level two */}
-            <Skill position={{x: 0, y:230}} title="Database Table" to="/c/databaseTable" concept={true} />
-            <Skill position={{x: -300, y: 230}} title="Query language" to="/c/queryLanguage" concept={true} />
+            <Skill position={{x: 400, y:230}} title="Database Table" to="/c/databaseTable" concept={true} />
+            <Skill position={{x: 100, y: 230}} title="Query language" to="/c/queryLanguage" concept={true} />
 
             {/* Level three */}
-            <Skill position={{x: -300, y: 340}} title="SQL" to="/c/sql" concept={true} />
-            <Skill position={{x: -100, y:340}} title="Data Types" to="/c/dataTypes" concept={true} />
-            <Skill position={{x: 100, y: 340}} title="Projection and Filtering" to="/c/projectionAndFiltering" concept={true} />
-            <Skill position={{x: 300, y: 340}} title="Database Keys" to="/c/databaseKeys" concept={true} />
+            <Skill position={{x: 100, y: 340}} title="SQL" to="/c/sql" concept={true} />
+            <Skill position={{x: 300, y:340}} title="Data Types" to="/c/dataTypes" concept={true} />
+            <Skill position={{x: 500, y: 340}} title="Projection and Filtering" to="/c/projectionAndFiltering" concept={true} />
+            <Skill position={{x: 700, y: 340}} title="Database Keys" to="/c/databaseKeys" concept={true} />
 
             {/* Level four */}
-            <Skill position={{x: -300, y: 450}} title="Filter Rows" to  ="/c/filterRows" />
-            <Skill position={{x: 0, y: 450}} title="Choose Columns" to="/c/chooseColumns" />
-            <Skill position={{x: 300, y:450}} title="Join and Decomposition" to ="/c/joinAndDecomposition" concept={true}/>
+            <Skill position={{x: 100, y: 450}} title="Filter Rows" to  ="/c/filterRows" />
+            <Skill position={{x: 400, y: 450}} title="Choose Columns" to="/c/chooseColumns" />
+            <Skill position={{x: 700, y:450}} title="Join and Decomposition" to ="/c/joinAndDecomposition" concept={true}/>
 
             {/* Arrows connecting skills */}
             {/* Database to Database Table */}
-            <SkillArrow 
-                from={{x: 0, y: 125}}  
-                to={{x: 0, y: 205}}    
+            <SkillArrow
+                from={{x: 400, y: 125}}
+                to={{x: 400, y: 205}}
             />
             {/* Database to Query language */}
-            <SkillArrow 
-                from={{x: 0, y: 125}}  
-                to={{x: -300, y: 205}}    
+            <SkillArrow
+                from={{x: 400, y: 125}}
+                to={{x: 100, y: 205}}
             />
             {/* Query language to SQL */}
             <SkillArrow
-                from ={{x: -300, y: 255}}
-                to ={{x: -300, y: 315}}
+                from ={{x: 100, y: 255}}
+                to ={{x: 100, y: 315}}
             />
             {/* Database Table to Data Types */}
-            <SkillArrow 
-                from={{x: 0, y: 255}}  
-                to={{x: -100, y: 315}}    
+            <SkillArrow
+                from={{x: 400, y: 255}}
+                to={{x: 300, y: 315}}
             />
             {/* Database Table to Projection and Filtering */}
-            <SkillArrow 
-                from={{x: 0, y: 255}}  
-                to={{x: 100, y: 315}}    
+            <SkillArrow
+                from={{x: 400, y: 255}}
+                to={{x: 500, y: 315}}
             />
             {/* Database Table to Database Keys */}
-            <SkillArrow 
-                from={{x: 0, y: 255}}  
-                to={{x: 300, y: 315}}    
+            <SkillArrow
+                from={{x: 400, y: 255}}
+                to={{x: 700, y: 315}}
             />
             {/* SQL to Filter Rows */}
-            <SkillArrow 
-                from={{x: -300, y: 365}}  
-                to={{x: -300, y: 425}}    
+            <SkillArrow
+                from={{x: 100, y: 365}}
+                to={{x: 100, y: 425}}
             />
             {/* SQL to Choose Columns */}
-            <SkillArrow 
-                from={{x: -300, y: 365}}  
-                to={{x: 0, y: 425}}    
+            <SkillArrow
+                from={{x: 100, y: 365}}
+                to={{x: 400, y: 425}}
             />
             {/* Data Types to Filter Rows */}
-            <SkillArrow 
-                from={{x: -100, y: 365}}  
-                to={{x: -300, y: 425}}    
+            <SkillArrow
+                from={{x: 300, y: 365}}
+                to={{x: 100, y: 425}}
             />
             {/* Data Types to Join and Decomposition */}
-            <SkillArrow 
-                from={{x: -100, y: 365}}  
-                to={{x: 300, y: 425}}    
+            <SkillArrow
+                from={{x: 300, y: 365}}
+                to={{x: 700, y: 425}}
             />
             {/* Projection and Filtering to Filter Rows */}
-            <SkillArrow 
-                from={{x: 100, y: 365}}  
-                to={{x: -300, y: 425}}    
+            <SkillArrow
+                from={{x: 500, y: 365}}
+                to={{x: 100, y: 425}}
             />
             {/* Projection and Filtering to Choose Columns */}
-            <SkillArrow 
-                from={{x: 100, y: 365}}  
-                to={{x: 0, y: 425}}    
+            <SkillArrow
+                from={{x: 500, y: 365}}
+                to={{x: 400, y: 425}}
             />
             {/* Projection and Filtering to Join and Decomposition */}
-            <SkillArrow 
-                from={{x: 100, y: 365}}  
-                to={{x: 300, y: 425}}    
+            <SkillArrow
+                from={{x: 500, y: 365}}
+                to={{x: 700, y: 425}}
             />
             {/* Database Keys to Join and Decomposition */}
-            <SkillArrow 
-                from={{x: 300, y: 365}}  
-                to={{x: 300, y: 425}}    
+            <SkillArrow
+                from={{x: 700, y: 365}}
+                to={{x: 700, y: 425}}
             />
-        </Drawing>
-    </Subpage>  
+                </Drawing>
+            </div>
+        </div>
+    </Subpage>
 }
 
 export default Design
