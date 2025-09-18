@@ -1,124 +1,40 @@
-import { Link , useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Subpage } from 'components'
-import { Rectangle, Drawing, Element, Line, ArrowHead, Curve} from 'components'
+import { Rectangle, Drawing, Element } from 'components'
 import { Vector } from 'util'
-import { components } from '../edu/skillTree.js'
+import { contents } from '../edu/skillTree.js'
 
-// Helper function to calculate levels based on prerequisites
-function calculateLevels(componentsMap) {
-    const levels = new Map();
-    const visited = new Set();
+// Helper function to flatten the nested contents structure
+function flattenContents(contentsObj) {
+    const flattened = {};
 
-    function getLevel(componentId) {
-        if (levels.has(componentId)) return levels.get(componentId);
-        if (visited.has(componentId)) return 0; // Make sure to avoid cycles
-
-        visited.add(componentId);
-        const component = componentsMap[componentId];
-        if (!component) return 0;
-
-        let maxPrereqLevel = -1;
-        if (component.prerequisites && component.prerequisites.length > 0) {
-            for (const prereq of component.prerequisites) {
-                const prereqLevel = getLevel(prereq.id);
-                maxPrereqLevel = Math.max(maxPrereqLevel, prereqLevel);
+    function traverse(obj, path = []) {
+        Object.entries(obj).forEach(([key, value]) => {
+            if (value && typeof value === 'object' && value.type && value.name) {
+                // This is a skill/concept object
+                flattened[key] = value;
+            } else if (value && typeof value === 'object') {
+                // This is a nested category, continue traversing
+                traverse(value, [...path, key]);
             }
-        }
-
-        const level = maxPrereqLevel + 1;
-        levels.set(componentId, level);
-        visited.delete(componentId);
-        return level;
+        });
     }
 
-    // Calculate levels for all components
-    Object.keys(componentsMap).forEach(id => getLevel(id));
-    return levels;
+    traverse(contentsObj);
+    return flattened;
 }
 
-// Improved layout calculation with better spacing and positioning
-function calculateLayout(componentsMap, canvasWidth, canvasHeight) {
-    const levels = calculateLevels(componentsMap);
-    const maxLevel = Math.max(...Array.from(levels.values()));
-
-    // Group components by level
-    const levelGroups = new Map();
-    Object.entries(componentsMap).forEach(([id, component]) => {
-        const level = levels.get(id);
-        if (!levelGroups.has(level)) levelGroups.set(level, []);
-        levelGroups.get(level).push({ id, ...component });
-    });
-
-    const positions = {};
-
-    // Improved spacing calculations
-    const topPadding = 80;
-    const bottomPadding = 80;
-    const availableHeight = canvasHeight - topPadding - bottomPadding;
-    const levelSpacing = maxLevel > 0 ? availableHeight / maxLevel : availableHeight;
-
-    // Ensure minimum spacing between levels
-    const minLevelSpacing = 120;
-    const actualLevelSpacing = Math.max(minLevelSpacing, levelSpacing);
-
-    levelGroups.forEach((componentsInLevel, level) => {
-        const levelY = topPadding + (level * actualLevelSpacing);
-
-        // Improved horizontal spacing
-        const sidePadding = 100;
-        const availableWidth = canvasWidth - (2 * sidePadding);
-
-        // Calculate positions to avoid overlap
-        const itemWidth = 200; // estimated max width of items
-        const minSpacing = itemWidth + 40; // minimum gap between items
-
-        if (componentsInLevel.length === 1) {
-            // Center single items
-            positions[componentsInLevel[0].id] = {
-                x: canvasWidth / 2,
-                y: levelY
-            };
-        } else {
-            // For multiple items, ensure proper spacing
-            const totalRequiredWidth = componentsInLevel.length * minSpacing;
-
-            if (totalRequiredWidth <= availableWidth) {
-                // Items fit with good spacing
-                const actualSpacing = availableWidth / (componentsInLevel.length + 1);
-                componentsInLevel.forEach((component, index) => {
-                    positions[component.id] = {
-                        x: sidePadding + actualSpacing * (index + 1),
-                        y: levelY
-                    };
-                });
-            } else {
-                // Items need to be compressed but avoid overlap
-                const actualSpacing = availableWidth / componentsInLevel.length;
-                componentsInLevel.forEach((component, index) => {
-                    positions[component.id] = {
-                        x: sidePadding + actualSpacing * (index + 0.5),
-                        y: levelY
-                    };
-                });
-            }
-        }
-    });
-
-    return positions;
-}
-
-// Fixed layout calculation that prevents overlaps
+// Layout calculation using explicit level and position fields
 function calculateTreeLayout(componentsMap, canvasWidth, canvasHeight) {
-    const levels = calculateLevels(componentsMap);
-
     const positions = {};
     const levelHeight = 140;
     const topPadding = 80;
 
-    // Process level by level
+    // Group components by their explicit level field
     const levelNodes = new Map();
     Object.entries(componentsMap).forEach(([id, component]) => {
-        const level = levels.get(id);
+        // Use explicit level field, default to 1 if not provided
+        const level = component.level || 1;
         if (!levelNodes.has(level)) levelNodes.set(level, []);
         levelNodes.get(level).push({ id, ...component });
     });
@@ -126,19 +42,20 @@ function calculateTreeLayout(componentsMap, canvasWidth, canvasHeight) {
     // Position nodes level by level with proper spacing
     Array.from(levelNodes.keys()).sort((a, b) => a - b).forEach(level => {
         const nodesAtLevel = levelNodes.get(level);
-        const levelY = topPadding + (level * levelHeight);
+
+        // Sort nodes by their position field (left to right)
+        nodesAtLevel.sort((a, b) => (a.position || 0) - (b.position || 0));
+
+        // Calculate Y position (level 1 starts from top)
+        const levelY = topPadding + ((level - 1) * levelHeight);3
 
         // Calculate actual width needed for each skill
         const getSkillWidth = (component) => component.type === 'concept' ? 150 : 180;
         const skillWidths = nodesAtLevel.map(node => getSkillWidth(node));
 
-        // Calculate spacing to prevent overlaps
-        const minGap = 50; // minimum gap between skills
+        // Calculate spacing based on number of skills - smaller levels more centered, larger levels spread out
         const totalSkillWidth = skillWidths.reduce((sum, width) => sum + width, 0);
-        const totalGapWidth = (nodesAtLevel.length - 1) * minGap;
-        const totalRequiredWidth = totalSkillWidth + totalGapWidth;
-
-        const sidePadding = 100;
+        const sidePadding = 20; // Reduced from 100 to minimize margin space
         const availableWidth = canvasWidth - (2 * sidePadding);
 
         if (nodesAtLevel.length === 1) {
@@ -147,13 +64,13 @@ function calculateTreeLayout(componentsMap, canvasWidth, canvasHeight) {
                 x: canvasWidth / 2,
                 y: levelY
             };
-        } else if (totalRequiredWidth <= availableWidth) {
-            // Items fit with good spacing - distribute evenly
-            const extraSpace = availableWidth - totalRequiredWidth;
-            const spaceBetween = minGap + (extraSpace / (nodesAtLevel.length - 1));
+        } else if (nodesAtLevel.length <= 2) {
+            // Small levels (2 skills) - keep them more centered with tighter spacing
+            const centerGap = 120; // Fixed gap for small levels
+            const totalWidth = totalSkillWidth + centerGap;
+            const startX = (canvasWidth - totalWidth) / 2 + skillWidths[0] / 2;
 
-            let currentX = sidePadding + skillWidths[0] / 2; // start at center of first skill
-
+            let currentX = startX;
             nodesAtLevel.forEach((node, index) => {
                 positions[node.id] = {
                     x: currentX,
@@ -162,26 +79,51 @@ function calculateTreeLayout(componentsMap, canvasWidth, canvasHeight) {
 
                 // Move to next position
                 if (index < nodesAtLevel.length - 1) {
-                    currentX += skillWidths[index] / 2 + spaceBetween + skillWidths[index + 1] / 2;
+                    currentX += skillWidths[index] / 2 + centerGap + skillWidths[index + 1] / 2;
                 }
             });
         } else {
-            // Items need compression but maintain minimum gaps
-            const compressionFactor = availableWidth / totalRequiredWidth;
-            const compressedGap = Math.max(20, minGap * compressionFactor); // never less than 20px
+            // Larger levels (3+ skills) - spread them out more using available width
+            const minGap = 50;
+            const totalGapWidth = (nodesAtLevel.length - 1) * minGap;
+            const totalRequiredWidth = totalSkillWidth + totalGapWidth;
 
-            let currentX = sidePadding + skillWidths[0] / 2;
+            if (totalRequiredWidth <= availableWidth) {
+                // Spread items across available width with extra spacing
+                const extraSpace = availableWidth - totalRequiredWidth;
+                const spaceBetween = minGap + (extraSpace / (nodesAtLevel.length - 1));
 
-            nodesAtLevel.forEach((node, index) => {
-                positions[node.id] = {
-                    x: currentX,
-                    y: levelY
-                };
+                let currentX = sidePadding + skillWidths[0] / 2;
 
-                if (index < nodesAtLevel.length - 1) {
-                    currentX += skillWidths[index] / 2 + compressedGap + skillWidths[index + 1] / 2;
-                }
-            });
+                nodesAtLevel.forEach((node, index) => {
+                    positions[node.id] = {
+                        x: currentX,
+                        y: levelY
+                    };
+
+                    // Move to next position
+                    if (index < nodesAtLevel.length - 1) {
+                        currentX += skillWidths[index] / 2 + spaceBetween + skillWidths[index + 1] / 2;
+                    }
+                });
+            } else {
+                // Items need compression but maintain minimum gaps
+                const compressionFactor = availableWidth / totalRequiredWidth;
+                const compressedGap = Math.max(20, minGap * compressionFactor);
+
+                let currentX = sidePadding + skillWidths[0] / 2;
+
+                nodesAtLevel.forEach((node, index) => {
+                    positions[node.id] = {
+                        x: currentX,
+                        y: levelY
+                    };
+
+                    if (index < nodesAtLevel.length - 1) {
+                        currentX += skillWidths[index] / 2 + compressedGap + skillWidths[index + 1] / 2;
+                    }
+                });
+            }
         }
     });
 
@@ -238,49 +180,13 @@ function Skill({position, title, to, concept = false}) {
     
 }
 
-// Arrow positioning 
-function SkillArrow({from, to, style = {}}) {
-    if (!from || !to) return null;
-
-    const fromVector = new Vector(from);
-    const toVector = new Vector(to);
-
-    // Calculate connection points on the edges of rectangles
-    const skillHeight = 50;
-    const fromY = fromVector.y + (skillHeight / 2) + 5; // bottom edge + small gap
-    const toY = toVector.y - (skillHeight / 2) - 5; // top edge - small gap
-
-    // Create smoother curves
-    const controlPoint1Y = fromY + (toY - fromY) * 0.3;
-    const controlPoint2Y = fromY + (toY - fromY) * 0.7;
-
-    const points = [
-        new Vector(fromVector.x, fromY),
-        new Vector(fromVector.x, controlPoint1Y),
-        new Vector(toVector.x, controlPoint2Y),
-        new Vector(toVector.x, toY)
-    ];
-
-    return (
-        <Curve
-            points={points}
-            endArrow={true}
-            spread={15}
-            color="#888"
-            style={{
-                strokeWidth: 1.5,
-                fill: 'none',
-                opacity: 0.8,
-                ...style
-            }}
-        />
-    );
-}
-
 
 export function Design() {
-    // Use the improved layout - choose one:
-    const positions = calculateTreeLayout(components, 1200, 800); // or calculateLayout
+    // Flatten the nested contents structure
+    const components = flattenContents(contents);
+
+    // Use the improved layout
+    const positions = calculateTreeLayout(components, 1200, 800);
 
     const skillElements = Object.entries(components).map(([id, component]) => {
         const position = positions[id];
@@ -293,7 +199,7 @@ export function Design() {
                 key={id}
                 position={position}
                 title={component.name}
-                to={`/${component.type}/${id}`}
+                to={`/c/${id}`}
                 concept={isConceptType}
             />
         );
