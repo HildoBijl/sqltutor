@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+﻿import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import path from 'path';
@@ -22,6 +22,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      components: path.resolve(__dirname, './src/components'),
+      util: path.resolve(__dirname, './src/util'),
+      settings: path.resolve(__dirname, './src/settings.js'),
+      routing: path.resolve(__dirname, './src/routing'),
+      assets: path.resolve(__dirname, './src/assets'),
+      pages: path.resolve(__dirname, './src/pages'),
+      edu: path.resolve(__dirname, './src/edu'),
+      content: path.resolve(__dirname, './src/features/content'),
+      eduComponents: path.resolve(__dirname, './src/eduComponents'),
     },
   },
   server: {
@@ -43,3 +52,7 @@ export default defineConfig({
     },
   },
 });
+
+
+
+
