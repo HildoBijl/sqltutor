@@ -1,4 +1,5 @@
-﻿import { Suspense, useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -22,6 +23,7 @@ import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
 import { useContent } from './hooks/useContent';
+import { useSkillExerciseState } from './useSkillExerciseState';
 
 interface ExerciseInstance {
   id: string;
@@ -50,10 +52,13 @@ export default function SkillPage() {
     validate?: (input: string, state: any, result: any) => boolean;
     solutionTemplate?: string;
   } | null>(null);
-  const [currentExercise, setCurrentExercise] = useState<ExerciseInstance | null>(null);
+  const { currentExercise, startNewExercise, submitInput } = useSkillExerciseState(
+    skillId || '',
+    skillModule,
+  );
   const [query, setQuery] = useState('');
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const [exerciseCompleted, setExerciseCompleted] = useState(false);
+  const exerciseCompleted = !!currentExercise?.done;
 
   // Skill metadata
   const [skillMeta, setSkillMeta] = useState<(ContentMeta & { database?: SchemaKey }) | null>(null);
@@ -88,7 +93,6 @@ export default function SkillPage() {
 
     const entry = contentIndex.find(item => item.type === 'skill' && item.id === skillId) || null;
     setSkillMeta(entry);
-    setCurrentExercise(null);
 
     if (!entry) {
       setSkillModule(null);
@@ -154,36 +158,6 @@ export default function SkillPage() {
     setComponentState({ tab: tabNames[newValue] });
   };
 
-
-  // Utilities available to content generators
-  const genUtils = {
-    selectRandomly: <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)],
-    generateRandomNumber: (min: number, max: number) =>
-      Math.floor(Math.random() * (max - min + 1)) + min,
-  };
-
-  // Generate a new exercise
-  const generateExercise = useCallback(() => {
-    if (!skillModule?.generate) {
-      return;
-    }
-
-    const state = skillModule.generate(genUtils) || {};
-    const instance: ExerciseInstance = {
-      id: state?.id || 'exercise',
-      description: state?.description || 'Solve the exercise',
-      expectedQuery: state?.expectedQuery,
-      validatorFn: skillModule.validate,
-      solutionTemplate: skillModule.solutionTemplate,
-      config: {},
-      state,
-    };
-    setCurrentExercise(instance);
-    setQuery('');
-    setFeedback(null);
-    setExerciseCompleted(false);
-  }, [skillModule, genUtils]);
-
   const TheoryContent = useContent(skillMeta?.id, 'Theory');
   const StoryContent = useContent(skillMeta?.id, 'Story');
 
@@ -204,9 +178,16 @@ export default function SkillPage() {
   // Initialize first exercise when DB ready
   useEffect(() => {
     if (dbReady && !currentExercise) {
-      generateExercise();
+      startNewExercise();
     }
-  }, [dbReady, currentExercise, generateExercise]);
+  }, [dbReady, currentExercise, startNewExercise]);
+
+  // Also start when content module becomes available
+  useEffect(() => {
+    if (dbReady && skillModule && !currentExercise) {
+      startNewExercise();
+    }
+  }, [dbReady, skillModule, currentExercise, startNewExercise]);
 
   // Check answer
   const handleExecute = async (override?: string) => {
@@ -225,49 +206,13 @@ export default function SkillPage() {
     try {
       const result = await executeQuery(effectiveQuery);
 
-      let isCorrect = false;
-
-      // Prefer content-provided validator if available
-      if (currentExercise.validatorFn) {
-        isCorrect = !!currentExercise.validatorFn(effectiveQuery, currentExercise.state, result);
-      }
-      // Check if exercise has expected query
-      else if (currentExercise.expectedQuery) {
-        // Simple check - in real app would need better SQL comparison
-        const normalize = (s: string) => s
-          .toLowerCase()
-          .replace(/\s+/g, ' ')
-          .trim()
-          .replace(/;$/, '');
-        const normalizedQuery = normalize(effectiveQuery);
-        const normalizedExpected = normalize(currentExercise.expectedQuery);
-        isCorrect = normalizedQuery === normalizedExpected ||
-          (result && result.length > 0 && result[0].values.length > 0);
-      }
-      // Default: check if query returned results
-      else {
-        isCorrect = result && result.length > 0;
-      }
-
+      const outcome = submitInput(effectiveQuery, result);
+      const isCorrect = !!outcome?.correct;
       if (isCorrect) {
-        // Update progress
-        const nextSolved = Math.min(requiredCount, (componentState.numSolved || 0) + 1);
-        const newHistory = [
-          ...(componentState.exerciseHistory || []),
-          { id: currentExercise.id, solved: true, timestamp: new Date() }
-        ];
-
-        setComponentState({
-          numSolved: nextSolved,
-          exerciseHistory: newHistory
-        });
-
         setFeedback({
-          message: `Excellent! Exercise completed successfully! (${nextSolved}/${requiredCount})`,
+          message: `Excellent! Exercise completed successfully! (${Math.min((componentState.numSolved || 0), requiredCount)}/${requiredCount})`,
           type: 'success'
         });
-        // Mark current exercise as completed; require explicit click to continue
-        setExerciseCompleted(true);
       } else {
         setFeedback({
           message: 'Not quite right. Check your query and try again!',
@@ -297,8 +242,8 @@ export default function SkillPage() {
     let solution = currentExercise.expectedQuery;
 
     // Otherwise use solution template if available
-    if (!solution && currentExercise.solutionTemplate) {
-      solution = currentExercise.solutionTemplate.replace(/{{(.*?)}}/g, (_m, p1) => {
+    if (!solution && skillModule?.solutionTemplate) {
+      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, p1) => {
         const key = String(p1).trim();
         const v = currentExercise.state?.[key];
         return v !== undefined && v !== null ? String(v) : '';
@@ -316,7 +261,9 @@ export default function SkillPage() {
 
   // New exercise
   const handleNewExercise = () => {
-    generateExercise();
+    startNewExercise();
+    setQuery('');
+    setFeedback(null);
   };
 
   if (isLoading) {
