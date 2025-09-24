@@ -13,8 +13,12 @@ import {
   CircularProgress,
   Tabs,
   Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
-import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit } from '@mui/icons-material';
+import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Celebration } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -74,6 +78,7 @@ export default function SkillPage() {
   );
   const [query, setQuery] = useState('');
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const exerciseCompleted = !!currentExercise?.done;
 
   // Skill metadata
@@ -228,10 +233,20 @@ export default function SkillPage() {
       const outcome = submitInput(effectiveQuery, result);
       const isCorrect = !!outcome?.correct;
       if (isCorrect) {
-        setFeedback({
-          message: `Excellent! Exercise completed successfully! (${Math.min((componentState.numSolved || 0), requiredCount)}/${requiredCount})`,
-          type: 'success'
-        });
+        const currentNumSolved = componentState.numSolved || 0;
+        const wasAlreadyCompleted = currentNumSolved >= requiredCount;
+        const newNumSolved = currentNumSolved + 1; // submitInput will increment this
+        
+        // Show completion dialog if we just reached mastery
+        if (!wasAlreadyCompleted && newNumSolved >= requiredCount) {
+          setShowCompletionDialog(true);
+        } else {
+          // Only show regular feedback if not showing completion dialog
+          setFeedback({
+            message: `Excellent! Exercise completed successfully! (${Math.min(newNumSolved, requiredCount)}/${requiredCount})`,
+            type: 'success'
+          });
+        }
       } else {
         setFeedback({
           message: 'Not quite right. Check your query and try again!',
@@ -314,6 +329,30 @@ export default function SkillPage() {
           {skillMeta.name}
           {isCompleted && <CheckCircle color="success" sx={{ ml: 1 }} />}
         </Typography>
+        {/* Progress Indicator */}
+        {isCurrentTab('practice') && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Progress:
+            </Typography>
+            <Box sx={{ 
+              bgcolor: isCompleted ? 'success.main' : 'primary.main',
+              color: 'white',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 1,
+              fontSize: '0.875rem',
+              fontWeight: 500
+            }}>
+              {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount}
+            </Box>
+            {isCompleted && (
+              <Typography variant="body2" color="success.main" sx={{ fontWeight: 500 }}>
+                Mastered!
+              </Typography>
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* Description */}
@@ -341,27 +380,15 @@ export default function SkillPage() {
         {/* Tab Content */}
         {isCurrentTab('practice') && (
           <CardContent>
-            {/* Progress */}
-            <Alert severity={isCompleted ? 'success' : 'info'} sx={{ mb: 2 }}>
-              Progress: {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount} exercises completed
-              {isCompleted && ' - Skill mastered!'}
-            </Alert>
-
-            {/* Database Info */}
-            {tableNames.length > 0 && (
-              <Alert severity="info" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Available tables:</strong> {tableNames.join(', ')}
-                </Typography>
-              </Alert>
-            )}
-
             {/* Exercise Description */}
             {currentExercise && (
               <Card sx={{ mb: 2 }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Exercise {Math.min((componentState.numSolved || 0) + 1, requiredCount)}
+                    {(componentState.numSolved || 0) >= requiredCount 
+                      ? `Practice Exercise ${(componentState.numSolved || 0) + 1 - requiredCount}`
+                      : `Exercise ${(componentState.numSolved || 0) + 1}`
+                    }
                   </Typography>
                   <Typography variant="body1">
                     {currentExercise.description}
@@ -380,9 +407,16 @@ export default function SkillPage() {
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}>
-                <Typography variant="subtitle2" sx={{ ml: 1 }}>
-                  Write your SQL query:
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Typography variant="subtitle2">
+                    Write your SQL query:
+                  </Typography>
+                  {tableNames.length > 0 && (
+                    <Typography variant="caption" color="text.secondary">
+                      Tables: {tableNames.join(', ')}
+                    </Typography>
+                  )}
+                </Box>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
                     size="small"
@@ -502,6 +536,104 @@ export default function SkillPage() {
           {feedback?.message}
         </Alert>
       </Snackbar>
+
+      {/* Skill Completion Dialog */}
+      <Dialog
+        open={showCompletionDialog}
+        onClose={() => setShowCompletionDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            border: '2px solid',
+            borderColor: 'success.main',
+          }
+        }}
+      >
+        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+            Skill Mastered!
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent sx={{ textAlign: 'center', py: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Congratulations!
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            You've successfully completed all <strong>3 exercises</strong> for the skill:
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 2 }}>
+            "{skillMeta?.name}"
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            You've demonstrated mastery of this skill and can now confidently apply it in real-world scenarios!
+          </Typography>
+        </DialogContent>
+        
+        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
+          <Button
+            onClick={() => setShowCompletionDialog(false)}
+            variant="contained"
+            size="large"
+            startIcon={<CheckCircle />}
+            sx={{ 
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1.1rem'
+            }}
+          >
+            Awesome!
+          </Button>
+          
+          {/* Show story button only if not in focused mode and story tab is available */}
+          {!focusedMode && availableTabs.some(tab => tab.key === 'story') && (
+            <Button
+              onClick={() => {
+                setShowCompletionDialog(false);
+                const storyIndex = availableTabs.findIndex(tab => tab.key === 'story');
+                if (storyIndex >= 0) {
+                  setCurrentTab(storyIndex);
+                  setComponentState({ tab: 'story' });
+                }
+              }}
+              variant="outlined"
+              size="large"
+              startIcon={<MenuBook />}
+              sx={{ 
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '1.1rem'
+              }}
+            >
+              See the Story
+            </Button>
+          )}
+          
+          <Button
+            onClick={() => navigate('/learn')}
+            variant="outlined"
+            size="large"
+            sx={{ 
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1.1rem'
+            }}
+          >
+            Continue Learning
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
