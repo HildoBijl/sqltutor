@@ -324,172 +324,169 @@ export default function SkillPage() {
       </Box>
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={currentTab} onChange={handleTabChange}>
-          {availableTabs.map((tab) => (
-            <Tab 
-              key={tab.key} 
-              label={tab.label} 
-              icon={tab.icon} 
-              iconPosition="start" 
-            />
-          ))}
-        </Tabs>
-      </Box>
-
-      {/* Progress */}
-      {isCurrentTab('practice') && (
-        <Alert severity={isCompleted ? 'success' : 'info'} sx={{ mb: 2 }}>
-          Progress: {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount} exercises completed
-          {isCompleted && ' - Skill mastered!'}
-        </Alert>
-      )}
-
-      {/* Database Info */}
-      {isCurrentTab('practice') && tableNames.length > 0 && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <Typography variant="body2">
-            <strong>Available tables:</strong> {tableNames.join(', ')}
-          </Typography>
-        </Alert>
-      )}
-
-      {/* Exercise Description */}
-      {isCurrentTab('practice') && currentExercise && (
-        <Card sx={{ mb: 2 }}>
+      <Card>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={currentTab} onChange={handleTabChange}>
+            {availableTabs.map((tab) => (
+              <Tab 
+                key={tab.key} 
+                label={tab.label} 
+                icon={tab.icon} 
+                iconPosition="start" 
+              />
+            ))}
+          </Tabs>
+        </Box>
+        
+        {/* Tab Content */}
+        {isCurrentTab('practice') && (
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Exercise {Math.min((componentState.numSolved || 0) + 1, requiredCount)}
-            </Typography>
-            <Typography variant="body1">
-              {currentExercise.description}
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
+            {/* Progress */}
+            <Alert severity={isCompleted ? 'success' : 'info'} sx={{ mb: 2 }}>
+              Progress: {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount} exercises completed
+              {isCompleted && ' - Skill mastered!'}
+            </Alert>
 
-      {/* SQL Editor */}
-      {isCurrentTab('practice') && (
-        <Card sx={{ mb: 2 }}>
-          <Box sx={{
-            p: 1,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <Typography variant="subtitle2" sx={{ ml: 1 }}>
-              Write your SQL query:
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                size="small"
-                onClick={handleAutoComplete}
-                startIcon={<CheckCircle />}
-                disabled={!currentExercise || isExecuting}
-              >
-                Auto-complete
-              </Button>
-              <Button
-                size="small"
-                startIcon={<RestartAlt />}
-                onClick={handleResetDatabase}
-                disabled={!dbReady || isExecuting}
-                title="Reset the current exercise database"
-              >
-                Reset Database
-              </Button>
-              {!exerciseCompleted ? (
-                <Button
-                  size="small"
-                  startIcon={<Refresh />}
-                  onClick={handleNewExercise}
-                  disabled={isExecuting}
-                  title="Try a different exercise"
-                >
-                  Try Another
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<ArrowForward />}
-                  onClick={handleNewExercise}
-                  title="Proceed to the next exercise"
-                >
-                  Next Exercise
-                </Button>
-              )}
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<PlayArrow />}
-                onClick={() => { void handleExecute(); }}
-                disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
-              >
-                Run & Check
-              </Button>
-            </Box>
-          </Box>
-          <CardContent sx={{ p: 0 }}>
-            <SQLEditor
-              value={query}
-              onChange={setQuery}
-              height="200px"
-              onExecute={handleExecute}
-              showResults={false}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Results */}
-      {isCurrentTab('practice') && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Query Results
-            </Typography>
-            {queryError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {queryError instanceof Error ? queryError.message : 'Query execution failed'}
+            {/* Database Info */}
+            {tableNames.length > 0 && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  <strong>Available tables:</strong> {tableNames.join(', ')}
+                </Typography>
               </Alert>
             )}
-            {queryResult && queryResult.length > 0 ? (
-              <DataTable data={queryResult[0]} />
-            ) : (
-              <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                Run your query to see results
-              </Typography>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Theory */}
-      {isCurrentTab('theory') && (
-        <Card>
+            {/* Exercise Description */}
+            {currentExercise && (
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Exercise {Math.min((componentState.numSolved || 0) + 1, requiredCount)}
+                  </Typography>
+                  <Typography variant="body1">
+                    {currentExercise.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* SQL Editor */}
+            <Card sx={{ mb: 2 }}>
+              <Box sx={{
+                p: 1,
+                borderBottom: 1,
+                borderColor: 'divider',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <Typography variant="subtitle2" sx={{ ml: 1 }}>
+                  Write your SQL query:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    size="small"
+                    onClick={handleAutoComplete}
+                    startIcon={<CheckCircle />}
+                    disabled={!currentExercise || isExecuting}
+                  >
+                    Auto-complete
+                  </Button>
+                  <Button
+                    size="small"
+                    startIcon={<RestartAlt />}
+                    onClick={handleResetDatabase}
+                    disabled={!dbReady || isExecuting}
+                    title="Reset the current exercise database"
+                  >
+                    Reset Database
+                  </Button>
+                  {!exerciseCompleted ? (
+                    <Button
+                      size="small"
+                      startIcon={<Refresh />}
+                      onClick={handleNewExercise}
+                      disabled={isExecuting}
+                      title="Try a different exercise"
+                    >
+                      Try Another
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<ArrowForward />}
+                      onClick={handleNewExercise}
+                      title="Proceed to the next exercise"
+                    >
+                      Next Exercise
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<PlayArrow />}
+                    onClick={() => { void handleExecute(); }}
+                    disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
+                  >
+                    Run & Check
+                  </Button>
+                </Box>
+              </Box>
+              <CardContent sx={{ p: 0 }}>
+                <SQLEditor
+                  value={query}
+                  onChange={setQuery}
+                  height="200px"
+                  onExecute={handleExecute}
+                  showResults={false}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Results */}
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Query Results
+                </Typography>
+                {queryError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {queryError instanceof Error ? queryError.message : 'Query execution failed'}
+                  </Alert>
+                )}
+                {queryResult && queryResult.length > 0 ? (
+                  <DataTable data={queryResult[0]} />
+                ) : (
+                  <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+                    Run your query to see results
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </CardContent>
+        )}
+
+        {/* Theory Tab */}
+        {isCurrentTab('theory') && (
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Theory
             </Typography>
             {renderContent(TheoryContent, 'Theory coming soon.')}
           </CardContent>
-        </Card>
-      )}
+        )}
 
-      {/* Story */}
-      {isCurrentTab('story') && (
-        <Card>
+        {/* Story Tab */}
+        {isCurrentTab('story') && (
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Story
             </Typography>
             {renderContent(StoryContent, 'Story coming soon.')}
           </CardContent>
-        </Card>
-      )}
+        )}
+      </Card>
 
       {/* Feedback Snackbar */}
       <Snackbar
