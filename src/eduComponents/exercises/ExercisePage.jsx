@@ -16,12 +16,15 @@ export function ExercisePage() {
 	const handlers = useSkillStateHandlers(skillState, setSkillState)
 	const { databaseReady, getExercise, startNewExercise } = handlers
 
-	// Whenever there are no exercises, and SQLJS is ready, initialize the first exercise. (When there is an exercise, display its solution still.)
+	// Initialize the first exercise only if there's no exercise history at all and SQLJS is ready.
+	// This ensures exercises persist across page refreshes and only change when explicitly requested.
 	useEffect(() => {
 		const exercise = getExercise()
-		if (!exercise && databaseReady)
+		const history = skillState.exerciseHistory || []
+		// Only auto-generate if there's no exercise history at all (first time visiting)
+		if (!exercise && history.length === 0 && databaseReady)
 			startNewExercise()
-	}, [getExercise, startNewExercise, databaseReady])
+	}, [getExercise, startNewExercise, databaseReady, skillState.exerciseHistory])
 
 	// When no exercises are in the state yet, we are most likely initializing one. For now, show a loading note.
 	const history = useMemo(() => skillState.exerciseHistory || [], [skillState])

@@ -10,7 +10,6 @@ import {
   Tabs,
   Tab,
   Alert,
-  Paper,
 } from '@mui/material';
 import {
   ArrowBack,
@@ -18,13 +17,9 @@ import {
   School,
   Lightbulb,
   MenuBook,
-  Code,
 } from '@mui/icons-material';
 
 import { useComponentState, useAppStore } from '@/store';
-import { useConceptDatabase } from '@/shared/hooks/useDatabase';
-import { SQLEditor } from '@/shared/components/SQLEditor';
-import { DataTable } from '@/shared/components/DataTable';
 import { contentIndex, type ContentMeta } from '@/features/content';
 import { useContent } from './hooks/useContent';
 
@@ -53,7 +48,7 @@ function TabPanel(props: TabPanelProps) {
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(1); // Start with theory tab
 
   // Use new store
   const [componentState, setComponentState] = useComponentState(conceptId || '');
@@ -61,25 +56,12 @@ export default function ConceptPage() {
 
   // Define available tabs, filtering out story in focused mode
   const allTabs = [
+    { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     { key: 'summary', label: 'Summary', icon: <MenuBook /> },
-    { key: 'examples', label: 'Examples', icon: <Code /> },
-    { key: 'story', label: 'Story', icon: <MenuBook /> },
   ];
   
   const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
-
-  // Database for concept demonstrations
-  const {
-    executeQuery,
-    queryResult,
-    queryError,
-    isExecuting,
-    tableNames
-  } = useConceptDatabase('companies');
-
-  // Demo query state for interactive examples
-  const [demoQuery, setDemoQuery] = useState('SELECT * FROM companies LIMIT 5;');
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
@@ -92,38 +74,20 @@ export default function ConceptPage() {
     }
   }, [componentState.type, setComponentState]);
 
-  // Restore saved tab or default to theory (index 0)
+  // Always default to theory tab
   useEffect(() => {
-    if (componentState.tab) {
-      const tabIndex = availableTabs.findIndex(tab => tab.key === componentState.tab);
-      if (tabIndex >= 0) {
-        setCurrentTab(tabIndex);
-      } else if (componentState.tab === 'story' && focusedMode) {
-        // If user had story tab selected but is now in focused mode, switch to theory
-        setCurrentTab(0);
-        setComponentState({ tab: 'theory' });
-      }
-    } else {
-      // Default to theory tab and save it
-      setCurrentTab(0);
+    const theoryIndex = availableTabs.findIndex(tab => tab.key === 'theory');
+    if (theoryIndex >= 0) {
+      setCurrentTab(theoryIndex);
       setComponentState({ tab: 'theory' });
     }
-  }, [componentState.tab, setComponentState, availableTabs, focusedMode]);
+  }, [availableTabs.length, focusedMode]); // Only depend on tab count and focused mode changes
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
     const selectedTab = availableTabs[newValue];
     if (selectedTab) {
       setComponentState({ tab: selectedTab.key });
-    }
-  };
-
-  const handleExecuteDemo = async () => {
-    try {
-      await executeQuery(demoQuery);
-    } catch (error) {
-      // Error is handled by the database hook
-      console.error('Demo query failed:', error);
     }
   };
 
@@ -160,27 +124,6 @@ export default function ConceptPage() {
         <Component />
       </Suspense>
     );
-  };
-
-  // Demo queries based on concept
-  const getDemoQueries = (conceptId: string) => {
-    const demoQueries: Record<string, string[]> = {
-      'database': [
-        'SELECT * FROM companies LIMIT 5;',
-        'SELECT COUNT(*) as total_companies FROM companies;',
-        'SELECT DISTINCT country FROM companies;'
-      ],
-      'database-table': [
-        'SELECT company_name, country FROM companies LIMIT 5;',
-        'SELECT * FROM companies WHERE country = "Netherlands";',
-        'SELECT company_name, num_employees FROM companies ORDER BY num_employees DESC LIMIT 3;'
-      ],
-      'data-types': [
-        'SELECT company_name, founded_year, num_employees FROM companies LIMIT 5;',
-        'SELECT typeof(company_name), typeof(founded_year), typeof(num_employees) FROM companies LIMIT 1;'
-      ]
-    };
-    return demoQueries[conceptId] || ['SELECT * FROM companies LIMIT 5;'];
   };
 
   return (
@@ -237,81 +180,6 @@ export default function ConceptPage() {
               {tab.key === 'theory' && renderContent(TheoryContent, 'Theory content coming soon.')}
               {tab.key === 'summary' && renderContent(SummaryContent, 'Summary coming soon.')}
               {tab.key === 'story' && renderContent(StoryContent, 'Story coming soon.')}
-              {tab.key === 'examples' && (
-                <>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    Try these example queries to understand the concept better:
-                  </Typography>
-
-                  {/* Database Info */}
-                  {tableNames.length > 0 && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      <Typography variant="body2">
-                        <strong>Available tables:</strong> {tableNames.join(', ')}
-                      </Typography>
-                    </Alert>
-                  )}
-
-                  {/* Demo Query Buttons */}
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>Quick Examples:</Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {getDemoQueries(conceptId || '').map((query, index) => (
-                        <Button
-                          key={index}
-                          size="small"
-                          variant="outlined"
-                          onClick={() => setDemoQuery(query)}
-                          sx={{ textTransform: 'none', fontFamily: 'monospace', fontSize: '0.75rem' }}
-                        >
-                          {query.length > 30 ? `${query.substring(0, 30)}...` : query}
-                        </Button>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  {/* SQL Editor */}
-                  <Paper sx={{ mb: 2 }}>
-                    <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-                      <Button
-                        startIcon={<Code />}
-                        onClick={handleExecuteDemo}
-                        disabled={!demoQuery.trim() || isExecuting}
-                        variant="contained"
-                        size="small"
-                      >
-                        Run Example
-                      </Button>
-                    </Box>
-                    <SQLEditor
-                      value={demoQuery}
-                      onChange={setDemoQuery}
-                      height="150px"
-                      onExecute={handleExecuteDemo}
-                      showResults={false}
-                    />
-                  </Paper>
-
-                  {/* Results */}
-                  <Paper sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Results
-                    </Typography>
-                    {queryError && (
-                      <Alert severity="error" sx={{ mb: 2 }}>
-                        {queryError instanceof Error ? queryError.message : 'Query execution failed'}
-                      </Alert>
-                    )}
-                    {queryResult && queryResult.length > 0 ? (
-                      <DataTable data={queryResult[0]} maxRows={10} compact />
-                    ) : (
-                      <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
-                        Run an example query to see results
-                      </Typography>
-                    )}
-                  </Paper>
-                </>
-              )}
             </CardContent>
           </TabPanel>
         ))}

@@ -14,7 +14,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt } from '@mui/icons-material';
+import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -41,7 +41,7 @@ type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
 export default function SkillPage() {
   const { skillId } = useParams<{ skillId: string }>();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(0); // 0: Practice, 1: Theory, 2: Story
+  const [currentTab, setCurrentTab] = useState(1); // Always start with practice tab
 
   // State management
   const [componentState, setComponentState] = useComponentState(skillId || '');
@@ -49,9 +49,9 @@ export default function SkillPage() {
 
   // Define available tabs, filtering out story in focused mode
   const allTabs = [
-    { key: 'practice', label: 'Practice' },
-    { key: 'theory', label: 'Theory' },
-    { key: 'story', label: 'Story' },
+    { key: 'story', label: 'Story', icon: <MenuBook /> },
+    { key: 'practice', label: 'Practice', icon: <Edit /> },
+    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
   ];
   
   const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
@@ -160,19 +160,14 @@ export default function SkillPage() {
     };
   }, [resetExerciseDb]);
 
-  // Restore saved tab
+  // Always default to practice tab
   useEffect(() => {
-    if (componentState.tab) {
-      const tabIndex = availableTabs.findIndex(tab => tab.key === componentState.tab);
-      if (tabIndex >= 0) {
-        setCurrentTab(tabIndex);
-      } else if (componentState.tab === 'story' && focusedMode) {
-        // If user had story tab selected but is now in focused mode, switch to practice
-        setCurrentTab(0);
-        setComponentState({ tab: 'practice' });
-      }
+    const practiceIndex = availableTabs.findIndex(tab => tab.key === 'practice');
+    if (practiceIndex >= 0) {
+      setCurrentTab(practiceIndex);
+      setComponentState({ tab: 'practice' });
     }
-  }, [componentState.tab, availableTabs, focusedMode, setComponentState]);
+  }, [availableTabs.length, focusedMode]); // Only depend on tab count and focused mode changes
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -332,7 +327,12 @@ export default function SkillPage() {
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange}>
           {availableTabs.map((tab) => (
-            <Tab key={tab.key} label={tab.label} />
+            <Tab 
+              key={tab.key} 
+              label={tab.label} 
+              icon={tab.icon} 
+              iconPosition="start" 
+            />
           ))}
         </Tabs>
       </Box>
