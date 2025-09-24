@@ -65,7 +65,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       components: {},
       sidebarOpen: true,
-      currentTheme: 'dark',
+      currentTheme: 'light',
       focusedMode: false,
       _hasHydrated: false,
 
