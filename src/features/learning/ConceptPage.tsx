@@ -21,7 +21,7 @@ import {
   Code,
 } from '@mui/icons-material';
 
-import { useComponentState } from '@/store';
+import { useComponentState, useAppStore } from '@/store';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -57,6 +57,17 @@ export default function ConceptPage() {
 
   // Use new store
   const [componentState, setComponentState] = useComponentState(conceptId || '');
+  const focusedMode = useAppStore((state) => state.focusedMode);
+
+  // Define available tabs, filtering out story in focused mode
+  const allTabs = [
+    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: 'summary', label: 'Summary', icon: <MenuBook /> },
+    { key: 'examples', label: 'Examples', icon: <Code /> },
+    { key: 'story', label: 'Story', icon: <MenuBook /> },
+  ];
+  
+  const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
 
   // Database for concept demonstrations
   const {
@@ -84,19 +95,27 @@ export default function ConceptPage() {
   // Restore saved tab or default to theory (index 0)
   useEffect(() => {
     if (componentState.tab) {
-      const tabIndex = ['theory', 'summary', 'examples', 'story'].indexOf(componentState.tab);
-      if (tabIndex >= 0) setCurrentTab(tabIndex);
+      const tabIndex = availableTabs.findIndex(tab => tab.key === componentState.tab);
+      if (tabIndex >= 0) {
+        setCurrentTab(tabIndex);
+      } else if (componentState.tab === 'story' && focusedMode) {
+        // If user had story tab selected but is now in focused mode, switch to theory
+        setCurrentTab(0);
+        setComponentState({ tab: 'theory' });
+      }
     } else {
       // Default to theory tab and save it
       setCurrentTab(0);
       setComponentState({ tab: 'theory' });
     }
-  }, [componentState.tab, setComponentState]);
+  }, [componentState.tab, setComponentState, availableTabs, focusedMode]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
-    const tabNames = ['theory', 'summary', 'examples', 'story'];
-    setComponentState({ tab: tabNames[newValue] });
+    const selectedTab = availableTabs[newValue];
+    if (selectedTab) {
+      setComponentState({ tab: selectedTab.key });
+    }
   };
 
   const handleExecuteDemo = async () => {
@@ -200,110 +219,103 @@ export default function ConceptPage() {
       <Card>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={currentTab} onChange={handleTabChange}>
-            <Tab label="Theory" icon={<Lightbulb />} iconPosition="start" />
-            <Tab label="Summary" icon={<MenuBook />} iconPosition="start" />
-            <Tab label="Examples" icon={<Code />} iconPosition="start" />
-            <Tab label="Story" icon={<MenuBook />} iconPosition="start" />
+            {availableTabs.map((tab, index) => (
+              <Tab 
+                key={tab.key}
+                label={tab.label} 
+                icon={tab.icon} 
+                iconPosition="start" 
+              />
+            ))}
           </Tabs>
         </Box>
 
-        <TabPanel value={currentTab} index={0}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>Theory</Typography>
-            {renderContent(TheoryContent, 'Theory content coming soon.')}
-          </CardContent>
-        </TabPanel>
+        {availableTabs.map((tab, index) => (
+          <TabPanel key={tab.key} value={currentTab} index={index}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>{tab.label}</Typography>
+              {tab.key === 'theory' && renderContent(TheoryContent, 'Theory content coming soon.')}
+              {tab.key === 'summary' && renderContent(SummaryContent, 'Summary coming soon.')}
+              {tab.key === 'story' && renderContent(StoryContent, 'Story coming soon.')}
+              {tab.key === 'examples' && (
+                <>
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    Try these example queries to understand the concept better:
+                  </Typography>
 
-        <TabPanel value={currentTab} index={3}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>Story</Typography>
-            {renderContent(StoryContent, 'Story coming soon.')}
-          </CardContent>
-        </TabPanel>
+                  {/* Database Info */}
+                  {tableNames.length > 0 && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Available tables:</strong> {tableNames.join(', ')}
+                      </Typography>
+                    </Alert>
+                  )}
 
-        <TabPanel value={currentTab} index={1}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>Summary</Typography>
-            {renderContent(SummaryContent, 'Summary coming soon.')}
-          </CardContent>
-        </TabPanel>
+                  {/* Demo Query Buttons */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>Quick Examples:</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      {getDemoQueries(conceptId || '').map((query, index) => (
+                        <Button
+                          key={index}
+                          size="small"
+                          variant="outlined"
+                          onClick={() => setDemoQuery(query)}
+                          sx={{ textTransform: 'none', fontFamily: 'monospace', fontSize: '0.75rem' }}
+                        >
+                          {query.length > 30 ? `${query.substring(0, 30)}...` : query}
+                        </Button>
+                      ))}
+                    </Box>
+                  </Box>
 
-        <TabPanel value={currentTab} index={2}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>Interactive Examples</Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Try these example queries to understand the concept better:
-            </Typography>
+                  {/* SQL Editor */}
+                  <Paper sx={{ mb: 2 }}>
+                    <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
+                      <Button
+                        startIcon={<Code />}
+                        onClick={handleExecuteDemo}
+                        disabled={!demoQuery.trim() || isExecuting}
+                        variant="contained"
+                        size="small"
+                      >
+                        Run Example
+                      </Button>
+                    </Box>
+                    <SQLEditor
+                      value={demoQuery}
+                      onChange={setDemoQuery}
+                      height="150px"
+                      onExecute={handleExecuteDemo}
+                      showResults={false}
+                    />
+                  </Paper>
 
-            {/* Database Info */}
-            {tableNames.length > 0 && (
-              <Alert severity="info" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Available tables:</strong> {tableNames.join(', ')}
-                </Typography>
-              </Alert>
-            )}
-
-            {/* Demo Query Buttons */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" gutterBottom>Quick Examples:</Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {getDemoQueries(conceptId || '').map((query, index) => (
-                  <Button
-                    key={index}
-                    size="small"
-                    variant="outlined"
-                    onClick={() => setDemoQuery(query)}
-                    sx={{ textTransform: 'none', fontFamily: 'monospace', fontSize: '0.75rem' }}
-                  >
-                    {query.length > 30 ? `${query.substring(0, 30)}...` : query}
-                  </Button>
-                ))}
-              </Box>
-            </Box>
-
-            {/* SQL Editor */}
-            <Paper sx={{ mb: 2 }}>
-              <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-                <Button
-                  startIcon={<Code />}
-                  onClick={handleExecuteDemo}
-                  disabled={!demoQuery.trim() || isExecuting}
-                  variant="contained"
-                  size="small"
-                >
-                  Run Example
-                </Button>
-              </Box>
-              <SQLEditor
-                value={demoQuery}
-                onChange={setDemoQuery}
-                height="150px"
-                onExecute={handleExecuteDemo}
-                showResults={false}
-              />
-            </Paper>
-
-            {/* Results */}
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Results
-              </Typography>
-              {queryError && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {queryError instanceof Error ? queryError.message : 'Query execution failed'}
-                </Alert>
+                  {/* Results */}
+                  <Paper sx={{ p: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Results
+                    </Typography>
+                    {queryError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {queryError instanceof Error ? queryError.message : 'Query execution failed'}
+                      </Alert>
+                    )}
+                    {queryResult && queryResult.length > 0 ? (
+                      <DataTable data={queryResult[0]} maxRows={10} compact />
+                    ) : (
+                      <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
+                        Run an example query to see results
+                      </Typography>
+                    )}
+                  </Paper>
+                </>
               )}
-              {queryResult && queryResult.length > 0 ? (
-                <DataTable data={queryResult[0]} maxRows={10} compact />
-              ) : (
-                <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
-                  Run an example query to see results
-                </Typography>
-              )}
-            </Paper>
-          </CardContent>
-        </TabPanel>
+            </CardContent>
+          </TabPanel>
+        ))}
+
       </Card>
 
       {/* Action Buttons */}

@@ -45,6 +45,7 @@ interface AppState {
   // UI state
   sidebarOpen: boolean;
   currentTheme: 'light' | 'dark';
+  focusedMode: boolean;
 
   // Hydration state
   _hasHydrated: boolean;
@@ -54,6 +55,7 @@ interface AppState {
   getComponent: (id: string) => ComponentState;
   resetComponent: (id: string) => void;
   toggleSidebar: () => void;
+  toggleFocusedMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 }
@@ -64,6 +66,7 @@ export const useAppStore = create<AppState>()(
       components: {},
       sidebarOpen: true,
       currentTheme: 'dark',
+      focusedMode: false,
       _hasHydrated: false,
 
       updateComponent: (id, data) =>
@@ -92,6 +95,9 @@ export const useAppStore = create<AppState>()(
       toggleSidebar: () =>
         set(state => ({ sidebarOpen: !state.sidebarOpen })),
 
+      toggleFocusedMode: () =>
+        set(state => ({ focusedMode: !state.focusedMode })),
+
       setTheme: (theme) =>
         set({ currentTheme: theme }),
 
@@ -104,6 +110,7 @@ export const useAppStore = create<AppState>()(
         components: state.components,
         currentTheme: state.currentTheme,
         sidebarOpen: state.sidebarOpen,
+        focusedMode: state.focusedMode,
         // Don't persist _hasHydrated - it should start false on each load
       }),
       onRehydrateStorage: () => (state) => {

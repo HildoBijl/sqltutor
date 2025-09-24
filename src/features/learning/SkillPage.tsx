@@ -18,7 +18,7 @@ import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt } 
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
-import { useComponentState } from '@/store';
+import { useComponentState, useAppStore } from '@/store';
 import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
@@ -45,6 +45,22 @@ export default function SkillPage() {
 
   // State management
   const [componentState, setComponentState] = useComponentState(skillId || '');
+  const focusedMode = useAppStore((state) => state.focusedMode);
+
+  // Define available tabs, filtering out story in focused mode
+  const allTabs = [
+    { key: 'practice', label: 'Practice' },
+    { key: 'theory', label: 'Theory' },
+    { key: 'story', label: 'Story' },
+  ];
+  
+  const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
+
+  // Helper function to check current tab
+  const isCurrentTab = (tabKey: string) => {
+    const tab = availableTabs[currentTab];
+    return tab ? tab.key === tabKey : false;
+  };
 
   // Skill content + exercise state
   const [skillModule, setSkillModule] = useState<{
@@ -147,15 +163,23 @@ export default function SkillPage() {
   // Restore saved tab
   useEffect(() => {
     if (componentState.tab) {
-      const tabIndex = ['practice', 'theory', 'story'].indexOf(componentState.tab as string);
-      if (tabIndex >= 0) setCurrentTab(tabIndex);
+      const tabIndex = availableTabs.findIndex(tab => tab.key === componentState.tab);
+      if (tabIndex >= 0) {
+        setCurrentTab(tabIndex);
+      } else if (componentState.tab === 'story' && focusedMode) {
+        // If user had story tab selected but is now in focused mode, switch to practice
+        setCurrentTab(0);
+        setComponentState({ tab: 'practice' });
+      }
     }
-  }, [componentState.tab]);
+  }, [componentState.tab, availableTabs, focusedMode, setComponentState]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
-    const tabNames = ['practice', 'theory', 'story'];
-    setComponentState({ tab: tabNames[newValue] });
+    const selectedTab = availableTabs[newValue];
+    if (selectedTab) {
+      setComponentState({ tab: selectedTab.key });
+    }
   };
 
   const TheoryContent = useContent(skillMeta?.id, 'Theory');
@@ -307,14 +331,14 @@ export default function SkillPage() {
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange}>
-          <Tab label="Practice" />
-          <Tab label="Theory" />
-          <Tab label="Story" />
+          {availableTabs.map((tab) => (
+            <Tab key={tab.key} label={tab.label} />
+          ))}
         </Tabs>
       </Box>
 
       {/* Progress */}
-      {currentTab === 0 && (
+      {isCurrentTab('practice') && (
         <Alert severity={isCompleted ? 'success' : 'info'} sx={{ mb: 2 }}>
           Progress: {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount} exercises completed
           {isCompleted && ' - Skill mastered!'}
@@ -322,7 +346,7 @@ export default function SkillPage() {
       )}
 
       {/* Database Info */}
-      {currentTab === 0 && tableNames.length > 0 && (
+      {isCurrentTab('practice') && tableNames.length > 0 && (
         <Alert severity="info" sx={{ mb: 2 }}>
           <Typography variant="body2">
             <strong>Available tables:</strong> {tableNames.join(', ')}
@@ -331,7 +355,7 @@ export default function SkillPage() {
       )}
 
       {/* Exercise Description */}
-      {currentTab === 0 && currentExercise && (
+      {isCurrentTab('practice') && currentExercise && (
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -345,7 +369,7 @@ export default function SkillPage() {
       )}
 
       {/* SQL Editor */}
-      {currentTab === 0 && (
+      {isCurrentTab('practice') && (
         <Card sx={{ mb: 2 }}>
           <Box sx={{
             p: 1,
@@ -421,7 +445,7 @@ export default function SkillPage() {
       )}
 
       {/* Results */}
-      {currentTab === 0 && (
+      {isCurrentTab('practice') && (
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -444,7 +468,7 @@ export default function SkillPage() {
       )}
 
       {/* Theory */}
-      {currentTab === 1 && (
+      {isCurrentTab('theory') && (
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -456,7 +480,7 @@ export default function SkillPage() {
       )}
 
       {/* Story */}
-      {currentTab === 2 && (
+      {isCurrentTab('story') && (
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

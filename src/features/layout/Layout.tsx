@@ -8,16 +8,22 @@ import {
   Container,
   IconButton,
   Tooltip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   Home as HomeIcon,
   School as LearnIcon,
   PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
-import { DarkMode, LightMode, RestartAlt } from '@mui/icons-material';
+import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { ColorModeContext } from '@/theme';
+import { useAppStore } from '@/store';
 
 export function Layout() {
   const navigate = useNavigate();
@@ -77,11 +83,8 @@ export function Layout() {
               })}
             </Box>
 
-            {/* Theme toggle */}
-            <ThemeToggle />
-
-            {/* Reset data */}
-            <ResetDataButton />
+            {/* Settings Menu */}
+            <SettingsMenu />
           </Toolbar>
         </Container>
       </AppBar>
@@ -101,24 +104,44 @@ export function Layout() {
   );
 }
 
-function ThemeToggle() {
+function SettingsMenu() {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  
+  // Theme context
   const { mode, toggleColorMode } = useContext(ColorModeContext);
   const isLight = mode === 'light';
-  return (
-    <Tooltip title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}>
-      <IconButton color="inherit" onClick={toggleColorMode} aria-label="toggle color mode">
-        {isLight ? <DarkMode /> : <LightMode />}
-      </IconButton>
-    </Tooltip>
-  );
-}
+  
+  // Focused mode state
+  const focusedMode = useAppStore((state) => state.focusedMode);
+  const toggleFocusedMode = useAppStore((state) => state.toggleFocusedMode);
 
-function ResetDataButton() {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleThemeToggle = () => {
+    toggleColorMode();
+    // Don't close menu - allow multiple toggles
+  };
+
+  const handleFocusedModeToggle = () => {
+    toggleFocusedMode();
+    // Don't close menu - allow multiple toggles
+  };
+
   const handleReset = () => {
     const confirmed = window.confirm(
       'Reset all your data? This clears progress, settings, and history.'
     );
-    if (!confirmed) return;
+    if (!confirmed) {
+      handleClose();
+      return;
+    }
 
     try {
       // Collect and remove app-specific localStorage keys
@@ -138,13 +161,75 @@ function ResetDataButton() {
       console.error('Failed to reset data:', err);
       alert('Sorry, something went wrong resetting your data.');
     }
+    handleClose();
   };
 
   return (
-    <Tooltip title="Reset all data">
-      <IconButton color="inherit" onClick={handleReset} aria-label="reset all data">
-        <RestartAlt />
-      </IconButton>
-    </Tooltip>
+    <>
+      <Tooltip title="Settings">
+        <IconButton
+          color="inherit"
+          onClick={handleClick}
+          aria-label="settings"
+          aria-controls={open ? 'settings-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+        >
+          <Settings />
+        </IconButton>
+      </Tooltip>
+      
+      <Menu
+        id="settings-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'settings-button',
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={handleFocusedModeToggle}>
+          <ListItemIcon>
+            <CenterFocusStrong 
+              sx={{ color: focusedMode ? 'primary.main' : 'inherit' }} 
+            />
+          </ListItemIcon>
+          <ListItemText>Focus Mode</ListItemText>
+          <Check 
+            sx={{ 
+              color: 'primary.main', 
+              ml: 1,
+              visibility: focusedMode ? 'visible' : 'hidden'
+            }} 
+          />
+        </MenuItem>
+        
+        <MenuItem onClick={handleThemeToggle}>
+          <ListItemIcon>
+            {isLight ? <DarkMode /> : <LightMode />}
+          </ListItemIcon>
+          <ListItemText>
+            {isLight ? 'Dark Theme' : 'Light Theme'}
+          </ListItemText>
+        </MenuItem>
+        
+        <Divider />
+        
+        <MenuItem onClick={handleReset}>
+          <ListItemIcon>
+            <RestartAlt />
+          </ListItemIcon>
+          <ListItemText>Reset Data</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 }

@@ -8,6 +8,7 @@ import { Subpage, Container, useLocalStorageStateParameter, useIsLocalStorageIni
 import { useComponent } from 'edu'
 import * as content from 'content'
 import { ExercisePage, CompleteConcept } from 'eduComponents'
+import { useAppStore } from '@/store'
 
 import { tabs, useUrlTab } from './tabs'
 
@@ -26,8 +27,15 @@ export function Component() {
 
 // ComponentFromModule shows a component, but then based on a given module that has already been loaded.
 export function ComponentFromModule({ component, module }) {
+	const focusedMode = useAppStore((state) => state.focusedMode);
+	
 	// Filter the tabs contained in this module. Deal with the exercises separately.
-	const shownTabs = tabs.filter(tab => module[tab.component] || (tab.url === 'exercises' && module.exercises))
+	// In focused mode, exclude story tabs.
+	const shownTabs = tabs.filter(tab => {
+		const hasContent = module[tab.component] || (tab.url === 'exercises' && module.exercises);
+		const isStoryTab = tab.url === 'story';
+		return hasContent && !(focusedMode && isStoryTab);
+	});
 
 	// When the module is empty, show a note.
 	if (shownTabs.length === 0)
