@@ -24,7 +24,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Understanding databases, tables, and database management systems',
     prerequisites: [],
-    position: { x: 520, y: 20 },
+    position: { x: 424, y: 24 },
   },
   {
     id: 'database-table',
@@ -32,7 +32,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Learn about rows, columns, and how data is structured in tables',
     prerequisites: ['database'],
-    position: { x: 520, y: 120 },
+    position: { x: 424, y: 144 },
   },
   {
     id: 'data-types',
@@ -40,7 +40,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Different types of data that can be stored in database columns',
     prerequisites: ['database-table'],
-    position: { x: 520, y: 220 },
+    position: { x: 424, y: 264 },
   },
   {
     id: 'database-keys',
@@ -48,7 +48,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Primary keys, foreign keys, and unique identifiers',
     prerequisites: ['database-table'],
-    position: { x: 950, y: 220 },
+    position: { x: 976, y: 264 },
   },
   {
     id: 'projection-and-filtering',
@@ -56,7 +56,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Limit tables to the columns and rows needed for analysis',
     prerequisites: ['database-table'],
-    position: { x: 750, y: 220 },
+    position: { x: 700, y: 264 },
   },
   {
     id: 'join-and-decomposition',
@@ -64,7 +64,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Split tables safely and join them back together without losing data',
     prerequisites: ['database-keys', 'projection-and-filtering'],
-    position: { x: 750, y: 320 },
+    position: { x: 700, y: 384 },
   },
   {
     id: 'inner-and-outer-join',
@@ -72,7 +72,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Choose the right join type when matching rows across tables',
     prerequisites: ['join-and-decomposition', 'data-types'],
-    position: { x: 750, y: 420 },
+    position: { x: 700, y: 504 },
   },
   {
     id: 'aggregation',
@@ -80,7 +80,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Group records and compute summary statistics with SQL',
     prerequisites: ['data-types', 'projection-and-filtering'],
-    position: { x: 950, y: 420 },
+    position: { x: 976, y: 504 },
   },
   {
     id: 'pivot-table',
@@ -88,7 +88,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Reshape aggregated data so categories become columns',
     prerequisites: ['database-table'],
-    position: { x: 1200, y: 520 },
+    position: { x: 1240, y: 624 },
   },
   {
     id: 'query-language',
@@ -96,7 +96,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'How databases interpret commands and why SQL became the standard',
     prerequisites: ['database'],
-    position: { x: 250, y: 120 },
+    position: { x: 100, y: 144 },
   },
   {
     id: 'sql',
@@ -104,7 +104,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Core SQL clauses for reading and modifying relational data',
     prerequisites: ['query-language'],
-    position: { x: 250, y: 220 },
+    position: { x: 100, y: 264 },
   },
   {
     id: 'filter-rows',
@@ -112,7 +112,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Use WHERE clauses to filter data based on conditions',
     prerequisites: ['sql', 'projection-and-filtering', 'data-types'],
-    position: { x: 250, y: 320 },
+    position: { x: 100, y: 384 },
   },
   {
     id: 'filter-rows-on-multiple-criteria',
@@ -120,7 +120,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Combine AND/OR logic, pattern matching, and NULL checks in filters',
     prerequisites: ['filter-rows'],
-    position: { x: 250, y: 520 },
+    position: { x: 100, y: 624 },
   },
   {
     id: 'choose-columns',
@@ -128,7 +128,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Select and rename the columns returned by a query',
     prerequisites: ['sql', 'projection-and-filtering'],
-    position: { x: 520, y: 320 },
+    position: { x: 424, y: 384 },
   },
   {
     id: 'create-processed-columns',
@@ -136,7 +136,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Compute derived columns directly within the SELECT list',
     prerequisites: ['data-types', 'choose-columns'],
-    position: { x: 520, y: 520 },
+    position: { x: 424, y: 624 },
   },
   {
     id: 'sort-rows',
@@ -144,7 +144,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Order results with ORDER BY and paginate using LIMIT/OFFSET',
     prerequisites: ['sql', 'data-types'],
-    position: { x: 50, y: 520 },
+    position: { x: -140, y: 624 },
   },
   {
     id: 'write-single-criterion-query',
@@ -152,7 +152,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Build SELECT statements that filter on a single condition',
     prerequisites: ['choose-columns', 'filter-rows'],
-    position: { x: 375, y: 420 },
+    position: { x: 250, y: 504 },
   },
   {
     id: 'write-multi-criterion-query',
@@ -160,7 +160,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Combine multiple predicates with AND, OR, and grouping parentheses',
     prerequisites: ['create-processed-columns', 'filter-rows-on-multiple-criteria', 'sort-rows'],
-    position: { x: 250, y: 620 },
+    position: { x: 100, y: 744 },
   },
   {
     id: 'join-tables',
@@ -169,7 +169,7 @@ export const contentIndex: ContentMeta[] = [
     description: 'Join related tables together by matching keys',
     prerequisites: ['inner-and-outer-join', 'choose-columns', 'filter-rows-on-multiple-criteria'],
     database: 'companiesAndPositions',
-    position: { x: 520, y: 620 },
+    position: { x: 424, y: 744 },
   },
   {
     id: 'write-multi-table-query',
@@ -178,7 +178,7 @@ export const contentIndex: ContentMeta[] = [
     description: 'Chain several joins to answer questions that span multiple tables',
     prerequisites: ['join-tables', 'write-single-criterion-query'],
     database: 'employees',
-    position: { x: 520, y: 720 },
+    position: { x: 424, y: 864 },
   },
   {
     id: 'write-multi-layered-query',
@@ -187,7 +187,7 @@ export const contentIndex: ContentMeta[] = [
     description: 'Use subqueries or CTEs to break complex logic into stages',
     prerequisites: ['use-filtered-aggregation', 'write-multi-criterion-query', 'write-multi-table-query'],
     database: 'employees',
-    position: { x: 520, y: 820 },
+    position: { x: 424, y: 984 },
   },
   {
     id: 'aggregate-columns',
@@ -195,7 +195,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Group data and compute counts, sums, and averages',
     prerequisites: ['aggregation', 'choose-columns'],
-    position: { x: 950, y: 520 },
+    position: { x: 976, y: 624 },
   },
   {
     id: 'use-filtered-aggregation',
@@ -203,7 +203,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Filter aggregate results with HAVING and targeted WHERE clauses',
     prerequisites: ['aggregate-columns', 'filter-rows-on-multiple-criteria', 'create-processed-columns'],
-    position: { x: 750, y: 620 },
+    position: { x: 700, y: 744 },
   },
   {
     id: 'use-dynamic-aggregation',
@@ -211,7 +211,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Adapt aggregations to changing grouping dimensions',
     prerequisites: ['aggregate-columns'],
-    position: { x: 950, y: 620 },
+    position: { x: 976, y: 744 },
   },
   {
     id: 'create-pivot-table',
@@ -219,7 +219,7 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Shape aggregated data into pivoted columns for reporting',
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
-    position: { x: 1200, y: 620 },
+    position: { x: 1240, y: 744 },
   },
 ];
 

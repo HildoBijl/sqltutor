@@ -9,7 +9,7 @@ import {
   Switch,
   FormControlLabel,
 } from "@mui/material";
-import { CheckCircle, PlayArrow, MenuBook, Build } from "@mui/icons-material";
+import { CheckCircle, MenuBook, Build } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useAppStore } from "@/store";
 import {
@@ -20,6 +20,7 @@ import {
 export default function LearningOverviewPage() {
   const components = useAppStore((state) => state.components);
 
+  // Import the skills from index
   const contentItems = useMemo(() => learningContentIndex, []);
 
   const concepts = useMemo(
@@ -31,6 +32,7 @@ export default function LearningOverviewPage() {
     [contentItems]
   );
 
+  // Check if a skill is completed based on exercises done or concept understood
   const isCompleted = (id: string) => {
     const component = components[id];
     if (!component) return false;
@@ -71,13 +73,14 @@ export default function LearningOverviewPage() {
     const completed = isCompleted(item.id);
     const progress = getProgress(item.id);
     const type = item.type;
+    //Shows different icons for concept vs skill
     const Icon = type === "concept" ? MenuBook : Build;
 
     return (
       <Box
         ref={setNodeRef(item.id)}
         sx={{
-          width: 160, // Bigger cards
+          width: 200,
           position: "absolute",
           left: item.position.x,
           top: item.position.y,
@@ -99,12 +102,13 @@ export default function LearningOverviewPage() {
               variant={completed ? "outlined" : undefined}
               sx={{
                 width: "100%",
-                height: type === "concept" ? 60 : 80, // Different heights for concepts vs skills
+                height: 80,
                 display: "flex",
                 flexDirection: "column",
                 border: "1px solid",
                 borderColor: "divider",
-                borderRadius: type === "concept" ? 1 : 6, // Rectangular for concepts, rounded for skills
+                // Rectangle for concepts, rounded for skills
+                borderRadius: type === "concept" ? 1 : 3,
                 transition:
                   "box-shadow 90ms cubic-bezier(.2,.7,.2,1), border-color 90ms cubic-bezier(.2,.7,.2,1), background-color 90ms cubic-bezier(.2,.7,.2,1)",
                 backgroundColor: "background.paper",
@@ -115,6 +119,7 @@ export default function LearningOverviewPage() {
                   backgroundColor: "action.hover",
                 },
               }}
+              //Handle hover state for cards
               onMouseEnter={() => {
                 if (hoverTimerRef.current)
                   window.clearTimeout(hoverTimerRef.current!);
@@ -153,6 +158,7 @@ export default function LearningOverviewPage() {
                       fontSize="small"
                       color={type === "concept" ? "action" : "primary"}
                     />
+                    {/* If completed, show checkmark with tooltip */}
                     {completed && (
                       <Tooltip
                         disableInteractive
@@ -168,7 +174,7 @@ export default function LearningOverviewPage() {
                     sx={{
                       fontWeight: 500,
                       color: completed ? "text.secondary" : "text.primary",
-                      fontSize: "0.75rem",
+                      fontSize: "0.95rem",
                       lineHeight: 1.2,
                     }}
                   >
@@ -197,6 +203,7 @@ export default function LearningOverviewPage() {
   };
 
   // Compute SVG paths connecting prerequisites to dependents
+  // Store path data with from: and to: node ids for filtering
   const [paths, setPaths] = useState<{ d: string; from: string; to: string }[]>(
     []
   );
@@ -231,9 +238,25 @@ export default function LearningOverviewPage() {
         }
         const y1 = rawY1 + gap;
         const y2 = rawY2 - gap;
+
+        // Make the lines a bit curved, instead of straight right angles
         const midY = (y1 + y2) / 2;
-        // Manhattan-style connector: down, across between rows, then up
-        const d = `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+        const radius = 10; // Curve radius in pixels
+
+        // Use quadratic curves at corners - this is Claude generated
+        // after Googling a bit, since I did not do the math myself :)
+        const d = `
+  M ${x1} ${y1}
+  L ${x1} ${midY - radius}
+  Q ${x1} ${midY} ${x1 + Math.sign(x2 - x1) * radius} ${midY}
+  L ${x2 - Math.sign(x2 - x1) * radius} ${midY}
+  Q ${x2} ${midY} ${x2} ${midY + radius}
+  L ${x2} ${y2}
+`
+//Cleaan up whitespace 
+          .replace(/\s+/g, " ")
+          .trim();
+
         newPaths.push({ d, from: pre, to: item.id });
       }
     }
@@ -288,16 +311,8 @@ export default function LearningOverviewPage() {
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       {/* Header */}
       <Box sx={{ mb: 4, textAlign: "center" }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{ fontWeight: 700 }}
-        >
-          SQL-Tutor Skill Tree
-        </Typography>
         <Typography variant="h6" color="text.secondary">
-          Progress from foundational concepts to advanced skills
+          Do we want a title here?
         </Typography>
       </Box>
 
@@ -335,12 +350,13 @@ export default function LearningOverviewPage() {
       </Box>
 
       {/* Manual Skill Tree Layout */}
+
       <Box
         ref={containerRef}
         sx={{
           position: "relative",
           width: "100%",
-          height: "900px", // Fixed height for the tree
+          height: "1200px", // Fixed height for the tree
         }}
       >
         {/* Connectors overlay */}
@@ -361,6 +377,7 @@ export default function LearningOverviewPage() {
                 strokeWidth={1.5}
                 fill="none"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
             ))}
           </svg>
