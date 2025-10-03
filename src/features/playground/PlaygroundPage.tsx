@@ -61,6 +61,21 @@ export default function PlaygroundPage() {
     state.components.playground?.history || []
   );
 
+  // Handle live query execution (for preview results)
+  const handleLiveExecute = async (liveQuery: string) => {
+    if (!isReady || !liveQuery.trim()) return;
+    
+    try {
+      await executeQuery(liveQuery);
+      // Live execution just updates the query results without adding to history or showing messages
+    } catch (error: any) {
+      // Let the error be shown in the UI - the executeQuery already sets queryError state
+      // No need to handle it here since the error will be displayed in the Results section
+      console.debug('Live query execution failed:', error);
+    }
+  };
+
+  // Handle actual execution (with history and messages)
   const handleExecute = async () => {
     try {
       const result = await executeQuery(query);
@@ -267,6 +282,9 @@ export default function PlaygroundPage() {
           onChange={setQuery}
           height="300px"
           onExecute={handleExecute}
+          onLiveExecute={handleLiveExecute}
+          enableLiveExecution={true}
+          liveExecutionDelay={500}
           showResults={false}
         />
       </Paper>

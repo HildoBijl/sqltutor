@@ -1,5 +1,4 @@
-import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useMemo } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -18,7 +17,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Celebration } from '@mui/icons-material';
+import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -28,16 +27,8 @@ import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
 import { useContent } from './hooks/useContent';
 import { useSkillExerciseState } from './useSkillExerciseState';
-
-interface ExerciseInstance {
-  id: string;
-  description: string;
-  expectedQuery?: string;
-  validatorFn?: (input: string, state: any, result: any) => boolean;
-  solutionTemplate?: string;
-  config?: { database?: string };
-  state: any; // generated state from generator
-}
+import { DataExplorerTab } from './components/DataExplorerTab';
+import { SKILL_SCHEMAS } from '@/constants';
 
 type SkillExerciseLoader = (typeof skillExerciseLoaders)[keyof typeof skillExerciseLoaders];
 type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
@@ -56,6 +47,7 @@ export default function SkillPage() {
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'practice', label: 'Practice', icon: <Edit /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: 'data', label: 'Data Explorer', icon: <Storage /> },
   ];
   
   const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
@@ -85,8 +77,11 @@ export default function SkillPage() {
   const [skillMeta, setSkillMeta] = useState<(ContentMeta & { database?: SchemaKey }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Database setup - allow meta-defined schema or fallback to skill mapping
-  const metaSchema = (skillMeta?.database as SchemaKey | undefined);
+  // Database setup - use skill schema mapping or fallback to default
+  const skillSchema = (skillId && skillId in SKILL_SCHEMAS) 
+    ? SKILL_SCHEMAS[skillId as keyof typeof SKILL_SCHEMAS] as SchemaKey
+    : 'companies' as SchemaKey;
+  
   const {
     executeQuery,
     queryResult,
@@ -97,7 +92,7 @@ export default function SkillPage() {
     resetDatabase: resetExerciseDb,
   } = useDatabase({
     context: 'exercise',
-    schema: metaSchema,
+    schema: skillSchema,
     resetOnSchemaChange: true,
     persistent: false,
   });
@@ -213,7 +208,21 @@ export default function SkillPage() {
     }
   }, [dbReady, skillModule, currentExercise, startNewExercise]);
 
-  // Check answer
+  // Handle live query execution (for preview results)
+  const handleLiveExecute = async (liveQuery: string) => {
+    if (!dbReady || !liveQuery.trim() || exerciseCompleted) return;
+    
+    try {
+      await executeQuery(liveQuery);
+      // Live execution just updates the query results without checking the answer
+    } catch (error: any) {
+      // Let the error be shown in the UI - the executeQuery already sets queryError state
+      // No need to handle it here since the error will be displayed in the Results section
+      console.debug('Live query execution failed:', error);
+    }
+  };
+
+  // Check answer (for actual submission)
   const handleExecute = async (override?: string) => {
     const effectiveQuery = (override ?? query).trim();
     if (!currentExercise || !effectiveQuery) return;
@@ -473,6 +482,9 @@ export default function SkillPage() {
                   onChange={setQuery}
                   height="200px"
                   onExecute={handleExecute}
+                  onLiveExecute={handleLiveExecute}
+                  enableLiveExecution={true}
+                  liveExecutionDelay={500}
                   showResults={false}
                 />
               </CardContent>
@@ -518,6 +530,22 @@ export default function SkillPage() {
               Story
             </Typography>
             {renderContent(StoryContent, 'Story coming soon.')}
+          </CardContent>
+        )}
+
+        {/* Data Explorer Tab */}
+        {isCurrentTab('data') && (
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Data Explorer
+            </Typography>
+            {dbReady ? (
+              <DataExplorerTab schema={skillSchema} />
+            ) : (
+              <Typography variant="body1" color="text.secondary">
+                Database is loading...
+              </Typography>
+            )}
           </CardContent>
         )}
       </Card>

@@ -3,6 +3,8 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { Box, Paper } from '@mui/material';
+import { useEffect, useCallback } from 'react';
+import { useDebounce } from '@/shared/hooks';
 
 interface SQLEditorProps {
   value: string;
@@ -12,6 +14,9 @@ interface SQLEditorProps {
   readOnly?: boolean;
   autoFocus?: boolean;
   onExecute?: () => void;
+  onLiveExecute?: (query: string) => void; // For live query execution
+  enableLiveExecution?: boolean; // Enable live execution feature
+  liveExecutionDelay?: number; // Debounce delay for live execution
   showResults?: boolean; // accepted for compatibility, no-op here
 }
 
@@ -23,7 +28,20 @@ export function SQLEditor({
   readOnly = false,
   autoFocus = false,
   onExecute,
+  onLiveExecute,
+  enableLiveExecution = false,
+  liveExecutionDelay = 500,
 }: SQLEditorProps) {
+  // Debounce the value for live execution
+  const debouncedValue = useDebounce(value, liveExecutionDelay);
+
+  // Handle live execution when debounced value changes
+  useEffect(() => {
+    if (enableLiveExecution && onLiveExecute && debouncedValue.trim()) {
+      onLiveExecute(debouncedValue);
+    }
+  }, [debouncedValue, enableLiveExecution, onLiveExecute]);
+
   const extensions = [
     sql(),
     EditorView.theme({
