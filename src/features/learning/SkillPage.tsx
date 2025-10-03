@@ -26,7 +26,7 @@ import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
 import { useContent } from './hooks/useContent';
-import { useSkillExerciseState } from './useSkillExerciseState';
+import { useSkillExerciseState, type SkillExerciseModuleLike } from './useSkillExerciseState';
 import { DataExplorerTab } from './components/DataExplorerTab';
 import { SKILL_SCHEMAS } from '@/constants';
 
@@ -59,19 +59,23 @@ export default function SkillPage() {
   };
 
   // Skill content + exercise state
-  const [skillModule, setSkillModule] = useState<{
-    generate?: (utils: any) => any;
-    validate?: (input: string, state: any, result: any) => boolean;
-    solutionTemplate?: string;
-  } | null>(null);
-  const { currentExercise, startNewExercise, submitInput } = useSkillExerciseState(
+  const [skillModule, setSkillModule] = useState<SkillExerciseModuleLike | null>(null);
+  const {
+    progress: exerciseProgress,
+    status: exerciseStatus,
+    currentExercise,
+    dispatch: exerciseDispatch,
+    previewValidation,
+    evaluate: evaluateAttempt,
+    solution: exerciseSolution,
+  } = useSkillExerciseState(
     skillId || '',
     skillModule,
   );
   const [query, setQuery] = useState('');
-  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning' } | null>(null);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
-  const exerciseCompleted = !!currentExercise?.done;
+  const exerciseCompleted = exerciseStatus === 'correct';
 
   // Skill metadata
   const [skillMeta, setSkillMeta] = useState<(ContentMeta & { database?: SchemaKey }) | null>(null);
@@ -101,6 +105,8 @@ export default function SkillPage() {
   const requiredCount = 3;
   const isCompleted = (componentState.numSolved || 0) >= requiredCount;
 
+
+  const normalizeForHistory = (value: string) => value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
   useEffect(() => {
     if (!skillId) return;
 
@@ -128,11 +134,17 @@ export default function SkillPage() {
     loader()
       .then((mod: SkillExerciseModule) => {
         if (cancelled) return;
-        setSkillModule({
+        const extendedMod = mod as any;
+        const moduleConfig: SkillExerciseModuleLike = {
           generate: typeof mod.generate === 'function' ? mod.generate : undefined,
           validate: typeof mod.validate === 'function' ? mod.validate : undefined,
-          solutionTemplate: typeof mod.solutionTemplate === 'string' ? mod.solutionTemplate : undefined,
-        });
+          validateInput: typeof extendedMod.validateInput === 'function' ? extendedMod.validateInput : undefined,
+          checkInput: typeof extendedMod.checkInput === 'function' ? extendedMod.checkInput : undefined,
+          runDemo: typeof extendedMod.runDemo === 'function' ? extendedMod.runDemo : undefined,
+          solutionTemplate: typeof extendedMod.solutionTemplate === 'string' ? extendedMod.solutionTemplate : undefined,
+          messages: typeof extendedMod.messages === 'object' && extendedMod.messages !== null ? extendedMod.messages : undefined,
+        };
+        setSkillModule(moduleConfig);
       })
       .catch((err: unknown) => {
         console.error('Failed to load skill content:', err);
@@ -194,20 +206,13 @@ export default function SkillPage() {
     );
   };
 
-  // Initialize first exercise when DB ready
+  // Initialize first exercise when database and module are ready
   useEffect(() => {
-    if (dbReady && !currentExercise) {
-      startNewExercise();
+    if (!dbReady || !skillModule) return;
+    if (!exerciseProgress.exercise) {
+      exerciseDispatch({ type: 'generate' });
     }
-  }, [dbReady, currentExercise, startNewExercise]);
-
-  // Also start when content module becomes available
-  useEffect(() => {
-    if (dbReady && skillModule && !currentExercise) {
-      startNewExercise();
-    }
-  }, [dbReady, skillModule, currentExercise, startNewExercise]);
-
+  }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
   // Handle live query execution (for preview results)
   const handleLiveExecute = async (liveQuery: string) => {
     if (!dbReady || !liveQuery.trim() || exerciseCompleted) return;
@@ -224,47 +229,78 @@ export default function SkillPage() {
 
   // Check answer (for actual submission)
   const handleExecute = async (override?: string) => {
-    const effectiveQuery = (override ?? query).trim();
+    const rawQuery = override ?? query;
+    const effectiveQuery = rawQuery.trim();
     if (!currentExercise || !effectiveQuery) return;
-    // Prevent counting multiple completions on the same exercise instance
+
     if (exerciseCompleted) {
       setFeedback({ message: 'Already completed. Click Next Exercise to continue.', type: 'info' });
       return;
     }
+
     if (!dbReady) {
       setFeedback({ message: 'Database is still loading. Please try again in a moment.', type: 'info' });
       return;
     }
 
+    const normalized = normalizeForHistory(effectiveQuery);
+    const previousAttempt = exerciseProgress.attempts.find((attempt) => attempt.normalizedInput === normalized);
+    if (previousAttempt) {
+      exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
+      setFeedback({
+        message: previousAttempt.feedback || 'You already tried this exact query.',
+        type: previousAttempt.status === 'correct' ? 'success' : previousAttempt.status === 'invalid' ? 'warning' : 'info',
+      });
+      return;
+    }
+
+    const validation = previewValidation(effectiveQuery);
+    if (!validation.ok) {
+      exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
+      setFeedback({
+        message: validation.message || 'Please fix the query before running.',
+        type: 'warning',
+      });
+      return;
+    }
+
     try {
       const result = await executeQuery(effectiveQuery);
+      const verification = evaluateAttempt(effectiveQuery, result);
+      exerciseDispatch({ type: 'input', input: effectiveQuery, result });
 
-      const outcome = submitInput(effectiveQuery, result);
-      const isCorrect = !!outcome?.correct;
-      if (isCorrect) {
-        const currentNumSolved = componentState.numSolved || 0;
-        const wasAlreadyCompleted = currentNumSolved >= requiredCount;
-        const newNumSolved = currentNumSolved + 1; // submitInput will increment this
-        
-        // Show completion dialog if we just reached mastery
-        if (!wasAlreadyCompleted && newNumSolved >= requiredCount) {
+      if (verification.correct) {
+        const previousSolvedCount = componentState.numSolved || 0;
+        const alreadyCounted = exerciseStatus === 'correct';
+        const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
+
+        if (!alreadyCounted) {
+          setComponentState((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+        }
+
+        const reachedMasteryNow =
+          !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
+
+        if (reachedMasteryNow) {
           setShowCompletionDialog(true);
         } else {
-          // Only show regular feedback if not showing completion dialog
+          const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
           setFeedback({
-            message: `Excellent! Exercise completed successfully! (${Math.min(newNumSolved, requiredCount)}/${requiredCount})`,
-            type: 'success'
+            message:
+              verification.message ||
+              'Excellent! Exercise completed successfully! (' + progressDisplay + '/' + requiredCount + ')',
+            type: 'success',
           });
         }
       } else {
         setFeedback({
-          message: 'Not quite right. Check your query and try again!',
-          type: 'info'
+          message: verification.message || 'Not quite right. Check your query and try again!',
+          type: 'info',
         });
       }
     } catch (error: any) {
       setFeedback({
-        message: `Query error: ${error?.message || 'Unknown error'}`,
+        message: 'Query error: ' + (error?.message || 'Unknown error'),
         type: 'error',
       });
     }
@@ -273,6 +309,7 @@ export default function SkillPage() {
   // Reset database without changing the exercise instance
   const handleResetDatabase = () => {
     resetExerciseDb();
+    exerciseDispatch({ type: 'reset', keepExercise: true });
     setQuery('');
     setFeedback({ message: 'Database reset - try again!', type: 'info' });
   };
@@ -281,15 +318,13 @@ export default function SkillPage() {
   const handleAutoComplete = async () => {
     if (!currentExercise) return;
 
-    // Prefer explicit expectedQuery if provided by generator
-    let solution = currentExercise.expectedQuery;
+    let solution = exerciseSolution || (currentExercise as any).expectedQuery;
 
-    // Otherwise use solution template if available
     if (!solution && skillModule?.solutionTemplate) {
-      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, p1) => {
-        const key = String(p1).trim();
-        const v = currentExercise.state?.[key];
-        return v !== undefined && v !== null ? String(v) : '';
+      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, token) => {
+        const key = String(token).trim();
+        const value = (currentExercise as Record<string, unknown>)[key];
+        return value !== undefined && value !== null ? String(value) : '';
       });
     }
 
@@ -301,10 +336,13 @@ export default function SkillPage() {
     setQuery(solution);
     setFeedback({ message: 'Solution inserted. Press Run & Check to execute.', type: 'info' });
   };
-
   // New exercise
   const handleNewExercise = () => {
-    startNewExercise();
+    if (!exerciseCompleted) {
+      setFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
+      return;
+    }
+    exerciseDispatch({ type: 'generate' });
     setQuery('');
     setFeedback(null);
   };
@@ -450,7 +488,7 @@ export default function SkillPage() {
                       startIcon={<Refresh />}
                       onClick={handleNewExercise}
                       disabled={isExecuting}
-                      title="Try a different exercise"
+                      title="Finish the current exercise to unlock a new one"
                     >
                       Try Another
                     </Button>
@@ -510,6 +548,23 @@ export default function SkillPage() {
                 )}
               </CardContent>
             </Card>
+            {exerciseCompleted && exerciseSolution && (
+              <Card sx={{ mt: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Solution
+                  </Typography>
+                  <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
+                    <Typography
+                      component="pre"
+                      sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}
+                    >
+                      {exerciseSolution}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
           </CardContent>
         )}
 
@@ -665,4 +720,3 @@ export default function SkillPage() {
     </Container>
   );
 }
-
