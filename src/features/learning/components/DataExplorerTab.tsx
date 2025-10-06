@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -56,10 +56,17 @@ export function DataExplorerTab({ schema }: DataExplorerTabProps) {
   // Parse schema to extract table information
   const tableInfo = parseSchemaForERDiagram(schemas[schema] || '');
   
-  // Set default selected table
-  if (!selectedTable && tableNames.length > 0) {
-    setSelectedTable(tableNames[0]);
-  }
+  useEffect(() => {
+    if (tableNames.length === 0) {
+      return;
+    }
+
+    const defaultTable = tableNames[0];
+    if (!selectedTable || !tableNames.includes(selectedTable)) {
+      setSelectedTable(defaultTable);
+      executeQuery(`SELECT * FROM ${defaultTable} LIMIT 100`);
+    }
+  }, [tableNames, selectedTable, executeQuery]);
 
   const handleSubTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedSubTab(newValue);
@@ -146,7 +153,7 @@ function ERDiagramView({ tableInfo }: { tableInfo: TableInfo[] }) {
                         display: 'flex', 
                         alignItems: 'center', 
                         py: 0.5,
-                        backgroundColor: index % 2 === 0 ? 'grey.50' : 'transparent',
+                        backgroundColor: index % 2 === 0 ? 'action.hover' : 'transparent',
                         px: 1,
                         borderRadius: 0.5
                       }}
@@ -221,7 +228,7 @@ function ERDiagramView({ tableInfo }: { tableInfo: TableInfo[] }) {
       </Grid>
       
       {/* Legend */}
-      <Paper sx={{ p: 2, mt: 3, bgcolor: 'grey.50' }}>
+      <Paper sx={{ p: 2, mt: 3, bgcolor: 'action.hover' }}>
         <Typography variant="subtitle2" gutterBottom>
           Legend:
         </Typography>
