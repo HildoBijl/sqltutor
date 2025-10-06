@@ -84,14 +84,13 @@ export function SkillTreeCanvas({
         }}
       >
         {({ zoomIn, zoomOut, resetTransform, centerView }) => (
-          <>
+          <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
             <ZoomControls
               onZoomIn={zoomIn}
               onZoomOut={zoomOut}
               onReset={resetTransform}
               onCenter={centerView}
             />
-
             <TransformComponent
               wrapperStyle={{
                 width: "100%",
@@ -163,7 +162,7 @@ export function SkillTreeCanvas({
                 <TreeLegend />
               </Box>
             </TransformComponent>
-          </>
+          </Box>
         )}
       </TransformWrapper>
     </Box>

@@ -4,10 +4,10 @@ import { Box, Button, Tooltip } from "@mui/material";
 * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
 */
 interface ZoomControlsProps {
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onReset: () => void;
-  onCenter: () => void;
+  onZoomIn: (step?: number, animationTime?: number) => void;
+  onZoomOut: (step?: number, animationTime?: number) => void;
+  onReset: (animationTime?: number) => void;
+  onCenter: (scale?: number, animationTime?: number) => void;
 }
 
 /*
@@ -44,7 +44,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={onZoomIn}
+          onClick={() => onZoomIn()}
           sx={{ minWidth: "40px" }}
         >
           +
@@ -54,7 +54,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={onZoomOut}
+          onClick={() => onZoomOut()}
           sx={{ minWidth: "40px" }}
         >
           −
@@ -64,7 +64,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={onReset}
+          onClick={() => onReset()}
           sx={{ minWidth: "40px" }}
         >
           ⟲
@@ -74,7 +74,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={onCenter}
+          onClick={() => onCenter()}
           sx={{ minWidth: "40px" }}
         >
           ◉
