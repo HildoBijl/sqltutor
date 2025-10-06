@@ -8,6 +8,7 @@ interface ZoomControlsProps {
   onZoomOut: (step?: number, animationTime?: number) => void;
   onReset: (animationTime?: number) => void;
   onCenter: (scale?: number, animationTime?: number) => void;
+  zoomStep?: number;
 }
 
 /*
@@ -23,6 +24,7 @@ export function ZoomControls({
   onZoomOut,
   onReset,
   onCenter,
+  zoomStep = 0.15,
 }: ZoomControlsProps) {
   return (
     <Box
@@ -44,7 +46,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={() => onZoomIn()}
+          onClick={() => onZoomIn(zoomStep)}
           sx={{ minWidth: "40px" }}
         >
           +
@@ -54,7 +56,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={() => onZoomOut()}
+          onClick={() => onZoomOut(zoomStep)}
           sx={{ minWidth: "40px" }}
         >
           −

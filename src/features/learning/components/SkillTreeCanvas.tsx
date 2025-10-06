@@ -91,6 +91,7 @@ export function SkillTreeCanvas({
               onReset={resetTransform}
               onCenter={centerView}
             />
+            <TreeLegend />
             <TransformComponent
               wrapperStyle={{
                 width: "100%",
@@ -158,8 +159,6 @@ export function SkillTreeCanvas({
                     />
                   </Box>
                 ))}
-
-                <TreeLegend />
               </Box>
             </TransformComponent>
           </Box>
