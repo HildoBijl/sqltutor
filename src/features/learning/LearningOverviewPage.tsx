@@ -8,6 +8,7 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
+  Button
 } from "@mui/material";
 import { CheckCircle, MenuBook, Build } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -17,11 +18,54 @@ import {
   type ContentMeta,
 } from "@/features/content";
 
+import {
+  TransformWrapper, 
+  TransformComponent,
+} from "react-zoom-pan-pinch";
+
 export default function LearningOverviewPage() {
   const components = useAppStore((state) => state.components);
 
   // Import the skills from index
   const contentItems = useMemo(() => learningContentIndex, []);
+
+// Calculate bounds of the skill tree so it can be included in the zoom/pan area
+const getTreeBounds = useMemo(() => {
+  if (contentItems.length === 0) {
+    return { minX: 0, minY: 0, maxX: 1400, maxY: 900, width: 1400, height: 900 };
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const item of contentItems) {
+    const cardWidth = 160;
+    const cardHeight = item.type === 'concept' ? 60 : 80;
+    
+    minX = Math.min(minX, item.position.x);
+    minY = Math.min(minY, item.position.y);
+    maxX = Math.max(maxX, item.position.x + cardWidth);
+    maxY = Math.max(maxY, item.position.y + cardHeight);
+  }
+
+  const padding = 40;
+  minX -= padding;
+  minY -= padding;
+  maxX += padding;
+  maxY += padding;
+
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+}, [contentItems]);
+
 
   const concepts = useMemo(
     () => contentItems.filter((item) => item.type === "concept"),
@@ -80,10 +124,7 @@ export default function LearningOverviewPage() {
       <Box
         ref={setNodeRef(item.id)}
         sx={{
-          width: 200,
-          position: "absolute",
-          left: item.position.x,
-          top: item.position.y,
+          width: 160,
           zIndex: 1,
         }}
       >
@@ -310,11 +351,11 @@ export default function LearningOverviewPage() {
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
+      {/* <Box sx={{ mb: 4, textAlign: "center" }}>
         <Typography variant="h6" color="text.secondary">
           Do we want a title here?
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Progress Summary */}
       <Box sx={{ mb: 4, display: "flex", justifyContent: "center", gap: 4 }}>
@@ -349,98 +390,213 @@ export default function LearningOverviewPage() {
         />
       </Box>
 
-      {/* Manual Skill Tree Layout */}
 
-      <Box
-        ref={containerRef}
-        sx={{
-          position: "relative",
-          width: "100%",
-          height: "1200px", // Fixed height for the tree
-        }}
-      >
-        {/* Connectors overlay */}
+     {/* Manual Skill Tree Layout with Zoom/Pan */}
+<Box
+  sx={{
+    width: '100%',
+    height: 'calc(100vh - 120px)',
+    minHeight: '600px',
+    border: '1px solid',
+    borderColor: 'divider',
+    borderRadius: 2,
+    overflow: 'hidden',
+    backgroundColor: 'background.default',
+    position: 'relative'
+  }}
+>
+  <TransformWrapper
+    initialScale={1}
+    minScale={0.3}
+    maxScale={2}
+    limitToBounds={false}
+    centerOnInit={true}
+    wheel={{
+      step: 0.05,
+    }}
+    doubleClick={{
+      mode: "zoomIn",
+    }}
+    panning={{
+      velocityDisabled: false,
+      excluded: ["a", "button", "input"]
+    }}
+  >
+    {({ zoomIn, zoomOut, resetTransform, centerView }) => (
+      <>
+        {/* Zoom Controls */}
         <Box
           sx={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        >
-          <svg width="100%" height="100%" style={{ overflow: "visible" }}>
-            {visiblePaths.map((p, i) => (
-              <path
-                key={i}
-                d={p.d}
-                stroke="#9aa0a6"
-                strokeWidth={1.5}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            ))}
-          </svg>
-        </Box>
-
-        {/* Absolutely positioned nodes */}
-        {contentItems.map((item) => (
-          <NodeCard key={item.id} item={item} />
-        ))}
-      </Box>
-
-      {/* Legend - Fixed in lower right */}
-      <Box sx={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
             gap: 1,
-            p: 2,
-            backgroundColor: "background.paper",
+            backgroundColor: 'background.paper',
             borderRadius: 2,
             boxShadow: 2,
+            p: 1
           }}
         >
-          <Typography variant="subtitle2" fontWeight={600}>
-            Legend
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 20,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+          <Tooltip title="Zoom In" placement="left">
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => zoomIn()}
+              sx={{ minWidth: '40px' }}
             >
-              <MenuBook fontSize="small" color="action" />
-            </Box>
-            <Typography variant="body2">Concept</Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 20,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 6,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              +
+            </Button>
+          </Tooltip>
+          <Tooltip title="Zoom Out" placement="left">
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => zoomOut()}
+              sx={{ minWidth: '40px' }}
             >
-              <Build fontSize="small" color="primary" />
-            </Box>
-            <Typography variant="body2">Skill</Typography>
-          </Box>
+              −
+            </Button>
+          </Tooltip>
+          <Tooltip title="Reset View" placement="left">
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => resetTransform()}
+              sx={{ minWidth: '40px' }}
+            >
+              ⟲
+            </Button>
+          </Tooltip>
+          <Tooltip title="Center View" placement="left">
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => centerView()}
+              sx={{ minWidth: '40px' }}
+            >
+              ◉
+            </Button>
+          </Tooltip>
         </Box>
-      </Box>
+
+        <TransformComponent
+          wrapperStyle={{
+            width: '100%',
+            height: '100%',
+          }}
+          contentStyle={{
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <Box
+            ref={containerRef}
+            sx={{
+              position: 'relative',
+              width: `${getTreeBounds.width}px`,
+              height: `${getTreeBounds.height}px`,
+              margin: '0 auto',
+            }}
+          >
+            {/* Connectors overlay */}
+            <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+              <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
+                {visiblePaths.map((p, i) => (
+                  <path
+                    key={i}
+                    d={p.d}
+                    stroke="#9aa0a6"
+                    strokeWidth={1.5}
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                ))}
+              </svg>
+            </Box>
+
+            {/* Absolutely positioned nodes */}
+            {contentItems.map(item => (
+              <Box
+                key={item.id}
+                sx={{
+                  position: 'absolute',
+                  left: item.position.x - getTreeBounds.minX,
+                  top: item.position.y - getTreeBounds.minY,
+                  opacity: 0.2
+                }}
+              >
+                <NodeCard item={item} />
+              </Box>
+            ))}
+
+            {/* Legend */}
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 20,
+                right: 20,
+                zIndex: 2
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                  p: 2,
+                  backgroundColor: 'background.paper',
+                  borderRadius: 2,
+                  boxShadow: 2
+                }}
+              >
+                <Typography variant="subtitle2" fontWeight={600}>
+                  Legend
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 20,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <MenuBook fontSize="small" color="action" />
+                  </Box>
+                  <Typography variant="body2">Concept</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 20,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 6,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Build fontSize="small" color="primary" />
+                  </Box>
+                  <Typography variant="body2">Skill</Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </TransformComponent>
+      </>
+    )}
+  </TransformWrapper>
+</Box>
     </Container>
   );
 }
