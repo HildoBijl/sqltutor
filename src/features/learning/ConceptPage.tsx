@@ -151,13 +151,6 @@ export default function ConceptPage() {
         </Typography>
       </Box>
 
-      {/* Prerequisites */}
-      {conceptMeta.prerequisites && conceptMeta.prerequisites.length > 0 && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <strong>Prerequisites:</strong> {conceptMeta.prerequisites.join(', ')}
-        </Alert>
-      )}
-
       {/* Content Tabs */}
       <Card>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
