@@ -40,9 +40,9 @@ export default function SkillPage() {
 
   // State management
   const [componentState, setComponentState] = useComponentState(skillId || '');
-  const focusedMode = useAppStore((state) => state.focusedMode);
+  const hideStories = useAppStore((state) => state.hideStories);
 
-  // Define available tabs, filtering out story in focused mode
+  // Define available tabs, filtering out story if hideStories is enabled
   const allTabs = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'practice', label: 'Practice', icon: <Edit /> },
@@ -50,7 +50,7 @@ export default function SkillPage() {
     { key: 'data', label: 'Data Explorer', icon: <Storage /> },
   ];
   
-  const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
+  const availableTabs = allTabs.filter(tab => !(hideStories && tab.key === 'story'));
 
   // Helper function to check current tab
   const isCurrentTab = (tabKey: string) => {
@@ -183,7 +183,7 @@ export default function SkillPage() {
       setCurrentTab(practiceIndex);
       setComponentState({ tab: 'practice' });
     }
-  }, [availableTabs.length, focusedMode]); // Only depend on tab count and focused mode changes
+  }, [availableTabs.length, hideStories]); // Only depend on tab count and hideStories changes
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -836,8 +836,8 @@ export default function SkillPage() {
             Awesome!
           </Button>
           
-          {/* Show story button only if not in focused mode and story tab is available */}
-          {!focusedMode && availableTabs.some(tab => tab.key === 'story') && (
+          {/* Show story button only if hideStories is disabled and story tab is available */}
+          {!hideStories && availableTabs.some(tab => tab.key === 'story') && (
             <Button
               onClick={() => {
                 setShowCompletionDialog(false);

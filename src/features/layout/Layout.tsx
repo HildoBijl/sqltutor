@@ -112,9 +112,9 @@ function SettingsMenu() {
   const { mode, toggleColorMode } = useContext(ColorModeContext);
   const isLight = mode === 'light';
   
-  // Focused mode state
-  const focusedMode = useAppStore((state) => state.focusedMode);
-  const toggleFocusedMode = useAppStore((state) => state.toggleFocusedMode);
+  // Hide stories state
+  const hideStories = useAppStore((state) => state.hideStories);
+  const toggleHideStories = useAppStore((state) => state.toggleHideStories);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -129,8 +129,8 @@ function SettingsMenu() {
     // Don't close menu - allow multiple toggles
   };
 
-  const handleFocusedModeToggle = () => {
-    toggleFocusedMode();
+  const handleHideStoriesToggle = () => {
+    toggleHideStories();
     // Don't close menu - allow multiple toggles
   };
 
@@ -196,18 +196,18 @@ function SettingsMenu() {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={handleFocusedModeToggle}>
+        <MenuItem onClick={handleHideStoriesToggle}>
           <ListItemIcon>
             <CenterFocusStrong 
-              sx={{ color: focusedMode ? 'primary.main' : 'inherit' }} 
+              sx={{ color: hideStories ? 'primary.main' : 'inherit' }} 
             />
           </ListItemIcon>
-          <ListItemText>Focus Mode</ListItemText>
+          <ListItemText>Hide Stories</ListItemText>
           <Check 
             sx={{ 
               color: 'primary.main', 
               ml: 1,
-              visibility: focusedMode ? 'visible' : 'hidden'
+              visibility: hideStories ? 'visible' : 'hidden'
             }} 
           />
         </MenuItem>

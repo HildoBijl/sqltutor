@@ -52,16 +52,16 @@ export default function ConceptPage() {
 
   // Use new store
   const [componentState, setComponentState] = useComponentState(conceptId || '');
-  const focusedMode = useAppStore((state) => state.focusedMode);
+  const hideStories = useAppStore((state) => state.hideStories);
 
-  // Define available tabs, filtering out story in focused mode
+  // Define available tabs, filtering out story if hideStories is enabled
   const allTabs = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     { key: 'summary', label: 'Summary', icon: <MenuBook /> },
   ];
   
-  const availableTabs = allTabs.filter(tab => !(focusedMode && tab.key === 'story'));
+  const availableTabs = allTabs.filter(tab => !(hideStories && tab.key === 'story'));
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
@@ -81,7 +81,7 @@ export default function ConceptPage() {
       setCurrentTab(theoryIndex);
       setComponentState({ tab: 'theory' });
     }
-  }, [availableTabs.length, focusedMode]); // Only depend on tab count and focused mode changes
+  }, [availableTabs.length, hideStories]); // Only depend on tab count and hideStories changes
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
