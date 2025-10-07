@@ -8,7 +8,6 @@ import {
   Container,
   Typography,
   Alert,
-  Snackbar,
   CircularProgress,
   Tabs,
   Tab,
@@ -17,7 +16,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
+import { CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -218,17 +217,77 @@ export default function SkillPage() {
       exerciseDispatch({ type: 'generate' });
     }
   }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
-  // Handle live query execution (for preview results)
+  // Handle live query execution (for preview results and live feedback)
   const handleLiveExecute = async (liveQuery: string) => {
-    if (!dbReady || !liveQuery.trim() || exerciseCompleted) return;
+    if (!dbReady || exerciseCompleted || !currentExercise) return;
     
+    // Clear feedback if query is empty
+    if (!liveQuery.trim()) {
+      setFeedback(null);
+      return;
+    }
+    
+    const supportsOutputValidation =
+      typeof skillModule?.validateOutput === 'function' && typeof skillModule?.verifyOutput === 'function';
+
     try {
-      await executeQuery(liveQuery);
-      // Live execution just updates the query results without checking the answer
+      const result = await executeQuery(liveQuery);
+      
+      // Provide live feedback based on validation
+      if (supportsOutputValidation) {
+        const execution: SqlExecutionResult = { success: true, output: result };
+        const validation = skillModule!.validateOutput!(currentExercise, execution);
+        
+        if (!validation.ok) {
+          setFeedback({
+            message: validation.message || 'Query result has invalid structure.',
+            type: 'warning',
+          });
+          return;
+        }
+
+        const outputForVerification = result ?? [];
+        const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification);
+        
+        if (verification.correct) {
+          setFeedback({
+            message: verification.message || '✓ Correct! Click "Run & Check" to submit.',
+            type: 'success',
+          });
+        } else {
+          setFeedback({
+            message: verification.message || 'Not quite right. Keep trying!',
+            type: 'info',
+          });
+        }
+      } else {
+        // Legacy flow
+        const validation = previewValidation(liveQuery);
+        if (!validation.ok) {
+          setFeedback({
+            message: validation.message || 'Please fix the query.',
+            type: 'warning',
+          });
+          return;
+        }
+
+        const verification = evaluateAttempt(liveQuery, result);
+        if (verification.correct) {
+          setFeedback({
+            message: verification.message || '✓ Correct! Click "Run & Check" to submit.',
+            type: 'success',
+          });
+        } else {
+          setFeedback({
+            message: verification.message || 'Not quite right. Keep trying!',
+            type: 'info',
+          });
+        }
+      }
     } catch (error: any) {
-      // Let the error be shown in the UI - the executeQuery already sets queryError state
-      // No need to handle it here since the error will be displayed in the Results section
+      // Query execution error - feedback will be shown via queryError display
       console.debug('Live query execution failed:', error);
+      setFeedback(null); // Clear any previous feedback since error is shown separately
     }
   };
 
@@ -432,7 +491,7 @@ export default function SkillPage() {
     }
 
     setQuery(solution);
-    setFeedback({ message: 'Solution inserted. Press Run & Check to execute.', type: 'info' });
+    // Note: Live feedback will automatically validate this solution
   };
   // New exercise
   const handleNewExercise = () => {
@@ -566,10 +625,10 @@ export default function SkillPage() {
                   <Button
                     size="small"
                     onClick={handleAutoComplete}
-                    startIcon={<CheckCircle />}
+                    startIcon={<Lightbulb />}
                     disabled={!currentExercise || isExecuting}
                   >
-                    Auto-complete
+                    Show Solution
                   </Button>
                   <Button
                     size="small"
@@ -604,11 +663,11 @@ export default function SkillPage() {
                   <Button
                     variant="contained"
                     size="small"
-                    startIcon={<PlayArrow />}
+                    startIcon={<CheckCircle />}
                     onClick={() => { void handleExecute(); }}
                     disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
                   >
-                    Run & Check
+                    Submit Answer
                   </Button>
                 </Box>
               </Box>
@@ -626,19 +685,38 @@ export default function SkillPage() {
               </CardContent>
             </Card>
 
+            {/* Feedback Alert - Persistent and close to input */}
+            {feedback && (
+              <Alert
+                severity={feedback.type}
+                sx={{ mb: 2 }}
+                onClose={() => setFeedback(null)}
+              >
+                {feedback.message}
+              </Alert>
+            )}
+            {!feedback && queryError && (
+              <Alert
+                severity="error"
+                sx={{ mb: 2 }}
+              >
+                {queryError instanceof Error ? queryError.message : 'Query execution failed'}
+              </Alert>
+            )}
+
             {/* Results */}
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Query Results
                 </Typography>
-                {queryError && (
-                  <Alert severity="error" sx={{ mb: 2 }}>
-                    {queryError instanceof Error ? queryError.message : 'Query execution failed'}
-                  </Alert>
-                )}
                 {queryResult && queryResult.length > 0 ? (
                   <DataTable data={queryResult[0]} />
+                ) : queryError ? (
+                  <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+                    {/* Error shown in feedback above */}
+                    No results due to query error
+                  </Typography>
                 ) : (
                   <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
                     Run your query to see results
@@ -702,21 +780,6 @@ export default function SkillPage() {
           </CardContent>
         )}
       </Card>
-
-      {/* Feedback Snackbar */}
-      <Snackbar
-        open={!!feedback}
-        autoHideDuration={6000}
-        onClose={() => setFeedback(null)}
-      >
-        <Alert
-          onClose={() => setFeedback(null)}
-          severity={feedback?.type}
-          sx={{ width: '100%' }}
-        >
-          {feedback?.message}
-        </Alert>
-      </Snackbar>
 
       {/* Skill Completion Dialog */}
       <Dialog
