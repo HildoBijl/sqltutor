@@ -83,3 +83,37 @@ export interface LearningPath {
   description: string;
   components: string[]; // Ordered list of component IDs
 }
+
+// -----------------------------------------------------------------------------
+// Exercise runtime helpers (new architecture)
+// -----------------------------------------------------------------------------
+
+export interface Utils {
+  selectRandomly: <T>(items: readonly T[]) => T;
+  randomInt: (min: number, max: number) => number;
+}
+
+export interface QueryResult {
+  columns: string[];
+  values: unknown[][];
+}
+
+export interface ExecutionResult<T = QueryResult[]> {
+  success: boolean;
+  output?: T;
+  error?: Error;
+}
+
+export interface ValidationResult {
+  ok: boolean;
+  message?: string;
+  code?: string;
+  warnings?: string[];
+}
+
+export interface VerificationResult {
+  correct: boolean;
+  message?: string;
+  solution?: string;
+  details?: Record<string, unknown>;
+}

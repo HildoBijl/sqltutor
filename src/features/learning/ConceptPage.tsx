@@ -162,7 +162,7 @@ export default function ConceptPage() {
       <Card>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={currentTab} onChange={handleTabChange}>
-            {availableTabs.map((tab, index) => (
+            {availableTabs.map((tab) => (
               <Tab 
                 key={tab.key}
                 label={tab.label} 

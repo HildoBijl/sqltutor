@@ -3,7 +3,7 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { Box, Paper } from '@mui/material';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useDebounce } from '@/shared/hooks';
 
 interface SQLEditorProps {

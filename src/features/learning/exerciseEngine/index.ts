@@ -59,7 +59,13 @@ export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unkn
 export type ExerciseAction<Input = unknown, Result = unknown> =
   | { type: 'generate'; seed?: number }
   | { type: 'reset'; keepExercise?: boolean }
-  | { type: 'input'; input: Input; result?: Result | null }
+  | {
+      type: 'input';
+      input: Input;
+      result?: Result | null;
+      validation?: ValidationResult | null;
+      verification?: VerificationResult | null;
+    }
   | { type: 'regenerate-demo' }
   | { type: 'hydrate'; state: ExerciseProgress<any, Input, any, Result> };
 
@@ -278,25 +284,28 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
           };
         }
 
-        const validation = config.validateInput
-          ? config.validateInput({
-              exercise: state.exercise,
-              input: action.input,
-              normalizedInput,
-              result: action.result,
-              previousAttempts: attempts,
-              helpers,
-            })
-          : validationOk();
+        const validation =
+          action.validation !== undefined && action.validation !== null
+            ? action.validation
+            : config.validateInput
+                ? config.validateInput({
+                    exercise: state.exercise,
+                    input: action.input,
+                    normalizedInput,
+                    result: action.result,
+                    previousAttempts: attempts,
+                    helpers,
+                  })
+                : validationOk();
 
-        if (!validation.ok) {
-          const feedback = validation.message || 'Please double-check your input before submitting.';
+        if (!validation?.ok) {
+          const feedback = validation?.message || 'Please double-check your input before submitting.';
           const attempt: ExerciseAttempt<Input> = {
             index: attempts.length,
             input: action.input,
             normalizedInput,
             status: 'invalid',
-            validation,
+            validation: validation ?? undefined,
             feedback,
             timestamp: now,
           };
@@ -311,7 +320,7 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
             ...state,
             attempts: [...attempts, attempt],
             status: 'validation-error',
-            validation,
+            validation: validation ?? null,
             verification: null,
             feedback,
             history: [...state.history, entry],
@@ -319,14 +328,17 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
           };
         }
 
-        const verification = config.checkInput({
-          exercise: state.exercise,
-          input: action.input,
-          normalizedInput,
-          result: action.result,
-          previousAttempts: attempts,
-          helpers,
-        });
+        const verification =
+          action.verification !== undefined && action.verification !== null
+            ? action.verification
+            : config.checkInput({
+                exercise: state.exercise,
+                input: action.input,
+                normalizedInput,
+                result: action.result,
+                previousAttempts: attempts,
+                helpers,
+              });
 
         const isCorrect = !!verification?.correct;
         const status: ExerciseStatus = isCorrect ? 'correct' : 'incorrect';
@@ -339,8 +351,8 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
           input: action.input,
           normalizedInput,
           status: isCorrect ? 'correct' : 'incorrect',
-          validation,
-          verification,
+          validation: validation ?? undefined,
+          verification: verification ?? undefined,
           feedback,
           timestamp: now,
         };
@@ -361,8 +373,8 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
           ...state,
           attempts: [...attempts, attempt],
           status,
-          validation,
-          verification,
+          validation: validation ?? null,
+          verification: verification ?? null,
           feedback,
           solution: computedSolution,
           history: [...state.history, entry],

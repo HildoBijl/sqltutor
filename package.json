@@ -23,6 +23,7 @@
     "@mui/x-data-grid": "^8.3.0",
     "@react-hook/resize-observer": "^2.0.2",
     "@uiw/react-codemirror": "^4.21.21",
+    "cookie": "^1.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",

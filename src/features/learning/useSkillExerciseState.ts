@@ -29,6 +29,9 @@ export interface SkillExerciseModuleLike {
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
   checkInput?: (args: CheckInputArgs<any, string, unknown>) => VerificationResult;
+  validateOutput?: (exercise: any, result: unknown) => ValidationResult;
+  verifyOutput?: (exercise: any, output: unknown) => VerificationResult;
+  getSolution?: (exercise: any) => string | null | undefined;
   runDemo?: (args: { exercise: any; helpers: ExerciseHelpers }) => unknown;
   solutionTemplate?: string;
   messages?: {
@@ -148,6 +151,12 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
     const derive = ({ exercise, verification }: { exercise: any; verification?: VerificationResult }) => {
       if (verification?.solution) return verification.solution;
+      if (moduleLike?.getSolution && exercise) {
+        const generatedSolution = moduleLike.getSolution(exercise);
+        if (generatedSolution) {
+          return generatedSolution;
+        }
+      }
       if (exercise?.expectedQuery) return exercise.expectedQuery;
       const templateSolution = solveFromTemplate(exercise);
       if (templateSolution) return templateSolution;
@@ -251,6 +260,24 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     [checkInputFn, helpers, progress.attempts, progress.exercise],
   );
 
+  const recordAttempt = useCallback(
+    (args: {
+      input: string;
+      result?: unknown;
+      validation?: ValidationResult | null;
+      verification?: VerificationResult | null;
+    }) => {
+      dispatch({
+        type: 'input',
+        input: args.input,
+        result: args.result,
+        validation: args.validation ?? null,
+        verification: args.verification ?? null,
+      });
+    },
+    [dispatch],
+  );
+
   return {
     progress,
     status,
@@ -263,6 +290,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     previewValidation,
     evaluate,
     checkInput: checkInputFn,
+    recordAttempt,
     moduleLike,
   } as const;
 }

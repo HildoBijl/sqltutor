@@ -11,10 +11,6 @@ export default defineConfig({
         {
           src: 'node_modules/sql.js/dist/sql-wasm.wasm',
           dest: 'sqljs'
-        },
-        {
-          src: 'content',
-          dest: ''
         }
       ]
     })
@@ -25,12 +21,8 @@ export default defineConfig({
       components: path.resolve(__dirname, './src/components'),
       util: path.resolve(__dirname, './src/util'),
       settings: path.resolve(__dirname, './src/settings.js'),
-      routing: path.resolve(__dirname, './src/routing'),
       assets: path.resolve(__dirname, './src/assets'),
-      pages: path.resolve(__dirname, './src/pages'),
-      edu: path.resolve(__dirname, './src/edu'),
       content: path.resolve(__dirname, './src/features/content'),
-      eduComponents: path.resolve(__dirname, './src/eduComponents'),
     },
   },
   server: {
@@ -40,10 +32,11 @@ export default defineConfig({
   build: {
     sourcemap: true,
     rollupOptions: {
+      maxParallelFileOps: 20,
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          mui: ['@mui/material', '@mui/icons-material'],
+          mui: ['@mui/material'],
           sql: ['sql.js'],
           editor: ['@codemirror/lang-sql', '@uiw/react-codemirror'],
           zustand: ['zustand'],

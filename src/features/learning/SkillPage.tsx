@@ -27,6 +27,7 @@ import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
 import { useContent } from './hooks/useContent';
 import { useSkillExerciseState, type SkillExerciseModuleLike } from './useSkillExerciseState';
+import type { ExecutionResult as SqlExecutionResult } from '@/features/content/types';
 import { DataExplorerTab } from './components/DataExplorerTab';
 import { SKILL_SCHEMAS } from '@/constants';
 
@@ -68,6 +69,7 @@ export default function SkillPage() {
     previewValidation,
     evaluate: evaluateAttempt,
     solution: exerciseSolution,
+    recordAttempt,
   } = useSkillExerciseState(
     skillId || '',
     skillModule,
@@ -136,10 +138,13 @@ export default function SkillPage() {
         if (cancelled) return;
         const extendedMod = mod as any;
         const moduleConfig: SkillExerciseModuleLike = {
-          generate: typeof mod.generate === 'function' ? mod.generate : undefined,
-          validate: typeof mod.validate === 'function' ? mod.validate : undefined,
+          generate: typeof extendedMod.generate === 'function' ? extendedMod.generate : undefined,
+          validate: typeof extendedMod.validate === 'function' ? extendedMod.validate : undefined,
           validateInput: typeof extendedMod.validateInput === 'function' ? extendedMod.validateInput : undefined,
           checkInput: typeof extendedMod.checkInput === 'function' ? extendedMod.checkInput : undefined,
+          validateOutput: typeof extendedMod.validateOutput === 'function' ? extendedMod.validateOutput : undefined,
+          verifyOutput: typeof extendedMod.verifyOutput === 'function' ? extendedMod.verifyOutput : undefined,
+          getSolution: typeof extendedMod.getSolution === 'function' ? extendedMod.getSolution : undefined,
           runDemo: typeof extendedMod.runDemo === 'function' ? extendedMod.runDemo : undefined,
           solutionTemplate: typeof extendedMod.solutionTemplate === 'string' ? extendedMod.solutionTemplate : undefined,
           messages: typeof extendedMod.messages === 'object' && extendedMod.messages !== null ? extendedMod.messages : undefined,
@@ -249,60 +254,145 @@ export default function SkillPage() {
       exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
       setFeedback({
         message: previousAttempt.feedback || 'You already tried this exact query.',
-        type: previousAttempt.status === 'correct' ? 'success' : previousAttempt.status === 'invalid' ? 'warning' : 'info',
+        type:
+          previousAttempt.status === 'correct'
+            ? 'success'
+            : previousAttempt.status === 'invalid'
+            ? 'warning'
+            : 'info',
       });
       return;
     }
 
-    const validation = previewValidation(effectiveQuery);
-    if (!validation.ok) {
-      exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
-      setFeedback({
-        message: validation.message || 'Please fix the query before running.',
-        type: 'warning',
-      });
-      return;
-    }
+    const supportsOutputValidation =
+      typeof skillModule?.validateOutput === 'function' && typeof skillModule?.verifyOutput === 'function';
 
-    try {
-      const result = await executeQuery(effectiveQuery);
-      const verification = evaluateAttempt(effectiveQuery, result);
-      exerciseDispatch({ type: 'input', input: effectiveQuery, result });
-
-      if (verification.correct) {
-        const previousSolvedCount = componentState.numSolved || 0;
-        const alreadyCounted = exerciseStatus === 'correct';
-        const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
-
-        if (!alreadyCounted) {
-          setComponentState((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+    const runOutputValidationFlow = async () => {
+      try {
+        let execution: SqlExecutionResult;
+        try {
+          const output = await executeQuery(effectiveQuery);
+          execution = { success: true, output };
+        } catch (error: any) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          execution = { success: false, error: err };
         }
 
-        const reachedMasteryNow =
-          !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
+        const validation = skillModule!.validateOutput!(currentExercise, execution);
 
-        if (reachedMasteryNow) {
-          setShowCompletionDialog(true);
-        } else {
-          const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
+        if (!validation.ok) {
+          recordAttempt({ input: effectiveQuery, result: execution.output ?? null, validation });
           setFeedback({
-            message:
-              verification.message ||
-              'Excellent! Exercise completed successfully! (' + progressDisplay + '/' + requiredCount + ')',
-            type: 'success',
+            message: validation.message || 'Query result has invalid structure.',
+            type: execution.success ? 'warning' : 'error',
+          });
+          return;
+        }
+
+        const outputForVerification = execution.output ?? [];
+        const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification);
+
+        recordAttempt({
+          input: effectiveQuery,
+          result: execution.output ?? null,
+          validation,
+          verification,
+        });
+
+        if (verification.correct) {
+          const previousSolvedCount = componentState.numSolved || 0;
+          const alreadyCounted = exerciseCompleted;
+          const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
+
+          if (!alreadyCounted) {
+            setComponentState((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+          }
+
+          const reachedMasteryNow =
+            !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
+
+          if (reachedMasteryNow) {
+            setShowCompletionDialog(true);
+          } else {
+            const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
+            setFeedback({
+              message:
+                verification.message ||
+                `Excellent! Exercise completed successfully! (${progressDisplay}/${requiredCount})`,
+              type: 'success',
+            });
+          }
+        } else {
+          setFeedback({
+            message: verification.message || 'Not quite right. Check your query and try again!',
+            type: 'info',
           });
         }
-      } else {
+      } catch (error: any) {
         setFeedback({
-          message: verification.message || 'Not quite right. Check your query and try again!',
-          type: 'info',
+          message: 'Query error: ' + (error?.message || 'Unknown error'),
+          type: 'error',
         });
       }
-    } catch (error: any) {
-      setFeedback({
-        message: 'Query error: ' + (error?.message || 'Unknown error'),
-        type: 'error',
-      });
+    };
+
+    const runLegacyFlow = async () => {
+      const validation = previewValidation(effectiveQuery);
+      if (!validation.ok) {
+        exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
+        setFeedback({
+          message: validation.message || 'Please fix the query before running.',
+          type: 'warning',
+        });
+        return;
+      }
+
+      try {
+        const result = await executeQuery(effectiveQuery);
+        const verification = evaluateAttempt(effectiveQuery, result);
+        exerciseDispatch({ type: 'input', input: effectiveQuery, result });
+
+        if (verification.correct) {
+          const previousSolvedCount = componentState.numSolved || 0;
+          const alreadyCounted = exerciseCompleted;
+          const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
+
+          if (!alreadyCounted) {
+            setComponentState((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+          }
+
+          const reachedMasteryNow =
+            !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
+
+          if (reachedMasteryNow) {
+            setShowCompletionDialog(true);
+          } else {
+            const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
+            setFeedback({
+              message:
+                verification.message ||
+                `Excellent! Exercise completed successfully! (${progressDisplay}/${requiredCount})`,
+              type: 'success',
+            });
+          }
+        } else {
+          setFeedback({
+            message: verification.message || 'Not quite right. Check your query and try again!',
+            type: 'info',
+          });
+        }
+      } catch (error: any) {
+        setFeedback({
+          message: 'Query error: ' + (error?.message || 'Unknown error'),
+          type: 'error',
+        });
+      }
+    };
+
+    if (supportsOutputValidation) {
+      await runOutputValidationFlow();
+    } else {
+      await runLegacyFlow();
     }
   };
 
@@ -318,7 +408,15 @@ export default function SkillPage() {
   const handleAutoComplete = async () => {
     if (!currentExercise) return;
 
-    let solution = exerciseSolution || (currentExercise as any).expectedQuery;
+    let solution = exerciseSolution;
+
+    if (!solution && typeof skillModule?.getSolution === 'function') {
+      solution = skillModule.getSolution(currentExercise) ?? undefined;
+    }
+
+    if (!solution && (currentExercise as any).expectedQuery) {
+      solution = (currentExercise as any).expectedQuery;
+    }
 
     if (!solution && skillModule?.solutionTemplate) {
       solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, token) => {
