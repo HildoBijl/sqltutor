@@ -2,12 +2,13 @@ import { RefObject } from "react";
 import { Box } from "@mui/material";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ContentMeta } from "@/features/content";
-import { NodeCard } from "./NodeCard";
+import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
 
 /*
-* SkillTreeCanvas component that renders the interactive skill tree with zoom and pan capabilities.
+* SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
+* This component only handles the zoom/pan functionality and UI controls.
 *
 * @param contentItems - Array of content items (concepts and skills) to display.
 * @param treeBounds - The bounding box of the tree layout.
@@ -48,10 +49,6 @@ export function SkillTreeCanvas({
   containerRef,
   nodeRefs,
 }: SkillTreeCanvasProps) {
-  const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
-    nodeRefs.current?.set(id, el);
-  };
-
   return (
     <Box
       sx={{
@@ -102,64 +99,16 @@ export function SkillTreeCanvas({
                 height: "100%",
               }}
             >
-              <Box
-                ref={containerRef}
-                sx={{
-                  position: "relative",
-                  width: `${treeBounds.width}px`,
-                  height: `${treeBounds.height}px`,
-                  margin: "0 auto",
-                }}
-              >
-                {/* Connectors overlay */}
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    pointerEvents: "none",
-                    zIndex: 0,
-                  }}
-                >
-                  <svg
-                    width="100%"
-                    height="100%"
-                    style={{ overflow: "visible" }}
-                  >
-                    {visiblePaths.map((p, i) => (
-                      <path
-                        key={i}
-                        d={p.d}
-                        stroke="#9aa0a6"
-                        strokeWidth={1.5}
-                        fill="none"
-                        strokeLinecap="round"
-                      />
-                    ))}
-                  </svg>
-                </Box>
-
-                {/* Absolutely positioned nodes */}
-                {contentItems.map((item) => (
-                  <Box
-                    key={item.id}
-                    sx={{
-                      position: "absolute",
-                      left: item.position.x - treeBounds.minX,
-                      top: item.position.y - treeBounds.minY,
-                      opacity: 1,
-                    }}
-                  >
-                    <NodeCard
-                      item={item}
-                      completed={isCompleted(item.id)}
-                      progress={getProgress(item.id)}
-                      setNodeRef={setNodeRef}
-                      onHoverStart={setHoveredId}
-                      onHoverEnd={() => setHoveredId(null)}
-                    />
-                  </Box>
-                ))}
-              </Box>
+              <SkillTree
+                contentItems={contentItems}
+                treeBounds={treeBounds}
+                visiblePaths={visiblePaths}
+                isCompleted={isCompleted}
+                getProgress={getProgress}
+                setHoveredId={setHoveredId}
+                containerRef={containerRef}
+                nodeRefs={nodeRefs}
+              />
             </TransformComponent>
           </Box>
         )}
