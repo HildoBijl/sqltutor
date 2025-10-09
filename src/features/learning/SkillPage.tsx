@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -106,8 +106,8 @@ export default function SkillPage() {
   const requiredCount = 3;
   const isCompleted = (componentState.numSolved || 0) >= requiredCount;
 
-
   const normalizeForHistory = (value: string) => value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+
   useEffect(() => {
     if (!skillId) return;
 
@@ -217,8 +217,9 @@ export default function SkillPage() {
       exerciseDispatch({ type: 'generate' });
     }
   }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
-  // Handle live query execution (for preview results and live feedback)
-  const handleLiveExecute = async (liveQuery: string) => {
+
+  // Handle live query execution (for preview results)
+  const handleLiveExecute = useCallback(async (liveQuery: string) => {
     if (!dbReady || exerciseCompleted || !currentExercise) return;
     
     // Clear feedback if query is empty
@@ -227,72 +228,19 @@ export default function SkillPage() {
       return;
     }
     
-    const supportsOutputValidation =
-      typeof skillModule?.validateOutput === 'function' && typeof skillModule?.verifyOutput === 'function';
-
     try {
-      const result = await executeQuery(liveQuery);
-      
-      // Provide live feedback based on validation
-      if (supportsOutputValidation) {
-        const execution: SqlExecutionResult = { success: true, output: result };
-        const validation = skillModule!.validateOutput!(currentExercise, execution);
-        
-        if (!validation.ok) {
-          setFeedback({
-            message: validation.message || 'Query result has invalid structure.',
-            type: 'warning',
-          });
-          return;
-        }
-
-        const outputForVerification = result ?? [];
-        const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification);
-        
-        if (verification.correct) {
-          setFeedback({
-            message: verification.message || '✓ Correct! Click "Run & Check" to submit.',
-            type: 'success',
-          });
-        } else {
-          setFeedback({
-            message: verification.message || 'Not quite right. Keep trying!',
-            type: 'info',
-          });
-        }
-      } else {
-        // Legacy flow
-        const validation = previewValidation(liveQuery);
-        if (!validation.ok) {
-          setFeedback({
-            message: validation.message || 'Please fix the query.',
-            type: 'warning',
-          });
-          return;
-        }
-
-        const verification = evaluateAttempt(liveQuery, result);
-        if (verification.correct) {
-          setFeedback({
-            message: verification.message || '✓ Correct! Click "Run & Check" to submit.',
-            type: 'success',
-          });
-        } else {
-          setFeedback({
-            message: verification.message || 'Not quite right. Keep trying!',
-            type: 'info',
-          });
-        }
-      }
+      // Just execute the query - don't do validation/verification for live updates
+      // This keeps typing responsive
+      await executeQuery(liveQuery);
+      // The results will show in the table, but we won't provide feedback during typing
     } catch (error: any) {
-      // Query execution error - feedback will be shown via queryError display
+      // Silently fail for live execution - errors will show in the UI via queryError
       console.debug('Live query execution failed:', error);
-      setFeedback(null); // Clear any previous feedback since error is shown separately
     }
-  };
+  }, [dbReady, exerciseCompleted, currentExercise, executeQuery]);
 
   // Check answer (for actual submission)
-  const handleExecute = async (override?: string) => {
+  const handleExecute = useCallback(async (override?: string) => {
     const rawQuery = override ?? query;
     const effectiveQuery = rawQuery.trim();
     if (!currentExercise || !effectiveQuery) return;
@@ -453,18 +401,34 @@ export default function SkillPage() {
     } else {
       await runLegacyFlow();
     }
-  };
+  }, [
+    query,
+    currentExercise,
+    exerciseCompleted,
+    dbReady,
+    normalizeForHistory,
+    exerciseProgress.attempts,
+    skillModule,
+    executeQuery,
+    recordAttempt,
+    componentState.numSolved,
+    requiredCount,
+    setComponentState,
+    previewValidation,
+    evaluateAttempt,
+    exerciseDispatch,
+  ]);
 
   // Reset database without changing the exercise instance
-  const handleResetDatabase = () => {
+  const handleResetDatabase = useCallback(() => {
     resetExerciseDb();
     exerciseDispatch({ type: 'reset', keepExercise: true });
     setQuery('');
     setFeedback({ message: 'Database reset - try again!', type: 'info' });
-  };
+  }, [resetExerciseDb, exerciseDispatch]);
 
   // Autocomplete solution for the current exercise
-  const handleAutoComplete = async () => {
+  const handleAutoComplete = useCallback(async () => {
     if (!currentExercise) return;
 
     let solution = exerciseSolution;
@@ -491,10 +455,10 @@ export default function SkillPage() {
     }
 
     setQuery(solution);
-    // Note: Live feedback will automatically validate this solution
-  };
+  }, [currentExercise, exerciseSolution, skillModule]);
+
   // New exercise
-  const handleNewExercise = () => {
+  const handleNewExercise = useCallback(() => {
     if (!exerciseCompleted) {
       setFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
       return;
@@ -502,7 +466,7 @@ export default function SkillPage() {
     exerciseDispatch({ type: 'generate' });
     setQuery('');
     setFeedback(null);
-  };
+  }, [exerciseCompleted, exerciseDispatch]);
 
   if (isLoading) {
     return (
