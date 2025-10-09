@@ -1,11 +1,12 @@
-import { RefObject } from "react";
-import { Box } from "@mui/material";
+import { RefObject, useState } from "react";
 import { ContentMeta } from "@/features/content";
+import { Drawing } from "@/components/figures/Drawing";
 import { NodeCard } from "./NodeCard";
 
 /*
 * SkillTree component that renders the tree structure with nodes and connectors.
 * This is a pure rendering component without zoom/pan controls.
+* Uses the Drawing library for coordinate-based positioning.
 *
 * @param contentItems - Array of content items (concepts and skills) to display.
 * @param treeBounds - The bounding box of the tree layout.
@@ -39,73 +40,65 @@ export function SkillTree({
   treeBounds,
   visiblePaths,
   isCompleted,
-  getProgress,
-  setHoveredId,
+  // getProgress,
+  // setHoveredId,
   containerRef,
-  nodeRefs,
+  // nodeRefs,
 }: SkillTreeProps) {
-  const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
-    nodeRefs.current?.set(id, el);
-  };
+  // const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
+
+  // const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
+  //   nodeRefs.current?.set(id, el);
+  // };
+
+  // const handleHoverStart = (id: string) => {
+  //   setLocalHoveredId(id);
+  //   setHoveredId(id);
+  // };
+
+  // const handleHoverEnd = () => {
+  //   setLocalHoveredId(null);
+  //   setHoveredId(null);
+  // };
 
   return (
-    <Box
+    <div
       ref={containerRef}
-      sx={{
+      style={{
         position: "relative",
         width: `${treeBounds.width}px`,
         height: `${treeBounds.height}px`,
         margin: "0 auto",
       }}
     >
-      {/* Connectors overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
+      <Drawing
+        width={treeBounds.width}
+        height={treeBounds.height}
+        useSvg={true}
+        useCanvas={false}
       >
-        <svg
-          width="100%"
-          height="100%"
-          style={{ overflow: "visible" }}
-        >
-          {visiblePaths.map((p, i) => (
-            <path
-              key={i}
-              d={p.d}
-              stroke="#9aa0a6"
-              strokeWidth={1.5}
-              fill="none"
-              strokeLinecap="round"
-            />
-          ))}
-        </svg>
-      </Box>
+        {/* SVG connector paths - rendered in Drawing's SVG layer */}
+        {visiblePaths.map((p, i) => (
+          <path
+            key={i}
+            d={p.d}
+            stroke="#9aa0a6"
+            strokeWidth={1.5}
+            fill="none"
+            strokeLinecap="round"
+          />
+        ))}
 
-      {/* Absolutely positioned nodes */}
-      {contentItems.map((item) => (
-        <Box
-          key={item.id}
-          sx={{
-            position: "absolute",
-            left: item.position.x - treeBounds.minX,
-            top: item.position.y - treeBounds.minY,
-            opacity: 1,
-          }}
-        >
+        {/* Node rectangles - rendered in SVG layer */}
+        {contentItems.map((item) => (
           <NodeCard
+            key={item.id}
             item={item}
             completed={isCompleted(item.id)}
-            progress={getProgress(item.id)}
-            setNodeRef={setNodeRef}
-            onHoverStart={setHoveredId}
-            onHoverEnd={() => setHoveredId(null)}
+            isHovered={false}
           />
-        </Box>
-      ))}
-    </Box>
+        ))}
+      </Drawing>
+    </div>
   );
 }

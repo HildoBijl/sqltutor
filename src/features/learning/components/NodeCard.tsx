@@ -1,158 +1,62 @@
-import { useRef } from "react";
-import { Box, Card, CardContent, Tooltip, Typography } from "@mui/material";
-import { CheckCircle, MenuBook, Build } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import { ContentMeta } from "@/features/content";
+import { Rectangle, Element } from "@/components/figures/Drawing";
+// @ts-ignore - Vector is a JavaScript module without type definitions
+import { Vector } from "@/util/geometry/Vector";
 
 /*
-* NodeCard component representing a concept or skill in the learning tree.
-*/
+ * NodeCard component representing a concept or skill in the learning tree.
+ * Renders the Rectangle with text directly inside the SVG.
+ */
 interface NodeCardProps {
   item: ContentMeta;
   completed: boolean;
-  progress: string | null;
-  setNodeRef: (id: string) => (el: HTMLDivElement | null) => void;
-  onHoverStart: (id: string) => void;
-  onHoverEnd: () => void;
+  isHovered: boolean;
 }
 
-/*
-* NodeCard component representing a concept or skill in the learning tree.
-*
-* @param item - The content item (concept or skill) to display.
-* @param completed - Whether the item is completed.
-* @param progress - Progress string to display (e.g., "3/5 exercises completed").
-* @param setNodeRef - Function to set the ref for the node element.
-* @param onHoverStart - Callback when hover starts, receives the item ID.
-* @param onHoverEnd - Callback when hover ends.
-*/
-export function NodeCard({
-  item,
-  completed,
-  progress,
-  setNodeRef,
-  onHoverStart,
-  onHoverEnd,
-}: NodeCardProps) {
+export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
   const type = item.type;
-  const Icon = type === "concept" ? MenuBook : Build;
-  const hoverTimerRef = useRef<number | null>(null);
+  const width = 160;
+  const height = 80;
+  const cornerRadius = type === "concept" ? 4 : 12;
 
-  const handleMouseEnter = () => {
-    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
-    onHoverStart(item.id);
-  };
+  // Calculate rectangle bounds from position (top-left corner)
+  const rectStart = new Vector(item.position.x, item.position.y);
+  const rectEnd = new Vector(item.position.x + width, item.position.y + height);
 
-  const handleMouseLeave = () => {
-    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
-    hoverTimerRef.current = window.setTimeout(() => onHoverEnd(), 60);
-  };
+  // Calculate center position for text
+  const centerX = item.position.x + width / 2;
+  const centerY = item.position.y + height / 2;
 
   return (
-    <Box
-      ref={setNodeRef(item.id)}
-      sx={{
-        width: 160,
-        zIndex: 1,
-      }}
-    >
-      <Link
-        to={`/${type}/${item.id}`}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <Tooltip
-          title={item.description}
-          placement="top"
-          arrow
-          enterDelay={500}
-          leaveDelay={200}
+    <>
+      <Rectangle
+        dimensions={{ start: rectStart, end: rectEnd }}
+        cornerRadius={cornerRadius}
+        style={{
+          fill: isHovered ? "#f5f5f5" : "#fff",
+          stroke: isHovered ? "#1976d2" : "#e0e0e0",
+          strokeWidth: 1,
+          transition: "fill 90ms, stroke 90ms",
+        }}
+      />
+      <Element position={new Vector(centerX, centerY)}>
+        <span
+          style={{
+            color: completed ? "#757575" : "#212121",
+            fontWeight: 500,
+            textAlign: "center",
+            display: "block",
+            fontSize: "0.95rem",
+            wordWrap: "break-word",
+            whiteSpace: "normal",
+            width: `${width - 10}px`,
+            lineHeight: "1.2",
+          }}
         >
-          <Card
-            variant={completed ? "outlined" : undefined}
-            sx={{
-              width: "100%",
-              height: 80,
-              display: "flex",
-              flexDirection: "column",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: type === "concept" ? 1 : 3,
-              transition:
-                "box-shadow 90ms cubic-bezier(.2,.7,.2,1), border-color 90ms cubic-bezier(.2,.7,.2,1), background-color 90ms cubic-bezier(.2,.7,.2,1)",
-              backgroundColor: "background.paper",
-              cursor: "pointer",
-              "&:hover": {
-                boxShadow: 4,
-                borderColor: "primary.light",
-                backgroundColor: "action.hover",
-              },
-            }}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <CardContent
-              sx={{
-                p: 1,
-                flexGrow: 1,
-                minHeight: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Box sx={{ textAlign: "center" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 0.5,
-                    mb: 0.5,
-                  }}
-                >
-                  <Icon
-                    fontSize="small"
-                    color={type === "concept" ? "action" : "primary"}
-                  />
-                  {completed && (
-                    <Tooltip
-                      disableInteractive
-                      title={type === "concept" ? "Understood" : "Mastered"}
-                    >
-                      <CheckCircle color="success" fontSize="small" />
-                    </Tooltip>
-                  )}
-                </Box>
-                <Typography
-                  variant="body2"
-                  component="h3"
-                  sx={{
-                    fontWeight: 500,
-                    color: completed ? "text.secondary" : "text.primary",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {item.name}
-                </Typography>
-                {progress && (
-                  <Typography
-                    variant="caption"
-                    color="primary"
-                    sx={{
-                      display: "block",
-                      fontWeight: 600,
-                      fontSize: "0.65rem",
-                    }}
-                  >
-                    {progress}
-                  </Typography>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Tooltip>
-      </Link>
-    </Box>
+          {item.name}
+        </span>
+      </Element>
+    </>
   );
 }
+
