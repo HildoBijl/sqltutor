@@ -74,7 +74,7 @@ export interface ExerciseHelpers {
   randomInt(min: number, max: number): number;
 }
 
-export interface CheckInputArgs<Exercise, Input, Result> {
+export interface ExerciseAttemptContext<Exercise, Input, Result> {
   exercise: Exercise;
   input: Input;
   normalizedInput: string;
@@ -83,11 +83,10 @@ export interface CheckInputArgs<Exercise, Input, Result> {
   helpers: ExerciseHelpers;
 }
 
-export type ValidateInputArgs<Exercise, Input, Result> = CheckInputArgs<Exercise, Input, Result>;
+export type ValidateInputArgs<Exercise, Input, Result> = ExerciseAttemptContext<Exercise, Input, Result>;
 
 export interface SimpleExerciseConfig<Exercise, Input, Result, Demo = unknown> {
   generateExercise: (helpers: ExerciseHelpers) => Exercise;
-  checkInput: (args: CheckInputArgs<Exercise, Input, Result>) => VerificationResult;
   validateInput?: (args: ValidateInputArgs<Exercise, Input, Result>) => ValidationResult;
   runDemo?: (args: { exercise: Exercise; helpers: ExerciseHelpers }) => Demo;
   deriveSolution?: (args: { exercise: Exercise; verification?: VerificationResult }) => string | null | undefined;
@@ -328,23 +327,15 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
           };
         }
 
-        const verification =
-          action.verification !== undefined && action.verification !== null
-            ? action.verification
-            : config.checkInput({
-                exercise: state.exercise,
-                input: action.input,
-                normalizedInput,
-                result: action.result,
-                previousAttempts: attempts,
-                helpers,
-              });
+        const verification = action.verification ?? null;
 
         const isCorrect = !!verification?.correct;
         const status: ExerciseStatus = isCorrect ? 'correct' : 'incorrect';
-        const feedback = verification?.message || (isCorrect
-          ? 'Great job! That answer is correct.'
-          : 'Not quite there yet. Check the requirements and try again.');
+        const feedback = verification?.message || (!verification
+          ? 'We could not verify this submission. Please ensure the exercise supports result verification.'
+          : isCorrect
+              ? 'Great job! That answer is correct.'
+              : 'Not quite there yet. Check the requirements and try again.');
 
         const attempt: ExerciseAttempt<Input> = {
           index: attempts.length,

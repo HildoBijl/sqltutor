@@ -9,7 +9,6 @@ import {
   type ExerciseStatus,
   type ValidationResult,
   type VerificationResult,
-  type CheckInputArgs,
   type ValidateInputArgs,
 } from './exerciseEngine';
 
@@ -28,7 +27,6 @@ export interface SkillExerciseModuleLike {
   generate?: (helpers: ExerciseHelpers) => any;
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
-  checkInput?: (args: CheckInputArgs<any, string, unknown>) => VerificationResult;
   validateOutput?: (exercise: any, result: unknown) => ValidationResult;
   verifyOutput?: (exercise: any, output: unknown) => VerificationResult;
   getSolution?: (exercise: any) => string | null | undefined;
@@ -72,7 +70,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
   const storedProgress = componentState.exerciseProgress as SkillExerciseProgress | undefined;
 
-  const { reducer, validateInputFn, deriveSolution, checkInputFn } = useMemo(() => {
+  const { reducer, validateInputFn, deriveSolution } = useMemo(() => {
     const generateExercise = (exerciseHelpers: ExerciseHelpers) => {
       if (moduleLike?.generate) {
         return moduleLike.generate(exerciseHelpers) || {};
@@ -108,47 +106,6 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
       return applyTemplate(moduleLike.solutionTemplate, exercise || {});
     };
 
-    const checkInput = (args: CheckInputArgs<any, string, unknown>): VerificationResult => {
-      const query = typeof args.input === 'string' ? args.input : '';
-
-      if (moduleLike?.checkInput) {
-        return moduleLike.checkInput(args);
-      }
-
-      if (typeof moduleLike?.validate === 'function') {
-        const isCorrect = moduleLike.validate(query, args.exercise, args.result);
-        const solution = isCorrect ? solveFromTemplate(args.exercise) || args.exercise?.expectedQuery : undefined;
-        return {
-          correct: isCorrect,
-          message: isCorrect ? defaultCorrectMessage(moduleLike?.messages) : defaultIncorrectMessage(moduleLike?.messages),
-          solution,
-        };
-      }
-
-      const expected = args.exercise?.expectedQuery;
-      if (expected) {
-        const matches = args.normalizedInput === normalizeSql(expected);
-        return {
-          correct: matches,
-          message: matches ? defaultCorrectMessage(moduleLike?.messages) : defaultIncorrectMessage(moduleLike?.messages),
-          solution: expected,
-        };
-      }
-
-      const hasRows =
-        Array.isArray(args.result) &&
-        args.result.length > 0 &&
-        Array.isArray((args.result as any)[0]?.values) &&
-        (args.result as any)[0].values.length > 0;
-
-      return {
-        correct: false,
-        message: hasRows
-          ? 'Your query runs, but it does not match the expected pattern yet.'
-          : defaultIncorrectMessage(moduleLike?.messages),
-      };
-    };
-
     const derive = ({ exercise, verification }: { exercise: any; verification?: VerificationResult }) => {
       if (verification?.solution) return verification.solution;
       if (moduleLike?.getSolution && exercise) {
@@ -169,13 +126,11 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         normalizeInput: normalizeSql,
         generateExercise,
         validateInput,
-        checkInput,
         deriveSolution: derive,
         runDemo: moduleLike?.runDemo,
       }),
       validateInputFn: validateInput,
       deriveSolution: derive,
-      checkInputFn: checkInput,
     };
   }, [helpers, moduleLike]);
 
@@ -246,20 +201,6 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     return deriveSolution({ exercise: currentExercise, verification: progress.verification || undefined });
   }, [currentExercise, deriveSolution, progress.verification]);
 
-  const evaluate = useCallback(
-    (input: string, result?: unknown) => {
-      return checkInputFn({
-        exercise: progress.exercise,
-        input,
-        normalizedInput: normalizeSql(input),
-        result,
-        previousAttempts: progress.attempts,
-        helpers,
-      });
-    },
-    [checkInputFn, helpers, progress.attempts, progress.exercise],
-  );
-
   const recordAttempt = useCallback(
     (args: {
       input: string;
@@ -288,8 +229,6 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     solution: derivedSolution,
     dispatch,
     previewValidation,
-    evaluate,
-    checkInput: checkInputFn,
     recordAttempt,
     moduleLike,
   } as const;
