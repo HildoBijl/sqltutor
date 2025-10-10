@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   Container,
   Typography,
   Alert,
@@ -15,6 +14,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Paper,
 } from '@mui/material';
 import { CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
 
@@ -491,113 +491,105 @@ export default function SkillPage() {
         
         {/* Tab Content */}
         {isCurrentTab('practice') && (
-          <CardContent>
+          <Box sx={{ p: 3 }}>
             {/* Exercise Description */}
             {currentExercise && (
-              <Card sx={{ mb: 2 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {(componentState.numSolved || 0) >= requiredCount 
-                      ? `Practice Exercise ${(componentState.numSolved || 0) + 1 - requiredCount}`
-                      : `Exercise ${(componentState.numSolved || 0) + 1}`
-                    }
+              <Paper sx={{ p: 2, mb: 3, bgcolor: 'action.hover' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
+                  {(componentState.numSolved || 0) >= requiredCount 
+                    ? `Practice Exercise ${(componentState.numSolved || 0) + 1 - requiredCount}`
+                    : `Exercise ${(componentState.numSolved || 0) + 1}`
+                  }
+                </Typography>
+                <Typography variant="body1">
+                  {currentExercise.description}
+                </Typography>
+                {tableNames.length > 0 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Available tables: {tableNames.join(', ')}
                   </Typography>
-                  <Typography variant="body1">
-                    {currentExercise.description}
-                  </Typography>
-                </CardContent>
-              </Card>
+                )}
+              </Paper>
             )}
 
-            {/* SQL Editor */}
-            <Card sx={{ mb: 2 }}>
-              <Box sx={{
-                p: 1,
-                borderBottom: 1,
-                borderColor: 'divider',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Typography variant="subtitle2">
-                    Write your SQL query:
-                  </Typography>
-                  {tableNames.length > 0 && (
-                    <Typography variant="caption" color="text.secondary">
-                      Tables: {tableNames.join(', ')}
-                    </Typography>
-                  )}
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  onClick={handleAutoComplete}
+                  startIcon={<Lightbulb />}
+                  disabled={!currentExercise || isExecuting}
+                  variant="outlined"
+                >
+                  Show Solution
+                </Button>
+                <Button
+                  size="small"
+                  startIcon={<RestartAlt />}
+                  onClick={handleResetDatabase}
+                  disabled={!dbReady || isExecuting}
+                  title="Reset the current exercise database"
+                  variant="outlined"
+                >
+                  Reset Database
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {!exerciseCompleted ? (
                   <Button
                     size="small"
-                    onClick={handleAutoComplete}
-                    startIcon={<Lightbulb />}
-                    disabled={!currentExercise || isExecuting}
+                    startIcon={<Refresh />}
+                    onClick={handleNewExercise}
+                    disabled={isExecuting}
+                    title="Finish the current exercise to unlock a new one"
+                    variant="outlined"
                   >
-                    Show Solution
+                    Try Another
                   </Button>
-                  <Button
-                    size="small"
-                    startIcon={<RestartAlt />}
-                    onClick={handleResetDatabase}
-                    disabled={!dbReady || isExecuting}
-                    title="Reset the current exercise database"
-                  >
-                    Reset Database
-                  </Button>
-                  {!exerciseCompleted ? (
-                    <Button
-                      size="small"
-                      startIcon={<Refresh />}
-                      onClick={handleNewExercise}
-                      disabled={isExecuting}
-                      title="Finish the current exercise to unlock a new one"
-                    >
-                      Try Another
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<ArrowForward />}
-                      onClick={handleNewExercise}
-                      title="Proceed to the next exercise"
-                    >
-                      Next Exercise
-                    </Button>
-                  )}
+                ) : (
                   <Button
                     variant="contained"
                     size="small"
-                    startIcon={<CheckCircle />}
-                    onClick={() => { void handleExecute(); }}
-                    disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
+                    startIcon={<ArrowForward />}
+                    onClick={handleNewExercise}
+                    title="Proceed to the next exercise"
                   >
-                    Submit Answer
+                    Next Exercise
                   </Button>
-                </Box>
+                )}
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<CheckCircle />}
+                  onClick={() => { void handleExecute(); }}
+                  disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
+                >
+                  Submit Answer
+                </Button>
               </Box>
-              <CardContent sx={{ p: 0 }}>
-                <SQLEditor
-                  value={query}
-                  onChange={setQuery}
-                  height="200px"
-                  onExecute={handleExecute}
-                  onLiveExecute={handleLiveExecute}
-                  enableLiveExecution={true}
-                  liveExecutionDelay={500}
-                  showResults={false}
-                />
-              </CardContent>
-            </Card>
+            </Box>
 
-            {/* Feedback Alert - Persistent and close to input */}
+            {/* SQL Editor - No extra wrapper */}
+            <Box sx={{ mb: 3 }}>
+              <SQLEditor
+                value={query}
+                onChange={setQuery}
+                height="200px"
+                onExecute={handleExecute}
+                onLiveExecute={handleLiveExecute}
+                enableLiveExecution={true}
+                liveExecutionDelay={500}
+                showResults={false}
+              />
+            </Box>
+
+            {/* Feedback Alert */}
             {feedback && (
               <Alert
                 severity={feedback.type}
-                sx={{ mb: 2 }}
+                sx={{ mb: 3 }}
                 onClose={() => setFeedback(null)}
               >
                 {feedback.message}
@@ -606,75 +598,76 @@ export default function SkillPage() {
             {!feedback && queryError && (
               <Alert
                 severity="error"
-                sx={{ mb: 2 }}
+                sx={{ mb: 3 }}
               >
                 {queryError instanceof Error ? queryError.message : 'Query execution failed'}
               </Alert>
             )}
 
             {/* Results */}
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Query Results
-                </Typography>
-                {queryResult && queryResult.length > 0 ? (
-                  <DataTable data={queryResult[0]} />
-                ) : queryError ? (
-                  <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                    {/* Error shown in feedback above */}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Query Results
+              </Typography>
+              {queryResult && queryResult.length > 0 ? (
+                <DataTable data={queryResult[0]} />
+              ) : queryError ? (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                  <Typography color="text.secondary">
                     No results due to query error
                   </Typography>
-                ) : (
-                  <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+                </Paper>
+              ) : (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                  <Typography color="text.secondary">
                     Run your query to see results
                   </Typography>
-                )}
-              </CardContent>
-            </Card>
+                </Paper>
+              )}
+            </Box>
+
+            {/* Solution */}
             {exerciseCompleted && exerciseSolution && (
-              <Card sx={{ mt: 2 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Solution
+              <Paper sx={{ mt: 3, p: 2, bgcolor: 'success.light' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'success.dark' }}>
+                  Solution
+                </Typography>
+                <Paper sx={{ p: 2, bgcolor: 'background.paper' }}>
+                  <Typography
+                    component="pre"
+                    sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}
+                  >
+                    {exerciseSolution}
                   </Typography>
-                  <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
-                    <Typography
-                      component="pre"
-                      sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}
-                    >
-                      {exerciseSolution}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
+                </Paper>
+              </Paper>
             )}
-          </CardContent>
+          </Box>
         )}
 
         {/* Theory Tab */}
         {isCurrentTab('theory') && (
-          <CardContent>
+          <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Theory
             </Typography>
             {renderContent(TheoryContent, 'Theory coming soon.')}
-          </CardContent>
+          </Box>
         )}
 
         {/* Story Tab */}
         {isCurrentTab('story') && (
-          <CardContent>
+          <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Story
             </Typography>
             {renderContent(StoryContent, 'Story coming soon.')}
-          </CardContent>
+          </Box>
         )}
 
         {/* Data Explorer Tab */}
         {isCurrentTab('data') && (
-          <CardContent>
+          <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Data Explorer
             </Typography>
@@ -685,7 +678,7 @@ export default function SkillPage() {
                 Database is loading...
               </Typography>
             )}
-          </CardContent>
+          </Box>
         )}
       </Card>
 
