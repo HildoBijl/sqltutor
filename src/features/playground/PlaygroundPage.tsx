@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -62,7 +62,7 @@ export default function PlaygroundPage() {
   );
 
   // Handle live query execution (for preview results)
-  const handleLiveExecute = async (liveQuery: string) => {
+  const handleLiveExecute = useCallback(async (liveQuery: string) => {
     if (!isReady || !liveQuery.trim()) return;
     
     try {
@@ -73,7 +73,7 @@ export default function PlaygroundPage() {
       // No need to handle it here since the error will be displayed in the Results section
       console.debug('Live query execution failed:', error);
     }
-  };
+  }, [isReady, executeQuery]);
 
   // Handle actual execution (with history and messages)
   const handleExecute = async () => {
