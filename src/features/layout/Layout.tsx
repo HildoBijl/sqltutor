@@ -15,7 +15,6 @@ import {
   Divider,
 } from '@mui/material';
 import {
-  Home as HomeIcon,
   School as LearnIcon,
   PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
@@ -30,7 +29,6 @@ export function Layout() {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', label: 'Home', icon: HomeIcon },
     { path: '/learn', label: 'Learn', icon: LearnIcon },
     { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
   ];
