@@ -41,25 +41,30 @@ export function SkillTree({
   visiblePaths,
   isCompleted,
   // getProgress,
-  // setHoveredId,
+  setHoveredId,
   containerRef,
   // nodeRefs,
 }: SkillTreeProps) {
-  // const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
+  const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
 
   // const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
   //   nodeRefs.current?.set(id, el);
   // };
 
-  // const handleHoverStart = (id: string) => {
-  //   setLocalHoveredId(id);
-  //   setHoveredId(id);
-  // };
+  const handleHoverStart = (id: string) => {
+    setLocalHoveredId(id);
+    setHoveredId(id);
+  };
 
-  // const handleHoverEnd = () => {
-  //   setLocalHoveredId(null);
-  //   setHoveredId(null);
-  // };
+  const handleHoverEnd = () => {
+    setLocalHoveredId(null);
+    setHoveredId(null);
+  };
+
+  const handleNodeClick = (item: ContentMeta) => {
+    const path = item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
+    window.location.href = path;
+  };
 
   return (
     <div
@@ -91,12 +96,19 @@ export function SkillTree({
 
         {/* Node rectangles - rendered in SVG layer */}
         {contentItems.map((item) => (
-          <NodeCard
+          <g
             key={item.id}
-            item={item}
-            completed={isCompleted(item.id)}
-            isHovered={false}
-          />
+            onMouseEnter={() => handleHoverStart(item.id)}
+            onMouseLeave={handleHoverEnd}
+            onClick={() => handleNodeClick(item)}
+            style={{ cursor: "pointer" }}
+          >
+            <NodeCard
+              item={item}
+              completed={isCompleted(item.id)}
+              isHovered={localHoveredId === item.id}
+            />
+          </g>
         ))}
       </Drawing>
     </div>

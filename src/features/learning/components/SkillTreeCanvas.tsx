@@ -1,5 +1,4 @@
 import { RefObject } from "react";
-import { Box } from "@mui/material";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ContentMeta } from "@/features/content";
 import { SkillTree } from "./SkillTree";
@@ -50,16 +49,15 @@ export function SkillTreeCanvas({
   nodeRefs,
 }: SkillTreeCanvasProps) {
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         width: "100%",
         height: "calc(100vh - 120px)",
         minHeight: "600px",
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 2,
+        border: "1px solid #e0e0e0",
+        borderRadius: "8px",
         overflow: "hidden",
-        backgroundColor: "background.default",
+        backgroundColor: "#ffffff",
         position: "relative",
       }}
     >
@@ -81,7 +79,7 @@ export function SkillTreeCanvas({
         }}
       >
         {({ zoomIn, zoomOut, resetTransform, centerView }) => (
-          <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <ZoomControls
               onZoomIn={zoomIn}
               onZoomOut={zoomOut}
@@ -110,9 +108,9 @@ export function SkillTreeCanvas({
                 nodeRefs={nodeRefs}
               />
             </TransformComponent>
-          </Box>
+          </div>
         )}
       </TransformWrapper>
-    </Box>
+    </div>
   );
 }

@@ -34,7 +34,7 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
         cornerRadius={cornerRadius}
         style={{
           fill: isHovered ? "#f5f5f5" : "#fff",
-          stroke: isHovered ? "#1976d2" : "#e0e0e0",
+          stroke: isHovered ? "#ff0000" : "#e0e0e0",
           strokeWidth: 1,
           transition: "fill 90ms, stroke 90ms",
         }}
@@ -59,4 +59,3 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
     </>
   );
 }
-
