@@ -1,5 +1,7 @@
 import { ContentMeta } from "@/features/content";
-import { Rectangle, Element } from "@/components/figures/Drawing";
+import { Rectangle } from "@/components/figures/Drawing";
+// @ts-ignore - SvgPortal is a JavaScript module without type definitions
+import { SvgPortal } from "@/components/figures/Drawing/DrawingContext";
 // @ts-ignore - Vector is a JavaScript module without type definitions
 import { Vector } from "@/util/geometry/Vector";
 
@@ -11,6 +13,30 @@ interface NodeCardProps {
   item: ContentMeta;
   completed: boolean;
   isHovered: boolean;
+}
+
+// Helper function to split text into lines that fit within the width
+function wrapText(text: string, maxWidth: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+
+  // Should be based on font size, this is an estimate for 0.95 rem
+  const avgCharWidth = 7;
+  const maxCharsPerLine = Math.floor(maxWidth / avgCharWidth);
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (testLine.length <= maxCharsPerLine) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  return lines;
 }
 
 export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
@@ -27,6 +53,12 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
   const centerX = item.position.x + width / 2;
   const centerY = item.position.y + height / 2;
 
+  // Wrap text to fit in the node card
+  const lines = wrapText(item.name, width - 20);
+  const lineHeight = 16; 
+  const totalHeight = lines.length * lineHeight;
+  const startY = centerY - totalHeight / 2 + lineHeight / 2;
+
   return (
     <>
       <Rectangle
@@ -39,23 +71,27 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
           transition: "fill 90ms, stroke 90ms",
         }}
       />
-      <Element position={new Vector(centerX, centerY)}>
-        <span
+      <SvgPortal>
+        <text
+          x={centerX}
+          y={startY}
+          textAnchor="middle"
+          dominantBaseline="middle"
           style={{
-            color: completed ? "#757575" : "#212121",
+            fill: completed ? "#757575" : "#212121",
             fontWeight: 500,
-            textAlign: "center",
-            display: "block",
             fontSize: "0.95rem",
-            wordWrap: "break-word",
-            whiteSpace: "normal",
-            width: `${width - 10}px`,
-            lineHeight: "1.2",
+            pointerEvents: "none",
+            userSelect: "none",
           }}
         >
-          {item.name}
-        </span>
-      </Element>
+          {lines.map((line, i) => (
+            <tspan key={i} x={centerX} dy={i === 0 ? 0 : lineHeight}>
+              {line}
+            </tspan>
+          ))}
+        </text>
+      </SvgPortal>
     </>
   );
 }
