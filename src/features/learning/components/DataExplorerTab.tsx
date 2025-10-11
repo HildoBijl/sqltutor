@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
-  Tabs,
-  Tab,
   Typography,
   Card,
   CardContent,
   Grid,
   Chip,
-  Divider
+  Divider,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
-import { TableChart, AccountTree } from '@mui/icons-material';
+import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/shared/components/DataTable';
 import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
@@ -43,8 +46,8 @@ interface Relationship {
 }
 
 export function DataExplorerTab({ schema }: DataExplorerTabProps) {
-  const [selectedSubTab, setSelectedSubTab] = useState(0);
   const [selectedTable, setSelectedTable] = useState<string>('');
+  const [isErDiagramOpen, setIsErDiagramOpen] = useState(false);
   
   const { tableNames, executeQuery, queryResult } = useDatabase({
     context: 'concept',
@@ -68,10 +71,6 @@ export function DataExplorerTab({ schema }: DataExplorerTabProps) {
     }
   }, [tableNames, selectedTable, executeQuery]);
 
-  const handleSubTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setSelectedSubTab(newValue);
-  };
-
   const handleTableSelect = (tableName: string) => {
     setSelectedTable(tableName);
     // Execute SELECT * to show table data
@@ -79,41 +78,53 @@ export function DataExplorerTab({ schema }: DataExplorerTabProps) {
   };
 
   return (
-    <Box>
-      {/* Sub-tabs for ER Diagram and Table Data */}
-      <Paper sx={{ mb: 2 }}>
-        <Tabs 
-          value={selectedSubTab} 
-          onChange={handleSubTabChange}
-          variant="fullWidth"
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1.5,
+          alignItems: { xs: 'flex-start', sm: 'center' },
+        }}
+      >
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h6">Table Data Browser</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Inspect table contents and explore sample rows.
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          startIcon={<AccountTree />}
+          onClick={() => setIsErDiagramOpen(true)}
         >
-          <Tab 
-            icon={<AccountTree />} 
-            label="ER Diagram" 
-            iconPosition="start"
-          />
-          <Tab 
-            icon={<TableChart />} 
-            label="Table Data" 
-            iconPosition="start"
-          />
-        </Tabs>
-      </Paper>
+          View ER Diagram
+        </Button>
+      </Box>
 
-      {/* ER Diagram Tab */}
-      {selectedSubTab === 0 && (
-        <ERDiagramView tableInfo={tableInfo} />
-      )}
+      <TableDataView 
+        tableNames={tableNames}
+        selectedTable={selectedTable}
+        onTableSelect={handleTableSelect}
+        queryResult={queryResult}
+      />
 
-      {/* Table Data Tab */}
-      {selectedSubTab === 1 && (
-        <TableDataView 
-          tableNames={tableNames}
-          selectedTable={selectedTable}
-          onTableSelect={handleTableSelect}
-          queryResult={queryResult}
-        />
-      )}
+      <Dialog
+        open={isErDiagramOpen}
+        onClose={() => setIsErDiagramOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>Entity Relationship Diagram</DialogTitle>
+        <DialogContent dividers>
+          <ERDiagramView tableInfo={tableInfo} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsErDiagramOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
@@ -259,47 +270,72 @@ function TableDataView({
   queryResult: any[] | null;
 }) {
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Table Data Browser
-      </Typography>
-      
-      {/* Table selector */}
-      <Paper sx={{ p: 2, mb: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box>
         <Typography variant="subtitle2" gutterBottom>
-          Select a table to view its data:
+          Tables
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {tableNames.map((tableName) => (
-            <Chip
-              key={tableName}
-              label={tableName}
-              onClick={() => onTableSelect(tableName)}
-              color={selectedTable === tableName ? 'primary' : 'default'}
-              variant={selectedTable === tableName ? 'filled' : 'outlined'}
-              clickable
-            />
-          ))}
-        </Box>
-      </Paper>
-      
-      {/* Table data */}
-      {selectedTable && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              {selectedTable} Table
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flexWrap: 'wrap',
+            p: 1.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+          }}
+        >
+          {tableNames.length > 0 ? (
+            tableNames.map((tableName) => (
+              <Chip
+                key={tableName}
+                label={tableName}
+                onClick={() => onTableSelect(tableName)}
+                color={selectedTable === tableName ? 'primary' : 'default'}
+                variant={selectedTable === tableName ? 'filled' : 'outlined'}
+                clickable
+              />
+            ))
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No tables available for this schema.
             </Typography>
-            {queryResult && queryResult.length > 0 ? (
+          )}
+        </Box>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" gutterBottom>
+          Preview
+        </Typography>
+        <Box
+          sx={{
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+            overflow: 'hidden',
+          }}
+        >
+          {selectedTable ? (
+            queryResult && queryResult.length > 0 ? (
               <DataTable data={queryResult[0]} />
             ) : (
-              <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                Click on a table to view its data
+              <Box sx={{ py: 4, textAlign: 'center' }}>
+                <Typography color="text.secondary">
+                  Click on a table to view its data.
+                </Typography>
+              </Box>
+            )
+          ) : (
+            <Box sx={{ py: 4, textAlign: 'center' }}>
+              <Typography color="text.secondary">
+                Select a table to load its rows.
               </Typography>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            </Box>
+          )}
+        </Box>
+      </Box>
     </Box>
   );
 }
@@ -390,5 +426,3 @@ function parseSchemaForERDiagram(schemaSQL: string): TableInfo[] {
   
   return tables;
 }
-
-
