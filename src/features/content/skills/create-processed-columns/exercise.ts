@@ -27,10 +27,12 @@ interface ScenarioDefinition {
   buildState(): CreateProcessedColumnsState;
 }
 
+type ExpectedValueStore = Record<string, unknown> | Map<string, unknown>;
+
 export interface CreateProcessedColumnsState {
   scenario: ScenarioId;
   columns: [string, string];
-  expectedValues: Map<string, unknown>;
+  expectedValues: ExpectedValueStore;
 }
 
 export interface ExerciseState {
@@ -75,13 +77,13 @@ const SCENARIOS: ScenarioDefinition[] = [
     id: 'processed-columns-employees',
     description: MESSAGES.descriptions['processed-columns-employees'],
     buildState(): CreateProcessedColumnsState {
-      const expectedValues = new Map<string, unknown>();
+      const expectedValues: Record<string, number | null> = {};
 
       COMPANIES.forEach((company) => {
         const value = company.num_employees === null
           ? null
           : Math.round(((company.num_employees ?? 0) / 1000) * 10) / 10;
-        expectedValues.set(company.company_name, value);
+        expectedValues[company.company_name] = value;
       });
 
       return {
@@ -95,11 +97,11 @@ const SCENARIOS: ScenarioDefinition[] = [
     id: 'processed-columns-age',
     description: MESSAGES.descriptions['processed-columns-age'],
     buildState(): CreateProcessedColumnsState {
-      const expectedValues = new Map<string, unknown>();
+      const expectedValues: Record<string, number | null> = {};
 
       COMPANIES.forEach((company) => {
         const value = company.founded_year === null ? null : 2024 - company.founded_year;
-        expectedValues.set(company.company_name, value);
+        expectedValues[company.company_name] = value;
       });
 
       return {
@@ -187,7 +189,7 @@ export function verifyOutput(
 
   const nameIndex = 0;
   const valueIndex = 1;
-  const expected = exercise.state.expectedValues;
+  const expected = normalizeExpectedValues(exercise.state.expectedValues);
   const seen = new Set<string>();
 
   for (const row of firstResult.values) {
@@ -252,4 +254,17 @@ export function getSolution(exercise: ExerciseState): string {
 
 function stringify(value: unknown): string {
   return value === null || value === undefined ? '' : String(value);
+}
+
+function normalizeExpectedValues(store: ExpectedValueStore | undefined | null): Map<string, unknown> {
+  if (store instanceof Map) {
+    return store;
+  }
+  const map = new Map<string, unknown>();
+  if (store && typeof store === 'object') {
+    for (const [key, value] of Object.entries(store)) {
+      map.set(key, value);
+    }
+  }
+  return map;
 }
