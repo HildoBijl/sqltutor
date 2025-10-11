@@ -496,9 +496,9 @@ export default function SkillPage() {
             {currentExercise && (
               <Paper sx={{ p: 2, mb: 3, bgcolor: 'action.hover' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
-                  {(componentState.numSolved || 0) >= requiredCount 
-                    ? `Practice Exercise ${(componentState.numSolved || 0) + 1 - requiredCount}`
-                    : `Exercise ${(componentState.numSolved || 0) + 1}`
+                  {(componentState.numSolved || 0) >= requiredCount
+                    ? 'Practice Exercise'
+                    : 'Exercise'
                   }
                 </Typography>
                 <Typography variant="body1">
