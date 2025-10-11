@@ -17,12 +17,12 @@ export function useTreeBounds(contentItems: ContentMeta[]) {
   return useMemo(() => {
     // Hardcoded bounds for testing
     return {
-      minX: 0,
+      minX: -200,
       minY: 0,
       maxX: 1800,
       maxY: 1200,
-      width: 1600,
-      height: 900
+      width: 1800,
+      height: 1200
     };
 
     // Original dynamic calculation (commented out)
