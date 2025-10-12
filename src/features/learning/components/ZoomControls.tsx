@@ -72,7 +72,7 @@ export function ZoomControls({
           ⟲
         </Button>
       </Tooltip>
-      <Tooltip title="Center View" placement="left">
+      {/* <Tooltip title="Center View" placement="left">
         <Button
           variant="outlined"
           size="small"
@@ -81,7 +81,7 @@ export function ZoomControls({
         >
           ◉
         </Button>
-      </Tooltip>
+      </Tooltip> */}
     </Box>
   );
 }
