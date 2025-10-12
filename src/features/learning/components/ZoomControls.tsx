@@ -23,7 +23,7 @@ export function ZoomControls({
   onZoomIn,
   onZoomOut,
   onReset,
-  onCenter,
+  // onCenter,
   zoomStep = 0.15,
 }: ZoomControlsProps) {
   return (

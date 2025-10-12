@@ -1,6 +1,8 @@
 import { RefObject, useState } from "react";
 import { ContentMeta } from "@/features/content";
-import { Drawing } from "@/components/figures/Drawing";
+import { Drawing, Curve } from "@/components/figures/Drawing";
+// @ts-ignore - Vector is a JavaScript module without type definitions
+import type { Vector } from "@/util/geometry/Vector";
 import { NodeCard } from "./NodeCard";
 
 /*
@@ -10,7 +12,7 @@ import { NodeCard } from "./NodeCard";
 *
 * @param contentItems - Array of content items (concepts and skills) to display.
 * @param treeBounds - The bounding box of the tree layout.
-* @param visiblePaths - Array of SVG path data for visible connectors between nodes.
+* @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
 * @param isCompleted - Function to check if a content item is completed.
 * @param getProgress - Function to get progress string for a content item.
 * @param setHoveredId - Function to set the hovered node ID.
@@ -27,7 +29,7 @@ interface SkillTreeProps {
     width: number;
     height: number;
   };
-  visiblePaths: { d: string; from: string; to: string }[];
+  visiblePaths: { points: typeof Vector[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
   getProgress: (id: string) => string | null;
   setHoveredId: (id: string | null) => void;
@@ -82,19 +84,17 @@ export function SkillTree({
         useSvg={true}
         useCanvas={false}
       >
-        {/* SVG connector paths - rendered in Drawing's SVG layer */}
-        {visiblePaths.map((p, i) => (
-          <path
+        {/* The lines between skills and concepts */}
+        {visiblePaths.map((connector, i) => (
+          <Curve
             key={i}
-            d={p.d}
-            stroke="#9aa0a6"
-            strokeWidth={1.5}
-            fill="none"
-            strokeLinecap="round"
+            points={connector.points}
+            color="#9aa0a6"
+            size={1.5}
           />
         ))}
 
-        {/* Node rectangles - rendered in SVG layer */}
+        {/* Rectangles in the SVG layer */}
         {contentItems.map((item) => (
           <g
             key={item.id}

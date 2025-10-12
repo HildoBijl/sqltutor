@@ -13,7 +13,6 @@ import { useTreeConnectors } from "./hooks/useTreeConnectors";
 export default function LearningOverviewPage() {
   const components = useAppStore((state) => state.components);
   const contentItems = useMemo(() => learningContentIndex, []);
-  const showAll = true; 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -26,14 +25,7 @@ export default function LearningOverviewPage() {
 
   const treeBounds = useTreeBounds(contentItems);
 
-  const visiblePaths = useTreeConnectors(
-    contentItems,
-    containerRef,
-    nodeRefs,
-    hoveredId,
-    showAll,
-    components
-  );
+  const visiblePaths = useTreeConnectors(contentItems);
 
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>

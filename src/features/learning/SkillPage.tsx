@@ -1,5 +1,4 @@
-import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useMemo } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,

@@ -1,26 +1,29 @@
+import { ContentMeta } from "@/features/content";
+// @ts-ignore - Vector is a JavaScript module without type definitions
+import { Vector } from "@/util/geometry/Vector";
+
 /*
-* Utility function to compute SVG path data for connectors between nodes in the skill tree.   
-* @param fromEl - The HTMLDivElement of the starting node.  
-* @param toEl - The HTMLDivElement of the ending node.  
-* @param container - The container HTMLDivElement that holds the entire tree layout.  
-* @param cRect - The bounding client rect of the container element.  
-* @returns A string representing the SVG path 'd' attribute for the connector line.
-* 
-* Note: The quadratic curves function is Claude generated. 
+* Utility function to compute points for curved connectors between nodes in the skill tree.
+* Uses the Drawing library coordinate system directly from item positions.
+* Returns an array of Vector points that form a smooth curved path.
+*
+* @param fromItem - The starting content item (prerequisite).
+* @param toItem - The ending content item (dependent).
+* @returns An array of Vector points representing the curved connector path.
 */
 export function computeConnectorPath(
-  fromEl: HTMLDivElement,
-  toEl: HTMLDivElement,
-  container: HTMLDivElement,
-  cRect: DOMRect
-): string {
-  const a = fromEl.getBoundingClientRect();
-  const b = toEl.getBoundingClientRect();
+  fromItem: ContentMeta,
+  toItem: ContentMeta
+): typeof Vector[] {
+  // Card dimensions (must match NodeCard.tsx)
+  const cardWidth = 160;
+  const cardHeight = 80;
 
-  const x1 = a.left - cRect.left + a.width / 2 + (container.scrollLeft || 0);
-  const rawY1 = a.bottom - cRect.top + (container.scrollTop || 0);
-  const x2 = b.left - cRect.left + b.width / 2 + (container.scrollLeft || 0);
-  const rawY2 = b.top - cRect.top + (container.scrollTop || 0);
+  // Calculate center positions
+  const x1 = fromItem.position.x + cardWidth / 2;
+  const rawY1 = fromItem.position.y + cardHeight; // Bottom of from-card
+  const x2 = toItem.position.x + cardWidth / 2;
+  const rawY2 = toItem.position.y; // Top of to-card
 
   // Leave a small gap so lines don't touch/overlap nodes
   const distance = rawY2 - rawY1;
@@ -35,17 +38,35 @@ export function computeConnectorPath(
   const midY = (y1 + y2) / 2;
   const radius = 10; // Curve radius in pixels
 
-  // Use quadratic curves at corners
-  const d = `
-    M ${x1} ${y1}
-    L ${x1} ${midY - radius}
-    Q ${x1} ${midY} ${x1 + Math.sign(x2 - x1) * radius} ${midY}
-    L ${x2 - Math.sign(x2 - x1) * radius} ${midY}
-    Q ${x2} ${midY} ${x2} ${midY + radius}
-    L ${x2} ${y2}
-  `
-    .replace(/\s+/g, " ")
-    .trim();
+  // Build points array for the curved path
+  // The Drawing library's Curve component will smooth these points
+  const points = [];
 
-  return d;
+  // Start point (bottom of from-card)
+  points.push(new Vector(x1, y1));
+
+  // Vertical segment going down
+  points.push(new Vector(x1, midY - radius));
+
+  // Horizontal transition point (curve corner)
+  const xDirection = Math.sign(x2 - x1);
+  points.push(new Vector(x1 + xDirection * radius, midY));
+
+  // If there's significant horizontal distance, add midpoint
+  const horizontalDistance = Math.abs(x2 - x1);
+  if (horizontalDistance > radius * 4) {
+    const midX = (x1 + x2) / 2;
+    points.push(new Vector(midX, midY));
+  }
+
+  // Horizontal to vertical transition point (curve corner)
+  points.push(new Vector(x2 - xDirection * radius, midY));
+
+  // Vertical segment going up
+  points.push(new Vector(x2, midY + radius));
+
+  // End point (top of to-card)
+  points.push(new Vector(x2, y2));
+
+  return points;
 }

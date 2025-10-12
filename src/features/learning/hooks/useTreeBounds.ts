@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { ContentMeta } from "@/features/content";
 
-// Constants for card dimensions and tree padding
-const CARD_WIDTH = 160;
-const CARD_HEIGHT_CONCEPT = 60;
-const CARD_HEIGHT_SKILL = 80;
-const TREE_PADDING = 40;
+// Constants for card dimensions and tree padding (unused in hardcoded version)
+// const CARD_WIDTH = 160;
+// const CARD_HEIGHT_CONCEPT = 60;
+// const CARD_HEIGHT_SKILL = 80;
+// const TREE_PADDING = 40;
 
 /*
 * Calculate the bounding box of a set of content items in a tree layout.
