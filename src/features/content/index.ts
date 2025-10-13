@@ -201,6 +201,7 @@ export const contentComponents: Record<string, ContentComponentMap> = {
     Theory: lazy(() => import('./concepts/database/Theory')),
     Summary: lazy(() => import('./concepts/database/Summary')),
     Story: lazy(() => import('./concepts/database/Story')),
+    Video: lazy(() => import('./concepts/database/Video')),
   },
   'database-table': {
     Theory: lazy(() => import('./concepts/database-table/Theory')),

@@ -17,6 +17,7 @@ import {
   School,
   Lightbulb,
   MenuBook,
+  OndemandVideo,
 } from '@mui/icons-material';
 
 import { useComponentState, useAppStore } from '@/store';
@@ -58,6 +59,7 @@ export default function ConceptPage() {
   const allTabs = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: 'video', label: 'Video', icon: <OndemandVideo /> },
     { key: 'summary', label: 'Summary', icon: <MenuBook /> },
   ];
   
@@ -111,6 +113,7 @@ export default function ConceptPage() {
   const TheoryContent = useContent(conceptMeta?.id, 'Theory');
   const SummaryContent = useContent(conceptMeta?.id, 'Summary');
   const StoryContent = useContent(conceptMeta?.id, 'Story');
+  const VideoContent = useContent(conceptMeta?.id, 'Video');
 
   const renderContent = (
     Component: ReturnType<typeof useContent>,
@@ -171,6 +174,7 @@ export default function ConceptPage() {
             <CardContent>
               <Typography variant="h5" gutterBottom>{tab.label}</Typography>
               {tab.key === 'theory' && renderContent(TheoryContent, 'Theory content coming soon.')}
+              {tab.key === 'video' && renderContent(VideoContent, 'Video coming soon.')}
               {tab.key === 'summary' && renderContent(SummaryContent, 'Summary coming soon.')}
               {tab.key === 'story' && renderContent(StoryContent, 'Story coming soon.')}
             </CardContent>
@@ -198,4 +202,3 @@ export default function ConceptPage() {
     </Container>
   );
 }
-
