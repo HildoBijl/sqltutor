@@ -358,6 +358,9 @@ export const skillExerciseLoaders = {
   'create-pivot-table': () => import('./skills/create-pivot-table/exercise'),
 };
 
+
+// Helper function to calculate incoming and outgoing totals for content items
+// Might be used in the future for skill tree layout - for now, the positioning is manual
 export function calculateOutgoingIncoming(items: ContentMeta[]): ContentMeta[] {
 
   const incomingCount: Record<string, number> = {};

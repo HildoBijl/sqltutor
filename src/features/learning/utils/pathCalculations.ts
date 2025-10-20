@@ -1,7 +1,17 @@
 import { contentIndex, ContentMeta } from "@/features/content";
 // @ts-ignore - Vector is a JavaScript module without type definitions
-import { Vector } from "@/util/geometry/Vector";
+import { Vector } from "@/util/geometry/Vector"; 
 
+/**
+ * Computes horizonatal offsets for multiple outgoing connectors from the same node to avoid overlap.
+ * The offset is calculated based on the x-coordinate of the destination nodes. The leftmost node gets the 
+ * largest negative offset, the rightmost gets the largest positive offset. Equal spacing in between is applied.
+ * 
+ * @param items - Array of all content items in the skill tree. 
+ * @param spacing - Horizontal spacing between connectors. Set manually to match visual style.
+ * @returns - [sopurceId][targetId] = offsetValue 
+ * example of retuned structure: "nodeA": { "nodeB": -20, "nodeC": 0, "nodeD": 20 }
+ */
 export function computeOutgoingOffset(
   items: ContentMeta[],
   spacing = 20
@@ -9,15 +19,18 @@ export function computeOutgoingOffset(
   const offsets: Record<string, Record<string, number>> = {};
 
   for (const from of items) {
+    // Find all dependent nodes (nodes that have this node as prerequisite)
     const outgoing = items
     .filter(to => (to.prerequisites.includes(from.id)))
     .sort((a, b) => a.position.x - b.position.x);
 
     const total = outgoing.length;
+    // Skip if only one outgoing connector
     if (total <= 1 ) continue;
 
     const mid = (total - 1) / 2;
 
+    // Assign offsets based on position in sorted array
     outgoing.forEach((to, i) => {
       const offset = (i - mid) * spacing;
       if (!offsets[from.id]) offsets[from.id] = {};
@@ -28,8 +41,36 @@ export function computeOutgoingOffset(
   return offsets;
 }
 
+// Same structure as outgoing offsets but for incoming connectors
+export function computeIncomingOffset(
+  items: ContentMeta[],
+  spacing = 20
+): Record<string, Record<string, number>> {
+  const offsets: Record<string, Record<string, number>> = {};
 
-const offsets = computeOutgoingOffset(contentIndex);
+  for (const to of items) {
+    const incoming = items
+    .filter((from) => (to.prerequisites.includes(from.id)))
+    .sort((a, b) => a.position.x - b.position.x);
+
+    const total = incoming.length;
+    if (total <= 1 ) continue;
+
+    const mid = (total - 1) / 2;
+
+    incoming.forEach((from, i) => {
+      const offset = (i - mid) * spacing;
+      if (!offsets[to.id]) offsets[to.id] = {};
+      offsets[to.id][from.id] = offset;
+    });
+
+  }
+  return offsets;
+}
+
+
+const outgoingOffsets = computeOutgoingOffset(contentIndex);
+const incomingOffsets = computeIncomingOffset(contentIndex);
 
 
 /*
@@ -43,19 +84,20 @@ const offsets = computeOutgoingOffset(contentIndex);
 */
 export function computeConnectorPath(
   fromItem: ContentMeta,
-  toItem: ContentMeta
+  toItem: ContentMeta,
 ): Vector[] {
 
   // Card dimensions (must match NodeCard.tsx)
   const cardWidth = 160;
   const cardHeight = 80;
 
-  const xOffset = offsets[fromItem.id]?.[toItem.id] ?? 0;
+  const startOffset = outgoingOffsets?.[fromItem.id]?.[toItem.id] ?? 0;
+  const endOffset = incomingOffsets?.[toItem.id]?.[fromItem.id] ?? 0;
 
   // Calculate center positions
-  const x1 = fromItem.position.x + cardWidth / 2 + xOffset;
+  const x1 = fromItem.position.x + cardWidth / 2 + startOffset
   const rawY1 = fromItem.position.y + cardHeight; // Bottom of from-card
-  const x2 = toItem.position.x + cardWidth / 2;
+  const x2 = toItem.position.x + cardWidth / 2 + endOffset;
   const rawY2 = toItem.position.y; // Top of to-card
 
   // Leave a small gap so lines don't touch/overlap nodes
@@ -82,7 +124,7 @@ export function computeConnectorPath(
 
 
   // Control points for the curve
-  if (Math.abs(x2 - x1) > 10) {
+  if (Math.abs(x2 - x1) > 100) {
     points.push(new Vector(x1, y1 + curveOffset));
     points.push(new Vector(x2, y2 - curveOffset));
   } else 
