@@ -67,7 +67,7 @@ export function ZoomControls({
           variant="outlined"
           size="small"
           onClick={() => onReset()}
-          sx={{ minWidth: "40px" }}
+          sx={{ minWidth: "40px", fontSize:'15px' }}
         >
           ⟲
         </Button>
