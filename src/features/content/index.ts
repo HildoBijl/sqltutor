@@ -13,6 +13,10 @@ export interface ContentMeta {
   database?: SchemaKey;
   // Manual positioning for the skill tree 
   position: { x: number; y: number };
+  // Number of incoming edges of the node for the skill tree layout
+  incomingTotal? : number;
+  // Number of outgoing edges of the node for the skill tree layout
+  outgoingTotal? : number;
 }
 
 export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
@@ -353,3 +357,24 @@ export const skillExerciseLoaders = {
   'use-dynamic-aggregation': () => import('./skills/use-dynamic-aggregation/exercise'),
   'create-pivot-table': () => import('./skills/create-pivot-table/exercise'),
 };
+
+export function calculateOutgoingIncoming(items: ContentMeta[]): ContentMeta[] {
+
+  const incomingCount: Record<string, number> = {};
+  const outgoingCount: Record<string, number> = {};
+
+  // incomingCount: how many prerequisites each item has (incoming edges)
+  // outgoingCount: how many items depend on a given item (outgoing edges)
+  for (const item of items) {
+    incomingCount[item.id] = item.prerequisites?.length ?? 0;
+    for (const prereq of item.prerequisites) {
+      outgoingCount[prereq] = (outgoingCount[prereq] ?? 0) + 1;
+    }
+  }
+
+  return items.map((item) => ({
+    ...item,
+    incomingTotal: incomingCount[item.id] ?? 0,
+    outgoingTotal: outgoingCount[item.id] ?? 0,
+  }));
+}

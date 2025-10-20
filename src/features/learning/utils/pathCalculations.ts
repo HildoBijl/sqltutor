@@ -1,6 +1,35 @@
-import { ContentMeta } from "@/features/content";
+import { contentIndex, ContentMeta } from "@/features/content";
 // @ts-ignore - Vector is a JavaScript module without type definitions
 import { Vector } from "@/util/geometry/Vector";
+
+export function computeOutgoingOffset(
+  items: ContentMeta[],
+  spacing = 20
+): Record<string, Record<string, number>> {
+  const offsets: Record<string, Record<string, number>> = {};
+
+  for (const from of items) {
+    const outgoing = items
+    .filter(to => (to.prerequisites.includes(from.id)))
+    .sort((a, b) => a.position.x - b.position.x);
+
+    const total = outgoing.length;
+    if (total <= 1 ) continue;
+
+    const mid = (total - 1) / 2;
+
+    outgoing.forEach((to, i) => {
+      const offset = (i - mid) * spacing;
+      if (!offsets[from.id]) offsets[from.id] = {};
+      offsets[from.id][to.id] = offset;
+    });
+
+  }
+  return offsets;
+}
+
+
+const offsets = computeOutgoingOffset(contentIndex);
 
 
 /*
@@ -15,14 +44,16 @@ import { Vector } from "@/util/geometry/Vector";
 export function computeConnectorPath(
   fromItem: ContentMeta,
   toItem: ContentMeta
-): typeof Vector[] {
+): Vector[] {
 
   // Card dimensions (must match NodeCard.tsx)
   const cardWidth = 160;
   const cardHeight = 80;
 
+  const xOffset = offsets[fromItem.id]?.[toItem.id] ?? 0;
+
   // Calculate center positions
-  const x1 = fromItem.position.x + cardWidth / 2;
+  const x1 = fromItem.position.x + cardWidth / 2 + xOffset;
   const rawY1 = fromItem.position.y + cardHeight; // Bottom of from-card
   const x2 = toItem.position.x + cardWidth / 2;
   const rawY2 = toItem.position.y; // Top of to-card
@@ -44,7 +75,7 @@ export function computeConnectorPath(
 
 
 // Build points array for the curved path
-  const points = [];
+  const points: Vector[] = [];
 
   // Start point (bottom of from-card)
   points.push(new Vector(x1, y1));
@@ -66,3 +97,6 @@ export function computeConnectorPath(
 
   return points;
 }
+
+
+
