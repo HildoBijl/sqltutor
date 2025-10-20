@@ -140,7 +140,7 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
           textAnchor="middle"
           dominantBaseline="middle"
           style={{
-            fill: completed ? "#757575" : "#212121",
+            fill: "#212121",
             fontWeight: 500,
             fontSize: "0.95rem",
             pointerEvents: "none",

@@ -6,19 +6,19 @@ import type { Vector } from "@/util/geometry/Vector";
 import { NodeCard } from "./NodeCard";
 
 /*
-* SkillTree component that renders the tree structure with nodes and connectors.
-* This is a pure rendering component without zoom/pan controls.
-* Uses the Drawing library for coordinate-based positioning.
-*
-* @param contentItems - Array of content items (concepts and skills) to display.
-* @param treeBounds - The bounding box of the tree layout.
-* @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
-* @param isCompleted - Function to check if a content item is completed.
-* @param getProgress - Function to get progress string for a content item.
-* @param setHoveredId - Function to set the hovered node ID.
-* @param containerRef - Ref to the container div for the tree.
-* @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
-*/
+ * SkillTree component that renders the tree structure with nodes and connectors.
+ * This is a pure rendering component without zoom/pan controls.
+ * Uses the Drawing library for coordinate-based positioning.
+ *
+ * @param contentItems - Array of content items (concepts and skills) to display.
+ * @param treeBounds - The bounding box of the tree layout.
+ * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
+ * @param isCompleted - Function to check if a content item is completed.
+ * @param getProgress - Function to get progress string for a content item.
+ * @param setHoveredId - Function to set the hovered node ID.
+ * @param containerRef - Ref to the container div for the tree.
+ * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
+ */
 interface SkillTreeProps {
   contentItems: ContentMeta[];
   treeBounds: {
@@ -29,7 +29,7 @@ interface SkillTreeProps {
     width: number;
     height: number;
   };
-  visiblePaths: { points: typeof Vector[]; from: string; to: string }[];
+  visiblePaths: { points: (typeof Vector)[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
   getProgress: (id: string) => string | null;
   setHoveredId: (id: string | null) => void;
@@ -45,8 +45,8 @@ export function SkillTree({
   // getProgress,
   setHoveredId,
   containerRef,
-  // nodeRefs,
-}: SkillTreeProps) {
+}: // nodeRefs,
+SkillTreeProps) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
 
   // const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
@@ -64,7 +64,8 @@ export function SkillTree({
   };
 
   const handleNodeClick = (item: ContentMeta) => {
-    const path = item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
+    const path =
+      item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
     window.location.href = path;
   };
 
@@ -76,6 +77,7 @@ export function SkillTree({
         width: `${treeBounds.width}px`,
         height: `${treeBounds.height}px`,
         margin: "0 auto",
+        //opacity: 0.3,
       }}
     >
       <Drawing
@@ -92,6 +94,8 @@ export function SkillTree({
             points={connector.points}
             color="#9aa0a6"
             size={1.5}
+            spread={20}
+            style={{ opacity: 0.25 }}
           />
         ))}
 
