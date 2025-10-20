@@ -6,7 +6,6 @@ import { SvgPortal } from "@/components/figures/Drawing/DrawingContext";
 import { Vector } from "@/util/geometry/Vector";
 // @ts-ignore - Element is a JavaScript module without type definitions
 import { Element } from "@/components/figures";
-import { Opacity } from "@mui/icons-material";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -16,6 +15,7 @@ interface NodeCardProps {
   item: ContentMeta;
   completed: boolean;
   isHovered: boolean;
+  readyToLearn?: boolean;
 }
 
 // SVg data paths for icons - wrapped in a group with transform for positioning
@@ -49,7 +49,7 @@ function wrapText(text: string, maxWidth: number): string[] {
   return lines;
 }
 
-export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
+export function NodeCard({ item, completed, isHovered, readyToLearn = false}: NodeCardProps) {
   const type = item.type;
   const width = 160;
   const height = 80;
@@ -79,8 +79,21 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
   const totalHeight = lines.length * lineHeight;
   const startY = centerY - totalHeight / 2 + lineHeight / 2;
 
-  // Node opacity based on completion status 
-  const nodeOpacity = completed ? 1.0 : 0.15;
+  
+  // Set the opacity based on completion state 
+  let nodeOpacity: number;
+  let borderColor: string;
+
+  if (completed) {
+    nodeOpacity = 1.0;
+    borderColor = isHovered ? "#ff0000" : "#e0e0e0";
+  } else if (readyToLearn) {
+    nodeOpacity = 0.6;
+    borderColor = "#4CAF50"; 
+  } else {
+    nodeOpacity = 0.15;
+    borderColor = isHovered ? "#ff0000" : "#e0e0e0";
+  }
 
   return (
     <>
@@ -89,7 +102,7 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
         cornerRadius={cornerRadius}
         style={{
           fill: isHovered ? "#f5f5f5" : "#fff",
-          stroke: isHovered ? "#ff0000" : "#e0e0e0",
+          stroke: borderColor,
           strokeWidth: 1,
           transition: "fill 90ms, stroke 90ms",
         }}
@@ -139,25 +152,7 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
         <Element position={[centerX, centerY]} style={{opacity: nodeOpacity}}>
           <div style={{ width: width - 20, textAlign: 'center' }}>{item.name}</div>
         </Element>
-        {/* <text
-          x={centerX}
-          y={startY}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          style={{
-            fill: "#212121",
-            fontWeight: 500,
-            fontSize: "0.95rem",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          {lines.map((line, i) => (
-            <tspan key={i} x={centerX} dy={i === 0 ? 0 : lineHeight}>
-              {line}
-            </tspan>
-          ))}
-        </text> */}
+        
       </SvgPortal>
     </>
   );

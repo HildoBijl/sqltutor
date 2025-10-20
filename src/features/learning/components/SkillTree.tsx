@@ -100,21 +100,28 @@ SkillTreeProps) {
         ))}
 
         {/* Rectangles in the SVG layer */}
-        {contentItems.map((item) => (
-          <g
-            key={item.id}
-            onMouseEnter={() => handleHoverStart(item.id)}
-            onMouseLeave={handleHoverEnd}
-            onClick={() => handleNodeClick(item)}
-            style={{ cursor: "pointer" }}
-          >
-            <NodeCard
-              item={item}
-              completed={isCompleted(item.id)}
-              isHovered={localHoveredId === item.id}
-            />
-          </g>
-        ))}
+        {contentItems.map((item) => {
+
+          const allPrequisitesCompleted = item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
+          const readyToLearn = !isCompleted(item.id) && allPrequisitesCompleted;
+
+          return (
+            <g
+              key={item.id}
+              onMouseEnter={() => handleHoverStart(item.id)}
+              onMouseLeave={handleHoverEnd}
+              onClick={() => handleNodeClick(item)}
+              style={{ cursor: "pointer" }}
+            >
+              <NodeCard
+                item={item}
+                completed={isCompleted(item.id)}
+                isHovered={localHoveredId === item.id}
+                readyToLearn={readyToLearn}
+              />
+            </g>
+          );
+        })}
       </Drawing>
     </div>
   );
