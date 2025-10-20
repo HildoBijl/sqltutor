@@ -1,16 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useComponentState } from '@/store';
+
 import {
   createInitialProgress,
   createSimpleExerciseReducer,
+  extractStorableState,
+  rehydrateExerciseState,
   type ExerciseAction,
   type ExerciseHelpers,
   type ExerciseProgress,
   type ExerciseStatus,
+  type SimpleExerciseConfig,
   type ValidationResult,
   type VerificationResult,
   type ValidateInputArgs,
 } from './exerciseEngine';
+import {
+  useComponentState,
+  type ExerciseInstanceId,
+  type SkillComponentState,
+  type StoredExerciseEvent,
+  type StoredExerciseInstance,
+  type StoredExerciseState,
+} from '@/store';
 
 const normalizeSql = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
@@ -21,6 +32,10 @@ function applyTemplate(template: string, context: Record<string, unknown>): stri
     const v = context[key];
     return v !== undefined && v !== null ? String(v) : '';
   });
+}
+
+function generateInstanceId(): ExerciseInstanceId {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 export interface SkillExerciseModuleLike {
@@ -40,25 +55,18 @@ export interface SkillExerciseModuleLike {
 }
 
 type SkillExerciseProgress = ExerciseProgress<any, string, unknown, unknown>;
+type SkillStoredExerciseState = StoredExerciseState<any | null, string>;
 
 type Dispatch = (action: ExerciseAction<string, unknown>) => void;
 
 type ValidationPreview = (input: string) => ValidationResult;
-
-function defaultCorrectMessage(messages?: SkillExerciseModuleLike['messages']) {
-  return messages?.correct || 'Excellent work! That matches the expected result.';
-}
-
-function defaultIncorrectMessage(messages?: SkillExerciseModuleLike['messages']) {
-  return messages?.incorrect || 'Not quite right yet. Compare the requirements to your query and try again.';
-}
 
 function defaultInvalidMessage(messages?: SkillExerciseModuleLike['messages']) {
   return messages?.invalid || 'Please enter a valid SQL SELECT query so we can check it.';
 }
 
 export function useSkillExerciseState(componentId: string, moduleLike: SkillExerciseModuleLike | null) {
-  const [componentState, setComponentState] = useComponentState(componentId);
+  const [componentState, setComponentState] = useComponentState<SkillComponentState>(componentId, 'skill');
 
   const helpers = useMemo<ExerciseHelpers>(
     () => ({
@@ -68,9 +76,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     [],
   );
 
-  const storedProgress = componentState.exerciseProgress as SkillExerciseProgress | undefined;
-
-  const { reducer, validateInputFn, deriveSolution } = useMemo(() => {
+  const exerciseConfig = useMemo<SimpleExerciseConfig<any, string, unknown, unknown>>(() => {
     const generateExercise = (exerciseHelpers: ExerciseHelpers) => {
       if (moduleLike?.generate) {
         return moduleLike.generate(exerciseHelpers) || {};
@@ -121,62 +127,156 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     };
 
     return {
-      reducer: createSimpleExerciseReducer<any, string, unknown, unknown>({
-        helpers,
-        normalizeInput: normalizeSql,
-        generateExercise,
-        validateInput,
-        deriveSolution: derive,
-        runDemo: moduleLike?.runDemo,
-      }),
-      validateInputFn: validateInput,
+      helpers,
+      normalizeInput: normalizeSql,
+      generateExercise,
+      validateInput,
       deriveSolution: derive,
+      runDemo: moduleLike?.runDemo,
     };
   }, [helpers, moduleLike]);
 
-  const [progress, setProgress] = useState<SkillExerciseProgress>(() => {
-    if (storedProgress) {
-      return reducer(storedProgress, { type: 'hydrate', state: storedProgress });
-    }
-    return createInitialProgress();
-  });
+  const reducer = useMemo(
+    () => createSimpleExerciseReducer<any, string, unknown, unknown>(exerciseConfig),
+    [exerciseConfig],
+  );
+
+  const validateInputFn = exerciseConfig.validateInput!;
+  const deriveSolution = exerciseConfig.deriveSolution!;
+
+  const [progress, setProgress] = useState<SkillExerciseProgress>(() => createInitialProgress());
 
   useEffect(() => {
-    if (!storedProgress) return;
-    setProgress(prev => {
-      if (prev === storedProgress) return prev;
+    if (componentState.currentInstanceId) return;
+    const instances = Object.values(componentState.instances || {});
+    if (instances.length === 0) return;
+
+    let latest: StoredExerciseInstance | undefined;
+    for (const instance of instances) {
+      if (!latest || instance.createdAt > latest.createdAt) {
+        latest = instance;
+      }
+    }
+    if (latest) {
+      setComponentState({ currentInstanceId: latest.id });
+    }
+  }, [componentState.currentInstanceId, componentState.instances, setComponentState]);
+
+  useEffect(() => {
+    const instanceId = componentState.currentInstanceId;
+    if (!instanceId) {
+      setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
+      return;
+    }
+
+    const instance = componentState.instances[instanceId];
+    if (!instance || instance.events.length === 0) {
+      setProgress(createInitialProgress());
+      return;
+    }
+
+    const lastEvent = instance.events[instance.events.length - 1];
+    setProgress((prev) => {
       if (
-        prev.generatedAt === storedProgress.generatedAt &&
-        prev.status === storedProgress.status &&
-        prev.attempts?.length === storedProgress.attempts?.length
+        prev.generatedAt === lastEvent.resultingState.generatedAt &&
+        prev.status === lastEvent.resultingState.status &&
+        prev.attempts.length === lastEvent.resultingState.attempts.length
       ) {
         return prev;
       }
-      return reducer(prev, { type: 'hydrate', state: storedProgress });
+      return rehydrateExerciseState(lastEvent.resultingState, exerciseConfig);
     });
-  }, [storedProgress, reducer]);
+  }, [componentState.currentInstanceId, componentState.instances, exerciseConfig]);
 
-  const persistProgress = useCallback(
-    (next: SkillExerciseProgress) => {
-      setComponentState(prev => ({
-        ...prev,
-        exerciseProgress: next,
-        exerciseHistory: next.history,
-      }));
+  const appendEvent = useCallback(
+    (instanceId: ExerciseInstanceId, action: ExerciseAction<string, unknown>, storedState: SkillStoredExerciseState) => {
+      const timestamp = Date.now();
+      const event: StoredExerciseEvent = {
+        timestamp,
+        action,
+        resultingState: storedState,
+      };
+
+      setComponentState((prev) => {
+        const current = prev.instances[instanceId] ?? {
+          id: instanceId,
+          skillId: componentId,
+          createdAt: timestamp,
+          finalStatus: storedState.status,
+          events: [],
+        };
+
+        const updated: StoredExerciseInstance = {
+          ...current,
+          finalStatus: storedState.status === 'correct' ? 'correct' : storedState.status,
+          completedAt: storedState.status === 'correct' ? timestamp : current.completedAt,
+          events: [...current.events, event],
+        };
+
+        return {
+          ...prev,
+          instances: {
+            ...prev.instances,
+            [instanceId]: updated,
+          },
+        };
+      });
     },
-    [setComponentState],
+    [componentId, setComponentState],
   );
 
   const dispatch: Dispatch = useCallback(
     (action) => {
-      setProgress(prev => {
+      setProgress((prev) => {
         const next = reducer(prev, action);
         if (next === prev) return prev;
-        persistProgress(next);
+
+        const storedState = extractStorableState<any, string, unknown, unknown>(next);
+
+        if (action.type === 'generate') {
+          const instanceId = generateInstanceId();
+          const timestamp = Date.now();
+          const event: StoredExerciseEvent = {
+            timestamp,
+            action,
+            resultingState: storedState,
+          };
+          const instance: StoredExerciseInstance = {
+            id: instanceId,
+            skillId: componentId,
+            createdAt: timestamp,
+            finalStatus: storedState.status,
+            completedAt: storedState.status === 'correct' ? timestamp : undefined,
+            events: [event],
+          };
+
+          setComponentState((prevState) => ({
+            ...prevState,
+            currentInstanceId: instanceId,
+            instances: {
+              ...prevState.instances,
+              [instanceId]: instance,
+            },
+          }));
+        } else if (action.type !== 'hydrate') {
+          const currentInstanceId = componentState.currentInstanceId;
+          if (!currentInstanceId) {
+            // No active instance - start a new one implicitly
+            const fallbackId = generateInstanceId();
+            setComponentState((prevState) => ({
+              ...prevState,
+              currentInstanceId: fallbackId,
+            }));
+            appendEvent(fallbackId, action, storedState);
+          } else {
+            appendEvent(currentInstanceId, action, storedState);
+          }
+        }
+
         return next;
       });
     },
-    [reducer, persistProgress],
+    [appendEvent, componentId, componentState.currentInstanceId, reducer, setComponentState],
   );
 
   const previewValidation: ValidationPreview = useCallback(

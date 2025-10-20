@@ -20,7 +20,7 @@ import { CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Li
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
-import { useComponentState, useAppStore } from '@/store';
+import { useComponentState, useAppStore, type SkillComponentState } from '@/store';
 import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
@@ -39,7 +39,7 @@ export default function SkillPage() {
   const [currentTab, setCurrentTab] = useState(1); // Always start with practice tab
 
   // State management
-  const [componentState, setComponentState] = useComponentState(skillId || '');
+  const [componentState, setComponentState] = useComponentState<SkillComponentState>(skillId || '', 'skill');
   const hideStories = useAppStore((state) => state.hideStories);
 
   // Define available tabs, filtering out story if hideStories is enabled
@@ -159,12 +159,6 @@ export default function SkillPage() {
       cancelled = true;
     };
   }, [skillId]);
-
-  useEffect(() => {
-    if (componentState.type !== 'skill') {
-      setComponentState({ type: 'skill' });
-    }
-  }, [componentState.type, setComponentState]);
 
   // Cleanup exercise database when leaving the page
   useEffect(() => {

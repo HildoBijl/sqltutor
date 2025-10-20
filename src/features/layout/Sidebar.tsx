@@ -66,11 +66,15 @@ export function Sidebar({ open }: SidebarProps) {
 
     // For concepts, check if understood
     if (component.type === 'concept') {
-      return state.understood === true;
+      return state.type === 'concept' ? state.understood === true : false;
     }
 
     // For skills, check if completed (3+ exercises)
-    return (state.numSolved || 0) >= 3;
+    if (component.type === 'skill') {
+      return state.type === 'skill' ? (state.numSolved ?? 0) >= 3 : false;
+    }
+
+    return false;
   };
 
   const getProgress = (component: ComponentMeta) => {
@@ -78,8 +82,9 @@ export function Sidebar({ open }: SidebarProps) {
     if (!state) return null;
 
     // For skills, show exercise progress
-    if (component.type === 'skill' && state.numSolved) {
-      return `${state.numSolved}/3`;
+    if (component.type === 'skill' && state.type === 'skill') {
+      const solved = state.numSolved ?? 0;
+      return solved > 0 ? `${solved}/3` : null;
     }
 
     return null;
@@ -299,4 +304,3 @@ export function Sidebar({ open }: SidebarProps) {
     </Drawer>
   );
 }
-

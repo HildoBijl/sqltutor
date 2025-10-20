@@ -23,28 +23,21 @@ export default function LearningOverviewPage() {
   const skills = useMemo(() => contentItems.filter(item => item.type === 'skill'), [contentItems]);
 
   const isCompleted = (id: string) => {
-    const component = components[id];
-    if (!component) return false;
-
-    // For concepts, check if understood
-    if (concepts.find(c => c.id === id)) {
-      return component.understood === true;
-    }
-
-    // For skills, check if completed (3+ exercises)
-    return (component.numSolved || 0) >= 3;
+    const state = components[id];
+    if (!state) return false;
+    if (state.type === 'concept') return state.understood === true;
+    if (state.type === 'skill') return (state.numSolved ?? 0) >= 3;
+    return false;
   };
 
   const getProgress = (id: string) => {
-    const component = components[id];
-    if (!component) return null;
-
-    // For skills, return exercise progress
-    if (skills.find(s => s.id === id) && component.numSolved) {
-      return `${component.numSolved}/3`;
+    const state = components[id];
+    if (!state || state.type !== 'skill') {
+      return null;
     }
 
-    return null;
+    const solved = state.numSolved ?? 0;
+    return solved > 0 ? `${solved}/3` : null;
   };
 
   // Compute hierarchical levels for a simple skill tree layout
@@ -375,4 +368,3 @@ export default function LearningOverviewPage() {
     </Container>
   );
 }
-

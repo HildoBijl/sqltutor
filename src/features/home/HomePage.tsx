@@ -17,7 +17,6 @@ import {
   School,
   AutoStories,
   TrendingUp,
-  Email,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 

@@ -26,14 +26,12 @@ import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
 import { usePlaygroundDatabase } from '@/shared/hooks/useDatabase';
 import { schemas, getSchemaDescription, type SchemaKey } from '@/features/database/schemas';
-import { useAppStore } from '@/store';
-
-interface QueryHistory {
-  query: string;
-  timestamp: Date;
-  success: boolean;
-  rowCount?: number;
-}
+import {
+  useComponentState,
+  type PlaygroundComponentState,
+  type QueryHistory,
+  type SavedQuery,
+} from '@/store';
 
 export default function PlaygroundPage() {
   const [selectedSchema, setSelectedSchema] = useState<SchemaKey>('companiesAndPositions');
@@ -52,14 +50,9 @@ export default function PlaygroundPage() {
     isReady
   } = usePlaygroundDatabase(selectedSchema);
 
-  // Get saved queries from store
-  const savedQueries = useAppStore(state => state.components.playground?.savedQueries || []);
-  const updatePlayground = useAppStore(state => state.updateComponent);
-
-  // Get history from store
-  const history: QueryHistory[] = useAppStore(state =>
-    state.components.playground?.history || []
-  );
+  const [playgroundState, setPlaygroundState] = useComponentState<PlaygroundComponentState>('playground', 'playground');
+  const savedQueries = (playgroundState.savedQueries as SavedQuery[] | undefined) ?? [];
+  const history = (playgroundState.history as QueryHistory[] | undefined) ?? [];
 
   // Handle live query execution (for preview results)
   const handleLiveExecute = useCallback(async (liveQuery: string) => {
@@ -83,26 +76,26 @@ export default function PlaygroundPage() {
       // Add to history
       const newHistoryEntry: QueryHistory = {
         query,
-        timestamp: new Date(),
+        timestamp: Date.now(),
         success: true,
         rowCount: result?.[0]?.values?.length || 0,
       };
 
-      updatePlayground('playground', {
-        history: [newHistoryEntry, ...history.slice(0, 49)]
-      });
+      setPlaygroundState((prev) => ({
+        history: [newHistoryEntry, ...(prev.history ?? []).slice(0, 49)],
+      }));
 
       setMessage(`Query executed successfully (${result?.[0]?.values?.length || 0} rows)`);
     } catch (error) {
       const newHistoryEntry: QueryHistory = {
         query,
-        timestamp: new Date(),
+        timestamp: Date.now(),
         success: false,
       };
 
-      updatePlayground('playground', {
-        history: [newHistoryEntry, ...history.slice(0, 49)]
-      });
+      setPlaygroundState((prev) => ({
+        history: [newHistoryEntry, ...(prev.history ?? []).slice(0, 49)],
+      }));
 
       setMessage(`Query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -111,8 +104,8 @@ export default function PlaygroundPage() {
   const handleSaveQuery = () => {
     const name = prompt('Enter a name for this query:');
     if (name) {
-      const newSavedQueries = [...savedQueries, { name, query }];
-      updatePlayground('playground', { savedQueries: newSavedQueries });
+      const newSavedQueries: SavedQuery[] = [...savedQueries, { name, query }];
+      setPlaygroundState({ savedQueries: newSavedQueries });
       setMessage('Query saved successfully');
     }
   };
@@ -170,8 +163,8 @@ export default function PlaygroundPage() {
   };
 
   const handleDeleteSavedQuery = (index: number) => {
-    const newSavedQueries = savedQueries.filter((_: any, i: number) => i !== index);
-    updatePlayground('playground', { savedQueries: newSavedQueries });
+    const newSavedQueries = savedQueries.filter((_, i) => i !== index);
+    setPlaygroundState({ savedQueries: newSavedQueries });
     setMessage('Query deleted');
   };
 
@@ -369,7 +362,7 @@ export default function PlaygroundPage() {
           {currentTab === 2 && (
             <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
               {savedQueries.length > 0 ? (
-                savedQueries.map((saved: any, index: number) => (
+                savedQueries.map((saved, index) => (
                   <Paper
                     key={index}
                     sx={{

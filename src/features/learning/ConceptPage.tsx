@@ -20,7 +20,7 @@ import {
   OndemandVideo,
 } from '@mui/icons-material';
 
-import { useComponentState, useAppStore } from '@/store';
+import { useComponentState, useAppStore, type ConceptComponentState } from '@/store';
 import { contentIndex, type ContentMeta } from '@/features/content';
 import { useContent } from './hooks/useContent';
 
@@ -52,7 +52,7 @@ export default function ConceptPage() {
   const [currentTab, setCurrentTab] = useState(1); // Start with theory tab
 
   // Use new store
-  const [componentState, setComponentState] = useComponentState(conceptId || '');
+  const [componentState, setComponentState] = useComponentState<ConceptComponentState>(conceptId || '', 'concept');
   const hideStories = useAppStore((state) => state.hideStories);
 
   // Define available tabs, filtering out story if hideStories is enabled
@@ -69,12 +69,6 @@ export default function ConceptPage() {
     if (!conceptId) return undefined;
     return contentIndex.find(item => item.type === 'concept' && item.id === conceptId);
   }, [conceptId]);
-
-  useEffect(() => {
-    if (componentState.type !== 'concept') {
-      setComponentState({ type: 'concept' });
-    }
-  }, [componentState.type, setComponentState]);
 
   // Always default to theory tab
   useEffect(() => {

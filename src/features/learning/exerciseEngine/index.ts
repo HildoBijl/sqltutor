@@ -1,3 +1,5 @@
+import type { StoredAttempt, StoredExerciseState } from '@/store/types';
+
 export type ExerciseStatus =
   | 'idle'
   | 'ready'
@@ -21,15 +23,10 @@ export interface VerificationResult {
   details?: Record<string, unknown>;
 }
 
-export interface ExerciseAttempt<Input> {
-  index: number;
-  input: Input;
-  normalizedInput: string;
-  status: 'invalid' | 'incorrect' | 'correct';
+export interface ExerciseAttempt<Input> extends StoredAttempt<Input> {
   validation?: ValidationResult;
   verification?: VerificationResult;
   feedback: string;
-  timestamp: number;
   repeatOf?: number;
 }
 
@@ -42,9 +39,13 @@ export interface ExerciseHistoryEntry<Input, Result = unknown> {
   note?: string;
 }
 
-export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unknown> {
-  exercise: Exercise | null;
-  status: ExerciseStatus;
+export type StorableExerciseAttempt<Input = unknown> = StoredAttempt<Input>;
+
+export type StorableExerciseState<Exercise = unknown, Input = unknown> =
+  StoredExerciseState<Exercise, Input>;
+
+export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unknown>
+  extends StorableExerciseState<Exercise | null, Input> {
   attempts: ExerciseAttempt<Input>[];
   history: ExerciseHistoryEntry<Input, Result>[];
   demo?: Demo;
@@ -53,7 +54,6 @@ export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unkn
   feedback?: string | null;
   solution?: string | null;
   lastAction?: ExerciseAction<Input, Result>;
-  generatedAt?: number;
 }
 
 export type ExerciseAction<Input = unknown, Result = unknown> =
@@ -376,5 +376,86 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
       default:
         return state;
     }
+  };
+}
+
+export function extractStorableState<Exercise, Input, Demo = unknown, Result = unknown>(
+  state: ExerciseProgress<Exercise, Input, Demo, Result>,
+): StorableExerciseState<Exercise | null, Input> {
+  return {
+    exercise: state.exercise,
+    status: state.status,
+    attempts: state.attempts.map<StoredAttempt<Input>>(({ index, input, normalizedInput, status, timestamp }) => ({
+      index,
+      input,
+      normalizedInput,
+      status,
+      timestamp,
+    })),
+    generatedAt: state.generatedAt ?? Date.now(),
+  };
+}
+
+export function rehydrateExerciseState<Exercise, Input, Result = unknown, Demo = unknown>(
+  storedState: StorableExerciseState<Exercise | null, Input>,
+  config: SimpleExerciseConfig<Exercise, Input, Result, Demo>,
+): ExerciseProgress<Exercise, Input, Demo, Result> {
+  const helpers = config.helpers || defaultHelpers;
+  const attempts: ExerciseAttempt<Input>[] = [];
+  const exercise = storedState.exercise ?? null;
+
+  storedState.attempts.forEach((attemptData) => {
+    const validation = exercise && config.validateInput
+      ? config.validateInput({
+          exercise,
+          input: attemptData.input,
+          normalizedInput: attemptData.normalizedInput,
+          result: undefined,
+          previousAttempts: attempts,
+          helpers,
+        })
+      : undefined;
+
+    const feedback = (() => {
+      if (attemptData.status === 'invalid') {
+        return validation?.message ?? 'Please double-check your input before submitting.';
+      }
+      if (attemptData.status === 'correct') {
+        return 'Great job! That answer is correct.';
+      }
+      return 'Not quite there yet. Check the requirements and try again.';
+    })();
+
+    attempts.push({
+      ...attemptData,
+      validation: validation ?? undefined,
+      verification: undefined,
+      feedback,
+    });
+  });
+
+  const lastAttempt = attempts[attempts.length - 1];
+  const derivedSolution =
+    exercise && storedState.status === 'correct'
+      ? config.deriveSolution?.({ exercise, verification: undefined }) ?? null
+      : null;
+
+  const demo =
+    exercise && config.runDemo
+      ? config.runDemo({ exercise, helpers })
+      : undefined;
+
+  return {
+    exercise,
+    status: storedState.status,
+    attempts,
+    generatedAt: storedState.generatedAt,
+    history: [],
+    demo,
+    validation: lastAttempt?.validation ?? null,
+    verification: null,
+    feedback: lastAttempt?.feedback ?? null,
+    solution: derivedSolution,
+    lastAction: undefined,
   };
 }
