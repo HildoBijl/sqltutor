@@ -1,4 +1,4 @@
-import { useRef, useMemo, useImperativeHandle, useId } from 'react'
+import { useState, useEffect, useRef, useMemo, useImperativeHandle, useId } from 'react'
 import clsx from 'clsx'
 
 import { processOptions, filterOptions, resolveFunctions, getEventPosition, useEnsureRef, useForceUpdateEffect, Rectangle, Vector, notSelectable } from 'util'
@@ -52,6 +52,15 @@ export function Drawing(options) {
 	options.aspectRatio = height / width // This must be passed on to the Figure object.
 	options.maxWidth = options.maxWidth === 'fill' ? undefined : resolveFunctions(options.maxWidth, bounds)
 
+	// Determine the initial figure scale. This is needed when rendering without autoScale. In this case we stick with the initial scale.
+	const [initialFigureScale, setInitialFigureScale] = useState()
+	const innerFigure = figureRef.current?.inner
+	useEffect(() => {
+		if (innerFigure)
+			setInitialFigureScale(innerFigure.getBoundingClientRect().width / bounds.width)
+	}, [innerFigure, setInitialFigureScale])
+	const getFigureScale = () => options.autoScale ? innerFigure.getBoundingClientRect().width / bounds.width : initialFigureScale
+
 	// Set up refs and make them accessible to any implementing component.
 	useImperativeHandle(ref, () => ({
 		// Basic getters.
@@ -83,7 +92,7 @@ export function Drawing(options) {
 	// Render figure with SVG and Canvas properly placed.
 	options.className = clsx('drawing', options.className)
 	return (
-		<DrawingContext.Provider value={{ id, bounds, figure: figureRef.current, svg: svgRef.current, svgDefs: svgDefsRef.current, htmlContents: htmlContentsRef.current, canvas: canvasRef.current }}>
+		<DrawingContext.Provider value={{ id, bounds, figure: figureRef.current, svg: svgRef.current, svgDefs: svgDefsRef.current, htmlContents: htmlContentsRef.current, canvas: canvasRef.current, getFigureScale }}>
 			<Figure {...{ ...filterOptions(options, defaultFigureOptions), ref: figureRef }}>
 				{options.useSvg ? (
 					<svg ref={svgRef} style={svgStyle} viewBox={`0 0 ${width} ${height}`}>

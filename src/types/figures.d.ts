@@ -6,6 +6,7 @@ declare module '@/components/figures/Drawing' {
   export const Drawing: any;
   export const Element: any;
   export const Rectangle: any;
+  export const Circle: any;
   export const Curve: any;
   export function useTextNodeBounds(
     element: HTMLElement | null | undefined,

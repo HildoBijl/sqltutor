@@ -83,6 +83,7 @@ export function SkillTree({
         height={treeBounds.height}
         useSvg={true}
         useCanvas={false}
+        autoScale={false} // Scaling manually controlled by transformer.
       >
         {/* The lines between skills and concepts */}
         {visiblePaths.map((connector, i) => (

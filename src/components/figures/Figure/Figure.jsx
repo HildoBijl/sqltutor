@@ -41,11 +41,9 @@ export function Figure(options) {
 
 	// Render the figure.
 	options.className = clsx('figure', options.className)
-	return (
-		<Box ref={figureOuter} sx={{ ...resolveFunctions(figureStyle, styleOptions), ...options.style }}>
-			<Box ref={figureInner} sx={{ ...resolveFunctions(innerFigureStyle, styleOptions) }}>
-				{options.children}
-			</Box>
+	return <Box ref={figureOuter} sx={{ ...resolveFunctions(figureStyle, styleOptions), ...options.style }}>
+		<Box ref={figureInner} sx={{ ...resolveFunctions(innerFigureStyle, styleOptions) }}>
+			{options.children}
 		</Box>
-	)
+	</Box>
 }

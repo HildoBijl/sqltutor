@@ -48,7 +48,7 @@ export function Element(props) {
 	anchor = useEqualRefOnEquality(anchor)
 
 	// Extract the drawing from the context.
-	const { bounds, figure } = useDrawingData()
+	const { bounds, figure, getFigureScale } = useDrawingData()
 
 	// Define a handler that positions the element accordingly.
 	const updateElementPosition = useCallback(() => {
@@ -58,8 +58,7 @@ export function Element(props) {
 			return
 
 		// Calculate the scale at which the figure is drawn.
-		const figureRect = figure.inner.getBoundingClientRect()
-		const figureScale = figureRect.width / bounds.width
+		let figureScale = getFigureScale()
 
 		// Position the element accordingly.
 		element.style.transformOrigin = `${anchor.x * 100}% ${anchor.y * 100}%`
