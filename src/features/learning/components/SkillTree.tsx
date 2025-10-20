@@ -95,7 +95,7 @@ SkillTreeProps) {
             color="#9aa0a6"
             size={1.5}
             spread={20}
-            style={{ opacity: 0.25 }}
+            style={{ opacity: 0.20 }}
           />
         ))}
 

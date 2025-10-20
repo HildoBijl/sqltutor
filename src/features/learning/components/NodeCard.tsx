@@ -6,6 +6,7 @@ import { SvgPortal } from "@/components/figures/Drawing/DrawingContext";
 import { Vector } from "@/util/geometry/Vector";
 // @ts-ignore - Element is a JavaScript module without type definitions
 import { Element } from "@/components/figures";
+import { Opacity } from "@mui/icons-material";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -78,6 +79,9 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
   const totalHeight = lines.length * lineHeight;
   const startY = centerY - totalHeight / 2 + lineHeight / 2;
 
+  // Node opacity based on completion status 
+  const nodeOpacity = completed ? 1.0 : 0.15;
+
   return (
     <>
       <Rectangle
@@ -92,7 +96,8 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
       />
       <SvgPortal>
         {/* Type icon (concept/skill) in top-left corner */}
-        <g transform={`translate(${iconX - iconSize / 2}, ${iconY - iconSize / 2})`}>
+        <g transform={`translate(${iconX - iconSize / 2}, ${iconY - iconSize / 2})`}
+        style ={{ opacity: nodeOpacity }}>
           <circle
             cx={iconSize / 2}
             cy={iconSize / 2}
@@ -131,7 +136,7 @@ export function NodeCard({ item, completed, isHovered }: NodeCardProps) {
         )}
 
         {/* Text label */}
-        <Element position={[centerX, centerY]}>
+        <Element position={[centerX, centerY]} style={{opacity: nodeOpacity}}>
           <div style={{ width: width - 20, textAlign: 'center' }}>{item.name}</div>
         </Element>
         {/* <text
