@@ -47,6 +47,7 @@ export default function PlaygroundPage() {
     isExecuting,
     tableNames,
     resetDatabase,
+    clearQueryState,
     isReady
   } = usePlaygroundDatabase(selectedSchema);
 
@@ -56,7 +57,13 @@ export default function PlaygroundPage() {
 
   // Handle live query execution (for preview results)
   const handleLiveExecute = useCallback(async (liveQuery: string) => {
-    if (!isReady || !liveQuery.trim()) return;
+    if (!isReady) return;
+
+    const trimmedQuery = liveQuery.trim();
+    if (!trimmedQuery) {
+      clearQueryState();
+      return;
+    }
     
     try {
       await executeQuery(liveQuery);
@@ -66,7 +73,7 @@ export default function PlaygroundPage() {
       // No need to handle it here since the error will be displayed in the Results section
       console.debug('Live query execution failed:', error);
     }
-  }, [isReady, executeQuery]);
+  }, [isReady, executeQuery, clearQueryState]);
 
   // Handle actual execution (with history and messages)
   const handleExecute = async () => {
@@ -126,6 +133,7 @@ export default function PlaygroundPage() {
 
   const handleClearQuery = () => {
     setQuery('');
+    clearQueryState();
   };
 
   const handleExportResults = () => {
@@ -160,6 +168,7 @@ export default function PlaygroundPage() {
     // Update the default query based on the new schema
     const firstTable = getFirstTableFromSchema(newSchema);
     setQuery(`SELECT * FROM ${firstTable} LIMIT 10;`);
+    clearQueryState();
   };
 
   const handleDeleteSavedQuery = (index: number) => {
