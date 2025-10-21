@@ -48,19 +48,43 @@ export function SkillTree({
 }: // nodeRefs,
 SkillTreeProps) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
+  const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
   // const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
   //   nodeRefs.current?.set(id, el);
   // };
 
+  // Recursive function to get all prerequisites for a given item
+  const getPrerequisites = (itemId: string): Set<string> => {
+    const prerequisites = new Set<string>();
+    const item = contentItems.find(i => i.id === itemId);
+
+    if (!item?.prerequisites || item.prerequisites.length === 0) return prerequisites;
+
+    for (const prereqId of item.prerequisites) {
+      prerequisites.add(prereqId);
+      const nestedPrereqs = getPrerequisites(prereqId);
+      for (const p of nestedPrereqs) {
+        prerequisites.add(p);
+      }
+    }
+
+    return prerequisites;
+  }
+
   const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
     setHoveredId(id);
+    const chain = getPrerequisites(id);
+    // Caulculate full prerequisite chain
+    setPrerequisites(chain);
   };
 
   const handleHoverEnd = () => {
     setLocalHoveredId(null);
     setHoveredId(null);
+    // Reset the prerequisite chain
+    setPrerequisites(new Set());
   };
 
   const handleNodeClick = (item: ContentMeta) => {
@@ -118,6 +142,7 @@ SkillTreeProps) {
                 completed={isCompleted(item.id)}
                 isHovered={localHoveredId === item.id}
                 readyToLearn={readyToLearn}
+                isPrerequisite={prerequisites.has(item.id)}
               />
             </g>
           );
