@@ -3,7 +3,7 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { Box, Paper } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useDebounce } from '@/shared/hooks';
 
 interface SQLEditorProps {
@@ -32,6 +32,12 @@ export function SQLEditor({
   enableLiveExecution = false,
   liveExecutionDelay = 150,
 }: SQLEditorProps) {
+  const executeRef = useRef(onExecute);
+
+  useEffect(() => {
+    executeRef.current = onExecute;
+  }, [onExecute]);
+
   // Debounce the value for live execution
   const debouncedValue = useDebounce(value, liveExecutionDelay);
 
@@ -42,40 +48,67 @@ export function SQLEditor({
     }
   }, [debouncedValue, enableLiveExecution, onLiveExecute]);
 
-  const extensions = [
-    sql(),
-    EditorView.theme({
-      '&': {
-        fontSize: '14px',
-      },
-      '.cm-content': {
-        padding: '12px',
-      },
-      '.cm-focused .cm-cursor': {
-        borderLeftColor: '#c8102e',
-      },
-      '.cm-focused .cm-selectionBackground, ::selection': {
-        backgroundColor: '#c8102e33',
-      },
-    }),
-    EditorView.lineWrapping,
-  ];
+  const hasExecute = Boolean(onExecute);
 
-  // Add keyboard shortcut for execution
-  if (onExecute) {
-    extensions.push(
-      keymap.of([
-        {
-          key: 'Ctrl-Enter',
-          mac: 'Cmd-Enter',
-          run: () => {
-            onExecute();
-            return true;
-          },
+  // Memoize editor configuration so it stays stable between renders.
+  const extensions = useMemo(() => {
+    const baseExtensions = [
+      sql(),
+      EditorView.theme({
+        '&': {
+          fontSize: '14px',
         },
-      ])
-    );
-  }
+        '.cm-content': {
+          padding: '12px',
+        },
+        '.cm-focused .cm-cursor': {
+          borderLeftColor: '#c8102e',
+        },
+        '.cm-focused .cm-selectionBackground, ::selection': {
+          backgroundColor: '#c8102e33',
+        },
+      }),
+      EditorView.lineWrapping,
+    ];
+
+    if (hasExecute) {
+      baseExtensions.push(
+        keymap.of([
+          {
+            key: 'Ctrl-Enter',
+            mac: 'Cmd-Enter',
+            run: () => {
+              const execute = executeRef.current;
+              if (execute) {
+                execute();
+                return true;
+              }
+              return false;
+            },
+          },
+        ])
+      );
+    }
+
+    return baseExtensions;
+  }, [hasExecute]);
+
+  const basicSetup = useMemo(
+    () => ({
+      lineNumbers: true,
+      foldGutter: false,
+      dropCursor: true,
+      allowMultipleSelections: true,
+      indentOnInput: true,
+      bracketMatching: true,
+      closeBrackets: true,
+      autocompletion: true,
+      rectangularSelection: true,
+      highlightSelectionMatches: true,
+      searchKeymap: true,
+    }),
+    []
+  );
 
   return (
     <Paper
@@ -96,19 +129,7 @@ export function SQLEditor({
         height={height}
         editable={!readOnly}
         autoFocus={autoFocus}
-        basicSetup={{
-          lineNumbers: true,
-          foldGutter: false,
-          dropCursor: true,
-          allowMultipleSelections: true,
-          indentOnInput: true,
-          bracketMatching: true,
-          closeBrackets: true,
-          autocompletion: true,
-          rectangularSelection: true,
-          highlightSelectionMatches: true,
-          searchKeymap: true,
-        }}
+        basicSetup={basicSetup}
       />
     </Paper>
   );
