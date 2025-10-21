@@ -30,7 +30,7 @@ export function SQLEditor({
   onExecute,
   onLiveExecute,
   enableLiveExecution = false,
-  liveExecutionDelay = 500,
+  liveExecutionDelay = 150,
 }: SQLEditorProps) {
   // Debounce the value for live execution
   const debouncedValue = useDebounce(value, liveExecutionDelay);

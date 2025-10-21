@@ -277,7 +277,7 @@ export default function PlaygroundPage() {
           onExecute={handleExecute}
           onLiveExecute={handleLiveExecute}
           enableLiveExecution={true}
-          liveExecutionDelay={500}
+          liveExecutionDelay={150}
           showResults={false}
         />
       </Paper>
