@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ColorModeContext } from '@/theme';
 import { useAppStore } from '@/store';
 
@@ -32,6 +32,13 @@ export function Layout() {
     { path: '/learn', label: 'Learn', icon: LearnIcon },
     { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
   ];
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [location.pathname]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
