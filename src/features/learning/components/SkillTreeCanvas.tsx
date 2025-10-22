@@ -6,6 +6,7 @@ import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
 // @ts-ignore - Vector is a JavaScript module without type definitions
 import type { Vector } from "@/util/geometry/Vector";
+import { ContentPositionMeta } from "../utils/treeDefinition";
 
 /*
 * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -22,7 +23,8 @@ import type { Vector } from "@/util/geometry/Vector";
 * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
 */
 interface SkillTreeCanvasProps {
-  contentItems: ContentMeta[];
+  contentItems: Record<string, ContentMeta>;
+  contentPositions: Record<string, ContentPositionMeta>;
   treeBounds: {
     minX: number;
     minY: number;
@@ -42,6 +44,7 @@ interface SkillTreeCanvasProps {
 
 export function SkillTreeCanvas({
   contentItems,
+  contentPositions,
   treeBounds,
   visiblePaths,
   isCompleted,
@@ -101,6 +104,7 @@ export function SkillTreeCanvas({
             >
               <SkillTree
                 contentItems={contentItems}
+                contentPositions={contentPositions}
                 treeBounds={treeBounds}
                 visiblePaths={visiblePaths}
                 isCompleted={isCompleted}

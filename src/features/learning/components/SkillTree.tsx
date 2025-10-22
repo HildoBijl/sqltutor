@@ -4,6 +4,7 @@ import { Drawing, Curve } from "@/components/figures/Drawing";
 // @ts-ignore - Vector is a JavaScript module without type definitions
 import type { Vector } from "@/util/geometry/Vector";
 import { NodeCard } from "./NodeCard";
+import { ContentPositionMeta } from "../utils/treeDefinition";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -20,7 +21,8 @@ import { NodeCard } from "./NodeCard";
  * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 interface SkillTreeProps {
-  contentItems: ContentMeta[];
+  contentItems: Record<string, ContentMeta>;
+  contentPositions: Record<string, ContentPositionMeta>;
   treeBounds: {
     minX: number;
     minY: number;
@@ -39,6 +41,7 @@ interface SkillTreeProps {
 
 export function SkillTree({
   contentItems,
+  contentPositions,
   treeBounds,
   visiblePaths,
   isCompleted,
@@ -46,7 +49,7 @@ export function SkillTree({
   setHoveredId,
   containerRef,
 }: // nodeRefs,
-SkillTreeProps) {
+  SkillTreeProps) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
@@ -57,7 +60,7 @@ SkillTreeProps) {
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
     const prerequisites = new Set<string>();
-    const item = contentItems.find(i => i.id === itemId);
+    const item = contentItems[itemId];
 
     if (!item?.prerequisites || item.prerequisites.length === 0) return prerequisites;
 
@@ -123,9 +126,9 @@ SkillTreeProps) {
           />
         ))}
 
-        {/* Rectangles in the SVG layer */}
-        {contentItems.map((item) => {
-
+        {/* Rectangles in the SVG layer, and only those whose position is defined */}
+        {Object.values(contentPositions).map(positionData => {
+          const item = contentItems[positionData.id];
           const allPrequisitesCompleted = item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
           const readyToLearn = !isCompleted(item.id) && allPrequisitesCompleted;
 
@@ -139,6 +142,7 @@ SkillTreeProps) {
             >
               <NodeCard
                 item={item}
+                positionData={contentPositions[item.id]}
                 completed={isCompleted(item.id)}
                 isHovered={localHoveredId === item.id}
                 readyToLearn={readyToLearn}

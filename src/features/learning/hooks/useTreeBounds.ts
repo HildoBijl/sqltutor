@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ContentMeta } from "@/features/content";
+import { ContentPositionMeta } from "../utils/treeDefinition";
 
 // Constants for card dimensions and tree padding (unused in hardcoded version)
 // const CARD_WIDTH = 160;
@@ -13,7 +13,7 @@ import { ContentMeta } from "@/features/content";
 * @param contentItems - Array of content items with position and type.
 * @returns An object containing minX, minY, maxX, maxY, width, and height of the bounding box.
 */
-export function useTreeBounds(contentItems: ContentMeta[]) {
+export function useTreeBounds(contentPositions: Record<string, ContentPositionMeta>) {
   return useMemo(() => {
     // Hardcoded bounds for testing
     return {
@@ -57,5 +57,5 @@ export function useTreeBounds(contentItems: ContentMeta[]) {
     //   width: maxX - minX,
     //   height: maxY - minY
     // };
-  }, [contentItems]);
+  }, [contentPositions]);
 }

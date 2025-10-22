@@ -1,34 +1,28 @@
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 import type { SchemaKey } from '@/features/database/schemas';
+// @ts-ignore - util is a JavaScript module without type definitions
+import { keysToObject } from '@/util';
 
 export type ContentType = 'concept' | 'skill';
 
-export interface ContentMeta {
+export interface ContentMetaRaw {
   id: string;
   name: string;
   type: ContentType;
   description: string;
   prerequisites: string[];
   database?: SchemaKey;
-  // Manual positioning for the skill tree 
-  position: { x: number; y: number };
-  // Number of incoming edges of the node for the skill tree layout
-  incomingTotal? : number;
-  // Number of outgoing edges of the node for the skill tree layout
-  outgoingTotal? : number;
 }
 
-export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
-
-export const contentIndex: ContentMeta[] = [
+// The contentIndexRaw contains all definitions of content items, before being processed into more derived objects.
+const contentIndexRaw: ContentMetaRaw[] = [
   {
     id: 'database',
     name: 'What is a Database?',
     type: 'concept',
     description: 'Understanding databases, tables, and database management systems',
     prerequisites: [],
-    position: { x: 624, y: 24 },
   },
   {
     id: 'database-table',
@@ -36,7 +30,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Learn about rows, columns, and how data is structured in tables',
     prerequisites: ['database'],
-    position: { x: 624, y: 144 },
   },
   {
     id: 'data-types',
@@ -44,7 +37,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Different types of data that can be stored in database columns',
     prerequisites: ['database-table'],
-    position: { x: 624, y: 264 },
   },
   {
     id: 'database-keys',
@@ -52,7 +44,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Primary keys, foreign keys, and unique identifiers',
     prerequisites: ['database-table'],
-    position: { x: 1176, y: 264 },
   },
   {
     id: 'projection-and-filtering',
@@ -60,7 +51,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Limit tables to the columns and rows needed for analysis',
     prerequisites: ['database-table'],
-    position: { x: 900, y: 264 },
   },
   {
     id: 'join-and-decomposition',
@@ -68,7 +58,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Split tables safely and join them back together without losing data',
     prerequisites: ['database-keys', 'projection-and-filtering'],
-    position: { x: 900, y: 384 },
   },
   {
     id: 'inner-and-outer-join',
@@ -76,7 +65,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Choose the right join type when matching rows across tables',
     prerequisites: ['join-and-decomposition', 'data-types'],
-    position: { x: 900, y: 504 },
   },
   {
     id: 'aggregation',
@@ -84,7 +72,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Group records and compute summary statistics with SQL',
     prerequisites: ['data-types', 'projection-and-filtering'],
-    position: { x: 1176, y: 504 },
   },
   {
     id: 'pivot-table',
@@ -92,7 +79,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Reshape aggregated data so categories become columns',
     prerequisites: ['database-table'],
-    position: { x: 1440, y: 624 },
   },
   {
     id: 'query-language',
@@ -100,7 +86,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'How databases interpret commands and why SQL became the standard',
     prerequisites: ['database'],
-    position: { x: 300, y: 144 },
   },
   {
     id: 'sql',
@@ -108,7 +93,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'concept',
     description: 'Core SQL clauses for reading and modifying relational data',
     prerequisites: ['query-language'],
-    position: { x: 300, y: 264 },
   },
   {
     id: 'filter-rows',
@@ -116,7 +100,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Use WHERE clauses to filter data based on conditions',
     prerequisites: ['sql', 'projection-and-filtering', 'data-types'],
-    position: { x: 300, y: 384 },
   },
   {
     id: 'filter-rows-on-multiple-criteria',
@@ -124,7 +107,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Combine AND/OR logic, pattern matching, and NULL checks in filters',
     prerequisites: ['filter-rows'],
-    position: { x: 300, y: 624 },
   },
   {
     id: 'choose-columns',
@@ -132,7 +114,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Select and rename the columns returned by a query',
     prerequisites: ['sql', 'projection-and-filtering'],
-    position: { x: 624, y: 384 },
   },
   {
     id: 'create-processed-columns',
@@ -140,7 +121,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Compute derived columns directly within the SELECT list',
     prerequisites: ['data-types', 'choose-columns'],
-    position: { x: 624, y: 624 },
   },
   {
     id: 'sort-rows',
@@ -148,7 +128,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Order results with ORDER BY and paginate using LIMIT/OFFSET',
     prerequisites: ['sql', 'data-types'],
-    position: { x: 60, y: 624 },
   },
   {
     id: 'write-single-criterion-query',
@@ -156,7 +135,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Build SELECT statements that filter on a single condition',
     prerequisites: ['choose-columns', 'filter-rows'],
-    position: { x: 450, y: 504 },
   },
   {
     id: 'write-multi-criterion-query',
@@ -164,7 +142,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Combine multiple predicates with AND, OR, and grouping parentheses',
     prerequisites: ['create-processed-columns', 'filter-rows-on-multiple-criteria', 'sort-rows'],
-    position: { x: 300, y: 744 },
   },
   {
     id: 'join-tables',
@@ -173,7 +150,6 @@ export const contentIndex: ContentMeta[] = [
     description: 'Join related tables together by matching keys',
     prerequisites: ['inner-and-outer-join', 'choose-columns', 'filter-rows-on-multiple-criteria'],
     database: 'companiesAndPositions',
-    position: { x: 624, y: 744 },
   },
   {
     id: 'write-multi-table-query',
@@ -182,7 +158,6 @@ export const contentIndex: ContentMeta[] = [
     description: 'Chain several joins to answer questions that span multiple tables',
     prerequisites: ['join-tables', 'write-single-criterion-query'],
     database: 'employees',
-    position: { x: 624, y: 864 },
   },
   {
     id: 'write-multi-layered-query',
@@ -191,7 +166,6 @@ export const contentIndex: ContentMeta[] = [
     description: 'Use subqueries or CTEs to break complex logic into stages',
     prerequisites: ['use-filtered-aggregation', 'write-multi-criterion-query', 'write-multi-table-query'],
     database: 'employees',
-    position: { x: 624, y: 984 },
   },
   {
     id: 'aggregate-columns',
@@ -199,7 +173,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Group data and compute counts, sums, and averages',
     prerequisites: ['aggregation', 'choose-columns'],
-    position: { x: 1176, y: 624 },
   },
   {
     id: 'use-filtered-aggregation',
@@ -207,7 +180,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Filter aggregate results with HAVING and targeted WHERE clauses',
     prerequisites: ['aggregate-columns', 'filter-rows-on-multiple-criteria', 'create-processed-columns'],
-    position: { x: 900, y: 744 },
   },
   {
     id: 'use-dynamic-aggregation',
@@ -215,7 +187,6 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Adapt aggregations to changing grouping dimensions',
     prerequisites: ['aggregate-columns'],
-    position: { x: 1176, y: 744 },
   },
   {
     id: 'create-pivot-table',
@@ -223,9 +194,43 @@ export const contentIndex: ContentMeta[] = [
     type: 'skill',
     description: 'Shape aggregated data into pivoted columns for reporting',
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
-    position: { x: 1440, y: 744 },
   },
 ];
+
+// The contentItemsRaw contains all unprocessed content items, as an object.
+export const contentItemsRaw: Record<string, ContentMetaRaw> = keysToObject(contentIndexRaw.map(item => item.id), (_: string, index: number) => contentIndexRaw[index]);
+
+
+// Set up a new type for processed content items.
+export interface ContentMeta extends ContentMetaRaw {
+  followUps: string[];
+}
+
+// Prepare the contentIndex and contentItems for processed content items.
+export const contentIndex: ContentMeta[] = [];
+export const contentItems: Record<string, ContentMeta> = {};
+contentIndexRaw.forEach(item => {
+  const processedItem: ContentMeta = {
+    ...item,
+    followUps: [],
+  };
+  contentIndex.push(processedItem);
+  contentItems[item.id] = processedItem;
+});
+
+// Fill up the contentIndex and contentItems.
+contentIndexRaw.forEach(itemRaw => {
+  const item: ContentMeta = contentItems[itemRaw.id];
+  (itemRaw.prerequisites || []).forEach(prerequisiteId => {
+    const prerequisite: ContentMeta = contentItems[prerequisiteId];
+    if (!prerequisite)
+      throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at content item "${item.id}".`);
+    prerequisite.followUps.push(item.id);
+  });
+});
+
+
+export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
 
 export const contentComponents: Record<string, ContentComponentMap> = {
   database: {
@@ -357,27 +362,3 @@ export const skillExerciseLoaders = {
   'use-dynamic-aggregation': () => import('./skills/use-dynamic-aggregation/exercise'),
   'create-pivot-table': () => import('./skills/create-pivot-table/exercise'),
 };
-
-
-// Helper function to calculate incoming and outgoing totals for content items
-// Might be used in the future for skill tree layout - for now, the positioning is manual
-export function calculateOutgoingIncoming(items: ContentMeta[]): ContentMeta[] {
-
-  const incomingCount: Record<string, number> = {};
-  const outgoingCount: Record<string, number> = {};
-
-  // incomingCount: how many prerequisites each item has (incoming edges)
-  // outgoingCount: how many items depend on a given item (outgoing edges)
-  for (const item of items) {
-    incomingCount[item.id] = item.prerequisites?.length ?? 0;
-    for (const prereq of item.prerequisites) {
-      outgoingCount[prereq] = (outgoingCount[prereq] ?? 0) + 1;
-    }
-  }
-
-  return items.map((item) => ({
-    ...item,
-    incomingTotal: incomingCount[item.id] ?? 0,
-    outgoingTotal: outgoingCount[item.id] ?? 0,
-  }));
-}
