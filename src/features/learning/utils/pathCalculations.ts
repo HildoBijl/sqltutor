@@ -8,32 +8,32 @@ import { ContentPositionMeta } from "./treeDefinition";
 * Uses the Drawing library coordinate system directly from item positions.
 * Returns an array of Vector points that form a smooth curved path.
 *
-* @param fromItem - The starting content item (prerequisite).
-* @param toItem - The ending content item (dependent).
+* @param from - The starting content position item (prerequisite).
+* @param to - The ending content position item (dependent).
 * @returns An array of Vector points representing the curved connector path.
 */
 export function computeConnectorPath(
   from: ContentPositionMeta,
   to: ContentPositionMeta,
 ): Vector[] {
-  // Calculate the indices with respect to all prerequisites/follow-ups.
-  const toIndex = to.prerequisitesPathOrder.indexOf(from.id)
-  const fromIndex = from.followUpsPathOrder.indexOf(to.id)
+  // Calculate the index of the from/to with respect to all respective prerequisites/follow-ups.
+  const toIndex = to.prerequisitesPathOrder.indexOf(from.id);
+  const fromIndex = from.followUpsPathOrder.indexOf(to.id);
 
   // Calculate horizontal offsets.
   const startHorizontalOffset = getHorizontalPathOffset(fromIndex, from.followUpsPathOrder.length);
   const endHorizontalOffset = getHorizontalPathOffset(toIndex, to.prerequisitesPathOrder.length);
 
   // Calculate vertical offsets.
-  let startVerticalOffset = getVerticalPathOffset(fromIndex, from.followUpsPathOrder.length)
-  let endVerticalOffset = getVerticalPathOffset(toIndex, to.prerequisitesPathOrder.length)
+  let startVerticalOffset = getVerticalPathOffset(fromIndex, from.followUpsPathOrder.length);
+  let endVerticalOffset = getVerticalPathOffset(toIndex, to.prerequisitesPathOrder.length);
 
   // Determine start and end points.
   const start = from.position.add([startHorizontalOffset, cardHeight / 2]);
   const end = to.position.add([endHorizontalOffset, -cardHeight / 2]);
 
   // Add in intermediate control points.
-  return [start, start.add([0, startVerticalOffset]), end.add([0, -endVerticalOffset]), end]
+  return [start, start.add([0, startVerticalOffset]), end.add([0, -endVerticalOffset]), end];
 }
 
 // getHorizontalPathOffset takes an index (for example "2" for third) and a number of paths (for example 6) and calculates the offset which this third path should have relative to the center, given that there are six paths.

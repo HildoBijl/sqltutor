@@ -11,7 +11,8 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
  * This is a pure rendering component without zoom/pan controls.
  * Uses the Drawing library for coordinate-based positioning.
  *
- * @param contentItems - Array of content items (concepts and skills) to display.
+ * @param contentItems - Array of content items (concepts and skills) with info about these contents.
+ * @param contentPositions - Array of content position data entries to display.
  * @param treeBounds - The bounding box of the tree layout.
  * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
  * @param isCompleted - Function to check if a content item is completed.

@@ -12,7 +12,8 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
 * This component only handles the zoom/pan functionality and UI controls.
 *
-* @param contentItems - Array of content items (concepts and skills) to display.
+* @param contentItems - Array of content items (concepts and skills) with info about these contents.
+* @param contentPositions - Array of content position data entries to display.
 * @param treeBounds - The bounding box of the tree layout.
 * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
 * @param isCompleted - Function to check if a content item is completed.
