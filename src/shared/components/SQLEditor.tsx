@@ -3,6 +3,8 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { Box, Paper } from '@mui/material';
+import { useEffect, useMemo, useRef } from 'react';
+import { useDebounce } from '@/shared/hooks';
 
 interface SQLEditorProps {
   value: string;
@@ -12,6 +14,9 @@ interface SQLEditorProps {
   readOnly?: boolean;
   autoFocus?: boolean;
   onExecute?: () => void;
+  onLiveExecute?: (query: string) => void; // For live query execution
+  enableLiveExecution?: boolean; // Enable live execution feature
+  liveExecutionDelay?: number; // Debounce delay for live execution
   showResults?: boolean; // accepted for compatibility, no-op here
 }
 
@@ -23,41 +28,87 @@ export function SQLEditor({
   readOnly = false,
   autoFocus = false,
   onExecute,
+  onLiveExecute,
+  enableLiveExecution = false,
+  liveExecutionDelay = 150,
 }: SQLEditorProps) {
-  const extensions = [
-    sql(),
-    EditorView.theme({
-      '&': {
-        fontSize: '14px',
-      },
-      '.cm-content': {
-        padding: '12px',
-      },
-      '.cm-focused .cm-cursor': {
-        borderLeftColor: '#c8102e',
-      },
-      '.cm-focused .cm-selectionBackground, ::selection': {
-        backgroundColor: '#c8102e33',
-      },
-    }),
-    EditorView.lineWrapping,
-  ];
+  const executeRef = useRef(onExecute);
 
-  // Add keyboard shortcut for execution
-  if (onExecute) {
-    extensions.push(
-      keymap.of([
-        {
-          key: 'Ctrl-Enter',
-          mac: 'Cmd-Enter',
-          run: () => {
-            onExecute();
-            return true;
-          },
+  useEffect(() => {
+    executeRef.current = onExecute;
+  }, [onExecute]);
+
+  // Debounce the value for live execution
+  const debouncedValue = useDebounce(value, liveExecutionDelay);
+
+  // Handle live execution when debounced value changes
+  useEffect(() => {
+    if (enableLiveExecution && onLiveExecute && debouncedValue.trim()) {
+      onLiveExecute(debouncedValue);
+    }
+  }, [debouncedValue, enableLiveExecution, onLiveExecute]);
+
+  const hasExecute = Boolean(onExecute);
+
+  // Memoize editor configuration so it stays stable between renders.
+  const extensions = useMemo(() => {
+    const baseExtensions = [
+      sql(),
+      EditorView.theme({
+        '&': {
+          fontSize: '14px',
         },
-      ])
-    );
-  }
+        '.cm-content': {
+          padding: '12px',
+        },
+        '.cm-focused .cm-cursor': {
+          borderLeftColor: '#c8102e',
+        },
+        '.cm-focused .cm-selectionBackground, ::selection': {
+          backgroundColor: '#c8102e33',
+        },
+      }),
+      EditorView.lineWrapping,
+    ];
+
+    if (hasExecute) {
+      baseExtensions.push(
+        keymap.of([
+          {
+            key: 'Ctrl-Enter',
+            mac: 'Cmd-Enter',
+            run: () => {
+              const execute = executeRef.current;
+              if (execute) {
+                execute();
+                return true;
+              }
+              return false;
+            },
+          },
+        ])
+      );
+    }
+
+    return baseExtensions;
+  }, [hasExecute]);
+
+  const basicSetup = useMemo(
+    () => ({
+      lineNumbers: true,
+      foldGutter: false,
+      dropCursor: true,
+      allowMultipleSelections: true,
+      indentOnInput: true,
+      bracketMatching: true,
+      closeBrackets: true,
+      autocompletion: true,
+      rectangularSelection: true,
+      highlightSelectionMatches: true,
+      searchKeymap: true,
+    }),
+    []
+  );
 
   return (
     <Paper
@@ -78,19 +129,7 @@ export function SQLEditor({
         height={height}
         editable={!readOnly}
         autoFocus={autoFocus}
-        basicSetup={{
-          lineNumbers: true,
-          foldGutter: false,
-          dropCursor: true,
-          allowMultipleSelections: true,
-          indentOnInput: true,
-          bracketMatching: true,
-          closeBrackets: true,
-          autocompletion: true,
-          rectangularSelection: true,
-          highlightSelectionMatches: true,
-          searchKeymap: true,
-        }}
+        basicSetup={basicSetup}
       />
     </Paper>
   );

@@ -7,11 +7,12 @@ import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider } from './shared/providers/SQLJSProvider';
 import { DatabaseProvider } from './shared/providers/DatabaseProvider';
 import { ErrorBoundary } from './shared/components/ErrorBoundary';
-import { useAppStore } from './store';
+import { useAppStore, useIsStoreReady } from './store';
 
 export function App() {
   const mode = useAppStore((s) => s.currentTheme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const isStoreReady = useIsStoreReady();
 
   const muiTheme = useMemo(() => getTheme(mode), [mode]);
 
@@ -20,6 +21,10 @@ export function App() {
   }, [mode]);
 
   const toggleColorMode = () => setTheme(mode === 'light' ? 'dark' : 'light');
+
+  if (!isStoreReady) {
+    return null;
+  }
 
   return (
     <StrictMode>

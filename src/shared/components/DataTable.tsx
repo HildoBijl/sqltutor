@@ -177,7 +177,7 @@ export function DataTable({
         </Table>
       </TableContainer>
 
-      {showPagination && values.length > rowsPerPage && (
+      {showPagination && displayValues.length > 0 && (
         <TablePagination
           component="div"
           count={displayValues.length}

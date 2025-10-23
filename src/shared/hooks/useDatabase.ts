@@ -18,6 +18,7 @@ interface UseDatabaseReturn {
   database: any | null;
   executeQuery: (query: string) => Promise<QueryResult[]>;
   resetDatabase: () => void;
+  clearQueryState: () => void;
   isReady: boolean;
   isExecuting: boolean;
   error: string | null;
@@ -43,6 +44,11 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   const [queryResult, setQueryResult] = useState<QueryResult[] | null>(null);
   const [queryError, setQueryError] = useState<Error | null>(null);
   const [tableNames, setTableNames] = useState<string[]>([]);
+
+  const clearQueryState = useCallback(() => {
+    setQueryResult(null);
+    setQueryError(null);
+  }, []);
 
   // Determine which schema to use
   const resolvedSchema = schema ? schemas[schema] : schemas.companies;
@@ -143,6 +149,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
         }
       })();
       const error = new Error(message || 'Query execution failed');
+      setQueryResult(null);
       setQueryError(error);
       throw error;
     } finally {
@@ -155,15 +162,15 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     resetContextDatabase(context);
     // Clear local ref so effect reinitializes a new DB instance
     setDatabase(null);
-    setQueryResult(null);
-    setQueryError(null);
+    clearQueryState();
     setError(null);
-  }, [context, resetContextDatabase]);
+  }, [context, resetContextDatabase, clearQueryState]);
 
   return {
     database,
     executeQuery,
     resetDatabase,
+    clearQueryState,
     isReady: contextReady && !!database,
     isExecuting,
     error,

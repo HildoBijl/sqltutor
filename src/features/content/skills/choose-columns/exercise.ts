@@ -1,42 +1,237 @@
-export interface ExerciseState {
-  id: string;
-  description: string;
-  expectedQuery: string;
+import { COMMON_MESSAGES } from '../../messages';
+import { template } from '../../utils';
+import type {
+  ExecutionResult,
+  QueryResult,
+  Utils,
+  ValidationResult,
+  VerificationResult,
+} from '../../types';
+import { schemas } from '../../../database/schemas';
+import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
+
+interface CompanyRow {
+  id: number;
+  company_name: string;
+  country: string;
+  founded_year: number | null;
+  num_employees: number | null;
+  industry: string | null;
 }
 
-type Utils = {
-  selectRandomly: <T>(items: readonly T[]) => T;
-};
+interface FieldDescriptor {
+  column: string;
+  property: keyof CompanyRow;
+}
 
-const scenarios: readonly ExerciseState[] = [
+interface ScenarioBuildResult {
+  description: string;
+  fields: FieldDescriptor[];
+}
+
+interface ScenarioDefinition {
+  id: ChooseColumnsState['scenario'];
+  build(utils: Utils): ScenarioBuildResult;
+}
+
+export interface ChooseColumnsState {
+  scenario: 'choose-columns-basic' | 'choose-columns-alias' | 'choose-columns-location';
+  columns: string[];
+  expectedValues: unknown[][];
+}
+
+export interface ExerciseState {
+  id: ChooseColumnsState['scenario'];
+  description: string;
+  state: ChooseColumnsState;
+}
+
+const RAW_COMPANIES = parseSchemaRows(schemas.companies, 'companies');
+
+const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
+  id: Number(row.id ?? 0),
+  company_name: stringify(row.company_name),
+  country: stringify(row.country),
+  founded_year: typeof row.founded_year === 'number' ? row.founded_year : null,
+  num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
+  industry: row.industry === null || row.industry === undefined ? null : stringify(row.industry),
+}));
+
+const EXPECTED_ROW_COUNT = COMPANIES.length;
+
+export const MESSAGES = {
+  descriptions: {
+    'choose-columns-basic': 'Return company name and industry from the companies table.',
+    'choose-columns-alias': 'Select company name and number of employees, renaming the numeric column to employees.',
+    'choose-columns-location': 'Retrieve company name together with country and founded year.',
+  },
+  validation: {
+    ...COMMON_MESSAGES.validation,
+    noResultSet: 'Query returned no data.',
+    missingColumns: 'Select exactly the requested columns in the correct order.',
+    unexpectedColumns: 'Remove any extra columns from your result.',
+  },
+  verification: {
+    ...COMMON_MESSAGES.verification,
+    correct: 'Perfect! Those columns look great.',
+    wrongRowCount: 'Expected {expected} rows but got {actual}.',
+    wrongValues: 'Some rows do not match the expected results.',
+  },
+} as const;
+
+const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'choose-columns-basic',
-    description: 'Return company name and industry from the companies table.',
-    expectedQuery: 'SELECT company_name, industry FROM companies',
+    build() {
+      return {
+        description: MESSAGES.descriptions['choose-columns-basic'],
+        fields: [
+          { column: 'company_name', property: 'company_name' },
+          { column: 'industry', property: 'industry' },
+        ],
+      };
+    },
   },
   {
     id: 'choose-columns-alias',
-    description: 'Select company name and number of employees, renaming the numeric column to employees.',
-    expectedQuery: 'SELECT company_name, num_employees AS employees FROM companies',
+    build() {
+      return {
+        description: MESSAGES.descriptions['choose-columns-alias'],
+        fields: [
+          { column: 'company_name', property: 'company_name' },
+          { column: 'employees', property: 'num_employees' },
+        ],
+      };
+    },
   },
   {
     id: 'choose-columns-location',
-    description: 'Retrieve company name together with country and founded year.',
-    expectedQuery: 'SELECT company_name, country, founded_year FROM companies',
+    build() {
+      return {
+        description: MESSAGES.descriptions['choose-columns-location'],
+        fields: [
+          { column: 'company_name', property: 'company_name' },
+          { column: 'country', property: 'country' },
+          { column: 'founded_year', property: 'founded_year' },
+        ],
+      };
+    },
   },
 ];
 
 export function generate(utils: Utils): ExerciseState {
-  return utils.selectRandomly(scenarios);
+  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
+  const { description, fields } = scenario.build(utils);
+
+  const columns = fields.map((field) => field.column);
+  const expectedValues = COMPANIES.map((company) =>
+    fields.map((field) => company[field.property] ?? null),
+  );
+
+  return {
+    id: scenario.id,
+    description,
+    state: {
+      scenario: scenario.id,
+      columns,
+      expectedValues,
+    },
+  };
 }
 
-function normalize(query: string) {
-  return query.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+export function validateOutput(
+  exercise: ExerciseState,
+  result: ExecutionResult<QueryResult[]>,
+): ValidationResult {
+  if (!result.success) {
+    return {
+      ok: false,
+      message: template(MESSAGES.validation.syntaxError, {
+        error: result.error?.message || 'Unknown error',
+      }),
+    };
+  }
+
+  const firstResult = result.output?.[0];
+  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
+    return {
+      ok: false,
+      message: MESSAGES.validation.noResultSet,
+    };
+  }
+
+  if (firstResult.columns.length !== exercise.state.columns.length) {
+    return {
+      ok: false,
+      message: MESSAGES.validation.missingColumns,
+    };
+  }
+
+  for (let index = 0; index < exercise.state.columns.length; index += 1) {
+    if (firstResult.columns[index] !== exercise.state.columns[index]) {
+      return {
+        ok: false,
+        message: MESSAGES.validation.missingColumns,
+      };
+    }
+  }
+
+  return { ok: true };
 }
 
-export function validate(input: string, state: ExerciseState | null, _result: unknown) {
-  if (!state) return false;
-  return normalize(input) === normalize(state.expectedQuery);
+export function verifyOutput(
+  exercise: ExerciseState,
+  output: QueryResult[] | undefined,
+): VerificationResult {
+  const firstResult = output?.[0];
+
+  if (!firstResult || !Array.isArray(firstResult.values)) {
+    return {
+      correct: false,
+      message: MESSAGES.validation.noResultSet,
+    };
+  }
+
+  if (firstResult.values.length !== EXPECTED_ROW_COUNT) {
+    return {
+      correct: false,
+      message: template(MESSAGES.verification.wrongRowCount, {
+        expected: EXPECTED_ROW_COUNT,
+        actual: firstResult.values.length,
+      }),
+    };
+  }
+
+  const normalizedActual = firstResult.values.map((row) =>
+    JSON.stringify(row.slice(0, exercise.state.columns.length)),
+  );
+  const normalizedExpected = exercise.state.expectedValues.map((row) => JSON.stringify(row));
+
+  normalizedActual.sort();
+  normalizedExpected.sort();
+
+  const matches = normalizedActual.length === normalizedExpected.length &&
+    normalizedActual.every((value, index) => value === normalizedExpected[index]);
+
+  return {
+    correct: matches,
+    message: matches ? MESSAGES.verification.correct : MESSAGES.verification.wrongValues,
+  };
 }
 
-export const solutionTemplate = '{{expectedQuery}};';
+export function getSolution(exercise: ExerciseState): string {
+  switch (exercise.state.scenario) {
+    case 'choose-columns-basic':
+      return 'SELECT company_name, industry FROM companies';
+    case 'choose-columns-alias':
+      return 'SELECT company_name, num_employees AS employees FROM companies';
+    case 'choose-columns-location':
+      return 'SELECT company_name, country, founded_year FROM companies';
+    default:
+      return 'SELECT company_name FROM companies';
+  }
+}
+
+function stringify(value: unknown): string {
+  return value === null || value === undefined ? '' : String(value);
+}

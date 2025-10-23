@@ -1,42 +1,239 @@
-export interface ExerciseState {
-  id: string;
-  description: string;
-  expectedQuery: string;
+import { COMMON_MESSAGES } from '../../messages';
+import { template } from '../../utils';
+import type {
+  ExecutionResult,
+  QueryResult,
+  Utils,
+  ValidationResult,
+  VerificationResult,
+} from '../../types';
+import { schemas } from '../../../database/schemas';
+import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
+
+interface CompanyRow {
+  id: number;
+  company_name: string;
+  country: string;
+  founded_year: number | null;
+  num_employees: number | null;
+  industry: string | null;
 }
 
-type Utils = {
-  selectRandomly: <T>(items: readonly T[]) => T;
-};
+type ScenarioId = 'single-criterion-country' | 'single-criterion-founded' | 'single-criterion-industry';
 
-const scenarios: readonly ExerciseState[] = [
+interface ScenarioDefinition {
+  id: ScenarioId;
+  description: string;
+  columns: string[];
+  expectedRows: unknown[][];
+}
+
+export interface WriteSingleCriterionState {
+  scenario: ScenarioId;
+  columns: string[];
+  expectedRows: unknown[][];
+}
+
+export interface ExerciseState {
+  id: ScenarioId;
+  description: string;
+  state: WriteSingleCriterionState;
+}
+
+const RAW_COMPANIES = parseSchemaRows(schemas.companies, 'companies');
+
+const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
+  id: Number(row.id ?? 0),
+  company_name: stringify(row.company_name),
+  country: stringify(row.country),
+  founded_year: typeof row.founded_year === 'number' ? row.founded_year : null,
+  num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
+  industry: row.industry === null || row.industry === undefined ? null : stringify(row.industry),
+}));
+
+const ALL_COLUMNS = ['id', 'company_name', 'country', 'founded_year', 'num_employees', 'industry'];
+
+export const MESSAGES = {
+  descriptions: {
+    'single-criterion-country': 'Show company name and country for organisations based in the Netherlands.',
+    'single-criterion-founded': 'Retrieve all companies founded before 1980.',
+    'single-criterion-industry': 'List technology companies with their employee counts.',
+  },
+  validation: {
+    ...COMMON_MESSAGES.validation,
+    noResultSet: 'Query returned no data.',
+    wrongColumns: 'Return exactly the requested columns for this exercise.',
+  },
+  verification: {
+    ...COMMON_MESSAGES.verification,
+    correct: 'Filter looks good!',
+    wrongRowCount: 'Expected {expected} rows but got {actual}.',
+    wrongValues: 'Some returned rows do not match the filter criteria.',
+  },
+} as const;
+
+const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'single-criterion-country',
-    description: 'Show company name and country for organisations based in the Netherlands.',
-    expectedQuery: "SELECT company_name, country FROM companies WHERE country = 'Netherlands'",
+    description: MESSAGES.descriptions['single-criterion-country'],
+    columns: ['company_name', 'country'],
+    expectedRows: COMPANIES.filter((company) => company.country === 'Netherlands')
+      .map((company) => [company.company_name, company.country])
+      .sort(compareRows),
   },
   {
     id: 'single-criterion-founded',
-    description: 'Retrieve all companies founded before 1980.',
-    expectedQuery: 'SELECT * FROM companies WHERE founded_year < 1980',
+    description: MESSAGES.descriptions['single-criterion-founded'],
+    columns: ALL_COLUMNS,
+    expectedRows: COMPANIES.filter((company) => (company.founded_year ?? Number.MAX_SAFE_INTEGER) < 1980)
+      .map((company) => [
+        company.id,
+        company.company_name,
+        company.country,
+        company.founded_year,
+        company.num_employees,
+        company.industry,
+      ])
+      .sort(compareRows),
   },
   {
     id: 'single-criterion-industry',
-    description: 'List technology companies with their employee counts.',
-    expectedQuery: "SELECT company_name, num_employees FROM companies WHERE industry = 'Technology'",
+    description: MESSAGES.descriptions['single-criterion-industry'],
+    columns: ['company_name', 'num_employees'],
+    expectedRows: COMPANIES.filter((company) => company.industry === 'Technology')
+      .map((company) => [company.company_name, company.num_employees])
+      .sort(compareRows),
   },
 ];
 
 export function generate(utils: Utils): ExerciseState {
-  return utils.selectRandomly(scenarios);
+  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
+
+  return {
+    id: scenario.id,
+    description: scenario.description,
+    state: {
+      scenario: scenario.id,
+      columns: scenario.columns,
+      expectedRows: scenario.expectedRows,
+    },
+  };
 }
 
-function normalize(query: string) {
-  return query.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+export function validateOutput(
+  exercise: ExerciseState,
+  result: ExecutionResult<QueryResult[]>,
+): ValidationResult {
+  if (!result.success) {
+    return {
+      ok: false,
+      message: template(MESSAGES.validation.syntaxError, {
+        error: result.error?.message || 'Unknown error',
+      }),
+    };
+  }
+
+  const firstResult = result.output?.[0];
+  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
+    return {
+      ok: false,
+      message: MESSAGES.validation.noResultSet,
+    };
+  }
+
+  if (firstResult.columns.length !== exercise.state.columns.length) {
+    return {
+      ok: false,
+      message: MESSAGES.validation.wrongColumns,
+    };
+  }
+
+  for (let index = 0; index < exercise.state.columns.length; index += 1) {
+    if (firstResult.columns[index] !== exercise.state.columns[index]) {
+      return {
+        ok: false,
+        message: MESSAGES.validation.wrongColumns,
+      };
+    }
+  }
+
+  return { ok: true };
 }
 
-export function validate(input: string, state: ExerciseState | null, _result: unknown) {
-  if (!state) return false;
-  return normalize(input) === normalize(state.expectedQuery);
+export function verifyOutput(
+  exercise: ExerciseState,
+  output: QueryResult[] | undefined,
+): VerificationResult {
+  const firstResult = output?.[0];
+
+  if (!firstResult || !Array.isArray(firstResult.values)) {
+    return {
+      correct: false,
+      message: MESSAGES.validation.noResultSet,
+    };
+  }
+
+  const normalizedActual = firstResult.values.map((row) =>
+    JSON.stringify(row.slice(0, exercise.state.columns.length).map(normalizeValue)),
+  );
+  const normalizedExpected = exercise.state.expectedRows.map((row) =>
+    JSON.stringify(row.map(normalizeValue)),
+  );
+
+  normalizedActual.sort();
+  normalizedExpected.sort();
+
+  if (normalizedActual.length !== normalizedExpected.length) {
+    return {
+      correct: false,
+      message: template(MESSAGES.verification.wrongRowCount, {
+        expected: normalizedExpected.length,
+        actual: normalizedActual.length,
+      }),
+    };
+  }
+
+  const matches = normalizedActual.every((value, index) => value === normalizedExpected[index]);
+
+  return {
+    correct: matches,
+    message: matches ? MESSAGES.verification.correct : MESSAGES.verification.wrongValues,
+  };
 }
 
-export const solutionTemplate = '{{expectedQuery}};';
+export function getSolution(exercise: ExerciseState): string {
+  switch (exercise.state.scenario) {
+    case 'single-criterion-country':
+      return "SELECT company_name, country FROM companies WHERE country = 'Netherlands'";
+    case 'single-criterion-founded':
+      return 'SELECT * FROM companies WHERE founded_year < 1980';
+    case 'single-criterion-industry':
+      return "SELECT company_name, num_employees FROM companies WHERE industry = 'Technology'";
+    default:
+      return 'SELECT company_name FROM companies';
+  }
+}
+
+function stringify(value: unknown): string {
+  return value === null || value === undefined ? '' : String(value);
+}
+
+function compareRows(a: unknown[], b: unknown[]): number {
+  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
+    const left = a[index] === null ? '' : String(a[index]);
+    const right = b[index] === null ? '' : String(b[index]);
+    const diff = left.localeCompare(right);
+    if (diff !== 0) return diff;
+  }
+  return a.length - b.length;
+}
+
+function normalizeValue(value: unknown): unknown {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? Math.round(value * 1000) / 1000 : null;
+  }
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  return value;
+}

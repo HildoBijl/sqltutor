@@ -79,7 +79,7 @@ export const getTheme = (mode: PaletteMode) =>
   });
 
 // Backwards-compat: existing imports that expect a theme object
-export const theme = getTheme('dark');
+export const theme = getTheme('light');
 
 export const ColorModeContext = createContext<{
   mode: PaletteMode;

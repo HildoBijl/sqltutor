@@ -1,38 +1,34 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
   Card,
-  CardContent,
   Container,
   Typography,
   Alert,
-  Snackbar,
   CircularProgress,
   Tabs,
   Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Paper,
 } from '@mui/material';
-import { PlayArrow, CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt } from '@mui/icons-material';
+import { CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
-import { useComponentState } from '@/store';
+import { useComponentState, useAppStore, type SkillComponentState } from '@/store';
 import { useDatabase } from '@/shared/hooks/useDatabase';
 import type { SchemaKey } from '@/features/database/schemas';
 import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
 import { useContent } from './hooks/useContent';
-import { useSkillExerciseState } from './useSkillExerciseState';
-
-interface ExerciseInstance {
-  id: string;
-  description: string;
-  expectedQuery?: string;
-  validatorFn?: (input: string, state: any, result: any) => boolean;
-  solutionTemplate?: string;
-  config?: { database?: string };
-  state: any; // generated state from generator
-}
+import { useSkillExerciseState, type SkillExerciseModuleLike } from './useSkillExerciseState';
+import type { ExecutionResult as SqlExecutionResult } from '@/features/content/types';
+import { DataExplorerTab } from './components/DataExplorerTab';
+import { SKILL_SCHEMAS } from '@/constants';
 
 type SkillExerciseLoader = (typeof skillExerciseLoaders)[keyof typeof skillExerciseLoaders];
 type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
@@ -40,31 +36,55 @@ type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
 export default function SkillPage() {
   const { skillId } = useParams<{ skillId: string }>();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(0); // 0: Practice, 1: Theory, 2: Story
+  const [currentTab, setCurrentTab] = useState(1); // Always start with practice tab
 
   // State management
-  const [componentState, setComponentState] = useComponentState(skillId || '');
+  const [componentState, setComponentState] = useComponentState<SkillComponentState>(skillId || '', 'skill');
+  const hideStories = useAppStore((state) => state.hideStories);
+
+  // Define available tabs, filtering out story if hideStories is enabled
+  const allTabs = [
+    { key: 'story', label: 'Story', icon: <MenuBook /> },
+    { key: 'practice', label: 'Practice', icon: <Edit /> },
+    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: 'data', label: 'Data Explorer', icon: <Storage /> },
+  ];
+  
+  const availableTabs = allTabs.filter(tab => !(hideStories && tab.key === 'story'));
+
+  // Helper function to check current tab
+  const isCurrentTab = (tabKey: string) => {
+    const tab = availableTabs[currentTab];
+    return tab ? tab.key === tabKey : false;
+  };
 
   // Skill content + exercise state
-  const [skillModule, setSkillModule] = useState<{
-    generate?: (utils: any) => any;
-    validate?: (input: string, state: any, result: any) => boolean;
-    solutionTemplate?: string;
-  } | null>(null);
-  const { currentExercise, startNewExercise, submitInput } = useSkillExerciseState(
+  const [skillModule, setSkillModule] = useState<SkillExerciseModuleLike | null>(null);
+  const {
+    progress: exerciseProgress,
+    status: exerciseStatus,
+    currentExercise,
+    dispatch: exerciseDispatch,
+    solution: exerciseSolution,
+    recordAttempt,
+  } = useSkillExerciseState(
     skillId || '',
     skillModule,
   );
   const [query, setQuery] = useState('');
-  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const exerciseCompleted = !!currentExercise?.done;
+  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning' } | null>(null);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const exerciseCompleted = exerciseStatus === 'correct';
 
   // Skill metadata
   const [skillMeta, setSkillMeta] = useState<(ContentMeta & { database?: SchemaKey }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Database setup - allow meta-defined schema or fallback to skill mapping
-  const metaSchema = (skillMeta?.database as SchemaKey | undefined);
+  // Database setup - use skill schema mapping or fallback to default
+  const skillSchema = (skillId && skillId in SKILL_SCHEMAS) 
+    ? SKILL_SCHEMAS[skillId as keyof typeof SKILL_SCHEMAS] as SchemaKey
+    : 'companies' as SchemaKey;
+  
   const {
     executeQuery,
     queryResult,
@@ -75,7 +95,7 @@ export default function SkillPage() {
     resetDatabase: resetExerciseDb,
   } = useDatabase({
     context: 'exercise',
-    schema: metaSchema,
+    schema: skillSchema,
     resetOnSchemaChange: true,
     persistent: false,
   });
@@ -83,6 +103,8 @@ export default function SkillPage() {
   // Required exercises to mark skill as complete
   const requiredCount = 3;
   const isCompleted = (componentState.numSolved || 0) >= requiredCount;
+
+  const normalizeForHistory = (value: string) => value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
 
   useEffect(() => {
     if (!skillId) return;
@@ -111,11 +133,19 @@ export default function SkillPage() {
     loader()
       .then((mod: SkillExerciseModule) => {
         if (cancelled) return;
-        setSkillModule({
-          generate: typeof mod.generate === 'function' ? mod.generate : undefined,
-          validate: typeof mod.validate === 'function' ? mod.validate : undefined,
-          solutionTemplate: typeof mod.solutionTemplate === 'string' ? mod.solutionTemplate : undefined,
-        });
+        const extendedMod = mod as any;
+        const moduleConfig: SkillExerciseModuleLike = {
+          generate: typeof extendedMod.generate === 'function' ? extendedMod.generate : undefined,
+          validate: typeof extendedMod.validate === 'function' ? extendedMod.validate : undefined,
+          validateInput: typeof extendedMod.validateInput === 'function' ? extendedMod.validateInput : undefined,
+          validateOutput: typeof extendedMod.validateOutput === 'function' ? extendedMod.validateOutput : undefined,
+          verifyOutput: typeof extendedMod.verifyOutput === 'function' ? extendedMod.verifyOutput : undefined,
+          getSolution: typeof extendedMod.getSolution === 'function' ? extendedMod.getSolution : undefined,
+          runDemo: typeof extendedMod.runDemo === 'function' ? extendedMod.runDemo : undefined,
+          solutionTemplate: typeof extendedMod.solutionTemplate === 'string' ? extendedMod.solutionTemplate : undefined,
+          messages: typeof extendedMod.messages === 'object' && extendedMod.messages !== null ? extendedMod.messages : undefined,
+        };
+        setSkillModule(moduleConfig);
       })
       .catch((err: unknown) => {
         console.error('Failed to load skill content:', err);
@@ -130,12 +160,6 @@ export default function SkillPage() {
     };
   }, [skillId]);
 
-  useEffect(() => {
-    if (componentState.type !== 'skill') {
-      setComponentState({ type: 'skill' });
-    }
-  }, [componentState.type, setComponentState]);
-
   // Cleanup exercise database when leaving the page
   useEffect(() => {
     return () => {
@@ -143,18 +167,21 @@ export default function SkillPage() {
     };
   }, [resetExerciseDb]);
 
-  // Restore saved tab
+  // Always default to practice tab
   useEffect(() => {
-    if (componentState.tab) {
-      const tabIndex = ['practice', 'theory', 'story'].indexOf(componentState.tab as string);
-      if (tabIndex >= 0) setCurrentTab(tabIndex);
+    const practiceIndex = availableTabs.findIndex(tab => tab.key === 'practice');
+    if (practiceIndex >= 0) {
+      setCurrentTab(practiceIndex);
+      setComponentState({ tab: 'practice' });
     }
-  }, [componentState.tab]);
+  }, [availableTabs.length, hideStories]); // Only depend on tab count and hideStories changes
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
-    const tabNames = ['practice', 'theory', 'story'];
-    setComponentState({ tab: tabNames[newValue] });
+    const selectedTab = availableTabs[newValue];
+    if (selectedTab) {
+      setComponentState({ tab: selectedTab.key });
+    }
   };
 
   const TheoryContent = useContent(skillMeta?.id, 'Theory');
@@ -174,78 +201,189 @@ export default function SkillPage() {
     );
   };
 
-  // Initialize first exercise when DB ready
+  // Initialize first exercise when database and module are ready
   useEffect(() => {
-    if (dbReady && !currentExercise) {
-      startNewExercise();
+    if (!dbReady || !skillModule) return;
+    if (!exerciseProgress.exercise) {
+      exerciseDispatch({ type: 'generate' });
     }
-  }, [dbReady, currentExercise, startNewExercise]);
+  }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
 
-  // Also start when content module becomes available
-  useEffect(() => {
-    if (dbReady && skillModule && !currentExercise) {
-      startNewExercise();
+  // Handle live query execution (for preview results)
+  const handleLiveExecute = useCallback(async (liveQuery: string) => {
+    if (!dbReady || exerciseCompleted || !currentExercise) return;
+    
+    // Clear feedback if query is empty
+    if (!liveQuery.trim()) {
+      setFeedback(null);
+      return;
     }
-  }, [dbReady, skillModule, currentExercise, startNewExercise]);
+    
+    try {
+      // Just execute the query - don't do validation/verification for live updates
+      // This keeps typing responsive
+      await executeQuery(liveQuery);
+      // The results will show in the table, but we won't provide feedback during typing
+    } catch (error: any) {
+      // Silently fail for live execution - errors will show in the UI via queryError
+      console.debug('Live query execution failed:', error);
+    }
+  }, [dbReady, exerciseCompleted, currentExercise, executeQuery]);
 
-  // Check answer
-  const handleExecute = async (override?: string) => {
-    const effectiveQuery = (override ?? query).trim();
+  // Check answer (for actual submission)
+  const handleExecute = useCallback(async (override?: string) => {
+    const rawQuery = override ?? query;
+    const effectiveQuery = rawQuery.trim();
     if (!currentExercise || !effectiveQuery) return;
-    // Prevent counting multiple completions on the same exercise instance
+
     if (exerciseCompleted) {
       setFeedback({ message: 'Already completed. Click Next Exercise to continue.', type: 'info' });
       return;
     }
+
     if (!dbReady) {
       setFeedback({ message: 'Database is still loading. Please try again in a moment.', type: 'info' });
       return;
     }
 
-    try {
-      const result = await executeQuery(effectiveQuery);
+    const normalized = normalizeForHistory(effectiveQuery);
+    const previousAttempt = exerciseProgress.attempts.find((attempt) => attempt.normalizedInput === normalized);
+    if (previousAttempt) {
+      exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
+      setFeedback({
+        message: previousAttempt.feedback || 'You already tried this exact query.',
+        type:
+          previousAttempt.status === 'correct'
+            ? 'success'
+            : previousAttempt.status === 'invalid'
+            ? 'warning'
+            : 'info',
+      });
+      return;
+    }
 
-      const outcome = submitInput(effectiveQuery, result);
-      const isCorrect = !!outcome?.correct;
-      if (isCorrect) {
+    const supportsOutputValidation =
+      typeof skillModule?.validateOutput === 'function' && typeof skillModule?.verifyOutput === 'function';
+
+    if (!supportsOutputValidation) {
+      console.warn('Skill module missing verifyOutput/validateOutput implementation:', skillId);
+      setFeedback({
+        message: 'This exercise cannot be verified yet because it lacks result validation. Please try another exercise.',
+        type: 'warning',
+      });
+      return;
+    }
+
+    try {
+      let execution: SqlExecutionResult;
+      try {
+        const output = await executeQuery(effectiveQuery);
+        execution = { success: true, output };
+      } catch (error: any) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        execution = { success: false, error: err };
+      }
+
+      const validation = skillModule!.validateOutput!(currentExercise, execution);
+
+      if (!validation.ok) {
+        recordAttempt({ input: effectiveQuery, result: execution.output ?? null, validation });
         setFeedback({
-          message: `Excellent! Exercise completed successfully! (${Math.min((componentState.numSolved || 0), requiredCount)}/${requiredCount})`,
-          type: 'success'
+          message: validation.message || 'Query result has invalid structure.',
+          type: execution.success ? 'warning' : 'error',
         });
+        return;
+      }
+
+      const outputForVerification = execution.output ?? [];
+      const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification);
+
+      recordAttempt({
+        input: effectiveQuery,
+        result: execution.output ?? null,
+        validation,
+        verification,
+      });
+
+      if (verification.correct) {
+        const previousSolvedCount = componentState.numSolved || 0;
+        const alreadyCounted = exerciseCompleted;
+        const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
+
+        if (!alreadyCounted) {
+          setComponentState((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+        }
+
+        const reachedMasteryNow =
+          !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
+
+        if (reachedMasteryNow) {
+          setShowCompletionDialog(true);
+        } else {
+          const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
+          setFeedback({
+            message:
+              verification.message ||
+              `Excellent! Exercise completed successfully! (${progressDisplay}/${requiredCount})`,
+            type: 'success',
+          });
+        }
       } else {
         setFeedback({
-          message: 'Not quite right. Check your query and try again!',
-          type: 'info'
+          message: verification.message || 'Not quite right. Check your query and try again!',
+          type: 'info',
         });
       }
     } catch (error: any) {
       setFeedback({
-        message: `Query error: ${error?.message || 'Unknown error'}`,
+        message: 'Query error: ' + (error?.message || 'Unknown error'),
         type: 'error',
       });
     }
-  };
+  }, [
+    query,
+    currentExercise,
+    exerciseCompleted,
+    dbReady,
+    normalizeForHistory,
+    exerciseProgress.attempts,
+    skillModule,
+    executeQuery,
+    recordAttempt,
+    componentState.numSolved,
+    requiredCount,
+    setComponentState,
+    exerciseDispatch,
+    skillId,
+  ]);
 
   // Reset database without changing the exercise instance
-  const handleResetDatabase = () => {
+  const handleResetDatabase = useCallback(() => {
     resetExerciseDb();
+    exerciseDispatch({ type: 'reset', keepExercise: true });
     setQuery('');
     setFeedback({ message: 'Database reset - try again!', type: 'info' });
-  };
+  }, [resetExerciseDb, exerciseDispatch]);
 
   // Autocomplete solution for the current exercise
-  const handleAutoComplete = async () => {
+  const handleAutoComplete = useCallback(async () => {
     if (!currentExercise) return;
 
-    // Prefer explicit expectedQuery if provided by generator
-    let solution = currentExercise.expectedQuery;
+    let solution = exerciseSolution;
 
-    // Otherwise use solution template if available
+    if (!solution && typeof skillModule?.getSolution === 'function') {
+      solution = skillModule.getSolution(currentExercise) ?? undefined;
+    }
+
+    if (!solution && (currentExercise as any).expectedQuery) {
+      solution = (currentExercise as any).expectedQuery;
+    }
+
     if (!solution && skillModule?.solutionTemplate) {
-      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, p1) => {
-        const key = String(p1).trim();
-        const v = currentExercise.state?.[key];
-        return v !== undefined && v !== null ? String(v) : '';
+      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, token) => {
+        const key = String(token).trim();
+        const value = (currentExercise as Record<string, unknown>)[key];
+        return value !== undefined && value !== null ? String(value) : '';
       });
     }
 
@@ -255,15 +393,18 @@ export default function SkillPage() {
     }
 
     setQuery(solution);
-    setFeedback({ message: 'Solution inserted. Press Run & Check to execute.', type: 'info' });
-  };
+  }, [currentExercise, exerciseSolution, skillModule]);
 
   // New exercise
-  const handleNewExercise = () => {
-    startNewExercise();
+  const handleNewExercise = useCallback(() => {
+    if (!exerciseCompleted) {
+      setFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
+      return;
+    }
+    exerciseDispatch({ type: 'generate' });
     setQuery('');
     setFeedback(null);
-  };
+  }, [exerciseCompleted, exerciseDispatch]);
 
   if (isLoading) {
     return (
@@ -294,6 +435,30 @@ export default function SkillPage() {
           {skillMeta.name}
           {isCompleted && <CheckCircle color="success" sx={{ ml: 1 }} />}
         </Typography>
+        {/* Progress Indicator */}
+        {isCurrentTab('practice') && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Progress:
+            </Typography>
+            <Box sx={{ 
+              bgcolor: isCompleted ? 'success.main' : 'primary.main',
+              color: 'white',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 1,
+              fontSize: '0.875rem',
+              fontWeight: 500
+            }}>
+              {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount}
+            </Box>
+            {isCompleted && (
+              <Typography variant="body2" color="success.main" sx={{ fontWeight: 500 }}>
+                Mastered!
+              </Typography>
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* Description */}
@@ -304,183 +469,310 @@ export default function SkillPage() {
       </Box>
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={currentTab} onChange={handleTabChange}>
-          <Tab label="Practice" />
-          <Tab label="Theory" />
-          <Tab label="Story" />
-        </Tabs>
-      </Box>
+      <Card>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={currentTab} onChange={handleTabChange}>
+            {availableTabs.map((tab) => (
+              <Tab 
+                key={tab.key} 
+                label={tab.label} 
+                icon={tab.icon} 
+                iconPosition="start" 
+              />
+            ))}
+          </Tabs>
+        </Box>
+        
+        {/* Tab Content */}
+        {isCurrentTab('practice') && (
+          <Box sx={{ p: 3 }}>
+            {/* Exercise Description */}
+            {currentExercise && (
+              <Paper sx={{ p: 2, mb: 3, bgcolor: 'action.hover' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
+                  {(componentState.numSolved || 0) >= requiredCount
+                    ? 'Practice Exercise'
+                    : 'Exercise'
+                  }
+                </Typography>
+                <Typography variant="body1">
+                  {currentExercise.description}
+                </Typography>
+                {tableNames.length > 0 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Available tables: {tableNames.join(', ')}
+                  </Typography>
+                )}
+              </Paper>
+            )}
 
-      {/* Progress */}
-      {currentTab === 0 && (
-        <Alert severity={isCompleted ? 'success' : 'info'} sx={{ mb: 2 }}>
-          Progress: {Math.min(componentState.numSolved || 0, requiredCount)}/{requiredCount} exercises completed
-          {isCompleted && ' - Skill mastered!'}
-        </Alert>
-      )}
-
-      {/* Database Info */}
-      {currentTab === 0 && tableNames.length > 0 && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <Typography variant="body2">
-            <strong>Available tables:</strong> {tableNames.join(', ')}
-          </Typography>
-        </Alert>
-      )}
-
-      {/* Exercise Description */}
-      {currentTab === 0 && currentExercise && (
-        <Card sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Exercise {Math.min((componentState.numSolved || 0) + 1, requiredCount)}
-            </Typography>
-            <Typography variant="body1">
-              {currentExercise.description}
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* SQL Editor */}
-      {currentTab === 0 && (
-        <Card sx={{ mb: 2 }}>
-          <Box sx={{
-            p: 1,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <Typography variant="subtitle2" sx={{ ml: 1 }}>
-              Write your SQL query:
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                size="small"
-                onClick={handleAutoComplete}
-                startIcon={<CheckCircle />}
-                disabled={!currentExercise || isExecuting}
-              >
-                Auto-complete
-              </Button>
-              <Button
-                size="small"
-                startIcon={<RestartAlt />}
-                onClick={handleResetDatabase}
-                disabled={!dbReady || isExecuting}
-                title="Reset the current exercise database"
-              >
-                Reset Database
-              </Button>
-              {!exerciseCompleted ? (
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   size="small"
-                  startIcon={<Refresh />}
-                  onClick={handleNewExercise}
-                  disabled={isExecuting}
-                  title="Try a different exercise"
+                  onClick={handleAutoComplete}
+                  startIcon={<Lightbulb />}
+                  disabled={!currentExercise || isExecuting}
+                  variant="outlined"
                 >
-                  Try Another
+                  Show Solution
                 </Button>
-              ) : (
+                <Button
+                  size="small"
+                  startIcon={<RestartAlt />}
+                  onClick={handleResetDatabase}
+                  disabled={!dbReady || isExecuting}
+                  title="Reset the current exercise database"
+                  variant="outlined"
+                >
+                  Reset Database
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {!exerciseCompleted ? (
+                  <Button
+                    size="small"
+                    startIcon={<Refresh />}
+                    onClick={handleNewExercise}
+                    disabled={isExecuting}
+                    title="Finish the current exercise to unlock a new one"
+                    variant="outlined"
+                  >
+                    Try Another
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<ArrowForward />}
+                    onClick={handleNewExercise}
+                    title="Proceed to the next exercise"
+                  >
+                    Next Exercise
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   size="small"
-                  startIcon={<ArrowForward />}
-                  onClick={handleNewExercise}
-                  title="Proceed to the next exercise"
+                  startIcon={<CheckCircle />}
+                  onClick={() => { void handleExecute(); }}
+                  disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
                 >
-                  Next Exercise
+                  Submit Answer
                 </Button>
-              )}
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<PlayArrow />}
-                onClick={() => { void handleExecute(); }}
-                disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
-              >
-                Run & Check
-              </Button>
+              </Box>
             </Box>
-          </Box>
-          <CardContent sx={{ p: 0 }}>
-            <SQLEditor
-              value={query}
-              onChange={setQuery}
-              height="200px"
-              onExecute={handleExecute}
-              showResults={false}
-            />
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Results */}
-      {currentTab === 0 && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Query Results
-            </Typography>
-            {queryError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
+            {/* SQL Editor - No extra wrapper */}
+            <Box sx={{ mb: 3 }}>
+              <SQLEditor
+                value={query}
+                onChange={setQuery}
+                height="200px"
+                onExecute={handleExecute}
+                onLiveExecute={handleLiveExecute}
+                enableLiveExecution={true}
+                liveExecutionDelay={150}
+                showResults={false}
+              />
+            </Box>
+
+            {/* Feedback Alert */}
+            {feedback && (
+              <Alert
+                severity={feedback.type}
+                sx={{ mb: 3 }}
+                onClose={() => setFeedback(null)}
+              >
+                {feedback.message}
+              </Alert>
+            )}
+            {!feedback && queryError && (
+              <Alert
+                severity="error"
+                sx={{ mb: 3 }}
+              >
                 {queryError instanceof Error ? queryError.message : 'Query execution failed'}
               </Alert>
             )}
-            {queryResult && queryResult.length > 0 ? (
-              <DataTable data={queryResult[0]} />
-            ) : (
-              <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                Run your query to see results
-              </Typography>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Theory */}
-      {currentTab === 1 && (
-        <Card>
-          <CardContent>
+            {/* Results */}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Query Results
+              </Typography>
+              {queryResult && queryResult.length > 0 ? (
+                <DataTable data={queryResult[0]} />
+              ) : queryError ? (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                  <Typography color="text.secondary">
+                    No results due to query error
+                  </Typography>
+                </Paper>
+              ) : (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                  <Typography color="text.secondary">
+                    Run your query to see results
+                  </Typography>
+                </Paper>
+              )}
+            </Box>
+
+            {/* Solution */}
+            {exerciseCompleted && exerciseSolution && (
+              <Paper sx={{ mt: 3, p: 2, bgcolor: 'success.light' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'success.dark' }}>
+                  Solution
+                </Typography>
+                <Paper sx={{ p: 2, bgcolor: 'background.paper' }}>
+                  <Typography
+                    component="pre"
+                    sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}
+                  >
+                    {exerciseSolution}
+                  </Typography>
+                </Paper>
+              </Paper>
+            )}
+          </Box>
+        )}
+
+        {/* Theory Tab */}
+        {isCurrentTab('theory') && (
+          <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Theory
             </Typography>
             {renderContent(TheoryContent, 'Theory coming soon.')}
-          </CardContent>
-        </Card>
-      )}
+          </Box>
+        )}
 
-      {/* Story */}
-      {currentTab === 2 && (
-        <Card>
-          <CardContent>
+        {/* Story Tab */}
+        {isCurrentTab('story') && (
+          <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Story
             </Typography>
             {renderContent(StoryContent, 'Story coming soon.')}
-          </CardContent>
-        </Card>
-      )}
+          </Box>
+        )}
 
-      {/* Feedback Snackbar */}
-      <Snackbar
-        open={!!feedback}
-        autoHideDuration={6000}
-        onClose={() => setFeedback(null)}
+        {/* Data Explorer Tab */}
+        {isCurrentTab('data') && (
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Data Explorer
+            </Typography>
+            {dbReady ? (
+              <DataExplorerTab schema={skillSchema} />
+            ) : (
+              <Typography variant="body1" color="text.secondary">
+                Database is loading...
+              </Typography>
+            )}
+          </Box>
+        )}
+      </Card>
+
+      {/* Skill Completion Dialog */}
+      <Dialog
+        open={showCompletionDialog}
+        onClose={() => setShowCompletionDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            border: '2px solid',
+            borderColor: 'success.main',
+          }
+        }}
       >
-        <Alert
-          onClose={() => setFeedback(null)}
-          severity={feedback?.type}
-          sx={{ width: '100%' }}
-        >
-          {feedback?.message}
-        </Alert>
-      </Snackbar>
+        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+            Skill Mastered!
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent sx={{ textAlign: 'center', py: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Congratulations!
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            You've successfully completed all <strong>3 exercises</strong> for the skill:
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 2 }}>
+            "{skillMeta?.name}"
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            You've demonstrated mastery of this skill and can now confidently apply it in real-world scenarios!
+          </Typography>
+        </DialogContent>
+        
+        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
+          <Button
+            onClick={() => setShowCompletionDialog(false)}
+            variant="contained"
+            size="large"
+            startIcon={<CheckCircle />}
+            sx={{ 
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1.1rem'
+            }}
+          >
+            Awesome!
+          </Button>
+          
+          {/* Show story button only if hideStories is disabled and story tab is available */}
+          {!hideStories && availableTabs.some(tab => tab.key === 'story') && (
+            <Button
+              onClick={() => {
+                setShowCompletionDialog(false);
+                const storyIndex = availableTabs.findIndex(tab => tab.key === 'story');
+                if (storyIndex >= 0) {
+                  setCurrentTab(storyIndex);
+                  setComponentState({ tab: 'story' });
+                }
+              }}
+              variant="outlined"
+              size="large"
+              startIcon={<MenuBook />}
+              sx={{ 
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '1.1rem'
+              }}
+            >
+              See the Story
+            </Button>
+          )}
+          
+          <Button
+            onClick={() => navigate('/learn')}
+            variant="outlined"
+            size="large"
+            sx={{ 
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1.1rem'
+            }}
+          >
+            Continue Learning
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
-
