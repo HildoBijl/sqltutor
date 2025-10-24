@@ -289,7 +289,9 @@ export default function SkillPage() {
             ? 'success'
             : previousAttempt.status === 'invalid'
               ? 'warning'
-              : 'info',
+              : previousAttempt.status === 'incorrect'
+                ? 'error'
+                : 'info',
       });
       return;
     }
@@ -322,7 +324,7 @@ export default function SkillPage() {
         recordAttempt({ input: effectiveQuery, result: execution.output ?? null, validation });
         setFeedback({
           message: validation.message || 'Query result has invalid structure.',
-          type: execution.success ? 'warning' : 'error',
+          type: 'warning',
         });
         return;
       }
@@ -363,13 +365,13 @@ export default function SkillPage() {
       } else {
         setFeedback({
           message: verification.message || 'Not quite right. Check your query and try again!',
-          type: 'info',
+          type: 'error',
         });
       }
     } catch (error: any) {
       setFeedback({
         message: 'Query error: ' + (error?.message || 'Unknown error'),
-        type: 'error',
+        type: 'warning',
       });
     }
   }, [
@@ -605,7 +607,7 @@ export default function SkillPage() {
                       size="medium"
                       startIcon={<CheckCircle />}
                       onClick={() => { void handleExecute(); }}
-                      disabled={!currentExercise || !query.trim() || isExecuting || !dbReady}
+                      disabled={!currentExercise || !query.trim() || isExecuting || !dbReady || !!queryError}
                     >
                       Submit Answer
                     </Button>
@@ -636,7 +638,7 @@ export default function SkillPage() {
             )}
             {!feedback && queryError && (
               <Alert
-                severity="error"
+                severity="warning"
                 sx={{ mb: 3 }}
               >
                 {queryError instanceof Error ? queryError.message : 'Query execution failed'}
