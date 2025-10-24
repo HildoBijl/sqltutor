@@ -49,7 +49,7 @@ export default function SkillPage() {
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     { key: 'data', label: 'Data Explorer', icon: <Storage /> },
   ];
-  
+
   const availableTabs = allTabs.filter(tab => !(hideStories && tab.key === 'story'));
 
   // Helper function to check current tab
@@ -81,10 +81,10 @@ export default function SkillPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Database setup - use skill schema mapping or fallback to default
-  const skillSchema = (skillId && skillId in SKILL_SCHEMAS) 
+  const skillSchema = (skillId && skillId in SKILL_SCHEMAS)
     ? SKILL_SCHEMAS[skillId as keyof typeof SKILL_SCHEMAS] as SchemaKey
     : 'companies' as SchemaKey;
-  
+
   const {
     executeQuery,
     queryResult,
@@ -212,13 +212,13 @@ export default function SkillPage() {
   // Handle live query execution (for preview results)
   const handleLiveExecute = useCallback(async (liveQuery: string) => {
     if (!dbReady || exerciseCompleted || !currentExercise) return;
-    
+
     // Clear feedback if query is empty
     if (!liveQuery.trim()) {
       setFeedback(null);
       return;
     }
-    
+
     try {
       // Just execute the query - don't do validation/verification for live updates
       // This keeps typing responsive
@@ -256,8 +256,8 @@ export default function SkillPage() {
           previousAttempt.status === 'correct'
             ? 'success'
             : previousAttempt.status === 'invalid'
-            ? 'warning'
-            : 'info',
+              ? 'warning'
+              : 'info',
       });
       return;
     }
@@ -441,7 +441,7 @@ export default function SkillPage() {
             <Typography variant="body2" color="text.secondary">
               Progress:
             </Typography>
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: isCompleted ? 'success.main' : 'primary.main',
               color: 'white',
               px: 1.5,
@@ -473,16 +473,16 @@ export default function SkillPage() {
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={currentTab} onChange={handleTabChange}>
             {availableTabs.map((tab) => (
-              <Tab 
-                key={tab.key} 
-                label={tab.label} 
-                icon={tab.icon} 
-                iconPosition="start" 
+              <Tab
+                key={tab.key}
+                label={tab.label}
+                icon={tab.icon}
+                iconPosition="start"
               />
             ))}
           </Tabs>
         </Box>
-        
+
         {/* Tab Content */}
         {isCurrentTab('practice') && (
           <Box sx={{ p: 3 }}>
@@ -529,7 +529,7 @@ export default function SkillPage() {
                   Reset Database
                 </Button>
               </Box>
-              
+
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {!exerciseCompleted ? (
                   <Button
@@ -642,9 +642,6 @@ export default function SkillPage() {
         {/* Theory Tab */}
         {isCurrentTab('theory') && (
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Theory
-            </Typography>
             {renderContent(TheoryContent, 'Theory coming soon.')}
           </Box>
         )}
@@ -652,9 +649,6 @@ export default function SkillPage() {
         {/* Story Tab */}
         {isCurrentTab('story') && (
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Story
-            </Typography>
             {renderContent(StoryContent, 'Story coming soon.')}
           </Box>
         )}
@@ -662,9 +656,6 @@ export default function SkillPage() {
         {/* Data Explorer Tab */}
         {isCurrentTab('data') && (
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Data Explorer
-            </Typography>
             {dbReady ? (
               <DataExplorerTab schema={skillSchema} />
             ) : (
@@ -683,7 +674,7 @@ export default function SkillPage() {
         maxWidth="sm"
         fullWidth
         PaperProps={{
-          sx: { 
+          sx: {
             borderRadius: 3,
             border: '2px solid',
             borderColor: 'success.main',
@@ -698,7 +689,7 @@ export default function SkillPage() {
             Skill Mastered!
           </Typography>
         </DialogTitle>
-        
+
         <DialogContent sx={{ textAlign: 'center', py: 2 }}>
           <Typography variant="h6" gutterBottom>
             Congratulations!
@@ -713,14 +704,14 @@ export default function SkillPage() {
             You've demonstrated mastery of this skill and can now confidently apply it in real-world scenarios!
           </Typography>
         </DialogContent>
-        
+
         <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
           <Button
             onClick={() => setShowCompletionDialog(false)}
             variant="contained"
             size="large"
             startIcon={<CheckCircle />}
-            sx={{ 
+            sx={{
               px: 4,
               py: 1,
               borderRadius: 2,
@@ -730,7 +721,7 @@ export default function SkillPage() {
           >
             Awesome!
           </Button>
-          
+
           {/* Show story button only if hideStories is disabled and story tab is available */}
           {!hideStories && availableTabs.some(tab => tab.key === 'story') && (
             <Button
@@ -745,7 +736,7 @@ export default function SkillPage() {
               variant="outlined"
               size="large"
               startIcon={<MenuBook />}
-              sx={{ 
+              sx={{
                 px: 3,
                 py: 1,
                 borderRadius: 2,
@@ -756,12 +747,12 @@ export default function SkillPage() {
               See the Story
             </Button>
           )}
-          
+
           <Button
             onClick={() => navigate('/learn')}
             variant="outlined"
             size="large"
-            sx={{ 
+            sx={{
               px: 3,
               py: 1,
               borderRadius: 2,

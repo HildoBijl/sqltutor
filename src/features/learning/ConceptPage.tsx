@@ -166,7 +166,6 @@ export default function ConceptPage() {
         {availableTabs.map((tab, index) => (
           <TabPanel key={tab.key} value={currentTab} index={index}>
             <CardContent>
-              <Typography variant="h5" gutterBottom>{tab.label}</Typography>
               {tab.key === 'theory' && renderContent(TheoryContent, 'Theory content coming soon.')}
               {tab.key === 'video' && renderContent(VideoContent, 'Video coming soon.')}
               {tab.key === 'summary' && renderContent(SummaryContent, 'Summary coming soon.')}
