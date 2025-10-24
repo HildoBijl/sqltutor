@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Link as MuiLink, type LinkProps as MuiLinkProps } from '@mui/material';
 
-type LinkProps = MuiLinkProps & {
+export type LinkProps = MuiLinkProps & {
   to: string;
   children: ReactNode;
 };

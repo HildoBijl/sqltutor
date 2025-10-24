@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Box, type BoxProps } from '@mui/material';
 
-type ParProps = BoxProps & {
+export type ParProps = BoxProps & {
   children: ReactNode;
 };
 

@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Typography, type TypographyProps } from '@mui/material';
 
-type TermProps = TypographyProps & {
+export type TermProps = TypographyProps & {
   children: ReactNode;
 };
 

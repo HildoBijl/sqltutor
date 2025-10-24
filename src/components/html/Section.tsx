@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 
 import { Head } from './Head';
 
-type SectionProps = {
+export type SectionProps = {
 	title: string;
 	children: ReactNode;
 };

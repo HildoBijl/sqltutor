@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { List as MuiList, ListItem, type ListProps as MuiListProps } from '@mui/material';
 
-type ListProps = {
+export type ListProps = {
   items: ReactNode[];
   useNumbers?: boolean;
   sx?: MuiListProps['sx'];

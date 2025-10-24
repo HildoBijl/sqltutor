@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { Alert, Box, Typography } from '@mui/material';
 
-import { themeColor } from '@/components/styling/settings.js';
+import { useThemeColor } from '@/theme';
 import { Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures/Drawing';
-import { Par, Section, SQL } from 'components';
+import { Par, Section } from '@/components/html';
+import { SQL } from 'components';
 
 type SqlDrawingProps = {
   code: string;
@@ -24,6 +25,7 @@ function SqlDrawing({ code, height = 240 }: SqlDrawingProps) {
 }
 
 function SingleColumnSortingDiagram() {
+  const themeColor = useThemeColor();
   const drawingRef = useRef<any>(null);
   const [codeElement, setCodeElement] = useState<HTMLElement | null>(null);
   const bounds = useTextNodeBounds(codeElement, 'DESC', drawingRef);
