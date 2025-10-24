@@ -50,7 +50,7 @@ export function SkillTree({
   setHoveredId,
   containerRef,
 }: // nodeRefs,
-  SkillTreeProps) {
+SkillTreeProps) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
@@ -63,7 +63,8 @@ export function SkillTree({
     const prerequisites = new Set<string>();
     const item = contentItems[itemId];
 
-    if (!item?.prerequisites || item.prerequisites.length === 0) return prerequisites;
+    if (!item?.prerequisites || item.prerequisites.length === 0)
+      return prerequisites;
 
     for (const prereqId of item.prerequisites) {
       prerequisites.add(prereqId);
@@ -74,7 +75,7 @@ export function SkillTree({
     }
 
     return prerequisites;
-  }
+  };
 
   const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
@@ -123,14 +124,15 @@ export function SkillTree({
             color="#9aa0a6"
             size={1.5}
             spread={20}
-            style={{ opacity: 0.20 }}
+            style={{ opacity: 0.2 }}
           />
         ))}
 
         {/* Rectangles in the SVG layer, and only those whose position is defined */}
-        {Object.values(contentPositions).map(positionData => {
+        {Object.values(contentPositions).map((positionData) => {
           const item = contentItems[positionData.id];
-          const allPrequisitesCompleted = item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
+          const allPrequisitesCompleted =
+            item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
           const readyToLearn = !isCompleted(item.id) && allPrequisitesCompleted;
 
           return (

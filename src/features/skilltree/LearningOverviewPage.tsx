@@ -3,13 +3,13 @@ import { Container } from "@mui/material";
 import { useAppStore } from "@/store";
 import { contentIndex, contentItems } from "@/features/content";
 import { SkillTreeCanvas } from "./components/SkillTreeCanvas";
-import { useContentProgress } from "./hooks/useContentProgress";
+import { useContentProgress } from "../learning/hooks/useContentProgress";
 import { useTreeBounds } from "./hooks/useTreeBounds";
 import { contentPositions, connectors } from "./utils/treeDefinition";
 
 /*
-* LearningOverviewPage component that displays the skill tree overview page.
-*/
+ * LearningOverviewPage component that displays the skill tree overview page.
+ */
 export default function LearningOverviewPage() {
   const components = useAppStore((state) => state.components);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -19,7 +19,7 @@ export default function LearningOverviewPage() {
 
   const { isCompleted, getProgress } = useContentProgress(
     contentIndex,
-    components,
+    components
   );
 
   const treeBounds = useTreeBounds(contentPositions);

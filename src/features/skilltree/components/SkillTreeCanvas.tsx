@@ -9,20 +9,20 @@ import type { Vector } from "@/util/geometry/Vector";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 
 /*
-* SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
-* This component only handles the zoom/pan functionality and UI controls.
-*
-* @param contentItems - Array of content items (concepts and skills) with info about these contents.
-* @param contentPositions - Array of content position data entries to display.
-* @param treeBounds - The bounding box of the tree layout.
-* @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
-* @param isCompleted - Function to check if a content item is completed.
-* @param getProgress - Function to get progress string for a content item.
-* @param hoveredId - ID of the currently hovered node, or null if none.
-* @param setHoveredId - Function to set the hovered node ID.
-* @param containerRef - Ref to the container div for the tree.
-* @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
-*/
+ * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
+ * This component only handles the zoom/pan functionality and UI controls.
+ *
+ * @param contentItems - Array of content items (concepts and skills) with info about these contents.
+ * @param contentPositions - Array of content position data entries to display.
+ * @param treeBounds - The bounding box of the tree layout.
+ * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
+ * @param isCompleted - Function to check if a content item is completed.
+ * @param getProgress - Function to get progress string for a content item.
+ * @param hoveredId - ID of the currently hovered node, or null if none.
+ * @param setHoveredId - Function to set the hovered node ID.
+ * @param containerRef - Ref to the container div for the tree.
+ * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
+ */
 interface SkillTreeCanvasProps {
   contentItems: Record<string, ContentMeta>;
   contentPositions: Record<string, ContentPositionMeta>;
@@ -34,7 +34,7 @@ interface SkillTreeCanvasProps {
     width: number;
     height: number;
   };
-  visiblePaths: { points: typeof Vector[]; from: string; to: string }[];
+  visiblePaths: { points: (typeof Vector)[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
   getProgress: (id: string) => string | null;
   hoveredId: string | null;

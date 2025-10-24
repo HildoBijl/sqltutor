@@ -1,15 +1,15 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { Suspense } from 'react';
-import { LoadingScreen } from '@/shared/components/LoadingScreen';
-import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
+import { createBrowserRouter } from "react-router-dom";
+import { Suspense } from "react";
+import { LoadingScreen } from "@/shared/components/LoadingScreen";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 
 // Import components
-import HomePage from '@/features/home/HomePage';
-import LearningOverviewPage from '@/features/learning/LearningOverviewPage';
-import ConceptPage from '@/features/learning/ConceptPage';
-import SkillPage from '@/features/learning/SkillPage';
-import PlaygroundPage from '@/features/playground/PlaygroundPage';
-import { Layout } from '@/features/layout/Layout';
+import HomePage from "@/features/home/HomePage";
+import LearningOverviewPage from "@/features/skilltree/LearningOverviewPage";
+import ConceptPage from "@/features/learning/ConceptPage";
+import SkillPage from "@/features/learning/SkillPage";
+import PlaygroundPage from "@/features/playground/PlaygroundPage";
+import { Layout } from "@/features/layout/Layout";
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -21,12 +21,14 @@ function SuspenseWrapper({ children }: { children: React.ReactNode }) {
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <Layout />,
     errorElement: (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div style={{ padding: "2rem", textAlign: "center" }}>
         <h1>Something went wrong</h1>
-        <p><a href="/">Return to Home</a></p>
+        <p>
+          <a href="/">Return to Home</a>
+        </p>
       </div>
     ),
     children: [
@@ -39,7 +41,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'learn',
+        path: "learn",
         element: (
           <SuspenseWrapper>
             <LearningOverviewPage />
@@ -47,7 +49,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'concept/:conceptId',
+        path: "concept/:conceptId",
         element: (
           <SuspenseWrapper>
             <ConceptPage />
@@ -55,7 +57,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'skill/:skillId',
+        path: "skill/:skillId",
         element: (
           <SuspenseWrapper>
             <SkillPage />
@@ -63,7 +65,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'playground',
+        path: "playground",
         element: (
           <SuspenseWrapper>
             <PlaygroundPage />
@@ -71,11 +73,13 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '*',
+        path: "*",
         element: (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div style={{ textAlign: "center", padding: "2rem" }}>
             <h1>404 - Page not found</h1>
-            <p><a href="/">Return to Home</a></p>
+            <p>
+              <a href="/">Return to Home</a>
+            </p>
           </div>
         ),
       },
