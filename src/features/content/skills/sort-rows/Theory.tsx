@@ -1,31 +1,14 @@
-
-import { useRef, useState, type ReactNode } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Box, Typography } from '@mui/material';
 
 import { themeColor } from '@/components/styling/settings.js';
 import { Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures/Drawing';
-import { SQL } from 'components';
-
-type SectionProps = {
-  title: string;
-  children: ReactNode;
-};
+import { Par, Section, SQL } from 'components';
 
 type SqlDrawingProps = {
   code: string;
   height?: number;
 };
-
-function Section({ title, children }: SectionProps) {
-  return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
-      <Typography variant="h6" component="h3">
-        {title}
-      </Typography>
-      {children}
-    </Box>
-  );
-}
 
 function SqlDrawing({ code, height = 240 }: SqlDrawingProps) {
   const normalizedCode = code.trim();
@@ -74,10 +57,7 @@ ORDER BY name DESC
 export function Theory() {
   return (
     <Box display="flex" flexDirection="column" gap={3}>
-      <Typography variant="body1" component="p">
-        When we receive a result set from a query it is rarely in the exact order we need. SQL lets us describe how rows
-        should be sorted so that the most relevant information shows up first.
-      </Typography>
+      <Par>When we receive a result set from a query it is rarely in the exact order we need. SQL lets us describe how rows should be sorted so that the most relevant information shows up first.</Par>
 
       <Section title="Sort on a single column">
         <Typography variant="body1" component="p">

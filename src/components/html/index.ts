@@ -1,5 +1,6 @@
 export * from './Head'
 export * from './Par'
+export * from './Section'
 export * from './Term'
 export * from './Link'
 export * from './List'
