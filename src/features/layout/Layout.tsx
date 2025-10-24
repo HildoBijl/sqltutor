@@ -18,7 +18,7 @@ import {
   School as LearnIcon,
   PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
-import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check } from '@mui/icons-material';
+import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { ColorModeContext } from '@/theme';
@@ -112,6 +112,18 @@ export function Layout() {
 function SettingsMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [adminEnabled, setAdminEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return Boolean(window.localStorage.getItem('admin'));
+  });
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncAdmin = () => {
+      setAdminEnabled(Boolean(window.localStorage.getItem('admin')));
+    };
+    window.addEventListener('storage', syncAdmin);
+    return () => window.removeEventListener('storage', syncAdmin);
+  }, []);
   
   // Theme context
   const { mode, toggleColorMode } = useContext(ColorModeContext);
@@ -139,6 +151,24 @@ function SettingsMenu() {
     // Don't close menu - allow multiple toggles
   };
 
+  const handleAdminToggle = () => {
+    const next = !adminEnabled;
+    setAdminEnabled(next);
+    try {
+      if (typeof window !== 'undefined') {
+        if (next) {
+          window.localStorage.setItem('admin', 'true');
+        } else {
+          window.localStorage.removeItem('admin');
+        }
+        window.dispatchEvent(new CustomEvent('admin-mode-change', { detail: { enabled: next } }));
+      }
+    } catch (err) {
+      console.error('Failed to update admin mode:', err);
+      alert('Unable to change admin mode right now.');
+    }
+  };
+
   const handleReset = () => {
     const confirmed = window.confirm(
       'Reset all your data? This clears progress, settings, and history.'
@@ -154,7 +184,7 @@ function SettingsMenu() {
       for (let i = 0; i < window.localStorage.length; i++) {
         const key = window.localStorage.key(i);
         if (!key) continue;
-        if (key === 'sqltutor-storage' || key.startsWith('component-')) {
+        if (key === 'sqltutor-storage' || key.startsWith('component-') || key === 'admin') {
           keysToRemove.push(key);
         }
       }
@@ -165,6 +195,10 @@ function SettingsMenu() {
     } catch (err) {
       console.error('Failed to reset data:', err);
       alert('Sorry, something went wrong resetting your data.');
+    }
+    setAdminEnabled(false);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('admin-mode-change', { detail: { enabled: false } }));
     }
     handleClose();
   };
@@ -214,6 +248,22 @@ function SettingsMenu() {
               ml: 1,
               visibility: hideStories ? 'visible' : 'hidden'
             }} 
+          />
+        </MenuItem>
+
+        <MenuItem onClick={handleAdminToggle}>
+          <ListItemIcon>
+            <AdminPanelSettings
+              sx={{ color: adminEnabled ? 'primary.main' : 'inherit' }}
+            />
+          </ListItemIcon>
+          <ListItemText>Admin Mode</ListItemText>
+          <Check
+            sx={{
+              color: 'primary.main',
+              ml: 1,
+              visibility: adminEnabled ? 'visible' : 'hidden',
+            }}
           />
         </MenuItem>
         

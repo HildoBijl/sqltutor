@@ -16,7 +16,7 @@ import {
   DialogActions,
   Paper,
 } from '@mui/material';
-import { CheckCircle, ArrowBack, Refresh, ArrowForward, RestartAlt, MenuBook, Lightbulb, Edit, EmojiEvents, Storage } from '@mui/icons-material';
+import { CheckCircle, ArrowBack, ArrowForward, MenuBook, Lightbulb, Edit, EmojiEvents, Storage, Flag } from '@mui/icons-material';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
@@ -73,6 +73,12 @@ export default function SkillPage() {
   );
   const [query, setQuery] = useState('');
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' | 'warning' } | null>(null);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return Boolean(window.localStorage.getItem('admin'));
+  });
+  const [showGiveUpDialog, setShowGiveUpDialog] = useState(false);
+  const [hasGivenUp, setHasGivenUp] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const exerciseCompleted = exerciseStatus === 'correct';
 
@@ -105,6 +111,24 @@ export default function SkillPage() {
   const isCompleted = (componentState.numSolved || 0) >= requiredCount;
 
   const normalizeForHistory = (value: string) => value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncAdminFlag = (_event?: Event) => {
+      setIsAdmin(Boolean(window.localStorage.getItem('admin')));
+    };
+    syncAdminFlag();
+    window.addEventListener('storage', syncAdminFlag);
+    window.addEventListener('admin-mode-change', syncAdminFlag);
+    return () => {
+      window.removeEventListener('storage', syncAdminFlag);
+      window.removeEventListener('admin-mode-change', syncAdminFlag);
+    };
+  }, []);
+
+  useEffect(() => {
+    setHasGivenUp(false);
+  }, [currentExercise]);
 
   useEffect(() => {
     if (!skillId) return;
@@ -236,6 +260,14 @@ export default function SkillPage() {
     const effectiveQuery = rawQuery.trim();
     if (!currentExercise || !effectiveQuery) return;
 
+    if (hasGivenUp) {
+      setFeedback({
+        message: 'You chose to view the solution. Review it, then move on to the next exercise.',
+        type: 'info',
+      });
+      return;
+    }
+
     if (exerciseCompleted) {
       setFeedback({ message: 'Already completed. Click Next Exercise to continue.', type: 'info' });
       return;
@@ -355,15 +387,8 @@ export default function SkillPage() {
     setComponentState,
     exerciseDispatch,
     skillId,
+    hasGivenUp,
   ]);
-
-  // Reset database without changing the exercise instance
-  const handleResetDatabase = useCallback(() => {
-    resetExerciseDb();
-    exerciseDispatch({ type: 'reset', keepExercise: true });
-    setQuery('');
-    setFeedback({ message: 'Database reset - try again!', type: 'info' });
-  }, [resetExerciseDb, exerciseDispatch]);
 
   // Autocomplete solution for the current exercise
   const handleAutoComplete = useCallback(async () => {
@@ -397,14 +422,29 @@ export default function SkillPage() {
 
   // New exercise
   const handleNewExercise = useCallback(() => {
-    if (!exerciseCompleted) {
+    if (!exerciseCompleted && !hasGivenUp) {
       setFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
       return;
     }
     exerciseDispatch({ type: 'generate' });
     setQuery('');
     setFeedback(null);
-  }, [exerciseCompleted, exerciseDispatch]);
+    setHasGivenUp(false);
+  }, [exerciseCompleted, exerciseDispatch, hasGivenUp]);
+
+  const handleGiveUpConfirm = useCallback(() => {
+    setShowGiveUpDialog(false);
+    setFeedback({
+      message: 'Solution loaded. Take a moment to review it and explore the Theory page for more guidance.',
+      type: 'info',
+    });
+    setHasGivenUp(true);
+    void handleAutoComplete();
+  }, [handleAutoComplete, setFeedback, setShowGiveUpDialog, setHasGivenUp]);
+
+  const handleGiveUpCancel = useCallback(() => {
+    setShowGiveUpDialog(false);
+  }, [setShowGiveUpDialog]);
 
   if (isLoading) {
     return (
@@ -462,8 +502,8 @@ export default function SkillPage() {
       </Box>
 
       {/* Description */}
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body1" color="text.secondary">
+      <Box sx={{ mb: 2, pl: 2 }}>
+        <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem' }}>
           {skillMeta.description}
         </Typography>
       </Box>
@@ -506,67 +546,23 @@ export default function SkillPage() {
               </Paper>
             )}
 
-            {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+            {/* Admin Tools */}
+            {isAdmin && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                 <Button
                   size="small"
-                  onClick={handleAutoComplete}
+                  onClick={() => { void handleAutoComplete(); }}
                   startIcon={<Lightbulb />}
                   disabled={!currentExercise || isExecuting}
                   variant="outlined"
                 >
                   Show Solution
                 </Button>
-                <Button
-                  size="small"
-                  startIcon={<RestartAlt />}
-                  onClick={handleResetDatabase}
-                  disabled={!dbReady || isExecuting}
-                  title="Reset the current exercise database"
-                  variant="outlined"
-                >
-                  Reset Database
-                </Button>
               </Box>
-
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {!exerciseCompleted ? (
-                  <Button
-                    size="small"
-                    startIcon={<Refresh />}
-                    onClick={handleNewExercise}
-                    disabled={isExecuting}
-                    title="Finish the current exercise to unlock a new one"
-                    variant="outlined"
-                  >
-                    Try Another
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<ArrowForward />}
-                    onClick={handleNewExercise}
-                    title="Proceed to the next exercise"
-                  >
-                    Next Exercise
-                  </Button>
-                )}
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<CheckCircle />}
-                  onClick={() => { void handleExecute(); }}
-                  disabled={!currentExercise || !query.trim() || isExecuting || exerciseCompleted || !dbReady}
-                >
-                  Submit Answer
-                </Button>
-              </Box>
-            </Box>
+            )}
 
             {/* SQL Editor - No extra wrapper */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 2 }}>
               <SQLEditor
                 value={query}
                 onChange={setQuery}
@@ -577,6 +573,55 @@ export default function SkillPage() {
                 liveExecutionDelay={150}
                 showResults={false}
               />
+            </Box>
+
+            {/* Submission Controls */}
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', flexWrap: 'wrap', mb: 3 }}>
+              {!exerciseCompleted ? (
+                hasGivenUp ? (
+                  <Button
+                    variant="contained"
+                    size="medium"
+                    startIcon={<ArrowForward />}
+                    onClick={handleNewExercise}
+                    title="Move to the next exercise"
+                  >
+                    Next Exercise
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      startIcon={<Flag />}
+                      color="warning"
+                      onClick={() => setShowGiveUpDialog(true)}
+                      disabled={!currentExercise || isExecuting}
+                    >
+                      Give Up
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      startIcon={<CheckCircle />}
+                      onClick={() => { void handleExecute(); }}
+                      disabled={!currentExercise || !query.trim() || isExecuting || !dbReady}
+                    >
+                      Submit Answer
+                    </Button>
+                  </>
+                )
+              ) : (
+                <Button
+                  variant="contained"
+                  size="medium"
+                  startIcon={<ArrowForward />}
+                  onClick={handleNewExercise}
+                  title="Proceed to the next exercise"
+                >
+                  Next Exercise
+                </Button>
+              )}
             </Box>
 
             {/* Feedback Alert */}
@@ -666,6 +711,33 @@ export default function SkillPage() {
           </Box>
         )}
       </Card>
+
+      <Dialog
+        open={showGiveUpDialog}
+        onClose={handleGiveUpCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Need a Hint?</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure? You can also check out the Theory page to read more about how you might solve this Exercise.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleGiveUpCancel}>
+            Keep Trying
+          </Button>
+          <Button
+            onClick={handleGiveUpConfirm}
+            color="warning"
+            variant="contained"
+            startIcon={<Flag />}
+          >
+            Give Up
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Skill Completion Dialog */}
       <Dialog
