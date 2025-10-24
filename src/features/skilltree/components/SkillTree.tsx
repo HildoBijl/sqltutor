@@ -77,6 +77,7 @@ SkillTreeProps) {
     return prerequisites;
   };
 
+  // Handlers for hover events
   const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
     setHoveredId(id);
@@ -92,11 +93,55 @@ SkillTreeProps) {
     setPrerequisites(new Set());
   };
 
+  // Handler for click events on nodes
   const handleNodeClick = (item: ContentMeta) => {
     const path =
       item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
     window.location.href = path;
   };
+
+  // Determine if a node is ready to learn
+  const isReadyToLearn = (item: ContentMeta): boolean => {
+    const allPrequisitesCompleted =
+      item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
+    return !isCompleted(item.id) && allPrequisitesCompleted;
+  };
+
+  // Determine the style for connectors based on different cases
+  const getConnectorStyle = (connector: { from: string; to: string }) => {
+    const bothCompleted =
+      isCompleted(connector.from) && isCompleted(connector.to);
+    const isNextToLearn =
+      isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
+
+    if (bothCompleted) {
+      return { opacity: 1 };
+    }
+
+    if (isNextToLearn) {
+      return { opacity: 0.5 };
+    }
+    
+    return { opacity: 0.2 };
+  };
+
+  const getConnectorColor = (connector: { from: string; to: string }) => {
+    const bothCompleted =
+      isCompleted(connector.from) && isCompleted(connector.to);
+    const isNextToLearn =
+      isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
+
+    if (bothCompleted) {
+      return "#9aa0a6";
+    }
+
+    if (isNextToLearn) {
+      return "#4CAF50";
+    }
+  
+    return "#9aa0a6";
+
+  }
 
   return (
     <div
@@ -121,19 +166,17 @@ SkillTreeProps) {
           <Curve
             key={i}
             points={connector.points}
-            color="#9aa0a6"
+            color={getConnectorColor(connector)}
             size={1.5}
             spread={20}
-            style={{ opacity: 0.2 }}
+            style={getConnectorStyle(connector)}
           />
         ))}
 
         {/* Rectangles in the SVG layer, and only those whose position is defined */}
         {Object.values(contentPositions).map((positionData) => {
           const item = contentItems[positionData.id];
-          const allPrequisitesCompleted =
-            item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
-          const readyToLearn = !isCompleted(item.id) && allPrequisitesCompleted;
+          const readyToLearn = isReadyToLearn(item);
 
           return (
             <g
