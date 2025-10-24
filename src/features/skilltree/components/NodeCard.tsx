@@ -20,6 +20,7 @@ interface NodeCardProps {
   isHovered: boolean;
   readyToLearn?: boolean;
   isPrerequisite?: boolean;
+  isSomethingHovered?: boolean;
 }
 
 // SVG data paths for icons - wrapped in a group with transform for positioning
@@ -39,6 +40,7 @@ export function NodeCard({
   isHovered,
   readyToLearn = false,
   isPrerequisite = false,
+  isSomethingHovered = false,
 }: NodeCardProps) {
   const type = item.type;
   const cornerRadius = type === "concept" ? 4 : 12;
@@ -73,13 +75,25 @@ export function NodeCard({
     borderColor = isHovered ? "#FFD700" : "#9e9e9e";
     strokeWidth = 2;
   } else if (completed) {
-    nodeOpacity = 1.0;
-    borderColor = "#e0e0e0";
-    strokeWidth = 1;
+    if (isSomethingHovered && !isPrerequisite) {
+      nodeOpacity = 0.15;
+      borderColor = "#e0e0e0";
+      strokeWidth = 1;
+    } else {
+      nodeOpacity = 1.0;
+      borderColor = "#e0e0e0";
+      strokeWidth = 1;
+    }
   } else if (readyToLearn) {
-    nodeOpacity = 0.6;
-    borderColor = "#4CAF50";
-    strokeWidth = 1;
+    if (isSomethingHovered && !isPrerequisite) {
+      nodeOpacity = 0.15;
+      borderColor = "#e0e0e0";
+      strokeWidth = 1;
+    } else {
+      nodeOpacity = 0.6;
+      borderColor = "#4CAF50";
+      strokeWidth = 1;
+    }
   } else {
     nodeOpacity = 0.15;
     borderColor = "#e0e0e0";

@@ -150,6 +150,7 @@ SkillTreeProps) {
                 isHovered={localHoveredId === item.id}
                 readyToLearn={readyToLearn}
                 isPrerequisite={prerequisites.has(item.id)}
+                isSomethingHovered={localHoveredId !== null}
               />
             </g>
           );
