@@ -1,5 +1,5 @@
 ﻿import { Suspense, useMemo, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -26,22 +26,22 @@ import { useContent } from './hooks/useContent';
 
 interface TabPanelProps {
   children?: React.ReactNode;
-  index: number;
-  value: number;
+  value: string;
+  tabKey: string;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, tabKey, ...other } = props;
 
   return (
     <div
       role="tabpanel"
-      hidden={value !== index}
-      id={`concept-tabpanel-${index}`}
-      aria-labelledby={`concept-tab-${index}`}
+      hidden={value !== tabKey}
+      id={`concept-tabpanel-${tabKey}`}
+      aria-labelledby={`concept-tab-${tabKey}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === tabKey && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -49,7 +49,8 @@ function TabPanel(props: TabPanelProps) {
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(1); // Start with theory tab
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentTab, setCurrentTab] = useState<string>('theory'); // Fallback to theory tab
 
   // Use new store
   const [componentState, setComponentState] = useComponentState<ConceptComponentState>(conceptId || '', 'concept');
@@ -64,27 +65,57 @@ export default function ConceptPage() {
   ];
   
   const availableTabs = allTabs.filter(tab => !(hideStories && tab.key === 'story'));
+  const searchParamsString = searchParams.toString();
+  const normalizedTabParam = searchParams.get('tab')?.toLowerCase() ?? null;
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
     return contentIndex.find(item => item.type === 'concept' && item.id === conceptId);
   }, [conceptId]);
 
-  // Always default to theory tab
+  // Sync the active tab with URL params and persisted component state
   useEffect(() => {
-    const theoryIndex = availableTabs.findIndex(tab => tab.key === 'theory');
-    if (theoryIndex >= 0) {
-      setCurrentTab(theoryIndex);
-      setComponentState({ tab: 'theory' });
-    }
-  }, [availableTabs.length, hideStories]); // Only depend on tab count and hideStories changes
+    if (!availableTabs.length) return;
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
-    const selectedTab = availableTabs[newValue];
-    if (selectedTab) {
-      setComponentState({ tab: selectedTab.key });
+    const tabKeys = availableTabs.map((tab) => tab.key);
+    const defaultTab = tabKeys.includes('theory') ? 'theory' : tabKeys[0];
+
+    const preferredTab =
+      (normalizedTabParam && tabKeys.includes(normalizedTabParam) && normalizedTabParam) ||
+      (componentState.tab && tabKeys.includes(componentState.tab) && componentState.tab) ||
+      defaultTab;
+
+    if (!preferredTab) return;
+
+    if (preferredTab !== currentTab) {
+      setCurrentTab(preferredTab);
     }
+
+    if (componentState.tab !== preferredTab) {
+      setComponentState({ tab: preferredTab });
+    }
+
+    if (normalizedTabParam !== preferredTab) {
+      const params = new URLSearchParams(searchParamsString);
+      params.set('tab', preferredTab);
+      setSearchParams(params, { replace: true });
+    }
+  }, [
+    availableTabs,
+    componentState.tab,
+    currentTab,
+    normalizedTabParam,
+    searchParamsString,
+    setComponentState,
+    setSearchParams,
+  ]);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
+    setComponentState({ tab: newValue });
+    const params = new URLSearchParams(searchParamsString);
+    params.set('tab', newValue);
+    setSearchParams(params, { replace: true });
   };
 
   if (!conceptMeta) {
@@ -155,6 +186,9 @@ export default function ConceptPage() {
             {availableTabs.map((tab) => (
               <Tab 
                 key={tab.key}
+                value={tab.key}
+                id={`concept-tab-${tab.key}`}
+                aria-controls={`concept-tabpanel-${tab.key}`}
                 label={tab.label} 
                 icon={tab.icon} 
                 iconPosition="start" 
@@ -163,8 +197,8 @@ export default function ConceptPage() {
           </Tabs>
         </Box>
 
-        {availableTabs.map((tab, index) => (
-          <TabPanel key={tab.key} value={currentTab} index={index}>
+        {availableTabs.map((tab) => (
+          <TabPanel key={tab.key} value={currentTab} tabKey={tab.key}>
             <CardContent>
               {tab.key === 'theory' && renderContent(TheoryContent, 'Theory content coming soon.')}
               {tab.key === 'video' && renderContent(VideoContent, 'Video coming soon.')}

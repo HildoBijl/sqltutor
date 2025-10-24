@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -36,7 +36,8 @@ type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
 export default function SkillPage() {
   const { skillId } = useParams<{ skillId: string }>();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(1); // Always start with practice tab
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentTab, setCurrentTab] = useState<string>('practice'); // Fallback to practice tab
 
   // State management
   const [componentState, setComponentState] = useComponentState<SkillComponentState>(skillId || '', 'skill');
@@ -54,9 +55,11 @@ export default function SkillPage() {
 
   // Helper function to check current tab
   const isCurrentTab = (tabKey: string) => {
-    const tab = availableTabs[currentTab];
-    return tab ? tab.key === tabKey : false;
+    return currentTab === tabKey;
   };
+
+  const searchParamsString = searchParams.toString();
+  const normalizedTabParam = searchParams.get('tab')?.toLowerCase() ?? null;
 
   // Skill content + exercise state
   const [skillModule, setSkillModule] = useState<SkillExerciseModuleLike | null>(null);
@@ -191,21 +194,49 @@ export default function SkillPage() {
     };
   }, [resetExerciseDb]);
 
-  // Always default to practice tab
+  // Sync the active tab with URL params and persisted component state
   useEffect(() => {
-    const practiceIndex = availableTabs.findIndex(tab => tab.key === 'practice');
-    if (practiceIndex >= 0) {
-      setCurrentTab(practiceIndex);
-      setComponentState({ tab: 'practice' });
-    }
-  }, [availableTabs.length, hideStories]); // Only depend on tab count and hideStories changes
+    if (!availableTabs.length) return;
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
-    const selectedTab = availableTabs[newValue];
-    if (selectedTab) {
-      setComponentState({ tab: selectedTab.key });
+    const tabKeys = availableTabs.map((tab) => tab.key);
+    const defaultTab = tabKeys.includes('practice') ? 'practice' : tabKeys[0];
+
+    const preferredTab =
+      (normalizedTabParam && tabKeys.includes(normalizedTabParam) && normalizedTabParam) ||
+      (componentState.tab && tabKeys.includes(componentState.tab) && componentState.tab) ||
+      defaultTab;
+
+    if (!preferredTab) return;
+
+    if (preferredTab !== currentTab) {
+      setCurrentTab(preferredTab);
     }
+
+    if (componentState.tab !== preferredTab) {
+      setComponentState({ tab: preferredTab });
+    }
+
+    if (normalizedTabParam !== preferredTab) {
+      const params = new URLSearchParams(searchParamsString);
+      params.set('tab', preferredTab);
+      setSearchParams(params, { replace: true });
+    }
+  }, [
+    availableTabs,
+    componentState.tab,
+    currentTab,
+    normalizedTabParam,
+    searchParamsString,
+    setComponentState,
+    setSearchParams,
+  ]);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
+    setComponentState({ tab: newValue });
+    const params = new URLSearchParams(searchParamsString);
+    params.set('tab', newValue);
+    setSearchParams(params, { replace: true });
   };
 
   const TheoryContent = useContent(skillMeta?.id, 'Theory');
@@ -517,6 +548,7 @@ export default function SkillPage() {
             {availableTabs.map((tab) => (
               <Tab
                 key={tab.key}
+                value={tab.key}
                 label={tab.label}
                 icon={tab.icon}
                 iconPosition="start"
@@ -801,10 +833,13 @@ export default function SkillPage() {
             <Button
               onClick={() => {
                 setShowCompletionDialog(false);
-                const storyIndex = availableTabs.findIndex(tab => tab.key === 'story');
-                if (storyIndex >= 0) {
-                  setCurrentTab(storyIndex);
+                const storyTab = availableTabs.find(tab => tab.key === 'story');
+                if (storyTab) {
+                  setCurrentTab('story');
                   setComponentState({ tab: 'story' });
+                  const params = new URLSearchParams(searchParamsString);
+                  params.set('tab', 'story');
+                  setSearchParams(params, { replace: true });
                 }
               }}
               variant="outlined"
