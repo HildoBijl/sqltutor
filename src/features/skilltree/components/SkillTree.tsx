@@ -107,41 +107,66 @@ SkillTreeProps) {
     return !isCompleted(item.id) && allPrequisitesCompleted;
   };
 
+  // Check if a connector is part of the hovered path
+  const isConnectorInHoveredPath = (connector: { from: string; to: string }): boolean => {
+    if (!localHoveredId) return false;
+
+    const toIsHovered = connector.to === localHoveredId;
+    const fromIsInChain = prerequisites.has(connector.from);
+    const toIsInChain = prerequisites.has(connector.to) || toIsHovered;
+
+    return toIsInChain && fromIsInChain;
+  };
+
   // Determine the style for connectors based on different cases
   const getConnectorStyle = (connector: { from: string; to: string }) => {
+    // Full opacity for connectors in the hovered path
+    if (isConnectorInHoveredPath(connector)) {
+      return { opacity: 0.7 };
+    }
+    // If hovering over some node, fade all other connectors
+    if (localHoveredId) {
+      return { opacity: 0.2 };
+    }
+
+    // When no hover, opacity is based on completion status
     const bothCompleted =
       isCompleted(connector.from) && isCompleted(connector.to);
     const isNextToLearn =
       isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
 
     if (bothCompleted) {
-      return { opacity: 1 };
+      return { opacity: 0.7 };
     }
-
     if (isNextToLearn) {
       return { opacity: 0.5 };
     }
-    
     return { opacity: 0.2 };
   };
 
   const getConnectorColor = (connector: { from: string; to: string }) => {
+    // If a connectors is in the hover path, highlight it
+    if (isConnectorInHoveredPath(connector)) {
+      return "#FFD700";
+    }
+
+    if (localHoveredId) {
+      return "#9aa0a6";
+    }
+
+    // Color based on completition status, no hover active 
     const bothCompleted =
       isCompleted(connector.from) && isCompleted(connector.to);
     const isNextToLearn =
       isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
-
     if (bothCompleted) {
       return "#9aa0a6";
     }
-
     if (isNextToLearn) {
       return "#4CAF50";
     }
-  
     return "#9aa0a6";
-
-  }
+  };
 
   return (
     <div
