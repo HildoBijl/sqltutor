@@ -43,7 +43,7 @@ export interface SkillExerciseModuleLike {
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
   validateOutput?: (exercise: any, result: unknown) => ValidationResult;
-  verifyOutput?: (exercise: any, output: unknown) => VerificationResult;
+  verifyOutput?: (exercise: any, output: unknown, database?: unknown) => VerificationResult;
   getSolution?: (exercise: any) => string | null | undefined;
   runDemo?: (args: { exercise: any; helpers: ExerciseHelpers }) => unknown;
   solutionTemplate?: string;

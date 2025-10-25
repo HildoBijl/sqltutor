@@ -95,6 +95,7 @@ export default function SkillPage() {
     : 'companies' as SchemaKey;
 
   const {
+    database,
     executeQuery,
     queryResult,
     queryError,
@@ -360,8 +361,20 @@ export default function SkillPage() {
         return;
       }
 
+      if (!database) {
+        setFeedback({
+          message: 'Database is not ready for verification. Please try again in a moment.',
+          type: 'warning',
+        });
+        return;
+      }
+
       const outputForVerification = execution.output ?? [];
-      const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification);
+      const verification = skillModule!.verifyOutput!(
+        currentExercise,
+        outputForVerification,
+        database,
+      );
 
       recordAttempt({
         input: effectiveQuery,
