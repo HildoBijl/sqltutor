@@ -118,9 +118,11 @@ export function SQLEditor({
         border: '1px solid',
         borderColor: 'divider',
         borderRadius: 1,
+        bgcolor: '#1e1e1e',
       }}
     >
       <CodeMirror
+        key="sql-editor"
         value={value}
         onChange={onChange}
         placeholder={placeholder}

@@ -67,6 +67,14 @@ function defaultInvalidMessage(messages?: SkillExerciseModuleLike['messages']) {
 
 export function useSkillExerciseState(componentId: string, moduleLike: SkillExerciseModuleLike | null) {
   const [componentState, setComponentState] = useComponentState<SkillComponentState>(componentId, 'skill');
+  const queueComponentStateUpdate = useCallback(
+    (updater: Parameters<typeof setComponentState>[0]) => {
+      Promise.resolve().then(() => {
+        setComponentState(updater);
+      });
+    },
+    [setComponentState],
+  );
 
   const helpers = useMemo<ExerciseHelpers>(
     () => ({
@@ -197,7 +205,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         resultingState: storedState,
       };
 
-      setComponentState((prev) => {
+      queueComponentStateUpdate((prev) => {
         const current = prev.instances[instanceId] ?? {
           id: instanceId,
           skillId: componentId,
@@ -222,7 +230,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         };
       });
     },
-    [componentId, setComponentState],
+    [componentId, queueComponentStateUpdate],
   );
 
   const dispatch: Dispatch = useCallback(
@@ -250,7 +258,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
             events: [event],
           };
 
-          setComponentState((prevState) => ({
+          queueComponentStateUpdate((prevState) => ({
             ...prevState,
             currentInstanceId: instanceId,
             instances: {
@@ -263,7 +271,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
           if (!currentInstanceId) {
             // No active instance - start a new one implicitly
             const fallbackId = generateInstanceId();
-            setComponentState((prevState) => ({
+            queueComponentStateUpdate((prevState) => ({
               ...prevState,
               currentInstanceId: fallbackId,
             }));
@@ -276,7 +284,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         return next;
       });
     },
-    [appendEvent, componentId, componentState.currentInstanceId, reducer, setComponentState],
+    [appendEvent, componentId, componentState.currentInstanceId, queueComponentStateUpdate, reducer],
   );
 
   const previewValidation: ValidationPreview = useCallback(
