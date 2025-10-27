@@ -69,19 +69,22 @@ export function NodeCard({
   let nodeOpacity: number;
   let borderColor: string;
   let strokeWidth: number;
+  // let borderOpacity: number;
 
   if (isHovered || isPrerequisite) {
     nodeOpacity = 1.0;
-    borderColor = isHovered ? "#FFD700" : "#9e9e9e";
+    borderColor = "#E84421";
     strokeWidth = 2;
+    // borderOpacity = 1.0;
   } else if (completed) {
     if (isSomethingHovered && !isPrerequisite) {
-      nodeOpacity = 0.15;
-      borderColor = "#e0e0e0";
+      nodeOpacity = 0.4;
+      borderColor = "rgba(76, 175, 80, 0.4)";
+      // borderOpacity = 0.3;
       strokeWidth = 1;
     } else {
       nodeOpacity = 1.0;
-      borderColor = "#e0e0e0";
+      borderColor = "#4CAF50";
       strokeWidth = 1;
     }
   } else if (readyToLearn) {
@@ -91,7 +94,7 @@ export function NodeCard({
       strokeWidth = 1;
     } else {
       nodeOpacity = 0.6;
-      borderColor = "#4CAF50";
+      borderColor = "#FFD700";
       strokeWidth = 1;
     }
   } else {

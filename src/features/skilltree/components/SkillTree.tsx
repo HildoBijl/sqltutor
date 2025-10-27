@@ -147,7 +147,7 @@ SkillTreeProps) {
   const getConnectorColor = (connector: { from: string; to: string }) => {
     // If a connectors is in the hover path, highlight it
     if (isConnectorInHoveredPath(connector)) {
-      return "#FFD700";
+      return "#9aa0a6";
     }
 
     if (localHoveredId) {
@@ -163,7 +163,7 @@ SkillTreeProps) {
       return "#9aa0a6";
     }
     if (isNextToLearn) {
-      return "#4CAF50";
+      return "#FFD700";
     }
     return "#9aa0a6";
   };
