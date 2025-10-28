@@ -11,6 +11,8 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -147,7 +149,7 @@ export function NodeCard({
                   }}
                 />
               ) : (
-                <BuildIcon
+                <EditNoteIcon
                   sx={{
                     fontSize: iconSize,
                     color: completed ? "#757575" : "#ff0000",
