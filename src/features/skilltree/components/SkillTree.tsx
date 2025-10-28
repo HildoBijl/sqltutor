@@ -77,13 +77,49 @@ SkillTreeProps) {
     return prerequisites;
   };
 
+  // Tooltip state
+  const [tooltip, setTooltip] = useState<{
+    content: string;
+    x: number;
+    y: number;
+  } | null>(null);
+
   // Handlers for hover events
-  const handleHoverStart = (id: string) => {
+  const handleHoverStart = (id: string, event: React.MouseEvent) => {
     setLocalHoveredId(id);
     setHoveredId(id);
     const chain = getPrerequisites(id);
-    // Caulculate full prerequisite chain
+    // Calculate full prerequisite chain
     setPrerequisites(chain);
+
+    // Show tooltip at cursor position
+    const item = contentItems[id];
+    const rect = containerRef.current?.getBoundingClientRect();
+    const offsetX = rect ? event.clientX - rect.left : event.clientX;
+    const offsetY = rect ? event.clientY - rect.top : event.clientY;
+
+
+    // Upon hover, show description in tooltip
+    setTooltip({
+      content: item.description || "No description available",
+      x: offsetX + 15,
+      y: offsetY - 10, 
+    });
+  };
+
+  // Update tooltip position on mouse move
+  const handleMouseMove = (event: React.MouseEvent) => {
+    if (tooltip) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      const offsetX = rect ? event.clientX - rect.left : event.clientX;
+      const offsetY = rect ? event.clientY - rect.top : event.clientY;
+
+      setTooltip({
+        ...tooltip,
+        x: offsetX + 15,
+        y: offsetY - 10,
+      });
+    }
   };
 
   const handleHoverEnd = () => {
@@ -91,6 +127,7 @@ SkillTreeProps) {
     setHoveredId(null);
     // Reset the prerequisite chain
     setPrerequisites(new Set());
+    setTooltip(null);
   };
 
   // Handler for click events on nodes
@@ -108,7 +145,10 @@ SkillTreeProps) {
   };
 
   // Check if a connector is part of the hovered path
-  const isConnectorInHoveredPath = (connector: { from: string; to: string }): boolean => {
+  const isConnectorInHoveredPath = (connector: {
+    from: string;
+    to: string;
+  }): boolean => {
     if (!localHoveredId) return false;
 
     const toIsHovered = connector.to === localHoveredId;
@@ -154,7 +194,7 @@ SkillTreeProps) {
       return "#9aa0a6";
     }
 
-    // Color based on completition status, no hover active 
+    // Color based on completition status, no hover active
     const bothCompleted =
       isCompleted(connector.from) && isCompleted(connector.to);
     const isNextToLearn =
@@ -206,7 +246,8 @@ SkillTreeProps) {
           return (
             <g
               key={item.id}
-              onMouseEnter={() => handleHoverStart(item.id)}
+              onMouseEnter={(e) => handleHoverStart(item.id, e)}
+              onMouseMove={handleMouseMove}
               onMouseLeave={handleHoverEnd}
               onClick={() => handleNodeClick(item)}
               style={{ cursor: "pointer" }}
@@ -224,6 +265,26 @@ SkillTreeProps) {
           );
         })}
       </Drawing>
+      {tooltip && (
+        <div
+          style={{
+            position: "absolute",
+            left: tooltip.x,
+            top: tooltip.y,
+            border: "1px solid #ccc",
+            backgroundColor: "rgba(255, 255, 255, 0.75)",
+            color: "black",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            fontSize: "14px",
+            maxWidth: "300px",
+            pointerEvents: "none",
+            zIndex: 1000,
+          }}
+        >
+          {tooltip.content}
+        </div>
+      )}
     </div>
   );
 }
