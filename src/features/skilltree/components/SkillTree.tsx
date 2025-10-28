@@ -98,12 +98,11 @@ SkillTreeProps) {
     const offsetX = rect ? event.clientX - rect.left : event.clientX;
     const offsetY = rect ? event.clientY - rect.top : event.clientY;
 
-
     // Upon hover, show description in tooltip
     setTooltip({
       content: item.description || "No description available",
       x: offsetX + 15,
-      y: offsetY - 10, 
+      y: offsetY - 10,
     });
   };
 
@@ -215,7 +214,9 @@ SkillTreeProps) {
         position: "relative",
         width: `${treeBounds.width}px`,
         height: `${treeBounds.height}px`,
-        margin: "0 auto",
+        // Add a margin when rendering the SkillTree in the Canvas
+        marginLeft: "35px",
+        marginTop: "35px",
         //opacity: 0.3,
       }}
     >
