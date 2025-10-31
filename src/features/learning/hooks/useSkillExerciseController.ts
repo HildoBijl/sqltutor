@@ -43,6 +43,7 @@ interface SkillExerciseControllerState {
     tableNames: string[];
     canSubmit: boolean;
     canGiveUp: boolean;
+    hasExecutedQuery: boolean;
   };
   status: {
     dbReady: boolean;
@@ -109,11 +110,29 @@ export function useSkillExerciseController({
   } = useSkillExerciseState(skillId, skillModule);
 
   const [query, setQuery] = useState('');
-  const [feedback, setFeedback] = useState<PracticeFeedback | null>(null);
+  const [feedback, setFeedbackState] = useState<PracticeFeedback | null>(null);
+  const [feedbackSubmissionKey, setFeedbackSubmissionKey] = useState<string | null>(null);
+  const [feedbackHidden, setFeedbackHidden] = useState(false);
   const [hasGivenUp, setHasGivenUp] = useState(false);
   const [showGiveUpDialog, setShowGiveUpDialog] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
+  const [revealedSolution, setRevealedSolution] = useState<string | null>(null);
+
+  const updateFeedback = useCallback(
+    (nextFeedback: PracticeFeedback | null, metadata?: { normalizedQuery?: string | null }) => {
+      setFeedbackState(nextFeedback);
+
+      if (nextFeedback && (nextFeedback.type === 'error' || nextFeedback.type === 'warning')) {
+        setFeedbackSubmissionKey(metadata?.normalizedQuery ?? null);
+        setFeedbackHidden(false);
+      } else {
+        setFeedbackSubmissionKey(null);
+        setFeedbackHidden(false);
+      }
+    },
+    [],
+  );
 
   const queueComponentStateUpdate = useCallback(
     (updater: Parameters<typeof setComponentState>[0]) => {
@@ -128,7 +147,10 @@ export function useSkillExerciseController({
 
   useEffect(() => {
     setHasGivenUp(false);
-  }, [currentExercise]);
+    setRevealedSolution(null);
+    updateFeedback(null);
+    setHasExecutedQuery(false);
+  }, [currentExercise, setHasExecutedQuery, setRevealedSolution, updateFeedback]);
 
   useEffect(() => {
     return () => {
@@ -148,7 +170,7 @@ export function useSkillExerciseController({
       if (!dbReady || exerciseCompleted || !currentExercise) return;
 
       if (!liveQuery.trim()) {
-        setFeedback(null);
+        updateFeedback(null);
         setHasExecutedQuery(false);
         return;
       }
@@ -160,7 +182,7 @@ export function useSkillExerciseController({
         console.debug('Live query execution failed:', error);
       }
     },
-    [dbReady, exerciseCompleted, currentExercise, executeQuery],
+    [dbReady, exerciseCompleted, currentExercise, executeQuery, updateFeedback],
   );
 
   const handleExecute = useCallback(
@@ -171,20 +193,17 @@ export function useSkillExerciseController({
       setHasExecutedQuery(true);
 
       if (hasGivenUp) {
-        setFeedback({
-          message: 'You chose to view the solution. Review it, then move on to the next exercise.',
-          type: 'info',
-        });
+        updateFeedback(null);
         return;
       }
 
       if (exerciseCompleted) {
-        setFeedback({ message: 'Already completed. Click Next Exercise to continue.', type: 'info' });
+        updateFeedback({ message: 'Already completed. Click Next Exercise to continue.', type: 'info' });
         return;
       }
 
       if (!dbReady) {
-        setFeedback({ message: 'Database is still loading. Please try again in a moment.', type: 'info' });
+        updateFeedback({ message: 'Database is still loading. Please try again in a moment.', type: 'info' });
         return;
       }
 
@@ -194,17 +213,20 @@ export function useSkillExerciseController({
       );
       if (previousAttempt) {
         exerciseDispatch({ type: 'input', input: effectiveQuery, result: null });
-        setFeedback({
-          message: previousAttempt.feedback || 'You already tried this exact query.',
-          type:
-            previousAttempt.status === 'correct'
-              ? 'success'
-              : previousAttempt.status === 'invalid'
-                ? 'warning'
-                : previousAttempt.status === 'incorrect'
-                  ? 'error'
-                  : 'info',
-        });
+        updateFeedback(
+          {
+            message: previousAttempt.feedback || 'You already tried this exact query.',
+            type:
+              previousAttempt.status === 'correct'
+                ? 'success'
+                : previousAttempt.status === 'invalid'
+                  ? 'warning'
+                  : previousAttempt.status === 'incorrect'
+                    ? 'error'
+                    : 'info',
+          },
+          { normalizedQuery: normalized },
+        );
         return;
       }
 
@@ -213,11 +235,14 @@ export function useSkillExerciseController({
 
       if (!supportsOutputValidation) {
         console.warn('Skill module missing verifyOutput/validateOutput implementation:', skillId);
-        setFeedback({
-          message:
-            'This exercise cannot be verified yet because it lacks result validation. Please try another exercise.',
-          type: 'warning',
-        });
+        updateFeedback(
+          {
+            message:
+              'This exercise cannot be verified yet because it lacks result validation. Please try another exercise.',
+            type: 'warning',
+          },
+          { normalizedQuery: normalized },
+        );
         return;
       }
 
@@ -235,18 +260,24 @@ export function useSkillExerciseController({
 
         if (!validation.ok) {
           recordAttempt({ input: effectiveQuery, result: execution.output ?? null, validation });
-          setFeedback({
-            message: validation.message || 'Query result has invalid structure.',
-            type: 'warning',
-          });
+          updateFeedback(
+            {
+              message: validation.message || 'Query result has invalid structure.',
+              type: 'warning',
+            },
+            { normalizedQuery: normalized },
+          );
           return;
         }
 
         if (!database) {
-          setFeedback({
-            message: 'Database is not ready for verification. Please try again in a moment.',
-            type: 'warning',
-          });
+          updateFeedback(
+            {
+              message: 'Database is not ready for verification. Please try again in a moment.',
+              type: 'warning',
+            },
+            { normalizedQuery: normalized },
+          );
           return;
         }
 
@@ -276,7 +307,7 @@ export function useSkillExerciseController({
             setShowCompletionDialog(true);
           } else {
             const progressDisplay = Math.min(updatedSolvedCount, requiredCount);
-            setFeedback({
+            updateFeedback({
               message:
                 verification.message ||
                 `Excellent! Exercise completed successfully! (${progressDisplay}/${requiredCount})`,
@@ -284,16 +315,22 @@ export function useSkillExerciseController({
             });
           }
         } else {
-          setFeedback({
-            message: verification.message || 'Not quite right. Check your query and try again!',
-            type: 'error',
-          });
+          updateFeedback(
+            {
+              message: verification.message || 'Not quite right. Check your query and try again!',
+              type: 'error',
+            },
+            { normalizedQuery: normalized },
+          );
         }
       } catch (error: any) {
-        setFeedback({
-          message: 'Query error: ' + (error?.message || 'Unknown error'),
-          type: 'warning',
-        });
+        updateFeedback(
+          {
+            message: 'Query error: ' + (error?.message || 'Unknown error'),
+            type: 'warning',
+          },
+          { normalizedQuery: normalized },
+        );
       }
     },
     [
@@ -312,6 +349,7 @@ export function useSkillExerciseController({
       requiredCount,
       queueComponentStateUpdate,
       hasGivenUp,
+      updateFeedback,
     ],
   );
 
@@ -337,24 +375,26 @@ export function useSkillExerciseController({
     }
 
     if (!solution) {
-      setFeedback({ message: 'No auto-solution available for this exercise.', type: 'info' });
+      updateFeedback({ message: 'No auto-solution available for this exercise.', type: 'info' });
       return;
     }
 
     setQuery(solution);
-  }, [currentExercise, exerciseSolution, skillModule]);
+    setRevealedSolution(solution);
+  }, [currentExercise, exerciseSolution, setQuery, setRevealedSolution, skillModule, updateFeedback]);
 
   const handleNewExercise = useCallback(() => {
     if (!exerciseCompleted && !hasGivenUp) {
-      setFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
+      updateFeedback({ message: 'Finish the current exercise before moving on.', type: 'info' });
       return;
     }
     exerciseDispatch({ type: 'generate' });
     setQuery('');
-    setFeedback(null);
+    updateFeedback(null);
     setHasGivenUp(false);
     setHasExecutedQuery(false);
-  }, [exerciseCompleted, exerciseDispatch, hasGivenUp]);
+    setRevealedSolution(null);
+  }, [exerciseCompleted, exerciseDispatch, hasGivenUp, setRevealedSolution, updateFeedback]);
 
   const openGiveUpDialog = useCallback(() => {
     setShowGiveUpDialog(true);
@@ -366,13 +406,29 @@ export function useSkillExerciseController({
 
   const handleGiveUpConfirm = useCallback(() => {
     setShowGiveUpDialog(false);
-    setFeedback({
-      message: 'Solution loaded. Take a moment to review it and explore the Theory page for more guidance.',
-      type: 'info',
-    });
     setHasGivenUp(true);
+    updateFeedback(null);
     void handleAutoComplete();
-  }, [handleAutoComplete]);
+  }, [handleAutoComplete, updateFeedback]);
+
+  const handleSetQuery = useCallback(
+    (value: string) => {
+      setQuery(value);
+
+      if (!feedback) {
+        setFeedbackHidden(false);
+        return;
+      }
+
+      if (feedbackSubmissionKey && (feedback.type === 'error' || feedback.type === 'warning')) {
+        const normalizedValue = normalizeForHistory(value);
+        setFeedbackHidden(normalizedValue !== feedbackSubmissionKey);
+      } else {
+        setFeedbackHidden(false);
+      }
+    },
+    [feedback, feedbackSubmissionKey, setFeedbackHidden, setQuery],
+  );
 
   const practiceExerciseTitle = useMemo(
     () => ((componentState.numSolved || 0) >= requiredCount ? 'Practice Exercise' : 'Exercise'),
@@ -398,9 +454,9 @@ export function useSkillExerciseController({
     practice: {
       title: practiceExerciseTitle,
       query,
-      feedback,
+      feedback: feedbackHidden ? null : feedback,
       currentExercise: normalizedExercise,
-      solution: exerciseSolution ?? null,
+      solution: revealedSolution ?? exerciseSolution ?? null,
       hasGivenUp,
       exerciseCompleted,
       queryResult: normalizedResults,
@@ -432,12 +488,12 @@ export function useSkillExerciseController({
       },
     },
     actions: {
-      setQuery: (value: string) => setQuery(value),
+      setQuery: handleSetQuery,
       submit: handleExecute,
       liveExecute: handleLiveExecute,
       autoComplete: handleAutoComplete,
       nextExercise: handleNewExercise,
-      dismissFeedback: () => setFeedback(null),
+      dismissFeedback: () => updateFeedback(null),
     },
   };
 }

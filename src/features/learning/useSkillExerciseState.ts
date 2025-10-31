@@ -54,7 +54,7 @@ export interface SkillExerciseModuleLike {
   };
 }
 
-type SkillExerciseProgress = ExerciseProgress<any, string, unknown, unknown>;
+export type SkillExerciseProgress = ExerciseProgress<any, string, unknown, unknown>;
 type SkillStoredExerciseState = StoredExerciseState<any | null, string>;
 
 type Dispatch = (action: ExerciseAction<string, unknown>) => void;

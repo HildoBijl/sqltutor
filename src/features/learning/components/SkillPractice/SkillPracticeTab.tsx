@@ -26,6 +26,7 @@ export function SkillPracticeTab({
   isAdmin,
 }: SkillPracticeTabProps) {
   const description = practice.currentExercise?.description ?? '';
+  const showSolution = (practice.exerciseCompleted || practice.hasGivenUp) && Boolean(practice.solution);
 
   return (
     <Box>
@@ -72,13 +73,16 @@ export function SkillPracticeTab({
         queryError={practice.queryError}
       />
 
+      <ExerciseSolution
+        solution={practice.solution ?? undefined}
+        show={showSolution}
+      />
+
       <ExerciseResults
         queryResult={practice.queryResult}
         queryError={practice.queryError}
         hasExecuted={practice.hasExecutedQuery}
       />
-
-      {practice.exerciseCompleted && <ExerciseSolution solution={practice.solution ?? undefined} />}
 
       <GiveUpDialog
         open={dialogs.open}

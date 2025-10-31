@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, Alert } from '@mui/material';
+import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, OndemandVideo } from '@mui/icons-material';
 
 import { useAppStore, type ConceptComponentState } from '@/store';
@@ -94,4 +94,3 @@ export default function ConceptPage() {
     </Container>
   );
 }
-
