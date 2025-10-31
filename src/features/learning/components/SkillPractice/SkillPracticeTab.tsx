@@ -43,6 +43,7 @@ export function SkillPracticeTab({
         onQueryChange={actions.setQuery}
         onExecute={actions.submit}
         onLiveExecute={actions.liveExecute}
+        readOnly={practice.exerciseCompleted || practice.hasGivenUp}
       />
 
       <ExerciseControls
