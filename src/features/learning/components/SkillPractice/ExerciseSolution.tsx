@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Box, Button, Collapse, Paper, Typography } from '@mui/material';
+import { Box, Button, Collapse, Divider, Paper, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 interface ExerciseSolutionProps {
@@ -16,33 +16,53 @@ export function ExerciseSolution({ solution, show = true }: ExerciseSolutionProp
   }
 
   return (
-    <Paper sx={{ mt: 3, p: 2, bgcolor: 'success.light' }}>
+    <Paper
+      variant="outlined"
+      sx={{
+        mt: 3,
+        mb: 3,
+        p: 2.5,
+        borderRadius: 2,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        boxShadow: 'none',
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-        <Typography variant="h6" sx={{ color: 'success.dark' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           Solution
         </Typography>
         <Button
           size="small"
+          color="primary"
+          variant="text"
           onClick={() => setExpanded((prev) => !prev)}
           endIcon={expanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+          sx={{ textTransform: 'none', fontWeight: 500, px: 1 }}
         >
           {expanded ? 'Hide' : 'Show'}
         </Button>
       </Box>
       <Collapse in={expanded} unmountOnExit>
-        <Paper variant="outlined" sx={{ mt: 2, p: 2, bgcolor: 'background.paper' }}>
-          <Typography
-            component="pre"
-            sx={{
-              fontFamily: 'monospace',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              m: 0,
-            }}
-          >
-            {solution}
-          </Typography>
-        </Paper>
+        <Divider sx={{ my: 2 }} />
+        <Box
+          component="pre"
+          sx={{
+            m: 0,
+            px: 2,
+            py: 1.5,
+            borderRadius: 1,
+            bgcolor: 'grey.50',
+            fontFamily: 'Fira Code, monospace',
+            fontSize: '0.95rem',
+            lineHeight: 1.5,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            overflowX: 'auto',
+          }}
+        >
+          {solution}
+        </Box>
       </Collapse>
     </Paper>
   );
