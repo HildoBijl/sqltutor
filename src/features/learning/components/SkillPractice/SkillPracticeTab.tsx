@@ -70,7 +70,6 @@ export function SkillPracticeTab({
       <ExerciseFeedback
         feedback={practice.feedback}
         queryError={practice.queryError}
-        onClose={actions.dismissFeedback}
       />
 
       <ExerciseResults

@@ -5,13 +5,12 @@ import type { PracticeFeedback } from './types';
 interface ExerciseFeedbackProps {
   feedback: PracticeFeedback | null;
   queryError: Error | null;
-  onClose: () => void;
 }
 
-export function ExerciseFeedback({ feedback, queryError, onClose }: ExerciseFeedbackProps) {
+export function ExerciseFeedback({ feedback, queryError }: ExerciseFeedbackProps) {
   if (feedback) {
     return (
-      <Alert severity={feedback.type} sx={{ mb: 3 }} onClose={onClose}>
+      <Alert severity={feedback.type} sx={{ mb: 3 }}>
         {feedback.message}
       </Alert>
     );
