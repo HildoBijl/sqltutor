@@ -93,6 +93,7 @@ export function useSkillExerciseController({
     isExecuting,
     tableNames,
     resetDatabase,
+    clearQueryState,
   } = useDatabase({
     context: 'exercise',
     schema,
@@ -172,6 +173,7 @@ export function useSkillExerciseController({
       if (!liveQuery.trim()) {
         updateFeedback(null);
         setHasExecutedQuery(false);
+        clearQueryState();
         return;
       }
 
@@ -182,7 +184,7 @@ export function useSkillExerciseController({
         console.debug('Live query execution failed:', error);
       }
     },
-    [dbReady, exerciseCompleted, currentExercise, executeQuery, updateFeedback],
+    [clearQueryState, dbReady, exerciseCompleted, currentExercise, executeQuery, updateFeedback],
   );
 
   const handleExecute = useCallback(
@@ -422,12 +424,20 @@ export function useSkillExerciseController({
 
       if (feedbackSubmissionKey && (feedback.type === 'error' || feedback.type === 'warning')) {
         const normalizedValue = normalizeForHistory(value);
+
+        if (!normalizedValue) {
+          setFeedbackHidden(true);
+          updateFeedback(null);
+          clearQueryState();
+          return;
+        }
+
         setFeedbackHidden(normalizedValue !== feedbackSubmissionKey);
       } else {
         setFeedbackHidden(false);
       }
     },
-    [feedback, feedbackSubmissionKey, setFeedbackHidden, setQuery],
+    [clearQueryState, feedback, feedbackSubmissionKey, setFeedbackHidden, setQuery, updateFeedback],
   );
 
   const practiceExerciseTitle = useMemo(

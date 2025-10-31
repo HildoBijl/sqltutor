@@ -43,9 +43,11 @@ export function SQLEditor({
 
   // Handle live execution when debounced value changes
   useEffect(() => {
-    if (enableLiveExecution && onLiveExecute && debouncedValue.trim()) {
-      onLiveExecute(debouncedValue);
+    if (!enableLiveExecution || !onLiveExecute) {
+      return;
     }
+
+    onLiveExecute(debouncedValue);
   }, [debouncedValue, enableLiveExecution, onLiveExecute]);
 
   const hasExecute = Boolean(onExecute);
