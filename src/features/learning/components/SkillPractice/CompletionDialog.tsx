@@ -49,24 +49,16 @@ export function CompletionDialog({
         sx={{
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'stretch',
           gap: 1.5,
           px: 4,
           pb: 4,
         }}
       >
-        <Button
-          onClick={onClose}
-          variant="contained"
-          startIcon={<Replay />}
-          sx={{ width: '100%', textTransform: 'none' }}
-        >
-          Stay at this exercise
-        </Button>
-
         {showStoryButton && onViewStory && (
           <Button
             onClick={onViewStory}
-            variant="outlined"
+            variant="contained"
             startIcon={<MenuBook />}
             sx={{ width: '100%', textTransform: 'none' }}
           >
@@ -76,11 +68,20 @@ export function CompletionDialog({
 
         <Button
           onClick={onContinueLearning}
-          variant="outlined"
+          variant={showStoryButton && onViewStory ? 'outlined' : 'contained'}
           startIcon={<ArrowBack />}
           sx={{ width: '100%', textTransform: 'none' }}
         >
           Back to learning overview
+        </Button>
+
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          startIcon={<Replay />}
+          sx={{ width: '100%', textTransform: 'none' }}
+        >
+          Stay at this exercise
         </Button>
       </DialogActions>
     </Dialog>
