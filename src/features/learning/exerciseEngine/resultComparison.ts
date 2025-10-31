@@ -62,7 +62,7 @@ export function compareQueryResults(
   if (expected.columns.length !== actual.columns.length) {
     return {
       match: false,
-      feedback: `Expected ${expected.columns.length} columns but got ${actual.columns.length}.`,
+      feedback: 'Your query returned a different number of columns than expected.',
       details: {
         expectedRows: expectedRowCount,
         actualRows: actualRowCount,
@@ -78,17 +78,15 @@ export function compareQueryResults(
     const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
 
     if (missingCols.length > 0 || extraCols.length > 0) {
-      const parts = [];
-      if (missingCols.length > 0) {
-        parts.push(`Missing: ${missingCols.join(', ')}`);
+      let feedbackMessage = 'Your query did not return the expected set of columns.';
+      if (missingCols.length > 0 && extraCols.length === 0) {
+        feedbackMessage = 'Some expected columns are missing from your results.';
+      } else if (missingCols.length === 0 && extraCols.length > 0) {
+        feedbackMessage = 'Your results include columns that should not be there.';
       }
-      if (extraCols.length > 0) {
-        parts.push(`Extra: ${extraCols.join(', ')}`);
-      }
-
       return {
         match: false,
-        feedback: `Column mismatch. ${parts.join(' ')}`.trim(),
+        feedback: feedbackMessage,
         details: {
           expectedRows: expectedRowCount,
           actualRows: actualRowCount,
@@ -101,7 +99,7 @@ export function compareQueryResults(
       if (expectedCols[index] !== actualCols[index]) {
         return {
           match: false,
-          feedback: `Column order mismatch at position ${index + 1}. Expected '${expected.columns[index]}' but got '${actual.columns[index]}'.`,
+          feedback: 'Your columns are not in the expected order.',
           details: {
             expectedRows: expectedRowCount,
             actualRows: actualRowCount,
@@ -112,9 +110,13 @@ export function compareQueryResults(
   }
 
   if (expectedRowCount !== actualRowCount) {
+    const rowCountFeedback =
+      actualRowCount < expectedRowCount
+        ? 'Your query returned fewer rows than expected.'
+        : 'Your results include rows that should not be there.';
     return {
       match: false,
-      feedback: `Expected ${expectedRowCount} rows but got ${actualRowCount}.`,
+      feedback: rowCountFeedback,
       details: {
         expectedRows: expectedRowCount,
         actualRows: actualRowCount,
@@ -147,7 +149,7 @@ export function compareQueryResults(
   if (differences.length > 0) {
     return {
       match: false,
-      feedback: `Row data mismatch. ${differences.length} row(s) don't match the expected results.`,
+      feedback: 'Some rows in your result set differ from the expected data.',
       details: {
         expectedRows: expectedRowCount,
         actualRows: actualRowCount,
@@ -165,4 +167,3 @@ export function compareQueryResults(
     },
   };
 }
-
