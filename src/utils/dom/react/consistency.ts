@@ -1,4 +1,4 @@
-import { useRef, useCallback, MutableRefObject } from 'react';
+import { useRef, useCallback } from 'react';
 
 import { ensureConsistency } from '../../javascript';
 
@@ -10,8 +10,8 @@ export function useLatest<T>(value: T, initialValue: T = value) {
 }
 
 // Take a possibly non-existing ref object useEnsureRef takes a ref object that comes in and ensure there is always a valid MutableRefObject. This is useful when forwarding a ref and wanting to make sure you get an existing ref right at the start.
-export function useEnsureRef<T>(ref?: MutableRefObject<T | undefined>): MutableRefObject<T | undefined> {
-	const backupRef = useRef<T | undefined>(undefined);
+export function useEnsureRef<T>(ref?: React.Ref<T>): React.Ref<T | undefined> {
+  const backupRef = useRef<T | undefined>(undefined);
 	return ref ?? backupRef;
 }
 

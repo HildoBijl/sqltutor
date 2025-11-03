@@ -46,3 +46,23 @@ export function ensureConsistency<T>(next: T, prev?: T): T {
   // For anything else (primitive, class instantiations, etcetera), return the new value.
   return next;
 }
+
+// Process the options given to a function or component, filling in default values. Return a copied object.
+export function processOptions<T extends Record<string, any>>(givenOptions: Partial<T> = {}, defaultOptions: T): T {
+  // Check the input.
+  if (!isPlainObject(givenOptions))
+    throw new Error(`Invalid options: expected object but received type "${typeof givenOptions}".`);
+  if (!isPlainObject(defaultOptions))
+    throw new Error("Invalid defaultOptions: no or invalid object given.");
+
+  // Start with defaults and add given options.
+  const result: T = { ...defaultOptions };
+  for (const key in givenOptions) {
+    if (!Object.prototype.hasOwnProperty.call(defaultOptions, key))
+      throw new Error(`Invalid option: "${key}" is not a recognized option.`);
+    const value = givenOptions[key];
+    if (value !== undefined)
+      result[key] = value;
+  }
+  return result;
+}
