@@ -24,6 +24,7 @@
     "@react-hook/resize-observer": "^2.0.2",
     "@uiw/react-codemirror": "^4.21.21",
     "cookie": "^1.0.2",
+    "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@types/lodash": "^4.17.20",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/sql.js": "^1.4.9",
