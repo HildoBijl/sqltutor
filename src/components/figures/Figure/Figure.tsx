@@ -24,13 +24,13 @@ export function Figure(options: FigureOptions) {
 	options = processOptions<FigureOptions>(options, defaultFigureOptions);
 
 	// Define refs and make them accessible to calling elements.
-	const ref = useEnsureRef<FigureRef>(options.ref);
 	const figureInner = useRef<HTMLDivElement>(null);
 	const figureOuter = useRef<HTMLDivElement>(null);
+	const ref = useEnsureRef<FigureRef>(options.ref);
 	useImperativeHandle(ref, () => ({
 		get inner() { return figureInner.current },
 		get outer() { return figureOuter.current },
-	}))
+	}));
 
 	// Render the figure.
 	return <div ref={figureOuter} className={options.className} style={{ ...resolveFunctions(figureStyle, { maxWidth: options.maxWidth }), ...options.style } as CSSProperties}>

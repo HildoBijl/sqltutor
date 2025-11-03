@@ -1,5 +1,3 @@
-export * from './sqljs'
-export * from './styling'
 export * from './html'
 export * from './figures'
 export * from './codeMirror'
