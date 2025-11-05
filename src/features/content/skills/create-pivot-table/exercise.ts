@@ -9,6 +9,7 @@ import type {
 } from '../../types';
 import { schemas } from '../../../database/schemas';
 import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
+import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
 
 interface CompanyRow {
   id: number;
@@ -165,41 +166,48 @@ export function validateOutput(
 export function verifyOutput(
   exercise: ExerciseState,
   output: QueryResult[] | undefined,
+  database: any,
 ): VerificationResult {
-  const firstResult = output?.[0];
+  const actualResult = output?.[0];
 
-  if (!firstResult || !Array.isArray(firstResult.values)) {
+  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
     return {
       correct: false,
       message: MESSAGES.validation.noResultSet,
     };
   }
 
-  const normalizedActual = firstResult.values.map((row) =>
-    JSON.stringify(row.slice(0, exercise.state.columns.length).map(normalizeNumeric)),
-  );
-  const normalizedExpected = exercise.state.expectedRows.map((row) =>
-    JSON.stringify(row.map(normalizeNumeric)),
-  );
-
-  normalizedActual.sort();
-  normalizedExpected.sort();
-
-  if (normalizedActual.length !== normalizedExpected.length) {
+  if (!database || typeof database.exec !== 'function') {
     return {
       correct: false,
-      message: template(MESSAGES.verification.wrongRowCount, {
-        expected: normalizedExpected.length,
-        actual: normalizedActual.length,
-      }),
+      message: 'Unable to verify results. Please try again.',
     };
   }
 
-  const matches = normalizedActual.every((value, index) => value === normalizedExpected[index]);
+  const solutionQuery = getSolution(exercise);
+
+  let expectedResult: QueryResult | undefined;
+  try {
+    const result = database.exec(solutionQuery);
+    expectedResult = result?.[0];
+  } catch (error) {
+    console.error('Failed to execute solution query:', error);
+    return {
+      correct: false,
+      message: 'Unable to verify results. Please try again.',
+    };
+  }
+
+  const comparison = compareQueryResults(expectedResult, actualResult, {
+    ignoreRowOrder: true,
+    ignoreColumnOrder: false,
+    caseSensitive: false,
+  });
 
   return {
-    correct: matches,
-    message: matches ? MESSAGES.verification.correct : MESSAGES.verification.wrongValues,
+    correct: comparison.match,
+    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
+    details: comparison.details,
   };
 }
 
@@ -226,14 +234,4 @@ function compareRows(a: unknown[], b: unknown[]): number {
     if (diff !== 0) return diff;
   }
   return a.length - b.length;
-}
-
-function normalizeNumeric(value: unknown): unknown {
-  if (typeof value === 'number') {
-    return Number.isFinite(value) ? Math.round(value * 1000) / 1000 : null;
-  }
-  if (value === null || value === undefined) {
-    return null;
-  }
-  return value;
 }

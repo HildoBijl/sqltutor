@@ -151,14 +151,11 @@ export function DataTable({
               paginatedValues.map((row, rowIndex) => (
                 <TableRow
                   key={rowIndex}
-                  hover
                   sx={{
                     '&:nth-of-type(odd)': {
                       bgcolor: 'action.hover',
                     },
-                    '&:hover': {
-                      bgcolor: 'action.selected',
-                    },
+                    transition: 'none',
                   }}
                 >
                   {row.map((cell, cellIndex) => (
@@ -186,6 +183,26 @@ export function DataTable({
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           rowsPerPageOptions={[5, 10, 25, 50]}
+          sx={{
+            '.MuiTablePagination-toolbar': {
+              alignItems: 'center',
+              gap: 1,
+              flexWrap: 'wrap',
+            },
+            '.MuiTablePagination-selectLabel': {
+              m: 0,
+              display: 'flex',
+              alignItems: 'center',
+            },
+            '.MuiTablePagination-displayedRows': {
+              m: 0,
+              display: 'flex',
+              alignItems: 'center',
+            },
+            '.MuiTablePagination-actions': {
+              alignItems: 'center',
+            },
+          }}
         />
       )}
 

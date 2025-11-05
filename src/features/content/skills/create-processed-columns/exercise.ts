@@ -9,6 +9,7 @@ import type {
 } from '../../types';
 import { schemas } from '../../../database/schemas';
 import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
+import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
 
 interface CompanyRow {
   id: number;
@@ -51,8 +52,6 @@ const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
   num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
   industry: row.industry === null || row.industry === undefined ? null : stringify(row.industry),
 }));
-
-const EXPECTED_ROW_COUNT = COMPANIES.length;
 
 export const MESSAGES = {
   descriptions: {
@@ -167,77 +166,48 @@ export function validateOutput(
 export function verifyOutput(
   exercise: ExerciseState,
   output: QueryResult[] | undefined,
+  database: any,
 ): VerificationResult {
-  const firstResult = output?.[0];
+  const actualResult = output?.[0];
 
-  if (!firstResult || !Array.isArray(firstResult.values)) {
+  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
     return {
       correct: false,
       message: MESSAGES.validation.noResultSet,
     };
   }
 
-  if (firstResult.values.length !== EXPECTED_ROW_COUNT) {
+  if (!database || typeof database.exec !== 'function') {
     return {
       correct: false,
-      message: template(MESSAGES.verification.wrongRowCount, {
-        expected: EXPECTED_ROW_COUNT,
-        actual: firstResult.values.length,
-      }),
+      message: 'Unable to verify results. Please try again.',
     };
   }
 
-  const nameIndex = 0;
-  const valueIndex = 1;
-  const expected = normalizeExpectedValues(exercise.state.expectedValues);
-  const seen = new Set<string>();
+  const solutionQuery = getSolution(exercise);
 
-  for (const row of firstResult.values) {
-    const name = stringify(row?.[nameIndex]);
-    if (!expected.has(name) || seen.has(name)) {
-      return {
-        correct: false,
-        message: MESSAGES.verification.wrongValues,
-      };
-    }
-    seen.add(name);
-
-    const expectedValue = expected.get(name);
-    const actualRaw = row?.[valueIndex];
-    const actualValue = actualRaw === null || actualRaw === undefined ? null : Number(actualRaw);
-    const normalizedExpected = expectedValue === null || expectedValue === undefined ? null : Number(expectedValue);
-
-    if (normalizedExpected === null) {
-      if (actualRaw !== null && actualRaw !== undefined) {
-        return {
-          correct: false,
-          message: MESSAGES.verification.wrongValues,
-        };
-      }
-    } else {
-      if (
-        actualValue === null ||
-        Number.isNaN(actualValue) ||
-        Math.abs(actualValue - normalizedExpected) > 0.0001
-      ) {
-        return {
-          correct: false,
-          message: MESSAGES.verification.wrongValues,
-        };
-      }
-    }
-  }
-
-  if (seen.size !== expected.size) {
+  let expectedResult: QueryResult | undefined;
+  try {
+    const result = database.exec(solutionQuery);
+    expectedResult = result?.[0];
+  } catch (error) {
+    console.error('Failed to execute solution query:', error);
     return {
       correct: false,
-      message: MESSAGES.verification.wrongValues,
+      message: 'Unable to verify results. Please try again.',
     };
   }
+
+  const comparison = compareQueryResults(expectedResult, actualResult, {
+    ignoreRowOrder: true,
+    ignoreColumnOrder: false,
+    caseSensitive: false,
+  });
 
   return {
-    correct: true,
-    message: MESSAGES.verification.correct,
+    correct: comparison.match,
+    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
+    details: comparison.details,
   };
 }
 
@@ -256,15 +226,3 @@ function stringify(value: unknown): string {
   return value === null || value === undefined ? '' : String(value);
 }
 
-function normalizeExpectedValues(store: ExpectedValueStore | undefined | null): Map<string, unknown> {
-  if (store instanceof Map) {
-    return store;
-  }
-  const map = new Map<string, unknown>();
-  if (store && typeof store === 'object') {
-    for (const [key, value] of Object.entries(store)) {
-      map.set(key, value);
-    }
-  }
-  return map;
-}

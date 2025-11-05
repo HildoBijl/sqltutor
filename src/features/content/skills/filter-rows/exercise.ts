@@ -9,6 +9,7 @@ import type {
 } from '../../types';
 import { schemas } from '../../../database/schemas';
 import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
+import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
 
 // ============================================================================
 // DATA SETUP
@@ -209,47 +210,48 @@ export function validateOutput(
 export function verifyOutput(
   exercise: ExerciseState,
   output: QueryResult[] | undefined,
+  database: any,
 ): VerificationResult {
-  const firstResult = output?.[0];
+  const actualResult = output?.[0];
 
-  if (!firstResult || !Array.isArray(firstResult.values)) {
+  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
     return {
       correct: false,
       message: MESSAGES.validation.noResultSet,
     };
   }
 
-  const { state } = exercise;
-  const expectedIds = state.expectedRows.map((row) => row.id).sort((a, b) => a - b);
-
-  const idIndex = firstResult.columns.indexOf('id');
-  if (idIndex === -1) {
+  if (!database || typeof database.exec !== 'function') {
     return {
       correct: false,
-      message: MESSAGES.validation.missingColumns,
+      message: 'Unable to verify results. Please try again.',
     };
   }
 
-  const actualIds = firstResult.values
-    .map((row) => Number(row?.[idIndex]))
-    .filter((id) => !Number.isNaN(id))
-    .sort((a, b) => a - b);
+  const solutionQuery = getSolution(exercise);
 
-  if (actualIds.length !== expectedIds.length) {
+  let expectedResult: QueryResult | undefined;
+  try {
+    const result = database.exec(solutionQuery);
+    expectedResult = result?.[0];
+  } catch (error) {
+    console.error('Failed to execute solution query:', error);
     return {
       correct: false,
-      message: template(MESSAGES.verification.wrongRowCount, {
-        expected: expectedIds.length,
-        actual: actualIds.length,
-      }),
+      message: 'Unable to verify results. Please try again.',
     };
   }
 
-  const matches = expectedIds.every((expectedId, index) => expectedId === actualIds[index]);
+  const comparison = compareQueryResults(expectedResult, actualResult, {
+    ignoreRowOrder: true,
+    ignoreColumnOrder: true,
+    caseSensitive: false,
+  });
 
   return {
-    correct: matches,
-    message: matches ? MESSAGES.verification.correct : MESSAGES.verification.wrongRows,
+    correct: comparison.match,
+    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
+    details: comparison.details,
   };
 }
 
