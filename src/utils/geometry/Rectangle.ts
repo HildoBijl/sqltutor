@@ -10,6 +10,11 @@ export class Rectangle {
 	public readonly span: Span;
 
 	/*
+	 * Static properties.
+	 */
+	static zero = new Rectangle(Vector.zero, Vector.zero);
+
+	/*
 	 * Creation methods.
 	 */
 
@@ -129,7 +134,7 @@ export class Rectangle {
 	}
 
 	// Get the rectangle with start being min and end being max.
-	get minMax(): Rectangle {
+	normalize(): Rectangle {
 		return new Rectangle(this.min, this.max);
 	}
 
@@ -217,7 +222,7 @@ export class Rectangle {
 	getReferencePoint(anchor: VectorInput, useMinMax = false): Vector {
 		// Process input data.
 		const anchorVector = ensureVector(anchor, this.dimension);
-		const [start, end] = useMinMax ? [this.min, this.max] : [this.start, this.end];
+		const { start, end } = useMinMax ? this.normalize() : this;
 
 		// Set up the reference point.
 		const coordinates = this.middle.coordinates.map((mid, index) => mid + anchorVector.coordinates[index] * (end.coordinates[index] - start.coordinates[index]) / 2);
@@ -332,11 +337,14 @@ export class Rectangle {
 	// equals runs an exact equality check on the full set-up. Rectangles that have the same points but defined in a different way are still considered equal.
 	equals(rectangle: RectangleInput): boolean {
 		const r = ensureRectangle(rectangle);
-		return this.minMax.span.equals(r.minMax.span);
+		return this.normalize().span.equals(r.normalize().span);
 	}
 }
 
 // Turn the given parameter into a Rectangle object, or die trying.
-export function ensureRectangle(rectangle: RectangleInput): Rectangle {
-	return new Rectangle(rectangle);
+export function ensureRectangle(rectangle: RectangleInput, dimension?: number): Rectangle {
+	const rect = new Rectangle(rectangle);
+	if (dimension !== undefined && rect.dimension !== dimension)
+		throw new Error(`Invalid Rectangle dimension: expected dimension ${dimension}, got ${rect.dimension}.`);
+	return rect;
 }

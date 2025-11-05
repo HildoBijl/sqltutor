@@ -13,21 +13,15 @@ export class Vector {
 	/*
 	 * Static properties.
 	 */
-	static zero: Vector = new Vector(0, 0);
-	static i: Vector = new Vector(1, 0);
-	static j: Vector = new Vector(0, 1);
-
-	static '3D': {
-		zero: Vector;
-		i: Vector;
-		j: Vector;
-		k: Vector;
-	} = {
-			zero: new Vector(0, 0, 0),
-			i: new Vector(1, 0, 0),
-			j: new Vector(0, 1, 0),
-			k: new Vector(0, 0, 1),
-		};
+	static zero = new Vector(0, 0);
+	static i = new Vector(1, 0);
+	static j = new Vector(0, 1);
+	static '3D' = {
+		zero: new Vector(0, 0, 0),
+		i: new Vector(1, 0, 0),
+		j: new Vector(0, 1, 0),
+		k: new Vector(0, 0, 1),
+	};
 
 	/*
 	 * Creation methods.

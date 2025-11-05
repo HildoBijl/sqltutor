@@ -5,3 +5,4 @@ export * from './events';
 export * from './sizing';
 export * from './mouse';
 export * from './animation';
+export * from './style';

@@ -66,3 +66,14 @@ export function processOptions<T extends Record<string, any>>(givenOptions: Part
   }
   return result;
 }
+
+// Filter out properties from a given set of options to only be left with the ones in the second set of options.
+export function filterOptions<T extends Record<string, any>, U extends Record<string, any>>(givenOptions: T, defaultOptions: U): Partial<U> {
+  const keys = Object.keys(defaultOptions) as (keyof U)[];
+  const result = {} as Partial<U>;
+  for (const key of keys) {
+    if (key in givenOptions)
+      result[key] = givenOptions[key as keyof T] as any;
+  }
+  return result;
+}

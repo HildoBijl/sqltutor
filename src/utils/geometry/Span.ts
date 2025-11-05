@@ -192,14 +192,10 @@ export class Span {
 }
 
 // Turn the given parameter is a Span object, or die trying. Optionally, a dimension may be given which is then checked too.
-export function ensureSpan(input: Span | SpanDefinition, dimension?: number): Span {
-	// Try constructing a Span — this handles SpanDefinition and 2-point arrays.
-	const span = new Span(input)
-
-	// Validate dimension if required.
+export function ensureSpan(input: SpanInput, dimension?: number): Span {
+	const span = new Span(input);
 	if (dimension !== undefined && span.dimension !== dimension)
 		throw new Error(`Invalid Span dimension: expected ${dimension}D, got ${span.dimension}D.`);
-
 	return span
 }
 

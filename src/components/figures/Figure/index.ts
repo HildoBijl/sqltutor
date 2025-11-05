@@ -1,2 +1,2 @@
-export * from './settings'
+export * from './definitions'
 export * from './Figure'
