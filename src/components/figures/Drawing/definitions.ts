@@ -10,6 +10,7 @@ export interface DrawingData {
 	svgDefs: SVGDefsElement | null;
 	htmlContents: HTMLDivElement | null;
 	canvas: HTMLCanvasElement | null;
+	getFigureScale: () => number | undefined;
 	getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => Vector | undefined;
 	getPointFromEvent: (event: MouseEvent | TouchEvent) => Vector | undefined;
 	contains: (point: Vector) => boolean;
@@ -20,6 +21,7 @@ export interface DrawingProps<TRef = DrawingData> extends Omit<FigureProps<TRef>
 	maxWidth?: ((bounds: Rectangle) => number | undefined) | 'fill' | number;
 	width: number;
 	height: number;
+	autoScale?: boolean;
 	useSvg?: boolean;
 	useCanvas?: boolean;
 }
@@ -31,6 +33,7 @@ export const getDefaultDrawing = (): DrawingProps => {
 		maxWidth: (bounds) => bounds.width,
 		width: 400,
 		height: 300,
+		autoScale: true,
 		useSvg: true,
 		useCanvas: false,
 	}

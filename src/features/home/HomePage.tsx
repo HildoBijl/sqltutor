@@ -289,7 +289,7 @@ export default function HomePage() {
                   Alexandra Boala (Skill Tree Developer)
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Razvan (Storyline Designer)
+                  Razvan Efros (Storyline Designer)
                 </Typography>
               </Stack>
             </Grid>

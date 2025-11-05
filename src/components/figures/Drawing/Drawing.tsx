@@ -1,4 +1,4 @@
-import { useRef, useMemo, useImperativeHandle, useId, CSSProperties } from 'react';
+import { useState, useEffect, useRef, useMemo, useImperativeHandle, useId, type CSSProperties } from 'react';
 
 import { type Vector, Rectangle } from '@/utils/geometry';
 import { getEventPosition, useEnsureRef, useForceUpdateEffect, notSelectable } from '@/utils/dom';
@@ -25,7 +25,7 @@ const canvasStyle: CSSProperties = {
 };
 
 export function Drawing(props: DrawingProps) {
-	const { maxWidth, width, height, useSvg, useCanvas, ref, style, ...figureProps } = { ...getDefaultDrawing(), ...props };
+	const { maxWidth, width, height, autoScale, useSvg, useCanvas, ref, style, ...figureProps } = { ...getDefaultDrawing(), ...props };
 	if (!useSvg && !useCanvas)
 		throw new Error('Drawing error: cannot generate a drawing without either an SVG or a canvas present.');
 
@@ -50,6 +50,14 @@ export function Drawing(props: DrawingProps) {
 	const aspectRatio = height / width; // This must be passed on to the Figure object.
 	const figureMaxWidth = maxWidth === 'fill' ? undefined : (typeof maxWidth === 'function' ? maxWidth(bounds) : maxWidth);
 
+	// Determine the initial figure scale, in case autoScale is applied.
+	const [initialFigureScale, setInitialFigureScale] = useState<number | undefined>();
+	const innerFigure = figureRef.current?.inner;
+	useEffect(() => {
+		if (innerFigure)
+			setInitialFigureScale(innerFigure.getBoundingClientRect().width / bounds.width);
+	}, [innerFigure, setInitialFigureScale]);
+
 	// Set up refs and make them accessible to any implementing component.
 	const drawingData = {
 		id,
@@ -59,6 +67,7 @@ export function Drawing(props: DrawingProps) {
 		svgDefs: svgDefsRef.current,
 		htmlContents: htmlContentsRef.current,
 		canvas: canvasRef.current,
+		getFigureScale: () => autoScale && innerFigure ? innerFigure.getBoundingClientRect().width / bounds.width : initialFigureScale,
 		getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => getCoordinates(cPoint, bounds, figureRef.current, figureRect),
 		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventPosition(event), bounds, figureRef.current),
 		contains: (point: Vector) => bounds.contains(point),

@@ -29,7 +29,7 @@ export function Figure(props: FigureProps) {
 		<div ref={figureInner} style={{
 			boxSizing: 'content-box',
 			height: 0,
-			paddingBottom: `${(aspectRatio ?? 0.75) * 100}%`,
+			paddingBottom: `${aspectRatio! * 100}%`,
 			position: 'relative',
 			width: '100%',
 			...(innerStyle ?? {}),

@@ -32,27 +32,24 @@ export function Element(props: ElementProps) {
 
 	// Update element position based on current scale and transform.
 	const [mergedRef, internalRef] = useEnsureRef<HTMLDivElement>(ref);
-	const { bounds, figure } = useDrawingData();
+	const { bounds, figure, getFigureScale } = useDrawingData();
 	const updateElementPosition = useCallback(() => {
+		// On no data, show nothing.
 		const element = internalRef.current;
 		if (!element || !bounds || !figure?.inner)
 			return;
-
-		// Calculate the scale at which the figure is drawn.
-		const figureRect = figure.inner.getBoundingClientRect();
-		const figureScale = figureRect.width / bounds.width;
 
 		// Position the element accordingly.
 		element.style.transformOrigin = `${(a.x + 1) / 2 * 100}% ${(a.y + 1) / 2 * 100}%`;
 		element.style.transform = `
 			translate(${-(a.x + 1) / 2 * 100}%, ${-(a.y + 1) / 2 * 100}%)
-			scale(${figureScale})
+			scale(${getFigureScale()})
 			translate(${p.x}px, ${p.y}px)
 			scale(${scale})
 			rotate(${rotate! * 180 / Math.PI}deg)
 			${style?.transform ?? ''}
 		`;
-	}, [internalRef, bounds, figure, p, a, rotate, scale]);
+	}, [internalRef, bounds, figure, getFigureScale, p, a, rotate, scale]);
 
 	// Call update on layout changes and resize.
 	useLayoutEffect(updateElementPosition, [updateElementPosition, children]);

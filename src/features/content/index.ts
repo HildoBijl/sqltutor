@@ -1,10 +1,12 @@
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 import type { SchemaKey } from '@/features/database/schemas';
+// @ts-ignore - util is a JavaScript module without type definitions
+import { keysToObject } from '@/util';
 
 export type ContentType = 'concept' | 'skill';
 
-export interface ContentMeta {
+export interface ContentMetaRaw {
   id: string;
   name: string;
   type: ContentType;
@@ -13,9 +15,8 @@ export interface ContentMeta {
   database?: SchemaKey;
 }
 
-export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
-
-export const contentIndex: ContentMeta[] = [
+// The contentIndexRaw contains all definitions of content items, before being processed into more derived objects.
+const contentIndexRaw: ContentMetaRaw[] = [
   {
     id: 'database',
     name: 'What is a Database?',
@@ -195,6 +196,41 @@ export const contentIndex: ContentMeta[] = [
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
   },
 ];
+
+// The contentItemsRaw contains all unprocessed content items, as an object.
+export const contentItemsRaw: Record<string, ContentMetaRaw> = keysToObject(contentIndexRaw.map(item => item.id), (_: string, index: number) => contentIndexRaw[index]);
+
+
+// Set up a new type for processed content items.
+export interface ContentMeta extends ContentMetaRaw {
+  followUps: string[];
+}
+
+// Prepare the contentIndex and contentItems for processed content items.
+export const contentIndex: ContentMeta[] = [];
+export const contentItems: Record<string, ContentMeta> = {};
+contentIndexRaw.forEach(item => {
+  const processedItem: ContentMeta = {
+    ...item,
+    followUps: [],
+  };
+  contentIndex.push(processedItem);
+  contentItems[item.id] = processedItem;
+});
+
+// Fill up the contentIndex and contentItems.
+contentIndexRaw.forEach(itemRaw => {
+  const item: ContentMeta = contentItems[itemRaw.id];
+  (itemRaw.prerequisites || []).forEach(prerequisiteId => {
+    const prerequisite: ContentMeta = contentItems[prerequisiteId];
+    if (!prerequisite)
+      throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at content item "${item.id}".`);
+    prerequisite.followUps.push(item.id);
+  });
+});
+
+
+export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
 
 export const contentComponents: Record<string, ContentComponentMap> = {
   database: {
