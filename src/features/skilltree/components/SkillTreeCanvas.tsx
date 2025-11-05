@@ -1,12 +1,11 @@
 import { RefObject } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import type { Vector } from "@/utils/geometry";
 import { ContentMeta } from "@/features/content";
+import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
-// @ts-ignore - Vector is a JavaScript module without type definitions
-import type { Vector } from "@/util/geometry/Vector";
-import { ContentPositionMeta } from "../utils/treeDefinition";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -34,7 +33,7 @@ interface SkillTreeCanvasProps {
     width: number;
     height: number;
   };
-  visiblePaths: { points: (typeof Vector)[]; from: string; to: string }[];
+  visiblePaths: { points: Vector[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
   getProgress: (id: string) => string | null;
   hoveredId: string | null;

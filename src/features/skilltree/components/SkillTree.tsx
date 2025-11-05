@@ -1,8 +1,7 @@
 import { RefObject, useState } from "react";
+import type { Vector } from "@/utils/geometry";
+import { Drawing, Curve } from "@/components/figures";
 import { ContentMeta } from "@/features/content";
-import { Drawing, Curve } from "@/components/figures/Drawing";
-// @ts-ignore - Vector is a JavaScript module without type definitions
-import type { Vector } from "@/util/geometry/Vector";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 
@@ -32,7 +31,7 @@ interface SkillTreeProps {
     width: number;
     height: number;
   };
-  visiblePaths: { points: (typeof Vector)[]; from: string; to: string }[];
+  visiblePaths: { points: Vector[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
   getProgress: (id: string) => string | null;
   setHoveredId: (id: string | null) => void;
@@ -50,7 +49,7 @@ export function SkillTree({
   setHoveredId,
   containerRef,
 }: // nodeRefs,
-SkillTreeProps) {
+  SkillTreeProps) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
@@ -234,7 +233,7 @@ SkillTreeProps) {
             points={connector.points}
             color={getConnectorColor(connector)}
             size={1.5}
-            spread={20}
+            curveDistance={20}
             style={getConnectorStyle(connector)}
           />
         ))}

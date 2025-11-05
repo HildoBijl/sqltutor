@@ -1,5 +1,4 @@
-// @ts-ignore - Vector is a JavaScript module without type definitions
-import { Vector } from "@/util/geometry/Vector";
+import { Vector } from "@/utils/geometry";
 import { cardHeight, initialPathSpacing, maxPathSpace, minVerticalOffset, maxVerticalOffset } from "./settings";
 import { ContentPositionMeta } from "./treeDefinition";
 

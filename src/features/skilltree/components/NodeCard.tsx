@@ -1,15 +1,9 @@
-import { Rectangle } from "@/components/figures/Drawing";
-// @ts-ignore - SvgPortal is a JavaScript module without type definitions
-import { SvgPortal } from "@/components/figures/Drawing/DrawingContext";
-// @ts-ignore - Vector is a JavaScript module without type definitions
-import { Vector } from "@/util/geometry/Vector";
-// @ts-ignore - Element is a JavaScript module without type definitions
-import { Element } from "@/components/figures";
+import { Vector } from "@/utils/geometry";
+import { Rectangle, SvgPortal, Element } from "@/components/figures";
 import { ContentMeta } from "@/features/content";
 import { cardWidth, cardHeight } from "../utils/settings";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
@@ -113,9 +107,8 @@ export function NodeCard({
       <SvgPortal>
         {/* Type icon (concept/skill) in top-left corner */}
         <g
-          transform={`translate(${iconX - iconSize / 2}, ${
-            iconY - iconSize / 2
-          })`}
+          transform={`translate(${iconX - iconSize / 2}, ${iconY - iconSize / 2
+            })`}
           style={{ opacity: nodeOpacity }}
         >
           <circle

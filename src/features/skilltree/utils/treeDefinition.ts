@@ -1,13 +1,11 @@
 import { contentItems } from "@/features/content";
-// @ts-ignore - util is a JavaScript module without type definitions
-import { applyMapping } from '@/util';
-// @ts-ignore - Vector is a JavaScript module without type definitions
-import { Vector } from "@/util/geometry/Vector";
+import { applyMapping } from '@/utils/javascript';
+import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
 import { cardHeight } from "./settings";
 import { computeConnectorPath } from "./pathCalculations";
 
 export interface ContentPositionMetaRaw {
-	position: { x: number; y: number };
+	position: VectorInput;
 }
 
 const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
@@ -55,7 +53,7 @@ export const contentPositions: Record<string, ContentPositionMeta> = applyMappin
 	return {
 		...positionDataRaw,
 		id,
-		position: new Vector(positionDataRaw.position),
+		position: ensureVector(positionDataRaw.position, 2),
 		prerequisitesPathOrder: [],
 		followUpsPathOrder: [],
 	};
@@ -98,7 +96,7 @@ Object.values(contentPositions).forEach(positionData => {
 export const contentPositionList: ContentPositionMeta[] = Object.values(contentPositions)
 
 // Determine the connectors based on the item positions.
-export const connectors: { points: typeof Vector[]; from: string; to: string }[] = [];
+export const connectors: { points: Vector[]; from: string; to: string }[] = [];
 Object.values(contentPositions).forEach(positionData => {
 	positionData.prerequisitesPathOrder.map(prerequisiteId => {
 		const prerequisitePositionData = contentPositions[prerequisiteId];

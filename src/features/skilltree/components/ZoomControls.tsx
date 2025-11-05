@@ -1,5 +1,5 @@
 import { Box, Button, Tooltip } from "@mui/material";
-import {Add, Remove, Refresh} from "@mui/icons-material";  
+import { Add, Remove, Refresh } from "@mui/icons-material";
 
 /*
 * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
@@ -50,7 +50,7 @@ export function ZoomControls({
           onClick={() => onZoomIn(zoomStep)}
           sx={{ minWidth: "40px" }}
         >
-          <Add fontSize="small" color = "primary"/>
+          <Add fontSize="small" color="primary" />
         </Button>
       </Tooltip>
       <Tooltip title="Zoom Out" placement="left">
@@ -60,7 +60,7 @@ export function ZoomControls({
           onClick={() => onZoomOut(zoomStep)}
           sx={{ minWidth: "40px" }}
         >
-          <Remove fontSize="small" color = "primary" />
+          <Remove fontSize="small" color="primary" />
         </Button>
       </Tooltip>
       <Tooltip title="Reset View" placement="left">
@@ -68,9 +68,9 @@ export function ZoomControls({
           variant="outlined"
           size="small"
           onClick={() => onReset()}
-          sx={{ minWidth: "40px", fontSize:'15px' }}
+          sx={{ minWidth: "40px", fontSize: '15px' }}
         >
-        < Refresh fontSize="small" color = "primary"/>
+          <Refresh fontSize="small" color="primary" />
         </Button>
       </Tooltip>
     </Box>

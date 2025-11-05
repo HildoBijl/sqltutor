@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 import type { SchemaKey } from '@/features/database/schemas';
 // @ts-ignore - util is a JavaScript module without type definitions
-import { keysToObject } from '@/util';
+import { keysToObject } from '@/utils';
 
 export type ContentType = 'concept' | 'skill';
 

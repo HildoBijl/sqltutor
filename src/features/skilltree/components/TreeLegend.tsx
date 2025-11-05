@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
-import { MenuBook, Build, EditNote} from "@mui/icons-material";
+import { MenuBook, EditNote } from "@mui/icons-material";
 
 
 /*
 * TreeLegend component that displays a legend for the skill tree nodes.
-*/  
+*/
 export function TreeLegend() {
   return (
     <Box
