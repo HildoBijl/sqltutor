@@ -7,7 +7,7 @@ import { Group } from '../Group';
 
 import { type LinePropsWithoutArrows, type LineProps } from './types';
 import { ensurePathPoints, getLinePath, processCurveArrows } from './utils';
-import { ArrowHead, resolveArrowProps } from './ArrowHead';
+import { ArrowHead, resolveBooleanArrows } from './ArrowHead';
 
 export const getDefaultLine = (): LineProps => ({
 	...getDefaultObject<SVGPathElement>(),
@@ -40,10 +40,10 @@ function LineWithoutArrowHead(props: LineProps) {
 export function Line(props: LineProps) {
 	// Extract arrow definitions.
 	const { arrow, startArrow, endArrow, ...restProps } = props;
-	const startArrowDef = resolveArrowProps(startArrow) || resolveArrowProps(arrow);
-	const endArrowDef = resolveArrowProps(endArrow) || resolveArrowProps(arrow);
+	const startArrowDef = resolveBooleanArrows(startArrow) || resolveBooleanArrows(arrow);
+	const endArrowDef = resolveBooleanArrows(endArrow) || resolveBooleanArrows(arrow);
 
-	// If there are no arrows, render a simple path.
+	// If there are no arrows, render the line directly.
 	if (!startArrowDef && !endArrowDef)
 		return <LineWithoutArrowHead {...restProps} />;
 
@@ -51,6 +51,7 @@ export function Line(props: LineProps) {
 	const lineWithoutArrowProps = { ...getDefaultLine(), ...restProps } as LinePropsWithoutArrows;
 	const { points, startArrow: sArrow, endArrow: eArrow } = processCurveArrows(lineWithoutArrowProps, startArrowDef, endArrowDef);
 
+	// Render the line with arrow heads.
 	return <Group ref={lineWithoutArrowProps.ref}>
 		<LineWithoutArrowHead	{...{ ...lineWithoutArrowProps, ref: undefined, points }} />
 		{startArrowDef && <ArrowHead {...sArrow} />}

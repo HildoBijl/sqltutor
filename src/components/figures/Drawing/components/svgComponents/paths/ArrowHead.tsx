@@ -2,14 +2,9 @@ import { Vector, ensureVector } from '@/utils';
 
 import { SvgPortal } from '../../../DrawingContext';
 
-import { DefaultObjectProps, getDefaultObject } from '../definitions';
+import { getDefaultObject } from '../definitions';
 
-export interface ArrowHeadProps extends DefaultObjectProps<SVGPolygonElement> {
-	position?: Vector;
-	angle?: number;
-	size?: number;
-	color?: string;
-}
+import { type ArrowHeadProps } from './types';
 
 export const getDefaultArrowHead = (): ArrowHeadProps => ({
 	...getDefaultObject<SVGPolygonElement>(),
@@ -35,10 +30,10 @@ export function ArrowHead(props: ArrowHeadProps) {
 	</SvgPortal>;
 };
 
-export function resolveArrowProps(arrowProps?: Partial<ArrowHeadProps> | boolean): ArrowHeadProps | undefined {
-	if (!arrowProps)
+export function resolveBooleanArrows(arrowProps?: Partial<ArrowHeadProps> | boolean): ArrowHeadProps | undefined {
+	if (arrowProps === false)
 		return undefined;
 	if (arrowProps === true)
-		return getDefaultArrowHead();
-	return { ...getDefaultArrowHead(), ...arrowProps };
+		return {};
+	return arrowProps;
 }

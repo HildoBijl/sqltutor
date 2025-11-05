@@ -37,12 +37,12 @@ export function getCurvePathAlong(points: Vector[], close = false, curveRatio = 
 	if (close && !firstOf(points)!.equals(lastOf(points)!))
 		points = [...points, firstOf(points)!];
 
-	// Calculate intermediate lines for the curve.
+	// Calculate in-between line parts.
 	const lines: [Vector, Vector][] = repeat(points.length - 1, index => {
 		const start = points[index];
 		const end = points[index + 1];
 
-		// On a spread, use distances to find control points. Ensure equal distance.
+		// Use distances to find line start/end. Ensure equal distance.
 		if (curveDistance !== undefined) {
 			const distance = start.subtract(end).magnitude;
 			const maxFactor = close || (index > 0 && index < points.length - 2) ? 0.5 : 1;
@@ -50,7 +50,7 @@ export function getCurvePathAlong(points: Vector[], close = false, curveRatio = 
 			return [start.interpolate(end, factor), end.interpolate(start, factor)];
 		}
 
-		// On a part, use interpolation factors. These may differ. Use 0.9 maximum in case of arrow-heads.
+		// Use ratios to find line start/end. Ratio factors may differ. Use 0.9 maximum in case of arrow-heads.
 		const factor1 = curveRatio * (!close && index === points.length - 2 ? 0.9 : 0.5);
 		const factor2 = curveRatio * (!close && index === 0 ? 0.9 : 0.5);
 		return [start.interpolate(end, factor1), end.interpolate(start, factor2)];
@@ -85,6 +85,8 @@ export function getCurvePathThrough(points: Vector[], close = false, curveRatio 
 	points = points.filter((point, index) => index === 0 || !point.equals(points[index - 1]));
 	if (points.length < 2)
 		throw new Error(`Invalid path points: need at least two unique points.`);
+
+	// Find control points for the paths.
 	const controlPoints = getControlPoints(points, close, curveRatio, curveDistance);
 
 	// Set up the path.
@@ -118,13 +120,13 @@ export function getControlPoints(points: Vector[], close = false, curveRatio = 0
 			return [point, point];
 		controlDirection = controlDirection.normalize();
 
-		// On a spread, apply the control points with the given distance.
+		// Use distances to find the control points.
 		if (curveDistance !== undefined) {
 			const relativeControlPoint = controlDirection.multiply(curveDistance);
 			return [point.subtract(relativeControlPoint), point.add(relativeControlPoint)];
 		}
 
-		// On a part, project the relative vector onto the control direction vector.
+		// Use ratios to find the control points.
 		return [
 			point.add(prevRelative.getProjectionOn(controlDirection).multiply(curveRatio / 2)),
 			point.add(nextRelative.getProjectionOn(controlDirection).multiply(curveRatio / 2)),

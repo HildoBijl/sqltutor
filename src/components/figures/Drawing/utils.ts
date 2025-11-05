@@ -73,7 +73,7 @@ export function useElementBounds(
 
 // Finds a text node and returns its bounds in drawing coordinates.
 export function useTextNodeBounds(
-	container: Element,
+	container: Element | null | undefined,
 	condition: string | ((node: Text) => boolean),
 	drawingRef?: React.RefObject<DrawingData>,
 	index = 0,

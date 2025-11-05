@@ -2,9 +2,8 @@ import { useRef, useState } from 'react';
 import { Alert, Box, Typography } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
-import { Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures/Drawing';
-import { Par, Section } from '@/components/html';
-import { SQL } from 'components';
+import { Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures';
+import { SQL, Par, Section } from '@/components';
 
 type SqlDrawingProps = {
   code: string;

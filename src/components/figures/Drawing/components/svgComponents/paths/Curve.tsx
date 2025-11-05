@@ -4,7 +4,7 @@ import { Group } from '../Group';
 
 import { type CurvePropsWithoutArrows, type CurveProps } from './types';
 import { ensurePathPoints, getCurvePathThrough, getCurvePathAlong, processCurveArrows } from './utils';
-import { ArrowHead, resolveArrowProps } from './ArrowHead';
+import { ArrowHead, resolveBooleanArrows } from './ArrowHead';
 import { getDefaultLine, getDefaultLineStyle } from './Line';
 
 export const getDefaultCurve = (): CurveProps => ({
@@ -33,20 +33,20 @@ function CurveWithoutArrowHead(props: CurvePropsWithoutArrows) {
 export function Curve(props: CurveProps) {
 	// Extract arrow definitions.
 	const { arrow, startArrow, endArrow, ...restProps } = props;
-	const startArrowDef = resolveArrowProps(startArrow) || resolveArrowProps(arrow);
-	const endArrowDef = resolveArrowProps(endArrow) || resolveArrowProps(arrow);
+	const startArrowDef = resolveBooleanArrows(startArrow) || resolveBooleanArrows(arrow);
+	const endArrowDef = resolveBooleanArrows(endArrow) || resolveBooleanArrows(arrow);
 
 	// If there are no arrows, render the curve directly.
 	if (!startArrowDef && !endArrowDef)
 		return <CurveWithoutArrowHead {...restProps} />;
 
-	// Merge props and preprocess for arrow positioning.
+	// Merge props and preprocess the points for arrow placement.
 	const curveWithoutArrowProps = { ...getDefaultCurve(), ...restProps } as CurvePropsWithoutArrows;
 	const { points, startArrow: sArrow, endArrow: eArrow } = processCurveArrows(curveWithoutArrowProps, startArrowDef, endArrowDef);
 
 	// Render the curve with arrow heads.
 	return <Group ref={curveWithoutArrowProps.ref}>
-		<CurveWithoutArrowHead			{...{ ...curveWithoutArrowProps, ref: undefined, points }} />
+		<CurveWithoutArrowHead {...{ ...curveWithoutArrowProps, ref: undefined, points }} />
 		{startArrowDef && <ArrowHead {...sArrow} />}
 		{endArrowDef && <ArrowHead {...eArrow} />}
 	</Group>;
