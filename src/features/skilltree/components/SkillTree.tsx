@@ -1,6 +1,8 @@
-import { RefObject, useState } from "react";
+import { type RefObject, type ReactNode, useState, useEffect } from "react";
+import { useTransformContext } from "react-zoom-pan-pinch";
+import { useDebouncedFunction } from "@/utils/dom";
 import type { Vector } from "@/utils/geometry";
-import { Drawing, Curve } from "@/components/figures";
+import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components/figures";
 import { ContentMeta } from "@/features/content";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
@@ -57,6 +59,11 @@ export function SkillTree({
   //   nodeRefs.current?.set(id, el);
   // };
 
+  // On changes in the zoom-pan-pinch transform state, dispatch a scroll event to update rects.
+  const { transformState } = useTransformContext();
+  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
+  useEffect(dispatchScrollEvent, [transformState.scale, transformState.positionX, transformState.positionY]);
+
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
     const prerequisites = new Set<string>();
@@ -77,14 +84,10 @@ export function SkillTree({
   };
 
   // Tooltip state
-  const [tooltip, setTooltip] = useState<{
-    content: string;
-    x: number;
-    y: number;
-  } | null>(null);
+  const [tooltip, setTooltip] = useState<string | null>(null);
 
   // Handlers for hover events
-  const handleHoverStart = (id: string, event: React.MouseEvent) => {
+  const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
     setHoveredId(id);
     const chain = getPrerequisites(id);
@@ -93,31 +96,7 @@ export function SkillTree({
 
     // Show tooltip at cursor position
     const item = contentItems[id];
-    const rect = containerRef.current?.getBoundingClientRect();
-    const offsetX = rect ? event.clientX - rect.left : event.clientX;
-    const offsetY = rect ? event.clientY - rect.top : event.clientY;
-
-    // Upon hover, show description in tooltip
-    setTooltip({
-      content: item.description || "No description available",
-      x: offsetX + 15,
-      y: offsetY - 10,
-    });
-  };
-
-  // Update tooltip position on mouse move
-  const handleMouseMove = (event: React.MouseEvent) => {
-    if (tooltip) {
-      const rect = containerRef.current?.getBoundingClientRect();
-      const offsetX = rect ? event.clientX - rect.left : event.clientX;
-      const offsetY = rect ? event.clientY - rect.top : event.clientY;
-
-      setTooltip({
-        ...tooltip,
-        x: offsetX + 15,
-        y: offsetY - 10,
-      });
-    }
+    setTooltip(item.description || "No description available");
   };
 
   const handleHoverEnd = () => {
@@ -246,8 +225,7 @@ export function SkillTree({
           return (
             <g
               key={item.id}
-              onMouseEnter={(e) => handleHoverStart(item.id, e)}
-              onMouseMove={handleMouseMove}
+              onMouseEnter={() => handleHoverStart(item.id)}
               onMouseLeave={handleHoverEnd}
               onClick={() => handleNodeClick(item)}
               style={{ cursor: "pointer" }}
@@ -264,27 +242,33 @@ export function SkillTree({
             </g>
           );
         })}
+
+        {/* The tooltip. */}
+        <Tooltip>{tooltip}</Tooltip>
       </Drawing>
-      {tooltip && (
-        <div
-          style={{
-            position: "absolute",
-            left: tooltip.x,
-            top: tooltip.y,
-            border: "1px solid #ccc",
-            backgroundColor: "rgba(255, 255, 255, 0.75)",
-            color: "black",
-            padding: "8px 12px",
-            borderRadius: "4px",
-            fontSize: "14px",
-            maxWidth: "300px",
-            pointerEvents: "none",
-            zIndex: 1000,
-          }}
-        >
-          {tooltip.content}
-        </div>
-      )}
     </div>
   );
+}
+
+interface TooltipProps {
+  children?: ReactNode;
+}
+function Tooltip({ children }: TooltipProps) {
+  const mousePosition = useDrawingMousePosition();
+  if (!children || !mousePosition)
+    return null;
+  return <Element anchor={[-1, -1]} position={mousePosition.add([20, 10])}>
+    <div style={{
+      border: "1px solid #ccc",
+      backgroundColor: "rgba(255, 255, 255, 0.75)",
+      color: "black",
+      padding: "8px 12px",
+      borderRadius: "4px",
+      fontSize: "14px",
+      maxWidth: "300px",
+      zIndex: 1000,
+    }}>
+      {children}
+    </div>
+  </Element>
 }

@@ -26,7 +26,7 @@ export function getCoordinates(
 	}
 
 	const clientCoordinatesVector = ensureVector(clientCoordinates, 2);
-	const boundsRect = ensureRectangle(bounds);
+	const boundsRect = ensureRectangle(bounds, 2);
 
 	return new Vector([
 		((clientCoordinatesVector.x - figureRect.x) * boundsRect.width) / figureRect.width,
@@ -44,10 +44,13 @@ export function useDrawingMouseData(drawingRef?: React.RefObject<DrawingData>): 
 	const { position: clientPosition, keys } = useClientMouseData();
 
 	// Acquire data on the drawing.
-	const { figure, bounds } = useDrawingData(drawingRef);
-	const figureRect = useBoundingClientRect(figure?.inner);
+	const drawingData = useDrawingData(drawingRef);
+	if (!drawingData)
+		return {};
 
 	// If things are still initializing, don't return anything.
+	const { figure, bounds } = drawingData;
+	const figureRect = useBoundingClientRect(figure?.inner);
 	if (!clientPosition || !figureRect || figureRect.width === 0 || figureRect.height === 0)
 		return {};
 
