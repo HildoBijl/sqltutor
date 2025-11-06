@@ -70,7 +70,7 @@ interface SkillExerciseControllerState {
     setQuery: (value: string) => void;
     submit: (override?: string) => Promise<void> | void;
     liveExecute: (query: string) => Promise<void> | void;
-    autoComplete: () => Promise<void> | void;
+    autoComplete: (options?: { insertIntoEditor?: boolean }) => Promise<void> | void;
     nextExercise: () => void;
     dismissFeedback: () => void;
   };
@@ -118,6 +118,7 @@ export function useSkillExerciseController({
   const [showGiveUpDialog, setShowGiveUpDialog] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
+  const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
   const [revealedSolution, setRevealedSolution] = useState<string | null>(null);
 
   const updateFeedback = useCallback(
@@ -151,7 +152,8 @@ export function useSkillExerciseController({
     setRevealedSolution(null);
     updateFeedback(null);
     setHasExecutedQuery(false);
-  }, [currentExercise, setHasExecutedQuery, setRevealedSolution, updateFeedback]);
+    setHasSubmittedAttempt(false);
+  }, [currentExercise, setHasExecutedQuery, setHasSubmittedAttempt, setRevealedSolution, updateFeedback]);
 
   useEffect(() => {
     return () => {
@@ -192,6 +194,7 @@ export function useSkillExerciseController({
       const rawQuery = override ?? query;
       const effectiveQuery = rawQuery.trim();
       if (!currentExercise || !effectiveQuery) return;
+      setHasSubmittedAttempt(true);
       setHasExecutedQuery(true);
 
       if (hasGivenUp) {
@@ -355,7 +358,7 @@ export function useSkillExerciseController({
     ],
   );
 
-  const handleAutoComplete = useCallback(async () => {
+  const handleAutoComplete = useCallback(async (options?: { insertIntoEditor?: boolean }) => {
     if (!currentExercise) return;
 
     let solution = exerciseSolution;
@@ -381,7 +384,11 @@ export function useSkillExerciseController({
       return;
     }
 
-    setQuery(solution);
+    const shouldInsertIntoEditor = options?.insertIntoEditor ?? true;
+
+    if (shouldInsertIntoEditor) {
+      setQuery(solution);
+    }
     setRevealedSolution(solution);
   }, [currentExercise, exerciseSolution, setQuery, setRevealedSolution, skillModule, updateFeedback]);
 
@@ -395,6 +402,7 @@ export function useSkillExerciseController({
     updateFeedback(null);
     setHasGivenUp(false);
     setHasExecutedQuery(false);
+    setHasSubmittedAttempt(false);
     setRevealedSolution(null);
   }, [exerciseCompleted, exerciseDispatch, hasGivenUp, setRevealedSolution, updateFeedback]);
 
@@ -410,7 +418,7 @@ export function useSkillExerciseController({
     setShowGiveUpDialog(false);
     setHasGivenUp(true);
     updateFeedback(null);
-    void handleAutoComplete();
+    void handleAutoComplete({ insertIntoEditor: false });
   }, [handleAutoComplete, updateFeedback]);
 
   const handleSetQuery = useCallback(
@@ -458,7 +466,7 @@ export function useSkillExerciseController({
     dbReady &&
     !queryError;
 
-  const canGiveUp = Boolean(normalizedExercise) && !isExecuting;
+  const canGiveUp = Boolean(normalizedExercise) && !isExecuting && hasSubmittedAttempt;
 
   return {
     practice: {

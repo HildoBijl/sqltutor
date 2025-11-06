@@ -26,7 +26,9 @@ export function SkillPracticeTab({
   isAdmin,
 }: SkillPracticeTabProps) {
   const description = practice.currentExercise?.description ?? '';
-  const showSolution = (practice.exerciseCompleted || practice.hasGivenUp) && Boolean(practice.solution);
+  const showSolution =
+    (practice.exerciseCompleted || practice.hasGivenUp) &&
+    Boolean(practice.solution);
 
   return (
     <Box>
@@ -57,7 +59,7 @@ export function SkillPracticeTab({
         onGiveUp={dialogs.openDialog}
         onNext={actions.nextExercise}
         leftActions={
-          isAdmin && !practice.exerciseCompleted && !practice.hasGivenUp && practice.canGiveUp ? (
+          isAdmin && !practice.exerciseCompleted && !practice.hasGivenUp ? (
             <ExerciseAdminTools
               isAdmin
               disabled={!practice.currentExercise || status.isExecuting}
