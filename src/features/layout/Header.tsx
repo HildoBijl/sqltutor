@@ -6,7 +6,7 @@ import {
   School as LearnIcon,
   FitnessCenter as PracticeIcon,
   Timeline as ProgressIcon,
-  Code as PlaygroundIcon,
+  // Code as PlaygroundIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/store';
@@ -23,7 +23,7 @@ export function Header() {
     { path: '/learn', label: 'Learn', icon: LearnIcon },
     { path: '/practice', label: 'Practice', icon: PracticeIcon },
     { path: '/progress', label: 'Progress', icon: ProgressIcon },
-    { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
+    // { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
   ];
 
   const handleBack = () => {

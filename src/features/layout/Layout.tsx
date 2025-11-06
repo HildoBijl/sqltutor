@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import {
   School as LearnIcon,
-  PlayArrow as PlaygroundIcon,
+  // PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
 import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -30,7 +30,7 @@ export function Layout() {
 
   const navItems = [
     { path: '/learn', label: 'Learn', icon: LearnIcon },
-    { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
+    // { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
   ];
 
   useEffect(() => {
