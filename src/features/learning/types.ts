@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 export interface TabConfig {
   key: string;
   label: string;
-  icon?: ReactNode;
+  icon?: ReactElement | string;
   disabled?: boolean;
 }
 
