@@ -28,6 +28,7 @@ export function SkillPracticeTab({
   const description = practice.currentExercise?.description ?? '';
   const isSolvedOrGivenUp = practice.exerciseCompleted || practice.hasGivenUp;
   const showSolution = isSolvedOrGivenUp && Boolean(practice.solution?.query);
+  const hasFeedback = Boolean(practice.feedback || practice.queryError);
 
   return (
     <Box>
@@ -39,13 +40,24 @@ export function SkillPracticeTab({
         </Typography>
       )}
 
-      <ExerciseEditor
-        query={practice.query}
-        onQueryChange={actions.setQuery}
-        onExecute={actions.submit}
-        onLiveExecute={actions.liveExecute}
-        readOnly={practice.exerciseCompleted || practice.hasGivenUp}
-      />
+      <Box sx={{ mb: 3 }}>
+        <ExerciseEditor
+          query={practice.query}
+          onQueryChange={actions.setQuery}
+          onExecute={actions.submit}
+          onLiveExecute={actions.liveExecute}
+          readOnly={practice.exerciseCompleted || practice.hasGivenUp}
+        />
+
+        {hasFeedback ? (
+          <Box sx={{ mt: 1.5 }}>
+            <ExerciseFeedback
+              feedback={practice.feedback}
+              queryError={practice.queryError}
+            />
+          </Box>
+        ) : null}
+      </Box>
 
       <ExerciseControls
         exerciseCompleted={practice.exerciseCompleted}
@@ -68,11 +80,6 @@ export function SkillPracticeTab({
             />
           ) : null
         }
-      />
-
-      <ExerciseFeedback
-        feedback={practice.feedback}
-        queryError={practice.queryError}
       />
 
       <ExerciseSolution

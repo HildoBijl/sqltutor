@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 import { SQLEditor } from '@/shared/components/SQLEditor';
 
@@ -8,6 +9,7 @@ interface ExerciseEditorProps {
   onExecute: (value?: string) => Promise<void> | void;
   onLiveExecute: (value: string) => Promise<void> | void;
   readOnly?: boolean;
+  sx?: SxProps<Theme>;
 }
 
 export function ExerciseEditor({
@@ -16,9 +18,10 @@ export function ExerciseEditor({
   onExecute,
   onLiveExecute,
   readOnly = false,
+  sx,
 }: ExerciseEditorProps) {
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={sx}>
       <SQLEditor
         value={query}
         onChange={onQueryChange}
