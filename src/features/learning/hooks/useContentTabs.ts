@@ -31,7 +31,7 @@ export interface ContentTabsState<State> {
   ) => void;
 }
 
-export function useContentTabs<State extends { tab?: string }>(
+export function useContentTabs<State extends ComponentState & { tab?: string }>(
   componentId: string | undefined,
   componentType: ComponentType,
   tabs: TabConfig[],
