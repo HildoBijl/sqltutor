@@ -2,7 +2,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
@@ -112,22 +111,43 @@ export function DataTable({
 
   return (
     <Box>
-      <TableContainer
-        component={Paper}
+      <Paper
+        variant="outlined"
         sx={{
-          maxHeight: maxHeight,
-          overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: 8,
-            height: 8,
-          },
-          '&::-webkit-scrollbar-thumb': {
-            bgcolor: 'action.hover',
-            borderRadius: 1,
-          },
+          borderRadius: 2,
+          overflow: 'hidden',
         }}
       >
-        <Table stickyHeader size={compact ? 'small' : 'medium'}>
+        <Table
+          stickyHeader
+          size={compact ? 'small' : 'medium'}
+          sx={{
+            '& .MuiTableHead-root': {
+              position: 'sticky',
+              top: 0,
+              zIndex: 2,
+              backgroundColor: 'background.paper',
+            },
+            '& .MuiTableBody-root': {
+              display: 'block',
+              maxHeight: maxHeight,
+              overflowY: 'auto',
+              '&::-webkit-scrollbar': {
+                width: 8,
+                height: 8,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                bgcolor: 'action.hover',
+                borderRadius: 1,
+              },
+            },
+            '& .MuiTableHead-root, & .MuiTableBody-root .MuiTableRow-root': {
+              display: 'table',
+              width: '100%',
+              tableLayout: 'fixed',
+            },
+          }}
+        >
           <TableHead>
             <TableRow>
               {columns.map((column, index) => (
@@ -172,7 +192,7 @@ export function DataTable({
             )}
           </TableBody>
         </Table>
-      </TableContainer>
+      </Paper>
 
       {showPagination && displayValues.length > 0 && (
         <TablePagination

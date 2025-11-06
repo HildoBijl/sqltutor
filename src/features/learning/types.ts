@@ -22,3 +22,10 @@ export interface PracticeStateSnapshot {
   query: string;
   hasExecutedQuery: boolean;
 }
+
+export interface PracticeSolution {
+  query: string;
+  explanation?: string | null;
+}
+
+export type PracticeSolutionLike = PracticeSolution | string | null | undefined;

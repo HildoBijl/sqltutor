@@ -22,6 +22,8 @@ import {
   type StoredExerciseInstance,
   type StoredExerciseState,
 } from '@/store';
+import type { PracticeSolutionLike, PracticeSolution } from './types';
+import { normalizePracticeSolution } from './utils/normalizePracticeSolution';
 
 const normalizeSql = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
@@ -44,7 +46,7 @@ export interface SkillExerciseModuleLike {
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
   validateOutput?: (exercise: any, result: unknown) => ValidationResult;
   verifyOutput?: (exercise: any, output: unknown, database?: unknown) => VerificationResult;
-  getSolution?: (exercise: any) => string | null | undefined;
+  getSolution?: (exercise: any) => PracticeSolutionLike;
   runDemo?: (args: { exercise: any; helpers: ExerciseHelpers }) => unknown;
   solutionTemplate?: string;
   messages?: {
@@ -117,20 +119,26 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
     const solveFromTemplate = (exercise: any) => {
       if (!moduleLike?.solutionTemplate) return null;
-      return applyTemplate(moduleLike.solutionTemplate, exercise || {});
+      return normalizePracticeSolution(applyTemplate(moduleLike.solutionTemplate, exercise || {}));
     };
 
     const derive = ({ exercise, verification }: { exercise: any; verification?: VerificationResult }) => {
-      if (verification?.solution) return verification.solution;
+      const fromVerification = normalizePracticeSolution(verification?.solution);
+      if (fromVerification) return fromVerification;
+
       if (moduleLike?.getSolution && exercise) {
-        const generatedSolution = moduleLike.getSolution(exercise);
+        const generatedSolution = normalizePracticeSolution(moduleLike.getSolution(exercise));
         if (generatedSolution) {
           return generatedSolution;
         }
       }
-      if (exercise?.expectedQuery) return exercise.expectedQuery;
+
+      const expected = normalizePracticeSolution((exercise?.expectedQuery as PracticeSolutionLike) ?? null);
+      if (expected) return expected;
+
       const templateSolution = solveFromTemplate(exercise);
       if (templateSolution) return templateSolution;
+
       return null;
     };
 
@@ -305,7 +313,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
   const status: ExerciseStatus = progress.status;
   const currentExercise = progress.exercise;
 
-  const derivedSolution = useMemo(() => {
+  const derivedSolution = useMemo<PracticeSolution | null>(() => {
     return deriveSolution({ exercise: currentExercise, verification: progress.verification || undefined });
   }, [currentExercise, deriveSolution, progress.verification]);
 

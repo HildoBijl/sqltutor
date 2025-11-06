@@ -1,4 +1,5 @@
 import type { StoredAttempt, StoredExerciseState } from '@/store/types';
+import type { PracticeSolution, PracticeSolutionLike } from '../types';
 
 export type ExerciseStatus =
   | 'idle'
@@ -19,7 +20,7 @@ export interface VerificationResult {
   correct: boolean;
   message?: string;
   expected?: unknown;
-  solution?: string;
+  solution?: PracticeSolutionLike;
   details?: Record<string, unknown>;
 }
 
@@ -52,7 +53,7 @@ export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unkn
   validation?: ValidationResult | null;
   verification?: VerificationResult | null;
   feedback?: string | null;
-  solution?: string | null;
+  solution?: PracticeSolutionLike;
   lastAction?: ExerciseAction<Input, Result>;
 }
 
@@ -89,7 +90,7 @@ export interface SimpleExerciseConfig<Exercise, Input, Result, Demo = unknown> {
   generateExercise: (helpers: ExerciseHelpers) => Exercise;
   validateInput?: (args: ValidateInputArgs<Exercise, Input, Result>) => ValidationResult;
   runDemo?: (args: { exercise: Exercise; helpers: ExerciseHelpers }) => Demo;
-  deriveSolution?: (args: { exercise: Exercise; verification?: VerificationResult }) => string | null | undefined;
+  deriveSolution?: (args: { exercise: Exercise; verification?: VerificationResult }) => PracticeSolution | null;
   normalizeInput?: (input: Input) => string;
   feedbackForRepeat?: (args: { previous: ExerciseAttempt<Input>; currentInput: Input }) => string | undefined;
   initialState?: Partial<ExerciseProgress<Exercise, Input, Demo, Result>>;

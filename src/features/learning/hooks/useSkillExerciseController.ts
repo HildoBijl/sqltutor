@@ -10,7 +10,8 @@ import {
   type SkillExerciseProgress,
 } from '../useSkillExerciseState';
 import type { PracticeFeedback } from '../components/SkillPractice';
-import type { SkillExercise, QueryResultSet } from '../types';
+import type { SkillExercise, QueryResultSet, PracticeSolution, PracticeSolutionLike } from '../types';
+import { normalizePracticeSolution } from '../utils/normalizePracticeSolution';
 
 const normalizeForHistory = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
@@ -35,7 +36,7 @@ interface SkillExerciseControllerState {
     query: string;
     feedback: PracticeFeedback | null;
     currentExercise: SkillExercise | null;
-    solution: string | null;
+    solution: PracticeSolution | null;
     hasGivenUp: boolean;
     exerciseCompleted: boolean;
     queryResult: ReadonlyArray<QueryResultSet> | null;
@@ -119,7 +120,7 @@ export function useSkillExerciseController({
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
-  const [revealedSolution, setRevealedSolution] = useState<string | null>(null);
+  const [revealedSolution, setRevealedSolution] = useState<PracticeSolution | null>(null);
 
   const updateFeedback = useCallback(
     (nextFeedback: PracticeFeedback | null, metadata?: { normalizedQuery?: string | null }) => {
@@ -364,19 +365,22 @@ export function useSkillExerciseController({
     let solution = exerciseSolution;
 
     if (!solution && typeof skillModule?.getSolution === 'function') {
-      solution = skillModule.getSolution(currentExercise) ?? undefined;
+      solution = normalizePracticeSolution(skillModule.getSolution(currentExercise) ?? null);
     }
 
     if (!solution && (currentExercise as Record<string, unknown>).expectedQuery) {
-      solution = (currentExercise as Record<string, unknown>).expectedQuery as string;
+      solution = normalizePracticeSolution(
+        (currentExercise as Record<string, unknown>).expectedQuery as PracticeSolutionLike,
+      );
     }
 
     if (!solution && skillModule?.solutionTemplate) {
-      solution = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, token) => {
+      const templated = skillModule.solutionTemplate.replace(/{{(.*?)}}/g, (_m, token) => {
         const key = String(token).trim();
         const value = (currentExercise as Record<string, unknown>)[key];
         return value !== undefined && value !== null ? String(value) : '';
       });
+      solution = normalizePracticeSolution(templated);
     }
 
     if (!solution) {
@@ -387,7 +391,7 @@ export function useSkillExerciseController({
     const shouldInsertIntoEditor = options?.insertIntoEditor ?? true;
 
     if (shouldInsertIntoEditor) {
-      setQuery(solution);
+      setQuery(solution.query);
     }
     setRevealedSolution(solution);
   }, [currentExercise, exerciseSolution, setQuery, setRevealedSolution, skillModule, updateFeedback]);
