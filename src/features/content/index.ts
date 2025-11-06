@@ -347,19 +347,16 @@ export const contentComponents: Record<string, ContentComponentMap> = {
   },
 };
 
-export const skillExerciseLoaders = {
-  'filter-rows': () => import('./skills/filter-rows/exercise'),
-  'filter-rows-on-multiple-criteria': () => import('./skills/filter-rows-on-multiple-criteria/exercise'),
-  'choose-columns': () => import('./skills/choose-columns/exercise'),
-  'create-processed-columns': () => import('./skills/create-processed-columns/exercise'),
-  'sort-rows': () => import('./skills/sort-rows/exercise'),
-  'write-single-criterion-query': () => import('./skills/write-single-criterion-query/exercise'),
-  'write-multi-criterion-query': () => import('./skills/write-multi-criterion-query/exercise'),
-  'join-tables': () => import('./skills/join-tables/exercise'),
-  'write-multi-table-query': () => import('./skills/write-multi-table-query/exercise'),
-  'write-multi-layered-query': () => import('./skills/write-multi-layered-query/exercise'),
-  'aggregate-columns': () => import('./skills/aggregate-columns/exercise'),
-  'use-filtered-aggregation': () => import('./skills/use-filtered-aggregation/exercise'),
-  'use-dynamic-aggregation': () => import('./skills/use-dynamic-aggregation/exercise'),
-  'create-pivot-table': () => import('./skills/create-pivot-table/exercise'),
-};
+const skillExerciseModules = import.meta.glob('./skills/*/exercise.ts');
+
+type SkillExerciseLoader = () => Promise<unknown>;
+
+export const skillExerciseLoaders = Object.fromEntries(
+  Object.entries(skillExerciseModules).reduce<[string, SkillExerciseLoader][]>((entries, [path, loader]) => {
+    const match = path.match(/\.\/skills\/([^/]+)\/exercise\.ts$/);
+    if (match) {
+      entries.push([match[1], loader as SkillExerciseLoader]);
+    }
+    return entries;
+  }, []),
+) as Record<string, SkillExerciseLoader>;
