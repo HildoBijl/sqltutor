@@ -232,120 +232,50 @@ contentIndexRaw.forEach(itemRaw => {
 
 export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
 
-export const contentComponents: Record<string, ContentComponentMap> = {
-  database: {
-    Theory: lazy(() => import('./concepts/database/Theory')),
-    Summary: lazy(() => import('./concepts/database/Summary')),
-    Story: lazy(() => import('./concepts/database/Story')),
-    Video: lazy(() => import('./concepts/database/Video')),
-  },
-  'database-table': {
-    Theory: lazy(() => import('./concepts/database-table/Theory')),
-    Summary: lazy(() => import('./concepts/database-table/Summary')),
-    Story: lazy(() => import('./concepts/database-table/Story')),
-  },
-  'data-types': {
-    Theory: lazy(() => import('./concepts/data-types/Theory')),
-    Summary: lazy(() => import('./concepts/data-types/Summary')),
-    Story: lazy(() => import('./concepts/data-types/Story')),
-  },
-  'database-keys': {
-    Theory: lazy(() => import('./concepts/database-keys/Theory')),
-    Summary: lazy(() => import('./concepts/database-keys/Summary')),
-    Story: lazy(() => import('./concepts/database-keys/Story')),
-  },
-  'projection-and-filtering': {
-    Theory: lazy(() => import('./concepts/projection-and-filtering/Theory')),
-    Summary: lazy(() => import('./concepts/projection-and-filtering/Summary')),
-    Story: lazy(() => import('./concepts/projection-and-filtering/Story')),
-  },
-  'join-and-decomposition': {
-    Theory: lazy(() => import('./concepts/join-and-decomposition/Theory')),
-    Summary: lazy(() => import('./concepts/join-and-decomposition/Summary')),
-    Story: lazy(() => import('./concepts/join-and-decomposition/Story')),
-  },
-  'inner-and-outer-join': {
-    Theory: lazy(() => import('./concepts/inner-and-outer-join/Theory')),
-    Summary: lazy(() => import('./concepts/inner-and-outer-join/Summary')),
-    Story: lazy(() => import('./concepts/inner-and-outer-join/Story')),
-  },
-  aggregation: {
-    Theory: lazy(() => import('./concepts/aggregation/Theory')),
-    Summary: lazy(() => import('./concepts/aggregation/Summary')),
-    Story: lazy(() => import('./concepts/aggregation/Story')),
-  },
-  'pivot-table': {
-    Theory: lazy(() => import('./concepts/pivot-table/Theory')),
-    Summary: lazy(() => import('./concepts/pivot-table/Summary')),
-    Story: lazy(() => import('./concepts/pivot-table/Story')),
-  },
-  'query-language': {
-    Theory: lazy(() => import('./concepts/query-language/Theory')),
-    Summary: lazy(() => import('./concepts/query-language/Summary')),
-    Story: lazy(() => import('./concepts/query-language/Story')),
-  },
-  sql: {
-    Theory: lazy(() => import('./concepts/sql/Theory')),
-    Summary: lazy(() => import('./concepts/sql/Summary')),
-    Story: lazy(() => import('./concepts/sql/Story')),
-  },
-  'filter-rows': {
-    Theory: lazy(() => import('./skills/filter-rows/Theory')),
-    Story: lazy(() => import('./skills/filter-rows/Story')),
-  },
-  'filter-rows-on-multiple-criteria': {
-    Theory: lazy(() => import('./skills/filter-rows-on-multiple-criteria/Theory')),
-    Story: lazy(() => import('./skills/filter-rows-on-multiple-criteria/Story')),
-  },
-  'choose-columns': {
-    Theory: lazy(() => import('./skills/choose-columns/Theory')),
-    Story: lazy(() => import('./skills/choose-columns/Story')),
-  },
-  'create-processed-columns': {
-    Theory: lazy(() => import('./skills/create-processed-columns/Theory')),
-    Story: lazy(() => import('./skills/create-processed-columns/Story')),
-  },
-  'sort-rows': {
-    Theory: lazy(() => import('./skills/sort-rows/Theory')),
-    Story: lazy(() => import('./skills/sort-rows/Story')),
-  },
-  'write-single-criterion-query': {
-    Theory: lazy(() => import('./skills/write-single-criterion-query/Theory')),
-    Story: lazy(() => import('./skills/write-single-criterion-query/Story')),
-  },
-  'write-multi-criterion-query': {
-    Theory: lazy(() => import('./skills/write-multi-criterion-query/Theory')),
-    Story: lazy(() => import('./skills/write-multi-criterion-query/Story')),
-  },
-  'join-tables': {
-    Theory: lazy(() => import('./skills/join-tables/Theory')),
-    Story: lazy(() => import('./skills/join-tables/Story')),
-  },
-  'write-multi-table-query': {
-    Theory: lazy(() => import('./skills/write-multi-table-query/Theory')),
-    Story: lazy(() => import('./skills/write-multi-table-query/Story')),
-  },
-  'write-multi-layered-query': {
-    Theory: lazy(() => import('./skills/write-multi-layered-query/Theory')),
-    Story: lazy(() => import('./skills/write-multi-layered-query/Story')),
-  },
-  'aggregate-columns': {
-    Theory: lazy(() => import('./skills/aggregate-columns/Theory')),
-    Story: lazy(() => import('./skills/aggregate-columns/Story')),
-  },
-  'use-filtered-aggregation': {
-    Theory: lazy(() => import('./skills/use-filtered-aggregation/Theory')),
-    Story: lazy(() => import('./skills/use-filtered-aggregation/Story')),
-  },
-  'use-dynamic-aggregation': {
-    Theory: lazy(() => import('./skills/use-dynamic-aggregation/Theory')),
-    Story: lazy(() => import('./skills/use-dynamic-aggregation/Story')),
-  },
-  'create-pivot-table': {
-    Theory: lazy(() => import('./skills/create-pivot-table/Theory')),
-    Story: lazy(() => import('./skills/create-pivot-table/Story')),
-  },
-};
+const ALLOWED_CONTENT_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video']);
+
+type ComponentModule = {
+  default?: ComponentType<any>;
+} & Record<string, ComponentType<any> | undefined>;
+
+const contentComponentModules = import.meta.glob('./{concepts,skills}/*/*.tsx') as Record<
+  string,
+  () => Promise<Record<string, unknown>>
+>;
+
+function createLazyComponent(
+  loader: () => Promise<Record<string, unknown>>,
+  exportName: string,
+  modulePath: string,
+): LazyExoticComponent<ComponentType<any>> {
+  return lazy(async () => {
+    const module = (await loader()) as ComponentModule;
+    const component = module[exportName] ?? module.default;
+    if (!component) {
+      throw new Error(`Component "${exportName}" not found in module "${modulePath}".`);
+    }
+    return { default: component };
+  });
+}
+
+export const contentComponents: Record<string, ContentComponentMap> = Object.entries(
+  contentComponentModules,
+).reduce<Record<string, ContentComponentMap>>((acc, [path, loader]) => {
+  const match = path.match(/\.\/(?:concepts|skills)\/([^/]+)\/([^/]+)\.tsx$/);
+  if (!match) {
+    return acc;
+  }
+
+  const [, contentId, section] = match;
+  if (!ALLOWED_CONTENT_SECTIONS.has(section)) {
+    return acc;
+  }
+
+  const entry = acc[contentId] ?? (acc[contentId] = {} as ContentComponentMap);
+  entry[section] = createLazyComponent(loader, section, path);
+
+  return acc;
+}, {});
 
 const skillExerciseModules = import.meta.glob('./skills/*/exercise.ts');
 
