@@ -39,9 +39,14 @@ export function ContentHeader({
             {icon}
           </Box>
         )}
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h4"
+          sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+        >
           {title}
-          {isCompleted && <CheckCircle color="success" sx={{ ml: 1 }} />}
+          {isCompleted && (
+            <CheckCircle color="success" sx={{ fontSize: 'inherit' }} />
+          )}
         </Typography>
         {showProgress && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
