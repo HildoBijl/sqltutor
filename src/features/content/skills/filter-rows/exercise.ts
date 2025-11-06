@@ -7,51 +7,15 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
+import { groupCompaniesByCountry, groupCompaniesByInitial, type CompanyRow } from '../shared';
 
 // ============================================================================
 // DATA SETUP
 // ============================================================================
 
-interface CompanyRow {
-  id: number;
-  company_name: string;
-  country: string;
-  founded_year: number | null;
-  num_employees: number | null;
-  industry: string | null;
-}
-
-const RAW_COMPANIES = parseSchemaRows(schemas.companies, 'companies');
-
-const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
-  id: Number(row.id ?? 0),
-  company_name: String(row.company_name ?? ''),
-  country: String(row.country ?? ''),
-  founded_year: typeof row.founded_year === 'number' ? row.founded_year : null,
-  num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
-  industry: row.industry === null || row.industry === undefined ? null : String(row.industry),
-}));
-
-const COUNTRY_GROUPS = new Map<string, CompanyRow[]>();
-const LETTER_GROUPS = new Map<string, CompanyRow[]>();
-
-COMPANIES.forEach((company) => {
-  if (company.country) {
-    const list = COUNTRY_GROUPS.get(company.country) ?? [];
-    list.push(company);
-    COUNTRY_GROUPS.set(company.country, list);
-  }
-
-  const letter = company.company_name.charAt(0).toUpperCase();
-  if (letter && /[A-Z]/.test(letter)) {
-    const list = LETTER_GROUPS.get(letter) ?? [];
-    list.push(company);
-    LETTER_GROUPS.set(letter, list);
-  }
-});
+const COUNTRY_GROUPS = groupCompaniesByCountry();
+const LETTER_GROUPS = groupCompaniesByInitial();
 
 const COUNTRY_OPTIONS = [...COUNTRY_GROUPS.keys()].sort();
 const LETTER_OPTIONS = [...LETTER_GROUPS.keys()].sort();

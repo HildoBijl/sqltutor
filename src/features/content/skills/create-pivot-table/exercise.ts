@@ -7,17 +7,8 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-
-interface CompanyRow {
-  id: number;
-  company_name: string;
-  country: string;
-  num_employees: number | null;
-  industry: string | null;
-}
+import { COMPANIES, compareRows, type CompanyRow } from '../shared';
 
 type ScenarioId = 'pivot-country-counts' | 'pivot-employee-sum';
 
@@ -25,7 +16,7 @@ interface ScenarioDefinition {
   id: ScenarioId;
   description: string;
   columns: string[];
-  compute(rows: CompanyRow[]): unknown[][];
+  compute(rows: readonly CompanyRow[]): unknown[][];
 }
 
 export interface CreatePivotTableState {
@@ -39,16 +30,6 @@ export interface ExerciseState {
   description: string;
   state: CreatePivotTableState;
 }
-
-const RAW_COMPANIES = parseSchemaRows(schemas.companies, 'companies');
-
-const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
-  id: Number(row.id ?? 0),
-  company_name: stringify(row.company_name),
-  country: stringify(row.country),
-  num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
-  industry: row.industry === null || row.industry === undefined ? null : stringify(row.industry),
-}));
 
 export const MESSAGES = {
   descriptions: {
@@ -220,18 +201,4 @@ export function getSolution(exercise: ExerciseState): string {
     default:
       return 'SELECT industry FROM companies GROUP BY industry';
   }
-}
-
-function stringify(value: unknown): string {
-  return value === null || value === undefined ? '' : String(value);
-}
-
-function compareRows(a: unknown[], b: unknown[]): number {
-  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
-    const left = a[index] === null ? '' : String(a[index]);
-    const right = b[index] === null ? '' : String(b[index]);
-    const diff = left.localeCompare(right);
-    if (diff !== 0) return diff;
-  }
-  return a.length - b.length;
 }

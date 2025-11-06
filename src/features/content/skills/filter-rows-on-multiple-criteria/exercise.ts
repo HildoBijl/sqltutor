@@ -7,18 +7,8 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-
-interface CompanyRow {
-  id: number;
-  company_name: string;
-  country: string;
-  founded_year: number | null;
-  num_employees: number | null;
-  industry: string | null;
-}
+import { COMPANIES, type CompanyRow } from '../shared';
 
 type ScenarioId = 'multi-filter-us-large' | 'multi-filter-netherlands-tech' | 'multi-filter-uk-or-us';
 
@@ -38,17 +28,6 @@ export interface ExerciseState {
   description: string;
   state: FilterRowsMultiState;
 }
-
-const RAW_COMPANIES = parseSchemaRows(schemas.companies, 'companies');
-
-const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
-  id: Number(row.id ?? 0),
-  company_name: stringify(row.company_name),
-  country: stringify(row.country),
-  founded_year: typeof row.founded_year === 'number' ? row.founded_year : null,
-  num_employees: typeof row.num_employees === 'number' ? row.num_employees : null,
-  industry: row.industry === null || row.industry === undefined ? null : stringify(row.industry),
-}));
 
 const REQUIRED_COLUMNS = ['id', 'company_name', 'country', 'founded_year', 'num_employees', 'industry'];
 
@@ -197,8 +176,4 @@ export function getSolution(exercise: ExerciseState): string {
     default:
       return 'SELECT * FROM companies';
   }
-}
-
-function stringify(value: unknown): string {
-  return value === null || value === undefined ? '' : String(value);
 }

@@ -7,26 +7,13 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-
-interface EmployeeRow {
-  id: number;
-  name: string;
-}
-
-interface ProjectRow {
-  id: number;
-  name: string;
-  status: string;
-}
-
-interface EmployeeProjectRow {
-  employee_id: number;
-  project_id: number;
-  hours_allocated: number | null;
-}
+import {
+  EMPLOYEE_PROJECTS,
+  compareRows,
+  createEmployeeLookup,
+  createProjectLookup,
+} from '../shared';
 
 type ScenarioId = 'multi-table-projects' | 'multi-table-active' | 'multi-table-hours';
 
@@ -49,29 +36,8 @@ export interface ExerciseState {
   state: WriteMultiTableState;
 }
 
-const RAW_EMPLOYEES = parseSchemaRows(schemas.employees, 'employees');
-const RAW_PROJECTS = parseSchemaRows(schemas.employees, 'projects');
-const RAW_EMPLOYEE_PROJECTS = parseSchemaRows(schemas.employees, 'employee_projects');
-
-const EMPLOYEES: EmployeeRow[] = RAW_EMPLOYEES.map((row) => ({
-  id: Number(row.id ?? 0),
-  name: stringify(row.name),
-}));
-
-const PROJECTS: ProjectRow[] = RAW_PROJECTS.map((row) => ({
-  id: Number(row.id ?? 0),
-  name: stringify(row.name),
-  status: stringify(row.status),
-}));
-
-const EMPLOYEE_PROJECTS: EmployeeProjectRow[] = RAW_EMPLOYEE_PROJECTS.map((row) => ({
-  employee_id: Number(row.employee_id ?? 0),
-  project_id: Number(row.project_id ?? 0),
-  hours_allocated: typeof row.hours_allocated === 'number' ? row.hours_allocated : null,
-}));
-
-const EMPLOYEE_LOOKUP = new Map(EMPLOYEES.map((employee) => [employee.id, employee]));
-const PROJECT_LOOKUP = new Map(PROJECTS.map((project) => [project.id, project]));
+const EMPLOYEE_LOOKUP = createEmployeeLookup();
+const PROJECT_LOOKUP = createProjectLookup();
 
 export const MESSAGES = {
   descriptions: {
@@ -245,18 +211,4 @@ export function getSolution(exercise: ExerciseState): string {
     default:
       return 'SELECT e.name, p.name FROM employees e JOIN employee_projects ep ON e.id = ep.employee_id JOIN projects p ON ep.project_id = p.id';
   }
-}
-
-function stringify(value: unknown): string {
-  return value === null || value === undefined ? '' : String(value);
-}
-
-function compareRows(a: unknown[], b: unknown[]): number {
-  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
-    const left = a[index] === null ? '' : String(a[index]);
-    const right = b[index] === null ? '' : String(b[index]);
-    const diff = left.localeCompare(right);
-    if (diff !== 0) return diff;
-  }
-  return a.length - b.length;
 }

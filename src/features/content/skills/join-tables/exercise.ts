@@ -7,24 +7,13 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-
-interface CompanyRow {
-  id: number;
-  company_name: string;
-  country: string;
-}
-
-interface PositionRow {
-  id: number;
-  company_id: number;
-  position: string;
-  salary: number | null;
-  country: string;
-  city: string;
-}
+import {
+  COMPANIES,
+  POSITIONS,
+  compareRows,
+  createCompanyLookup,
+} from '../shared';
 
 type ScenarioId = 'join-company-positions' | 'join-left' | 'join-filtered';
 
@@ -47,25 +36,7 @@ export interface ExerciseState {
   state: JoinTablesState;
 }
 
-const RAW_COMPANIES = parseSchemaRows(schemas.companiesAndPositions, 'companies');
-const RAW_POSITIONS = parseSchemaRows(schemas.companiesAndPositions, 'positions');
-
-const COMPANIES: CompanyRow[] = RAW_COMPANIES.map((row) => ({
-  id: Number(row.id ?? 0),
-  company_name: stringify(row.company_name),
-  country: stringify(row.country),
-}));
-
-const POSITIONS: PositionRow[] = RAW_POSITIONS.map((row) => ({
-  id: Number(row.id ?? 0),
-  company_id: Number(row.company_id ?? 0),
-  position: stringify(row.position),
-  salary: typeof row.salary === 'number' ? row.salary : null,
-  country: stringify(row.country),
-  city: stringify(row.city),
-}));
-
-const COMPANY_LOOKUP = new Map(COMPANIES.map((company) => [company.id, company]));
+const COMPANY_LOOKUP = createCompanyLookup(COMPANIES);
 
 export const MESSAGES = {
   descriptions: {
@@ -237,18 +208,4 @@ export function getSolution(exercise: ExerciseState): string {
     default:
       return 'SELECT c.company_name, p.position FROM companies c JOIN positions p ON c.id = p.company_id';
   }
-}
-
-function stringify(value: unknown): string {
-  return value === null || value === undefined ? '' : String(value);
-}
-
-function compareRows(a: unknown[], b: unknown[]): number {
-  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
-    const left = a[index] === null ? '' : String(a[index]);
-    const right = b[index] === null ? '' : String(b[index]);
-    const diff = left.localeCompare(right);
-    if (diff !== 0) return diff;
-  }
-  return a.length - b.length;
 }

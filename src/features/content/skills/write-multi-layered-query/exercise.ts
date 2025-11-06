@@ -7,27 +7,13 @@ import type {
   ValidationResult,
   VerificationResult,
 } from '../../types';
-import { schemas } from '../../../database/schemas';
-import { parseSchemaRows } from '@/features/learning/exerciseEngine/schemaHelpers';
 import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-
-interface EmployeeRow {
-  id: number;
-  name: string;
-  department: string;
-  salary: number | null;
-}
-
-interface ProjectRow {
-  id: number;
-  name: string;
-  budget: number | null;
-}
-
-interface EmployeeProjectRow {
-  project_id: number;
-  hours_allocated: number | null;
-}
+import {
+  EMPLOYEES,
+  PROJECTS,
+  EMPLOYEE_PROJECTS,
+  compareRows,
+} from '../shared';
 
 type ScenarioId = 'multi-layered-department-average' | 'multi-layered-project-hours';
 
@@ -49,28 +35,6 @@ export interface ExerciseState {
   description: string;
   state: WriteMultiLayeredState;
 }
-
-const RAW_EMPLOYEES = parseSchemaRows(schemas.employees, 'employees');
-const RAW_PROJECTS = parseSchemaRows(schemas.employees, 'projects');
-const RAW_EMPLOYEE_PROJECTS = parseSchemaRows(schemas.employees, 'employee_projects');
-
-const EMPLOYEES: EmployeeRow[] = RAW_EMPLOYEES.map((row) => ({
-  id: Number(row.id ?? 0),
-  name: stringify(row.name),
-  department: stringify(row.department),
-  salary: typeof row.salary === 'number' ? row.salary : null,
-}));
-
-const PROJECTS: ProjectRow[] = RAW_PROJECTS.map((row) => ({
-  id: Number(row.id ?? 0),
-  name: stringify(row.name),
-  budget: typeof row.budget === 'number' ? row.budget : null,
-}));
-
-const EMPLOYEE_PROJECTS: EmployeeProjectRow[] = RAW_EMPLOYEE_PROJECTS.map((row) => ({
-  project_id: Number(row.project_id ?? 0),
-  hours_allocated: typeof row.hours_allocated === 'number' ? row.hours_allocated : null,
-}));
 
 export const MESSAGES = {
   descriptions: {
@@ -99,19 +63,23 @@ const SCENARIOS: ScenarioDefinition[] = [
       const stats = new Map<string, { sum: number; count: number }>();
       EMPLOYEES.forEach((employee) => {
         if (employee.salary === null) return;
-        const bucket = stats.get(employee.department) ?? { sum: 0, count: 0 };
+        const department = employee.department;
+        if (!department) return;
+        const bucket = stats.get(department) ?? { sum: 0, count: 0 };
         bucket.sum += employee.salary;
         bucket.count += 1;
-        stats.set(employee.department, bucket);
+        stats.set(department, bucket);
       });
       return EMPLOYEES.filter((employee) => {
         if (employee.salary === null) return false;
-        const departmentStats = stats.get(employee.department);
+        const department = employee.department;
+        if (!department) return false;
+        const departmentStats = stats.get(department);
         if (!departmentStats || departmentStats.count === 0) return false;
         const average = departmentStats.sum / departmentStats.count;
         return employee.salary > average;
       })
-        .map((employee) => [employee.name, employee.department, employee.salary])
+        .map((employee) => [employee.name, employee.department as string, employee.salary as number])
         .sort(compareRows);
     })(),
   },
@@ -246,18 +214,4 @@ export function getSolution(exercise: ExerciseState): string {
     default:
       return 'SELECT name FROM projects';
   }
-}
-
-function stringify(value: unknown): string {
-  return value === null || value === undefined ? '' : String(value);
-}
-
-function compareRows(a: unknown[], b: unknown[]): number {
-  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
-    const left = a[index] === null ? '' : String(a[index]);
-    const right = b[index] === null ? '' : String(b[index]);
-    const diff = left.localeCompare(right);
-    if (diff !== 0) return diff;
-  }
-  return a.length - b.length;
 }
