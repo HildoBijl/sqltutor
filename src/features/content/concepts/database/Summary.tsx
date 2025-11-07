@@ -1,13 +1,31 @@
-import { Box, Typography } from '@mui/material';
+import { useThemeColor } from '@/theme';
+import { Page, Section, Par, Term, Link } from '@/components';
+import { Drawing, Element, Rectangle } from '@/components/figures';
+
+import { FigureDatabaseUsage } from './Theory';
 
 export function Summary() {
-  return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
-      <Typography variant="body1">
-        Some summary will appear here.
-      </Typography>
-    </Box>
-  );
+  return <Page>
+    <Section>
+      <Par>In its essence, a <Term>database</Term> is a collection of tables, each filled with data. There may be millions of records that are constantly being updated by multiple applications at the same time.</Par>
+      <FigureTwoTables /> {/* ToDo: add actual tables here. */}
+      <Par>A database is always accompanied by tools (software) used to efficiently enter, update and read the data. This set of tools is known as the <Term>Database Management System</Term> (DBMS). Popular examples are <Link to="https://www.postgresql.org/">PostgreSQL</Link>, <Link to="https://www.mysql.com/">MySQL</Link>, <Link to="https://www.oracle.com/database/">Oracle</Link> and <Link to="https://sqlite.org/">SQLite</Link>.</Par>
+      <FigureDatabaseUsage />
+    </Section>
+  </Page>
 }
 
-export default Summary;
+function FigureTwoTables() {
+  const themeColor = useThemeColor();
+  return <Drawing width={800} height={400} maxWidth={800}>
+    <Element position={[0, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Table TechCompanies</span></Element>
+    <Rectangle dimensions={[[0, 25], [150, 195]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[170, 25], [320, 195]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[340, 25], [490, 195]]} style={{ fill: themeColor, opacity: 0.2 }} />
+
+    <Element position={[310, 205]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Table Vacancies</span></Element>
+    <Rectangle dimensions={[[310, 230], [460, 400]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[480, 230], [630, 400]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[650, 230], [800, 400]]} style={{ fill: themeColor, opacity: 0.2 }} />
+  </Drawing>;
+}
