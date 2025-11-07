@@ -53,11 +53,11 @@ export function useContentTabs<State extends ComponentState & { tab?: string }>(
     if (preferred && tabKeys.includes(preferred)) {
       return preferred;
     }
-    if (tabKeys.includes('practice')) {
-      return 'practice';
-    }
     if (tabKeys.includes('theory')) {
       return 'theory';
+    }
+    if (tabKeys.includes('practice')) {
+      return 'practice';
     }
     return tabKeys[0] ?? '';
   }, [options?.defaultTab, tabKeys]);

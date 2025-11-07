@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button } from '@mui/material';
-import { MenuBook, Lightbulb, Edit, Storage } from '@mui/icons-material';
+import { MenuBook, OndemandVideo, Lightbulb, Bolt, Edit, Storage } from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/store';
 import type { SchemaKey } from '@/features/database/schemas';
@@ -12,7 +12,7 @@ import { useAdminMode } from './hooks/useAdminMode';
 
 import { ContentHeader } from './components/ContentHeader';
 import { ContentTabs } from './components/ContentTabs';
-import { StoryTab, TheoryTab } from './components/TabContent/ContentTab';
+import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
 import { CompletionDialog, SkillPracticeTab } from './components/SkillPractice';
 import { DataExplorerTab } from './components/DataExplorerTab';
 import { SKILL_SCHEMAS } from '@/constants';
@@ -30,8 +30,10 @@ export default function SkillPage() {
 
   const allTabs: TabConfig[] = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
-    { key: 'practice', label: 'Practice', icon: <Edit /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: 'video', label: 'Video', icon: <OndemandVideo /> },
+    { key: 'summary', label: 'Summary', icon: <Bolt /> },
+    { key: 'practice', label: 'Practice', icon: <Edit /> },
     { key: 'data', label: 'Data Explorer', icon: <Storage /> },
   ];
 
@@ -87,9 +89,9 @@ export default function SkillPage() {
   const progressInfo =
     currentTab === 'practice'
       ? {
-          current: componentState.numSolved ?? 0,
-          required: REQUIRED_EXERCISE_COUNT,
-        }
+        current: componentState.numSolved ?? 0,
+        required: REQUIRED_EXERCISE_COUNT,
+      }
       : undefined;
 
   const { practice, status, actions } = controller;
@@ -125,6 +127,8 @@ export default function SkillPage() {
           )}
 
           {currentTab === 'theory' && <TheoryTab contentId={skillMeta.id} />}
+          {currentTab === 'video' && <VideoTab contentId={skillMeta.id} />}
+          {currentTab === 'summary' && <SummaryTab contentId={skillMeta.id} />}
           {currentTab === 'story' && <StoryTab contentId={skillMeta.id} />}
           {currentTab === 'data' &&
             (status.dbReady ? (
@@ -144,9 +148,9 @@ export default function SkillPage() {
         onViewStory={
           showStoryButton
             ? () => {
-                controller.dialogs.completion.close();
-                selectTab('story');
-              }
+              controller.dialogs.completion.close();
+              selectTab('story');
+            }
             : undefined
         }
         onContinueLearning={() => navigate('/learn')}

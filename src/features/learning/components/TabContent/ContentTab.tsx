@@ -38,23 +38,23 @@ function createContentTab({ section, emptyMessage }: CreateContentTabOptions) {
   };
 }
 
-export const TheoryTab = createContentTab({
-  section: 'Theory',
-  emptyMessage: 'Theory content coming soon.',
-});
-
 export const StoryTab = createContentTab({
   section: 'Story',
   emptyMessage: 'Story coming soon.',
 });
 
-export const SummaryTab = createContentTab({
-  section: 'Summary',
-  emptyMessage: 'Summary coming soon.',
+export const TheoryTab = createContentTab({
+  section: 'Theory',
+  emptyMessage: 'Theory content coming soon.',
 });
 
 export const VideoTab = createContentTab({
   section: 'Video',
   emptyMessage: 'Video coming soon.',
+});
+
+export const SummaryTab = createContentTab({
+  section: 'Summary',
+  emptyMessage: 'Summary coming soon.',
 });
 

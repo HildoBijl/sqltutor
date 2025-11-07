@@ -8,7 +8,7 @@ import { contentIndex, type ContentMeta } from '@/features/content';
 import { useContentTabs } from './hooks/useContentTabs';
 import { ContentHeader } from './components/ContentHeader';
 import { ContentTabs } from './components/ContentTabs';
-import { StoryTab, SummaryTab, TheoryTab, VideoTab } from './components/TabContent/ContentTab';
+import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
 import type { TabConfig } from './types';
 
 export default function ConceptPage() {
@@ -23,8 +23,8 @@ export default function ConceptPage() {
 
   const allTabs: TabConfig[] = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
-    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     { key: 'video', label: 'Video', icon: <OndemandVideo /> },
+    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     { key: 'summary', label: 'Summary', icon: <MenuBook /> },
   ];
 
