@@ -5,12 +5,12 @@ import { Rectangle } from '@/utils/geometry';
 import { type DrawingData } from '../definitions';
 
 // Set up a context so elements inside the drawing can ask for the drawing.
-export const DrawingContext = createContext<DrawingData | undefined>(undefined);
+export const DrawingContext = createContext<DrawingData | null>(null);
 
 // Get the data out of the context. Optionally, you can provide a ref, and this ref is used instead.
-export function useDrawingData(drawingRef?: Ref<DrawingData>): DrawingData {
+export function useDrawingData(drawingRef?: Ref<DrawingData | null>): DrawingData {
 	const drawingData = useContext(DrawingContext);
-	if (drawingRef && typeof drawingRef !== 'function')
+	if (drawingRef && typeof drawingRef !== 'function' && drawingRef.current)
 		return drawingRef.current!;
 	return drawingData!;
 }

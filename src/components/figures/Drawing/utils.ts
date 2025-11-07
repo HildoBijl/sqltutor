@@ -67,7 +67,7 @@ export function useDrawingMousePosition(): Vector | undefined {
 // Find the bounds of a given element in drawing coordinates.
 export function useElementBounds(
 	element?: Element | Text,
-	drawingRef?: React.RefObject<DrawingData>
+	drawingRef?: React.RefObject<DrawingData | null>
 ): Rectangle | undefined {
 	const clientRect = useBoundingClientRect(element);
 	const drawingData = useDrawingData(drawingRef);
@@ -78,7 +78,7 @@ export function useElementBounds(
 export function useTextNodeBounds(
 	container: Element | null | undefined,
 	condition: string | ((node: Text) => boolean),
-	drawingRef?: React.RefObject<DrawingData>,
+	drawingRef?: React.RefObject<DrawingData | null>,
 	index = 0,
 ): Rectangle | undefined {
 	const textNode = useTextNode(container, condition, index);

@@ -1,9 +1,11 @@
+import { type Ref, useEffect, useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { Box, Paper } from '@mui/material';
-import { useEffect, useMemo, useRef } from 'react';
+import { useLatest } from '@/utils/dom';
+import { noop } from '@/utils/javascript';
 import { useDebounce } from '@/shared/hooks';
 
 interface SQLEditorProps {
@@ -18,6 +20,8 @@ interface SQLEditorProps {
   enableLiveExecution?: boolean; // Enable live execution feature
   liveExecutionDelay?: number; // Debounce delay for live execution
   showResults?: boolean; // accepted for compatibility, no-op here
+  ref?: Ref<HTMLDivElement>;
+  onLoad?: (element: HTMLElement | null) => void;
 }
 
 export function SQLEditor({
@@ -31,12 +35,10 @@ export function SQLEditor({
   onLiveExecute,
   enableLiveExecution = false,
   liveExecutionDelay = 150,
+  ref,
+  onLoad = noop,
 }: SQLEditorProps) {
-  const executeRef = useRef(onExecute);
-
-  useEffect(() => {
-    executeRef.current = onExecute;
-  }, [onExecute]);
+  const executeRef = useLatest(onExecute);
 
   // Debounce the value for live execution
   const debouncedValue = useDebounce(value, liveExecutionDelay);
@@ -114,6 +116,7 @@ export function SQLEditor({
 
   return (
     <Paper
+      ref={ref}
       elevation={2}
       sx={{
         overflow: 'hidden',
@@ -134,6 +137,9 @@ export function SQLEditor({
         editable={!readOnly}
         autoFocus={autoFocus}
         basicSetup={basicSetup}
+        onCreateEditor={(...args) => {
+          onLoad(args[0]?.contentDOM ?? null);
+        }}
       />
     </Paper>
   );
@@ -143,12 +149,15 @@ export function SQLEditor({
 interface SQLDisplayProps {
   children: string;
   inline?: boolean;
+  ref?: Ref<HTMLDivElement>;
+  onLoad?: (element: HTMLElement | null) => void;
 }
 
-export function SQLDisplay({ children, inline = false }: SQLDisplayProps) {
+export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplayProps) {
   if (inline) {
     return (
       <Box
+        ref={ref}
         component="code"
         sx={{
           px: 0.5,
@@ -157,7 +166,9 @@ export function SQLDisplay({ children, inline = false }: SQLDisplayProps) {
           borderRadius: 0.5,
           fontFamily: 'monospace',
           fontSize: '0.875em',
+          fontWeight: 550,
           color: 'primary.main',
+          verticalAlign: '1px',
         }}
       >
         {children}
@@ -171,6 +182,8 @@ export function SQLDisplay({ children, inline = false }: SQLDisplayProps) {
         value={children.trim()}
         readOnly
         height="auto"
+        ref={ref}
+        onLoad={onLoad}
       />
     </Box>
   );

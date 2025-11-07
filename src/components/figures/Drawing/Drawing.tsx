@@ -25,7 +25,7 @@ const canvasStyle: CSSProperties = {
 };
 
 export function Drawing(props: DrawingProps) {
-	const { maxWidth, width, height, autoScale, useSvg, useCanvas, ref, style, ...figureProps } = { ...getDefaultDrawing(), ...props };
+	const { maxWidth, width, height, autoScale, useSvg, useCanvas, ref, style, children, ...figureProps } = { ...getDefaultDrawing(), ...props };
 	if (!useSvg && !useCanvas)
 		throw new Error('Drawing error: cannot generate a drawing without either an SVG or a canvas present.');
 
@@ -39,7 +39,7 @@ export function Drawing(props: DrawingProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	// Rerender the component once references are established.
-	useForceUpdateEffect()
+	useForceUpdateEffect();
 
 	// Determine figure size parameters to use for rendering.
 	if (width <= 0)
@@ -73,18 +73,18 @@ export function Drawing(props: DrawingProps) {
 		contains: (point: Vector) => bounds.contains(point),
 		applyBounds: (point: Vector) => bounds.applyBounds(point),
 	};
-	useImperativeHandle(mergedRef, () => drawingData, [bounds, figureRef.current, svgRef.current, svgDefsRef.current, htmlContentsRef.current, canvasRef.current])
+	useImperativeHandle(mergedRef, () => drawingData, [bounds, figureRef.current, svgRef.current, svgDefsRef.current, htmlContentsRef.current, canvasRef.current]);
 
 	// Render figure with SVG and Canvas properly placed.
 	return <DrawingContext.Provider value={drawingData}>
-		<Figure ref={figureRef} aspectRatio={aspectRatio} maxWidth={figureMaxWidth} {...figureProps}>
+		<Figure ref={figureRef} aspectRatio={aspectRatio} maxWidth={figureMaxWidth} {...figureProps} innerProps={{ style: { zIndex: 0, ...(figureProps?.innerProps?.style || {}) }, ...(figureProps?.innerProps || {}) }}>
 			{/* Containers that portals can place elements into. */}
 			{useSvg ? <svg ref={svgRef} viewBox={`0 0 ${width} ${height}`} style={svgStyle}>
 				<defs ref={svgDefsRef} />
 			</svg> : null}
 			{useCanvas ? <canvas ref={canvasRef} width={width} height={height} style={canvasStyle} /> : null}
 			<div ref={htmlContentsRef} />
-			{props.children}
+			{children}
 
 			{/* Clip path to prevent overflow. */}
 			<SvgDefsPortal>
