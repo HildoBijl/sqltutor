@@ -6,14 +6,12 @@ export type TermProps = TypographyProps & {
 };
 
 export function Term({ children, sx, ...props }: TermProps) {
-  return (
-    <Typography
-      component="strong"
-      fontWeight="bold"
-      sx={{ ...sx }}
-      {...props}
-    >
-      {children}
-    </Typography>
-  );
+  return <Typography
+    component="strong"
+    fontWeight="bold"
+    sx={{ ...sx }}
+    {...props}
+  >
+    {children}
+  </Typography>;
 }

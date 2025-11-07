@@ -1,14 +1,9 @@
-import { type ReactNode } from 'react';
-import { Typography, type TypographyProps } from '@mui/material';
+import { type TypographyProps, Typography } from '@mui/material';
 
-export type HeadProps = TypographyProps & {
-  children: ReactNode;
-};
+export type HeadProps = TypographyProps;
 
 export function Head({ children, ...props }: HeadProps) {
-  return (
-    <Typography variant="h5" component="h2" {...props}>
-      {children}
-    </Typography>
-  );
+  return <Typography variant="h5" component="h2" {...props}>
+    {children}
+  </Typography>;
 }

@@ -23,6 +23,7 @@ export function Figure(props: FigureProps) {
 		margin: '1rem auto',
 		padding: '0',
 		position: 'relative',
+		width: '100%',
 		...(maxWidth === undefined ? {} : { maxWidth: `${maxWidth}px` }),
 		...(style ?? {}),
 	}} {...rest}>

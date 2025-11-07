@@ -1,7 +1,7 @@
 import CodeMirror from '@uiw/react-codemirror'
 
 import './style.css'
-import { ownExtensions, SQLProps } from './util'
+import { ownExtensions, SQLProps } from './definitions'
 
 export function SQLInput({
   lineNumbers = true,

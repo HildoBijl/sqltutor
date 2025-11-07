@@ -7,14 +7,12 @@ export type LinkProps = MuiLinkProps & {
 };
 
 export function Link({ to, children, ...props }: LinkProps) {
-  return (
-    <MuiLink
-      href={to}
-      target="_blank"
-      rel="noopener noreferrer"
-      {...props}
-    >
-      {children}
-    </MuiLink>
-  );
+  return <MuiLink
+    href={to}
+    target="_blank"
+    rel="noopener noreferrer"
+    {...props}
+  >
+    {children}
+  </MuiLink>;
 }

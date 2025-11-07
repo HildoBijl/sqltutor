@@ -1,9 +1,9 @@
 import CodeMirror from '@uiw/react-codemirror';
 
-import { noop } from '@/utils'
+import { noop } from '@/utils';
 
-import './style.css'
-import { ownExtensions, SQLProps } from './util'
+import './style.css';
+import { ownExtensions, SQLProps } from './definitions';
 
 export function SQL({
 	setElement,
@@ -24,21 +24,20 @@ export function SQL({
 	if (typeof value !== 'string')
 		throw new Error(`Invalid SQL query: expected a query with only text, but received something of type "${typeof value}".`);
 
-	return (
-		<CodeMirror
-			basicSetup={{
-				lineNumbers,
-				foldGutter,
-				highlightActiveLine,
-				highlightActiveLineGutter: highlightActiveLine,
-			}}
-			onCreateEditor={(...args) => {
-				setElement?.(args[0]?.contentDOM ?? null);
-				onCreateEditor(...args);
-			}}
-			{...{ readOnly: true, editable: false, value, ...props }}
-			extensions={[...ownExtensions, ...extensions]}
-			style={{ display: 'inline-block', transform: 'translateY(-1pt)' }}
-		/>
-	);
+	// Render a read-only CodeMirror field.
+	return <CodeMirror
+		basicSetup={{
+			lineNumbers,
+			foldGutter,
+			highlightActiveLine,
+			highlightActiveLineGutter: highlightActiveLine,
+		}}
+		onCreateEditor={(...args) => {
+			setElement?.(args[0]?.contentDOM ?? null);
+			onCreateEditor(...args);
+		}}
+		{...{ readOnly: true, editable: false, value, ...props }}
+		extensions={[...ownExtensions, ...extensions]}
+		style={{ display: 'inline-block', transform: 'translateY(0pt)' }}
+	/>;
 }

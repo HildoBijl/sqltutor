@@ -1,33 +1,44 @@
 /* This file overrides the standard style of the CodeMirror element. */
-.cm-editor { /* General editor styling. */
+
+/* General editor styling. */
+.cm-editor {
 	background: #c5b1ff11;
 	color: #cceeffaf;
 }
 
-.ͼ2 .cm-gutters { /* Gutter styling. */
-	background: transparent; /* Default to editor background. */
+[data-theme='light'] .cm-editor {
+	background: #c5b1ff11;
+	color: #cceeffaf;
+}
+
+/* Gutter styling. */
+.ͼ2 .cm-gutters {
+	background: transparent;
 	border-right: 0;
 	color: #ffffff4c;
 }
 
-.ͼ2 .cm-activeLine, .ͼ2 .cm-activeLineGutter { /* Active line styling. */
+/* Active line styling. */
+.ͼ2 .cm-activeLine,
+.ͼ2 .cm-activeLineGutter {
 	background: #cceeff11;
 }
 
-.ͼb { /* Keywords: SELECT, FROM, ... */
+/* Keywords: SELECT, FROM, ... */
+.ͼb,
+.ͼp {
 	color: #c81919;
 	font-weight: 600;
 }
 
-.ͼe { /* String values */
+/* String values */
+.ͼe {
 	color: #98bc37;
 }
 
-.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor { /* Cursor */
-	border-left-color: #528bff;
-}
-
-.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor { /* Cursor */
+/* Cursor */
+.ͼ1 .cm-cursor,
+.ͼ1 .cm-dropCursor {
 	border-left-color: #528bff;
 }
 

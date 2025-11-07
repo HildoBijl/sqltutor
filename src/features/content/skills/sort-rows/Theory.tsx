@@ -1,26 +1,50 @@
 import { useRef, useState } from 'react';
-import { Alert, Box, Typography } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
 import { Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures';
-import { SQL, Par, Section } from '@/components';
+import { SQL, Page, Par, Section, Warning } from '@/components';
 
-type SqlDrawingProps = {
-  code: string;
-  height?: number;
-};
+export function Theory() {
+  return <Page>
+    <Par>When we receive a result set from a query, it is rarely in the exact order we need. SQL lets us describe how rows should be sorted, and optionally how to pick rows from this sorting.</Par>
 
-function SqlDrawing({ code, height = 240 }: SqlDrawingProps) {
-  const normalizedCode = code.trim();
+    <Section title="Sort on a single column">
+      <Par>To sort your results, add an <SQL>ORDER BY</SQL> clause to the end of the query and specify the column to sort by. Optionally, add <SQL>ASC</SQL> (ascending, default) or <SQL>DESC</SQL> (descending) to choose the sorting direction.</Par>
+      <SingleColumnSortingDiagram />
+    </Section>
 
-  return (
-    <Drawing width={500} height={height}>
-      <Rectangle dimensions={[[0, 0], [960, height]]} style={{ fill: 'blue', opacity: 0.1 }} />
-      <Element position={[60, 48]} anchor={[0, 0]}>
-        <SQL>{`\n${normalizedCode}\n`}</SQL>
-      </Element>
-    </Drawing>
-  );
+    <Section title="Sort based on multiple columns">
+      <Par>When the first column contains ties, you can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
+      <SqlDrawing code={`SELECT *
+FROM companies
+ORDER BY
+  country ASC,
+  name DESC;`} />
+    </Section>
+
+    <Section title="Limit the number of rows">
+      <Par>To limit the number of rows that are returned, add a <SQL>LIMIT</SQL> clause, followed by how many rows you want to be returned.</Par>
+      <SqlDrawing code={`SELECT *
+FROM companies
+ORDER BY name DESC
+LIMIT 2;`} />
+      <Par>Combine <SQL>LIMIT</SQL> with <SQL>OFFSET</SQL> to skip a number of rows before returning results.</Par>
+      <SqlDrawing code={`SELECT *
+FROM companies
+ORDER BY name DESC
+LIMIT 2 OFFSET 1;`} />
+      <Warning>
+        Most database engines support <SQL>LIMIT</SQL> and <SQL>OFFSET</SQL>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the preferred syntax.
+      </Warning>
+    </Section>
+
+    <Section title="Deal with NULL values">
+      <Par>NULLs are treated as the <strong>largest</strong> possible values when sorting. They appear last with ascending order and first with descending order. If you want this to be different, you can override this behaviour with <SQL>NULLS FIRST</SQL> or <SQL>NULLS LAST</SQL>, specified per sorting attribute.</Par>
+      <SqlDrawing code={`SELECT *
+FROM companies
+ORDER BY country ASC NULLS FIRST;`} />
+    </Section>
+  </Page>;
 }
 
 function SingleColumnSortingDiagram() {
@@ -28,99 +52,35 @@ function SingleColumnSortingDiagram() {
   const drawingRef = useRef<any>(null);
   const [codeElement, setCodeElement] = useState<HTMLElement | null>(null);
   const bounds = useTextNodeBounds(codeElement, 'DESC', drawingRef);
-  const highlightBounds = bounds as any;
+  const highlightBounds = bounds;
 
-  return (
-    <Drawing width={500} height={240} ref={drawingRef}>
-      <Element position={[0, 24]} anchor={[0, 0]}>
-        <SQL setElement={setCodeElement}>{`
+  return <Drawing ref={drawingRef} width={800} height={200} maxWidth={600}>
+    <Element position={[0, 20]} anchor={[-1, -1]}>
+      <SQL setElement={setCodeElement}>{`
 SELECT *
 FROM companies
 ORDER BY name DESC
         `}</SQL>
-      </Element>
+    </Element>
 
-      <Rectangle dimensions={[[360, 24], [552, 216]]} style={{ fill: themeColor, opacity: 0.2 }} />
-      <Rectangle dimensions={[[564, 24], [756, 216]]} style={{ fill: themeColor, opacity: 0.2 }} />
-      <Rectangle dimensions={[[768, 24], [960, 216]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[300, 20], [460, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[470, 20], [630, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Rectangle dimensions={[[640, 20], [800, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
 
-      {highlightBounds ? (
-        <Curve
-          points={[highlightBounds.topRight.add([0, 0]), [312, 0], [528, 0], [588, 48]]}
-          color={themeColor}
-          endArrow
-        />
-      ) : null}
-    </Drawing>
-  );
+    {highlightBounds ? <Curve
+      points={[highlightBounds.topRight.add([0, 0]), [260, 0], [440, 0], [490, 40]]}
+      color={themeColor}
+      endArrow
+    /> : null}
+  </Drawing>;
 }
 
-export function Theory() {
-  return (
-    <Box display="flex" flexDirection="column" gap={3}>
-      <Par>When we receive a result set from a query it is rarely in the exact order we need. SQL lets us describe how rows should be sorted so that the most relevant information shows up first.</Par>
-
-      <Section title="Sort on a single column">
-        <Typography variant="body1" component="p">
-          Add an <code>ORDER BY</code> clause to the end of the query and specify the column to sort by. Use
-          <code> ASC</code> (ascending, the default) or <code> DESC</code> (descending) to control the direction.
-        </Typography>
-        <SingleColumnSortingDiagram />
-      </Section>
-
-      <Section title="Sort based on multiple columns">
-        <Typography variant="body1" component="p">
-          When the first column contains ties, add additional sort keys separated by commas. SQL compares the second
-          column whenever the first column is equal, and so on until the order is determined.
-        </Typography>
-        <SqlDrawing
-          code={`SELECT *
-FROM companies
-ORDER BY
-  country ASC,
-  name DESC;`}
-        />
-      </Section>
-
-      <Section title="Limit the number of rows">
-        <Typography variant="body1" component="p">
-          Use <code>LIMIT</code> to return only the first <em>n</em> rows of the sorted result set.
-        </Typography>
-        <SqlDrawing
-          code={`SELECT *
-FROM companies
-ORDER BY name DESC
-LIMIT 2;`}
-        />
-        <Typography variant="body1" component="p">
-          Combine <code>LIMIT</code> with <code>OFFSET</code> to skip a number of rows before returning results.
-        </Typography>
-        <SqlDrawing
-          code={`SELECT *
-FROM companies
-ORDER BY name DESC
-LIMIT 2 OFFSET 1;`}
-        />
-        <Alert severity="warning" variant="outlined">
-          Most database engines support <code>LIMIT</code> and <code>OFFSET</code>, but a few use alternative keywords. If
-          these clauses do not work in your DBMS, check its documentation for the preferred syntax.
-        </Alert>
-      </Section>
-
-      <Section title="Deal with NULL values">
-        <Typography variant="body1" component="p">
-          NULLs are treated as the largest possible values when sorting. They appear last with ascending order and first
-          with descending order. Override this behaviour with <code>NULLS FIRST</code> or <code>NULLS LAST</code> per
-          column.
-        </Typography>
-        <SqlDrawing
-          code={`SELECT *
-FROM companies
-ORDER BY country ASC NULLS FIRST;`}
-        />
-      </Section>
-    </Box>
-  );
+function SqlDrawing({ code, height = 240 }: { code: string; height?: number }) {
+  const normalizedCode = code.trim();
+  return <Drawing width={800} height={height} maxWidth={600}>
+    <Rectangle dimensions={[[0, 0], [800, height]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.1 }} />
+    <Element position={[60, 48]} anchor={[-1, -1]}>
+      <SQL>{`\n${normalizedCode}\n`}</SQL>
+    </Element>
+  </Drawing>;
 }
-
-export default Theory;

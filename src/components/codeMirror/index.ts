@@ -1,3 +1,3 @@
-export * from './util'
+export * from './definitions'
 export * from './SQL'
 export * from './SQLInput'

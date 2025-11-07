@@ -1,18 +1,14 @@
-import { type ReactNode } from 'react';
-import { Box } from '@mui/material';
+import { type BoxProps, Box } from '@mui/material';
 
 import { Head } from './Head';
 
-export type SectionProps = {
-	title: string;
-	children: ReactNode;
+export type SectionProps = BoxProps & {
+	title?: string;
 };
 
-export function Section({ title, children }: SectionProps) {
-	return (
-		<Box display="flex" flexDirection="column" gap={1.5}>
-			<Head>{title}</Head>
-			{children}
-		</Box>
-	);
+export function Section({ title, children, ...props }: SectionProps) {
+	return <Box display="flex" flexDirection="column" gap={1.5} {...props}>
+		{title ? <Head>{title}</Head> : null}
+		{children}
+	</Box>;
 }
