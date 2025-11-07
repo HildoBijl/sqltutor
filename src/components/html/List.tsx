@@ -15,7 +15,6 @@ export function List({ items, useNumbers = false, sx, itemSx }: ListProps) {
   return <MuiList
     component={useNumbers ? 'ol' : 'ul'}
     sx={{
-      marginY: 2,
       textAlign: 'justify',
       listStyleType: useNumbers ? 'decimal' : 'disc',
       paddingLeft: 3,

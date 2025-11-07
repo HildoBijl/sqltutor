@@ -59,7 +59,7 @@ function SingleColumnSortingDiagram() {
       <SQLDisplay onLoad={setEditor}>{`
 SELECT *
 FROM companies
-ORDER BY name DESC
+ORDER BY name DESC;
         `}</SQLDisplay>
     </Element>
 
