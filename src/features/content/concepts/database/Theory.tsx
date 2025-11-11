@@ -1,6 +1,8 @@
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Link, Glyph } from '@/components';
 import { Drawing, Element, Rectangle, Curve } from '@/components/figures';
+import { useConceptDatabase } from '@/shared/hooks/useDatabase';
+import { useQueryResult } from '@/shared/hooks/useQuery';
 
 export function Theory() {
   return <Page>
@@ -34,6 +36,11 @@ export function Theory() {
 
 function FirstTable() {
   const themeColor = useThemeColor();
+  const stuff = useConceptDatabase();
+
+  const table = useQueryResult(stuff?.database, 'SELECT * FROM companies');
+  console.log(table);
+
   return <Drawing width={800} height={200} maxWidth={800}>
     <Element position={[50, 0]} anchor={[0, 0]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example Table (ToDo: add it)</span></Element>
     <Rectangle dimensions={[[50, 25], [270, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
@@ -41,6 +48,7 @@ function FirstTable() {
     <Rectangle dimensions={[[530, 25], [750, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
   </Drawing>;
 }
+
 
 function SecondTable() {
   return <FirstTable />;

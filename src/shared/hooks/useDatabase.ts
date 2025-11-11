@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useDatabaseContext, DatabaseContextType } from '@/shared/providers/DatabaseProvider';
 import { schemas } from '@/features/database/schemas';
 
-interface QueryResult {
+export interface QueryResult {
   columns: string[];
   values: any[][];
 }
