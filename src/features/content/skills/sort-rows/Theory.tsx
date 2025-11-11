@@ -1,8 +1,12 @@
 import { useRef, useState } from 'react';
+import { Box } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning } from '@/components';
-import { type DrawingData, Drawing, Element, Rectangle, Curve, useTextNodeBounds } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Rectangle, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
+import { useConceptDatabase } from '@/shared/hooks/useDatabase';
+import { useQueryResult } from '@/shared/hooks/useQuery';
+import { DataTable } from '@/shared/components/DataTable';
 import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
@@ -51,27 +55,37 @@ ORDER BY country ASC NULLS FIRST;`} />
 function SingleColumnSortingDiagram() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
+
+  // Set up query data.
+  const db = useConceptDatabase();
+  const data = useQueryResult(db?.database, 'SELECT * FROM companies ORDER BY company_name DESC LIMIT 6');
+
+  // Find the bounds for "DESC".
   const [editor, setEditor] = useState<HTMLElement | null>(null);
-  
   const descBounds = useTextNodeBounds(editor, 'DESC', drawingRef);
-  return <Drawing ref={drawingRef} width={800} height={200} maxWidth={800}>
+
+  // Find the bounds for "company_name".
+  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
+  const companyNameBounds = useTextNodeBounds(table, 'company_name', drawingRef);
+
+  return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800}>
     <Element position={[0, 20]} anchor={[-1, -1]} behind={true}>
       <SQLDisplay onLoad={setEditor}>{`
 SELECT *
 FROM companies
-ORDER BY name DESC;
+ORDER BY company_name DESC;
         `}</SQLDisplay>
     </Element>
 
-    <Rectangle dimensions={[[300, 20], [460, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[470, 20], [630, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[640, 20], [800, 180]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Element position={[300, 20]} anchor={[-1, -1]} scale={0.6} behind>
+      <Box sx={{ width: 800 }}>
+        <DataTable ref={tRef} data={data} showPagination={false} compact />
+      </Box>
+    </Element>
 
-    {descBounds ? <Curve
-      points={[descBounds.topRight.add([0, 0]), [260, 0], [440, 0], [490, 40]]}
-      color={themeColor}
-      endArrow
-    /> : null}
+    {descBounds && companyNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [280, 0], [360, 0], [390, 25]]} color={themeColor} endArrow /> : null}
+    {/* {descBounds && companyNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 40, 0], [companyNameBounds.left - 30, 0], companyNameBounds.topLeft.add([0, 0])]} color={themeColor} endArrow /> : null} */}
+    {companyNameBounds && tBounds ? <Curve points={[companyNameBounds.leftBottom.add([-8, 10]), [companyNameBounds.left - 8, tBounds.bottom - 4]]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }
 
