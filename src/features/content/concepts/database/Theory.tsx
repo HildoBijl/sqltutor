@@ -1,13 +1,19 @@
+import { useRef } from 'react';
+import { Box } from '@mui/material';
+
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Link, Glyph } from '@/components';
-import { Drawing, Element, Rectangle, Curve } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
+import { DataTable } from '@/shared/components/DataTable';
 
 export function Theory() {
   return <Page>
-    <Par>Suppose that we have a list of all the tech companies in the world, including a large number of properties of each. How would we store this data? Could we just put it in something like an Excel file?</Par>
-    <FirstTable />
+    <Section>
+      <Par>Suppose that we have a list of all the tech companies in the world, including a large number of properties of each. How would we store this data? Could we just put it in something like an Excel file?</Par>
+      <FirstTable />
+    </Section>
 
     <Section title="Why databases? A list of requirements">
       <Par>For many small-scale use cases, storing data in a single file would work. When scaling up, there are various reasons why this fails.</Par>
@@ -35,20 +41,20 @@ export function Theory() {
 }
 
 function FirstTable() {
-  const themeColor = useThemeColor();
-  const stuff = useConceptDatabase();
+  const db = useConceptDatabase();
+  const data = useQueryResult(db?.database, 'SELECT * FROM companies LIMIT 6');
+  const drawingRef = useRef<DrawingData>(null);
+  const [tRef, tBounds] = useRefWithBounds(drawingRef);
 
-  const table = useQueryResult(stuff?.database, 'SELECT * FROM companies');
-  console.log(table);
-
-  return <Drawing width={800} height={200} maxWidth={800}>
-    <Element position={[50, 0]} anchor={[0, 0]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example Table (ToDo: add it)</span></Element>
-    <Rectangle dimensions={[[50, 25], [270, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[290, 25], [510, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[530, 25], [750, 200]]} style={{ fill: themeColor, opacity: 0.2 }} />
+  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
+    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example list of tech companies</span></Element>
+    <Element position={[0, 25]} anchor={[-1, -1]}>
+      <Box sx={{ width: 800 }}>
+        <DataTable ref={tRef} data={data} showPagination={false} compact />
+      </Box>
+    </Element>
   </Drawing>;
 }
-
 
 function SecondTable() {
   return <FirstTable />;

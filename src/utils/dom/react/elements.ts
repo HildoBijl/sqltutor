@@ -4,9 +4,9 @@ import { createPortal } from 'react-dom'
 import { getTextNodes } from '../dom'
 
 // Get a tuple [ref, element]. Put the ref into a DOM object, and element will be the corresponding DOM element.
-export function useRefWithElement<T extends Element | undefined = Element>(): [(node: T | undefined) => void, T | undefined] {
-  const [element, setElement] = useState<T | undefined>(undefined);
-  const onRefChange = useCallback((node: T | undefined) => setElement(node), []);
+export function useRefWithElement<T extends Element | null = Element>(): [(node: T | null) => void, T | null] {
+  const [element, setElement] = useState<T | null>(null);
+  const onRefChange = useCallback((node: T | null) => setElement(node), []);
   return [onRefChange, element];
 }
 

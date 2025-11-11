@@ -20,7 +20,7 @@ export function Figure(props: FigureProps) {
 	// Render the figure.
 	return <div ref={figureOuter} style={{
 		boxSizing: 'content-box',
-		margin: '1rem auto',
+		margin: '0.75rem auto',
 		padding: '0',
 		position: 'relative',
 		width: '100%',

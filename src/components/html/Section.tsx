@@ -7,7 +7,7 @@ export type SectionProps = BoxProps & {
 };
 
 export function Section({ title, children, ...props }: SectionProps) {
-	return <Box display="flex" flexDirection="column" gap={1} {...props}>
+	return <Box display="flex" flexDirection="column" gap={1.5} {...props}>
 		{title ? <Head>{title}</Head> : null}
 		{children}
 	</Box>;

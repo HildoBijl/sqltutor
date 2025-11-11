@@ -1,3 +1,4 @@
+import { type Ref } from 'react';
 import {
   Table,
   TableBody,
@@ -16,12 +17,13 @@ interface DataTableProps {
   data: {
     columns: string[];
     values: any[][];
-  };
+  } | null;
   maxRows?: number;
   showPagination?: boolean;
   highlightHeader?: boolean;
   compact?: boolean;
   maxHeight?: number | string;
+  ref?: Ref<HTMLDivElement>;
 }
 
 export function DataTable({
@@ -31,13 +33,14 @@ export function DataTable({
   highlightHeader = true,
   compact = false,
   maxHeight = 400,
+  ref,
 }: DataTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   if (!data || !data.columns || !data.values) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
+      <Paper ref={ref} sx={{ p: 3, textAlign: 'center' }}>
         <Typography color="text.secondary">No data to display</Typography>
       </Paper>
     );
@@ -110,7 +113,7 @@ export function DataTable({
   };
 
   return (
-    <Box>
+    <Box ref={ref}>
       <Paper
         variant="outlined"
         sx={{

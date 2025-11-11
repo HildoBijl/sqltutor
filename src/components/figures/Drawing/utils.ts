@@ -1,4 +1,4 @@
-import { RefObject } from 'react';
+import { type Ref } from 'react';
 import { Vector, type VectorInput, ensureVector, Rectangle, type RectangleInput, ensureRectangle } from '@/utils/geometry';
 import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useBoundingClientRects, useRefWithElement, useTextNode } from '@/utils/dom';
 
@@ -35,7 +35,7 @@ export function getCoordinates(
 }
 
 // Track the mouse position in both client and drawing coordinates.
-export function useDrawingMouseData(drawingRef?: React.RefObject<DrawingData>): {
+export function useDrawingMouseData(drawingRef?: Ref<DrawingData | null>): {
 	clientPosition?: Vector;
 	position?: Vector;
 	keys?: UtilKeys;
@@ -66,8 +66,8 @@ export function useDrawingMousePosition(): Vector | undefined {
 
 // Find the bounds of a given element in drawing coordinates.
 export function useElementBounds(
-	element?: Element | Text,
-	drawingRef?: React.RefObject<DrawingData | null>
+	element?: Element | Text | null,
+	drawingRef?: Ref<DrawingData | null>,
 ): Rectangle | undefined {
 	const clientRect = useBoundingClientRect(element);
 	const drawingData = useDrawingData(drawingRef);
@@ -78,7 +78,7 @@ export function useElementBounds(
 export function useTextNodeBounds(
 	container: Element | null | undefined,
 	condition: string | ((node: Text) => boolean),
-	drawingRef?: React.RefObject<DrawingData | null>,
+	drawingRef?: Ref<DrawingData | null>,
 	index = 0,
 ): Rectangle | undefined {
 	const textNode = useTextNode(container, condition, index);
@@ -88,7 +88,7 @@ export function useTextNodeBounds(
 // Get the bounding rectangle of an element in drawing coordinates.
 export function useBoundingDrawingRect(
 	element?: Element,
-	drawingRef?: React.RefObject<DrawingData>
+	drawingRef?: Ref<DrawingData | null>
 ): DOMRect | undefined {
 	// Find the bounds.
 	const bounds = useElementBounds(element, drawingRef);
@@ -110,8 +110,8 @@ export function useBoundingDrawingRect(
 }
 
 // Return [ref, bounds, element] for an element within a drawing. Attach the ref to a DOM object to get its bounds and the element.
-export function useRefWithBounds(drawingRef?: RefObject<DrawingData>): [(node: Element | undefined) => void, Rectangle | undefined, Element | undefined] {
-	const [ref, element] = useRefWithElement<Element>();
+export function useRefWithBounds<T extends Element | null = Element>(drawingRef?: Ref<DrawingData | null>): [(node: T | null) => void, Rectangle | undefined, Element | null] {
+	const [ref, element] = useRefWithElement<T>();
 	const bounds = useElementBounds(element, drawingRef);
 	return [ref, bounds, element];
 }
@@ -119,7 +119,7 @@ export function useRefWithBounds(drawingRef?: RefObject<DrawingData>): [(node: E
 // Get bounds for each child of a given element. It only considers Elements and TextNodes, but not other ChildNodes like annotations/comments.
 export function useIndividualChildrenBounds(
 	element?: Element,
-	drawingRef?: React.RefObject<DrawingData>
+	drawingRef?: Ref<DrawingData | null>
 ): (Rectangle | undefined)[] {
 	const nodes = [...(element?.childNodes || [])].filter(node => node instanceof Element || node instanceof Text);
 	const clientRects = useBoundingClientRects(nodes);
