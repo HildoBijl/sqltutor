@@ -12,6 +12,7 @@ import {
 import type { PracticeFeedback } from '../components/SkillPractice';
 import type { SkillExercise, QueryResultSet, PracticeSolution, PracticeSolutionLike } from '../types';
 import { normalizePracticeSolution } from '../utils/normalizePracticeSolution';
+import { markPrerequisitesComplete } from '../utils/markPrerequisitesComplete';
 
 const normalizeForHistory = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
@@ -310,6 +311,8 @@ export function useSkillExerciseController({
             !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
 
           if (reachedMasteryNow) {
+            // Mark all prerequisites as complete when reaching mastery
+            markPrerequisitesComplete(skillId, requiredCount);
             setShowCompletionDialog(true);
           } else {
             const progressDisplay = Math.min(updatedSolvedCount, requiredCount);

@@ -10,6 +10,7 @@ import { ContentHeader } from './components/ContentHeader';
 import { ContentTabs } from './components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
 import type { TabConfig } from './types';
+import { markPrerequisitesComplete } from './utils/markPrerequisitesComplete';
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
@@ -55,6 +56,9 @@ export default function ConceptPage() {
 
   const handleComplete = () => {
     setComponentState({ understood: true });
+
+    //Mark all prerequisites as complete 
+    markPrerequisitesComplete(conceptMeta.id);
   };
 
   return (

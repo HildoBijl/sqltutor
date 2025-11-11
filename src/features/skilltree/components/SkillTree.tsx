@@ -177,7 +177,7 @@ export function SkillTree({
     const isNextToLearn =
       isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
     if (bothCompleted) {
-      return "#9aa0a6";
+      return "#4CAF50";
     }
     if (isNextToLearn) {
       return "#FFD700";

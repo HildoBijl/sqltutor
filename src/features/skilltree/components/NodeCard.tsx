@@ -61,15 +61,18 @@ export function NodeCard({
   // let borderOpacity: number;
 
   if (isHovered || isPrerequisite) {
+    if (completed) {
+      nodeOpacity = 1.0;
+      borderColor = "rgba(76, 175, 80, 1.0)";
+      strokeWidth = 2;
+    } else {
     nodeOpacity = 1.0;
     borderColor = "#E84421";
-    strokeWidth = 2;
-    // borderOpacity = 1.0;
+    strokeWidth = 2; }
   } else if (completed) {
     if (isSomethingHovered && !isPrerequisite) {
       nodeOpacity = 0.4;
       borderColor = "rgba(76, 175, 80, 0.4)";
-      // borderOpacity = 0.3;
       strokeWidth = 1;
     } else {
       nodeOpacity = 1.0;
