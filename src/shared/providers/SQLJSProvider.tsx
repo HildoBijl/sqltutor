@@ -6,12 +6,14 @@ interface SQLJSContextType {
   SQLJS: any | null;
   error: Error | null;
   isLoading: boolean;
+  isReady: boolean;
 }
 
 const SQLJSContext = createContext<SQLJSContextType>({
   SQLJS: null,
   error: null,
   isLoading: true,
+  isReady: false,
 });
 
 export function useSQLJSContext() {
@@ -58,6 +60,7 @@ export function SQLJSProvider({ children }: SQLJSProviderProps) {
         SQLJS,
         error,
         isLoading,
+        isReady: !!SQLJS && !isLoading && !error,
       }}
     >
       {children}
@@ -65,23 +68,18 @@ export function SQLJSProvider({ children }: SQLJSProviderProps) {
   );
 }
 
-// Hook to use SQLJS
 export function useSQLJS() {
-  const { SQLJS } = useSQLJSContext();
-  return SQLJS;
+  return useSQLJSContext().SQLJS;
 }
 
-// Hook to check if SQLJS is ready
+export function useSQLJSLoading() {
+  return useSQLJSContext().isLoading;
+}
+
 export function useSQLJSReady() {
-  const { SQLJS, isLoading, error } = useSQLJSContext();
-  return {
-    isReady: !!SQLJS && !isLoading && !error,
-    isLoading,
-    error,
-  };
+  return useSQLJSContext().isReady;
 }
 
-// Hook for SQLJS error state
 export function useSQLJSError() {
   return useSQLJSContext().error;
 }

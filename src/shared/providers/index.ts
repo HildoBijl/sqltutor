@@ -2,6 +2,7 @@
 export {
   SQLJSProvider,
   useSQLJS,
+  useSQLJSLoading,
   useSQLJSReady,
   useSQLJSError,
   useSQLJSContext

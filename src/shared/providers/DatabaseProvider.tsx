@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
+
+import { useLatest } from '@/utils/dom';
+
 import { useSQLJS } from './SQLJSProvider';
 
 export type DatabaseContextType = 'playground' | 'exercise' | 'concept';
@@ -38,12 +41,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     exercise: null,
     concept: null,
   });
-  const databasesRef = useRef<DatabaseState>({
-    playground: null,
-    exercise: null,
-    concept: null,
-  });
-
+  const databasesRef = useLatest<DatabaseState>(databases);
   const [isReady, setIsReady] = useState(false);
 
   // Track creation timestamps for cleanup policies
@@ -57,11 +55,6 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   useEffect(() => {
     setIsReady(!!SQLJS);
   }, [SQLJS]);
-
-  // Keep a ref of the latest databases to use in stable callbacks/cleanup
-  useEffect(() => {
-    databasesRef.current = databases;
-  }, [databases]);
 
   // Create a database with the given schema and context-specific setup
   const createDatabase = useCallback((schema: string, context: DatabaseContextType) => {
