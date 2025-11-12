@@ -1,13 +1,11 @@
-import { Box, Typography } from '@mui/material';
+import { Page, Section, Par, Warning, Info, Term } from '@/components';
 
 export function Summary() {
-  return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
-      <Typography variant="body1">
-        Some summary will appear here.
-      </Typography>
-    </Box>
-  );
+  return <Page>
+    <Section>
+      <Par>A database is a collection of <Term>tables</Term>, each having <Term>columns</Term> (with a name), <Term>rows</Term> and <Term>cells/fields</Term>. If we see the rows as objects, we can also say a table consists of <Term>records</Term>, each having various <Term>properties/attributes</Term>.</Par>
+      <Warning>ToDo: add image.</Warning>
+      <Info>The terminology used varies a bit, depending on what subfield of database studies you're in. Make sure you know your local language.</Info>
+    </Section>
+  </Page>;
 }
-
-export default Summary;
