@@ -17,6 +17,7 @@ export interface ContentMetaRaw {
 
 // The contentIndexRaw contains all definitions of content items, before being processed into more derived objects.
 const contentIndexRaw: ContentMetaRaw[] = [
+  // Fundamental database concepts.
   {
     id: 'database',
     name: 'Databases',
@@ -29,6 +30,13 @@ const contentIndexRaw: ContentMetaRaw[] = [
     name: 'Database Tables',
     type: 'concept',
     description: 'How are database tables built up? And what do we call their parts?',
+    prerequisites: ['database'],
+  },
+  {
+    id: 'query-language',
+    name: 'Query Languages',
+    type: 'concept',
+    description: 'How can we "talk" with a database? How do we program their instructions?',
     prerequisites: ['database'],
   },
   {
@@ -45,6 +53,8 @@ const contentIndexRaw: ContentMetaRaw[] = [
     description: 'How can we uniquely identify a table row?',
     prerequisites: ['database-table'],
   },
+
+  // Database table manipulation.
   {
     id: 'projection-and-filtering',
     name: 'Projection and Filtering',
@@ -53,18 +63,18 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['database-table'],
   },
   {
+    id: 'foreign-key',
+    name: 'Foreign Keys',
+    type: 'concept',
+    description: 'How do references from one table to another table work?',
+    prerequisites: ['database-keys'],
+  },
+  {
     id: 'join-and-decomposition',
     name: 'Join and Decomposition',
     type: 'concept',
     description: 'How can we split a large table up into multiple smaller tables, and then put them back together?',
-    prerequisites: ['database-keys', 'projection-and-filtering'],
-  },
-  {
-    id: 'inner-and-outer-join',
-    name: 'Inner and Outer Join',
-    type: 'concept',
-    description: 'What are different ways of joining tables, in case specific connections are missing?',
-    prerequisites: ['join-and-decomposition', 'data-types'],
+    prerequisites: ['projection-and-filtering', 'foreign-key'],
   },
   {
     id: 'aggregation',
@@ -73,20 +83,8 @@ const contentIndexRaw: ContentMetaRaw[] = [
     description: 'How can we merge multiple rows together into joint (aggregated) statistics?',
     prerequisites: ['data-types', 'projection-and-filtering'],
   },
-  {
-    id: 'pivot-table',
-    name: 'Pivot Tables',
-    type: 'concept',
-    description: 'How can we smoothly display aggregated data through so-called pivot tables?',
-    prerequisites: ['database-table'],
-  },
-  {
-    id: 'query-language',
-    name: 'Query Languages',
-    type: 'concept',
-    description: 'How can we "talk" with a database? How do we program their instructions?',
-    prerequisites: ['database'],
-  },
+
+  // SQL fundamentals.
   {
     id: 'sql',
     name: 'SQL Fundamentals',
@@ -95,25 +93,34 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['query-language'],
   },
   {
+    id: 'choose-columns',
+    name: 'Choose Columns',
+    type: 'skill',
+    description: 'How do we use SQL to select and possibly rename columns from a table?',
+    prerequisites: ['sql', 'projection-and-filtering'],
+  },
+  {
     id: 'filter-rows',
     name: 'Filter Rows',
     type: 'skill',
     description: 'How do we use SQL to filter table records based on a single condition?',
-    prerequisites: ['sql', 'projection-and-filtering', 'data-types'],
+    prerequisites: ['sql', 'data-types', 'projection-and-filtering'],
   },
+  {
+    id: 'write-single-criterion-query',
+    name: 'Write Single-Criterion Query',
+    type: 'skill',
+    description: 'How do we write simple SQL queries using basic column selection and row filtering?',
+    prerequisites: ['choose-columns', 'filter-rows'],
+  },
+
+  // Single-table SQL querying.
   {
     id: 'filter-rows-on-multiple-criteria',
     name: 'Filter Rows on Multiple Criteria',
     type: 'skill',
     description: 'How do we set up filters with multiple conditions, combined in various ways?',
     prerequisites: ['filter-rows'],
-  },
-  {
-    id: 'choose-columns',
-    name: 'Choose Columns',
-    type: 'skill',
-    description: 'How do we use SQL to select and possibly rename columns from a table?',
-    prerequisites: ['sql', 'projection-and-filtering'],
   },
   {
     id: 'create-processed-columns',
@@ -130,43 +137,14 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['sql', 'data-types'],
   },
   {
-    id: 'write-single-criterion-query',
-    name: 'Write Single-Criterion Query',
-    type: 'skill',
-    description: 'How do we write simple SQL queries using basic column selection and row filtering?',
-    prerequisites: ['choose-columns', 'filter-rows'],
-  },
-  {
     id: 'write-multi-criterion-query',
     name: 'Write Multi-Criterion Query',
     type: 'skill',
     description: 'How do we set up advanced queries extracting data from a single table in various ways?',
-    prerequisites: ['create-processed-columns', 'filter-rows-on-multiple-criteria', 'sort-rows'],
+    prerequisites: ['sort-rows', 'create-processed-columns', 'filter-rows-on-multiple-criteria'],
   },
-  {
-    id: 'join-tables',
-    name: 'Join Tables',
-    type: 'skill',
-    description: 'How can we use SQL to join tables together through a foreign key?',
-    prerequisites: ['inner-and-outer-join', 'choose-columns', 'filter-rows-on-multiple-criteria'],
-    database: 'companiesAndPositions',
-  },
-  {
-    id: 'write-multi-table-query',
-    name: 'Write Multi-Table Query',
-    type: 'skill',
-    description: 'How can we set up queries combining data from multiple tables in convoluted ways?',
-    prerequisites: ['join-tables', 'write-single-criterion-query'],
-    database: 'employees',
-  },
-  {
-    id: 'write-multi-layered-query',
-    name: 'Write Multi-Layered Query',
-    type: 'skill',
-    description: 'How do we set up very complex queries and structure their set-up through intermediate queries?',
-    prerequisites: ['use-filtered-aggregation', 'write-multi-criterion-query', 'write-multi-table-query'],
-    database: 'employees',
-  },
+
+  // Aggregation in SQL.
   {
     id: 'aggregate-columns',
     name: 'Aggregate Columns',
@@ -187,6 +165,45 @@ const contentIndexRaw: ContentMetaRaw[] = [
     type: 'skill',
     description: 'How do we apply multiple different aggregation groupings at the same time?',
     prerequisites: ['aggregate-columns'],
+  },
+
+  // Multi-table SQL querying.
+  {
+    id: 'write-look-up-query',
+    name: 'Write Look-up Query',
+    type: 'skill',
+    description: 'How do we select data from one table based on a condition in another table?',
+    prerequisites: ['foreign-key', 'write-single-criterion-query'],
+  },
+  {
+    id: 'join-tables',
+    name: 'Join Tables',
+    type: 'skill',
+    description: 'How can we use SQL to join tables together through a foreign key?',
+    prerequisites: ['join-and-decomposition', 'choose-columns', 'filter-rows-on-multiple-criteria'],
+  },
+  {
+    id: 'write-multi-table-query',
+    name: 'Write Multi-Table Query',
+    type: 'skill',
+    description: 'How can we set up queries combining data from multiple tables in convoluted ways?',
+    prerequisites: ['write-look-up-query', 'join-tables'],
+  },
+  {
+    id: 'write-multi-layered-query',
+    name: 'Write Multi-Layered Query',
+    type: 'skill',
+    description: 'How do we set up complex multi-table queries and structure their set-up through intermediate queries?',
+    prerequisites: ['write-multi-criterion-query', 'write-multi-table-query', 'use-filtered-aggregation'],
+  },
+
+  // Pivot tables in SQL.
+  {
+    id: 'pivot-table',
+    name: 'Pivot Tables',
+    type: 'concept',
+    description: 'How can we smoothly display aggregated data through so-called pivot tables?',
+    prerequisites: ['database-table'],
   },
   {
     id: 'create-pivot-table',
