@@ -6,11 +6,12 @@ export function Theory() {
       <Par>We know that a database is basically a collection of tables. Let's study one such table. What parts does it have and, more importantly, what do we call these parts?</Par>
     </Section>
     <Section title="Basic table terminology">
-      <Par>When talking about databases, we often use the basic terminology of tables. A <Term>table</Term> has various <Term>columns</Term>, each having a unique <Term>column name</Term>. The <Term>table contents</Term> consists of any number of <Term>rows</Term>, where each row consists of one <Term>cell</Term> for each column. Each cell contains a <Term>value</Term>.</Par>
+      <Par>When talking about database tables, we often use the terminology you are probably already familiar with. A <Term>table</Term> has various <Term>columns</Term>, each having a unique <Term>column name</Term>. The <Term>table contents</Term> consists of any number of <Term>rows</Term>, where each row consists of one <Term>cell</Term> for each column. Each cell contains a <Term>value</Term>.</Par>
       <Warning>ToDo: add image</Warning>
+      <Info>In database tables columns have names, but rows do not.</Info>
     </Section>
     <Section title="Rows as objects">
-      <Par>In databases, a table row often represents an object. In this case, another set of terminology is often used. Columns are called <Term>properties</Term> or <Term>attributes</Term>, and they have a <Term>property/attribute name</Term>. Rows represents <Term>records</Term>, and they have various <Term>fields</Term>.</Par>
+      <Par>In database tables, a table row often represents an object. When this is the case, another set of terminology is often used. Columns are called <Term>properties</Term> or <Term>attributes</Term>, and they have a <Term>property name</Term>. Rows represents <Term>records</Term>, and they have various <Term>fields/property values</Term>.</Par>
       <Warning>ToDo: add image</Warning>
     </Section>
     <Section title="Mathematical analysis of databases">

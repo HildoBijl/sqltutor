@@ -48,7 +48,7 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	// SQL fundamentals.
 	'sql': { position: { x: x2, y: y3 } },
 	'choose-columns': { position: { x: x2, y: y4 } },
-	'filter-rows': { position: { x: x4, y: y4 } },
+	'filter-rows': { position: { x: x3, y: y4 } },
 	'write-single-criterion-query': { position: { x: x3, y: y5 } },
 
 	// Single-table SQL querying.
