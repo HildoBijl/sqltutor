@@ -14,6 +14,7 @@ const svgStyle: CSSProperties = {
 	...notSelectable,
 	outline: 'none',
 	overflow: 'visible',
+	pointerEvents: 'none',
 	width: '100%',
 	zIndex: 2,
 };

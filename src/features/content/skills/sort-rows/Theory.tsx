@@ -69,7 +69,7 @@ function SingleColumnSortingDiagram() {
   const companyNameBounds = useTextNodeBounds(table, 'company_name', drawingRef);
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800}>
-    <Element position={[0, 20]} anchor={[-1, -1]} behind={true}>
+    <Element position={[0, 20]} anchor={[-1, -1]} behind>
       <SQLDisplay onLoad={setEditor}>{`
 SELECT *
 FROM companies

@@ -56,7 +56,7 @@ function MainFigure() {
   const b3 = new Vector([b2.x, b2.y + offset]);
   const b4 = new Vector([b3.x, b3.y + offset]);
 
-  // Render the figuire.
+  // Render the figure.
   return <Drawing ref={drawingRef} width={1000} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={1000}>
     {/* Query. */}
     <Element position={[150, 0]} anchor={[-1, -1]} behind>
