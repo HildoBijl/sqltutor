@@ -10,17 +10,5 @@ export const THEME_COLORS = {
   error: '#e73636',
 } as const;
 
-// Database schemas for skills
-export const SKILL_SCHEMAS = {
-  default: 'companies',
-  'filter-rows': 'companies',
-  'choose-columns': 'companies',
-  'sort-rows': 'companies',
-  'process-columns': 'positions',
-  'filter-rows-multiple': 'companiesAndPositions',
-  'join-tables': 'companiesAndPositions',
-  'aggregate-columns': 'positions',
-} as const;
-
 // Required exercises to complete a skill
 export const EXERCISES_TO_COMPLETE = 3;
