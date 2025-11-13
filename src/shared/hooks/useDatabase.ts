@@ -1,6 +1,15 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useDatabaseContext, DatabaseContextType } from '@/shared/providers/DatabaseProvider';
-import { schemas } from '@/features/database/schemas';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useDatabaseContext } from '@/shared/providers/DatabaseProvider';
+import {
+  buildSchema,
+  getTablesForSchema,
+  resolveDatasetSize,
+  resolveSkillTables,
+  type DatabaseRole,
+  type DatasetSize,
+  type SchemaKey,
+  type TableKey,
+} from '@/features/database/schemas';
 
 interface QueryResult {
   columns: string[];
@@ -8,10 +17,14 @@ interface QueryResult {
 }
 
 interface DatabaseOptions {
-  context: DatabaseContextType;
-  schema?: keyof typeof schemas;
+  role: DatabaseRole;
+  skillId?: string;
+  schema?: SchemaKey;
+  tables?: TableKey[];
+  size?: DatasetSize;
+  cacheKey?: string;
   resetOnSchemaChange?: boolean;
-  persistent?: boolean; // Only applies to playground context
+  persistent?: boolean;
 }
 
 interface UseDatabaseReturn {
@@ -29,10 +42,14 @@ interface UseDatabaseReturn {
 
 export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   const {
-    context,
+    role,
+    skillId,
     schema,
+    tables,
+    size,
+    cacheKey,
     resetOnSchemaChange = true,
-    persistent = false
+    persistent = false,
   } = options;
 
   const { databases: contextDatabases, getDatabase, resetDatabase: resetContextDatabase, isReady: contextReady } = useDatabaseContext();
@@ -50,27 +67,54 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     setQueryError(null);
   }, []);
 
-  // Determine which schema to use
-  const resolvedSchema = schema ? schemas[schema] : schemas.companies;
+  const resolvedSize = useMemo(() => resolveDatasetSize(role, skillId, size), [role, skillId, size]);
+
+  const resolvedTables = useMemo(() => {
+    const sourceTables: TableKey[] | undefined = tables?.length
+      ? tables
+      : schema
+        ? getTablesForSchema(schema)
+        : resolveSkillTables(role, skillId);
+
+    const baseTables = (sourceTables && sourceTables.length > 0 ? sourceTables : ['companies']) as TableKey[];
+    const deduped = Array.from(new Set(baseTables));
+    return deduped as TableKey[];
+  }, [tables, schema, role, skillId]);
+
+  const resolvedSchema = useMemo(() => {
+    return buildSchema({ tables: resolvedTables, size: resolvedSize, role });
+  }, [resolvedTables, resolvedSize, role]);
+
+  const contextKey = useMemo(() => {
+    const base = cacheKey ?? `${role}:${skillId ?? 'global'}`;
+    const tablesSignature = resolvedTables.join('|');
+    return `${base}:size=${resolvedSize}:tables=${tablesSignature}`;
+  }, [cacheKey, role, skillId, resolvedTables, resolvedSize]);
 
   // Update database when schema changes, provider DB instance changes, or context is ready
   useEffect(() => {
     if (!contextReady || !resolvedSchema) return;
 
     const schemaChanged = currentSchema !== resolvedSchema;
-    const providerDb = contextDatabases[context];
+    const providerEntry = contextDatabases[contextKey];
+    const providerDb = providerEntry?.instance ?? null;
     const shouldResetForSchema = resetOnSchemaChange && schemaChanged;
 
-    if (shouldResetForSchema && contextDatabases[context]) {
+    if (shouldResetForSchema && providerDb) {
       // Only reset early if there is an existing provider DB to close
-      resetContextDatabase(context);
+      resetContextDatabase(contextKey);
       setDatabase(null);
       return;
     }
 
     // If provider has no DB for this context, create it
     if (!providerDb) {
-      const db = getDatabase(context, resolvedSchema);
+      const db = getDatabase(contextKey, resolvedSchema, {
+        persistent,
+        role,
+        skillId,
+        size: resolvedSize,
+      });
       setDatabase(db);
       setCurrentSchema(resolvedSchema);
       setError(null);
@@ -115,8 +159,11 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     contextReady,
     resolvedSchema,
     currentSchema,
-    context,
+    contextKey,
     persistent,
+    role,
+    skillId,
+    resolvedSize,
     resetOnSchemaChange,
     getDatabase,
     resetContextDatabase,
@@ -127,7 +174,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   // Execute query function
   const executeQuery = useCallback(async (query: string): Promise<QueryResult[]> => {
     if (!database) {
-      throw new Error(`Database not ready for ${context} context`);
+      throw new Error(`Database not ready for ${contextKey}`);
     }
 
     setIsExecuting(true);
@@ -155,16 +202,16 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     } finally {
       setIsExecuting(false);
     }
-  }, [database, context]);
+  }, [database, contextKey]);
 
   // Reset current database
   const resetDatabase = useCallback(() => {
-    resetContextDatabase(context);
+    resetContextDatabase(contextKey);
     // Clear local ref so effect reinitializes a new DB instance
     setDatabase(null);
     clearQueryState();
     setError(null);
-  }, [context, resetContextDatabase, clearQueryState]);
+  }, [contextKey, resetContextDatabase, clearQueryState]);
 
   return {
     database,
@@ -181,20 +228,20 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
 }
 
 // Convenience hooks for specific contexts
-export function usePlaygroundDatabase(schema: keyof typeof schemas = 'companiesAndPositions') {
+export function usePlaygroundDatabase(schema: SchemaKey = 'companiesAndPositions') {
   return useDatabase({
-    context: 'playground',
+    role: 'display',
+    skillId: 'playground',
     schema,
     persistent: true,
     resetOnSchemaChange: true,
   });
 }
 
-export function useConceptDatabase(schema: keyof typeof schemas = 'companies') {
+export function useConceptDatabase(schema: SchemaKey = 'companies') {
   return useDatabase({
-    context: 'concept',
+    role: 'theory',
     schema,
     resetOnSchemaChange: true,
-    persistent: false,
   });
 }

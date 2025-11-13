@@ -3,7 +3,6 @@ import { Container, Typography, Alert, CircularProgress, Button } from '@mui/mat
 import { MenuBook, OndemandVideo, Lightbulb, Bolt, Edit, Storage } from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/store';
-import type { SchemaKey } from '@/features/database/schemas';
 
 import { useContentTabs } from './hooks/useContentTabs';
 import { useSkillContent } from './hooks/useSkillContent';
@@ -15,7 +14,6 @@ import { ContentTabs } from './components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
 import { CompletionDialog, SkillPracticeTab } from './components/SkillPractice';
 import { DataExplorerTab } from './components/DataExplorerTab';
-import { SKILL_SCHEMAS } from '@/constants';
 
 import type { TabConfig } from './types';
 
@@ -52,15 +50,9 @@ export default function SkillPage() {
 
   const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId);
 
-  const skillSchema: SchemaKey =
-    skillId && skillId in SKILL_SCHEMAS
-      ? (SKILL_SCHEMAS[skillId as keyof typeof SKILL_SCHEMAS] as SchemaKey)
-      : ('companies' as SchemaKey);
-
   const controller = useSkillExerciseController({
     skillId: skillId ?? '',
     skillModule,
-    schema: skillSchema,
     requiredCount: REQUIRED_EXERCISE_COUNT,
     componentState,
     setComponentState,
@@ -132,7 +124,7 @@ export default function SkillPage() {
           {currentTab === 'story' && <StoryTab contentId={skillMeta.id} />}
           {currentTab === 'data' &&
             (status.dbReady ? (
-              <DataExplorerTab schema={skillSchema} />
+              <DataExplorerTab skillId={skillId ?? ''} />
             ) : (
               <Typography variant="body1" color="text.secondary">
                 Database is loading...

@@ -10,5 +10,4 @@ export {
 export {
   DatabaseProvider,
   useDatabaseContext,
-  type DatabaseContextType
 } from './DatabaseProvider';
