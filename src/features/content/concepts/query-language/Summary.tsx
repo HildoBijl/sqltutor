@@ -1,13 +1,16 @@
-import { Box, Typography } from '@mui/material';
+import { Page, Section, Par, Warning, Term } from '@/components';
 
 export function Summary() {
-  return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
-      <Typography variant="body1">
-        Some summary will appear here.
-      </Typography>
-    </Box>
-  );
+  return <Page>
+    <Section>
+      <Par>The usual way of interacting with a database is by sending a <Term>query</Term> to the Database Management System (DBMS). A query is a structured command to extract/adjust data. Examples include "Create a new table", "Add a record" or "Find all records satisfying some condition".</Par>
+      <Warning>ToDo: add image</Warning>
+      <Par>Since DBMSs do not speak English, queries usually look like a piece of computer code. An example is </Par>
+      <Par><pre><code>{`SELECT company_name
+FROM companies
+WHERE num_employees > 200000
+`}</code></pre></Par>
+      <Par>The <Term>query language</Term> describes the exact way in which a query has to be set up. Every DBMS has its own query language, although the most commonly used databases use (some dialect of) the query language SQL.</Par>
+    </Section>
+  </Page>
 }
-
-export default Summary;
