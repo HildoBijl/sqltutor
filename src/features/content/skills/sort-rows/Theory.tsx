@@ -68,7 +68,7 @@ function SingleColumnSortingDiagram() {
   const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
   const companyNameBounds = useTextNodeBounds(table, 'company_name', drawingRef);
 
-  return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800}>
+  return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
       <SQLDisplay onLoad={setEditor}>{`
 SELECT *
@@ -91,7 +91,7 @@ ORDER BY company_name DESC;
 
 function SqlDrawing({ code, height = 240 }: { code: string; height?: number }) {
   const normalizedCode = code.trim();
-  return <Drawing width={800} height={height} maxWidth={800}>
+  return <Drawing width={800} height={height} maxWidth={800} disableSVGPointerEvents>
     <Rectangle dimensions={[[0, 0], [800, height]]} cornerRadius={20} style={{ fill: 'blue', opacity: 0.1 }} />
     <Element position={[60, 48]} anchor={[-1, -1]}>
       <SQLDisplay>{`\n${normalizedCode}\n`}</SQLDisplay>

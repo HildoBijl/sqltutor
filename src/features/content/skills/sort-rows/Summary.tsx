@@ -57,7 +57,7 @@ function MainFigure() {
   const b4 = new Vector([b3.x, b3.y + offset]);
 
   // Render the figure.
-  return <Drawing ref={drawingRef} width={1000} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={1000}>
+  return <Drawing ref={drawingRef} width={1000} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={1000} disableSVGPointerEvents>
     {/* Query. */}
     <Element position={[150, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
