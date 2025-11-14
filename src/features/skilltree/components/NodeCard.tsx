@@ -96,6 +96,17 @@ export function NodeCard({
 
   return (
     <>
+    {/* Background rectangle to avoid lines in the backround */}
+    <Rectangle
+        dimensions={{ start: rectStart, end: rectEnd }}
+        cornerRadius={cornerRadius}
+        style ={{
+          fill: theme.palette.background.paper,
+          stroke: theme.palette.divider,
+          strokeWidth: 1,
+          strokeOpacity: nodeOpacity,
+        }}
+      />
       <Rectangle
         dimensions={{ start: rectStart, end: rectEnd }}
         cornerRadius={cornerRadius}
@@ -103,6 +114,7 @@ export function NodeCard({
           fill: isHovered ? theme.palette.action.hover : theme.palette.background.paper,
           stroke: borderColor,
           strokeWidth: strokeWidth,
+          strokeOpacity: nodeOpacity,
           transition: "fill 90ms, stroke 90ms",
         }}
       />
