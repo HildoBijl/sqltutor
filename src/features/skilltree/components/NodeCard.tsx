@@ -6,6 +6,7 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useTheme } from "@mui/material/";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -30,6 +31,7 @@ export function NodeCard({
   isPrerequisite = false,
   isSomethingHovered = false,
 }: NodeCardProps) {
+  const theme = useTheme();
   const type = item.type;
   const cornerRadius = type === "concept" ? 4 : 12;
 
@@ -98,7 +100,7 @@ export function NodeCard({
         dimensions={{ start: rectStart, end: rectEnd }}
         cornerRadius={cornerRadius}
         style={{
-          fill: isHovered ? "#f5f5f5" : "#fff",
+          fill: isHovered ? theme.palette.action.hover : theme.palette.background.paper,
           stroke: borderColor,
           strokeWidth: strokeWidth,
           transition: "fill 90ms, stroke 90ms",
@@ -132,7 +134,7 @@ export function NodeCard({
               left: -5,
               width: iconSize,
               height: iconSize,
-              backgroundColor: "#ffffff",
+              backgroundColor: theme.palette.background.paper,
               borderRadius: "50%",
               display: "flex",
               alignItems: "center",
@@ -164,7 +166,7 @@ export function NodeCard({
                 right: -5,
                 width: checkmarkSize,
                 height: checkmarkSize,
-                backgroundColor: "#ffffff",
+                backgroundColor: theme.palette.background.paper,
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",

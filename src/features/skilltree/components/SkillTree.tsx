@@ -2,10 +2,16 @@ import { type RefObject, type ReactNode, useState, useEffect } from "react";
 import { useTransformContext } from "react-zoom-pan-pinch";
 import { useDebouncedFunction } from "@/utils/dom";
 import type { Vector } from "@/utils/geometry";
-import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components/figures";
+import {
+  Drawing,
+  Element,
+  Curve,
+  useDrawingMousePosition,
+} from "@/components/figures";
 import { ContentMeta } from "@/features/content";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
+import { useTheme } from "@mui/material/";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -51,7 +57,9 @@ export function SkillTree({
   setHoveredId,
   containerRef,
 }: // nodeRefs,
-  SkillTreeProps) {
+SkillTreeProps) {
+  const theme = useTheme();
+
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
@@ -61,8 +69,14 @@ export function SkillTree({
 
   // On changes in the zoom-pan-pinch transform state, dispatch a scroll event to update rects.
   const { transformState } = useTransformContext();
-  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
-  useEffect(dispatchScrollEvent, [transformState.scale, transformState.positionX, transformState.positionY]);
+  const dispatchScrollEvent = useDebouncedFunction(() =>
+    window.dispatchEvent(new Event("scroll"))
+  );
+  useEffect(dispatchScrollEvent, [
+    transformState.scale,
+    transformState.positionX,
+    transformState.positionY,
+  ]);
 
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
@@ -195,7 +209,7 @@ export function SkillTree({
         // Add a margin when rendering the SkillTree in the Canvas
         marginLeft: "35px",
         marginTop: "35px",
-        //opacity: 0.3,
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <Drawing
@@ -255,20 +269,23 @@ interface TooltipProps {
 }
 function Tooltip({ children }: TooltipProps) {
   const mousePosition = useDrawingMousePosition();
-  if (!children || !mousePosition)
-    return null;
-  return <Element anchor={[-1, -1]} position={mousePosition.add([20, 10])}>
-    <div style={{
-      border: "1px solid #ccc",
-      backgroundColor: "rgba(255, 255, 255, 0.75)",
-      color: "black",
-      padding: "8px 12px",
-      borderRadius: "4px",
-      fontSize: "14px",
-      maxWidth: "300px",
-      zIndex: 1000,
-    }}>
-      {children}
-    </div>
-  </Element>
+  if (!children || !mousePosition) return null;
+  return (
+    <Element anchor={[-1, -1]} position={mousePosition.add([20, 10])}>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          backgroundColor: "rgba(255, 255, 255, 0.75)",
+          color: "black",
+          padding: "8px 12px",
+          borderRadius: "4px",
+          fontSize: "14px",
+          maxWidth: "300px",
+          zIndex: 1000,
+        }}
+      >
+        {children}
+      </div>
+    </Element>
+  );
 }

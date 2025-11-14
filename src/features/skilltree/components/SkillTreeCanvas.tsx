@@ -6,6 +6,7 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
+import { useTheme } from "@mui/material/";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -53,16 +54,17 @@ export function SkillTreeCanvas({
   containerRef,
   nodeRefs,
 }: SkillTreeCanvasProps) {
+  const theme = useTheme();
+
   return (
     <div
       style={{
         width: "100%",
         height: "calc(100vh - 120px)",
         minHeight: "600px",
-        border: "1px solid #e0e0e0",
-        borderRadius: "8px",
+        border: `1px solid ${theme.palette.divider}`,
         overflow: "hidden",
-        backgroundColor: "#ffffff",
+        backgroundColor: theme.palette.background.paper,
         position: "relative",
       }}
     >
