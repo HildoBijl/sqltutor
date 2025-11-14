@@ -59,7 +59,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     id: 'projection-and-filtering',
     name: 'Projection and Filtering',
     type: 'concept',
-    description: 'How can we manipulate tables, for instance by selecting specific rows/columns?',
+    description: 'How can we manipulate tables, for instance by selecting specific columns/rows?',
     prerequisites: ['database-table'],
   },
   {

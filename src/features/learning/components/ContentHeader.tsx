@@ -78,8 +78,8 @@ export function ContentHeader({
       </Box>
 
       {description && (
-        <Box sx={{ mb: 3, pl: 1 }}>
-          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+        <Box sx={{ mb: 3, pl: 0.5 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
             {description}
           </Typography>
         </Box>
