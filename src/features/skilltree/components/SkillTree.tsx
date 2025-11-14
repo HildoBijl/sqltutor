@@ -1,6 +1,4 @@
-import { type RefObject, type ReactNode, useState, useEffect } from "react";
-import { useTransformContext } from "react-zoom-pan-pinch";
-import { useDebouncedFunction } from "@/utils/dom";
+import { type RefObject, type ReactNode, useState } from "react";
 import type { Vector } from "@/utils/geometry";
 import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components/figures";
 import { ContentMeta } from "@/features/content";
@@ -58,11 +56,6 @@ export function SkillTree({
   // const setNodeRef = (id: string) => (el: HTMLDivElement | null) => {
   //   nodeRefs.current?.set(id, el);
   // };
-
-  // On changes in the zoom-pan-pinch transform state, dispatch a scroll event to update rects.
-  const { transformState } = useTransformContext();
-  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
-  useEffect(dispatchScrollEvent, [transformState.scale, transformState.positionX, transformState.positionY]);
 
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
