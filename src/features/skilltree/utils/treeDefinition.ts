@@ -29,13 +29,13 @@ const x4 = x3 + dx;
 const x5 = x4 + dx;
 const x6 = x5 + dx;
 // const x7 = x6 + dx;
-export const treeWidth = x6 + cardWidth/2 + margin;
+export const treeWidth = x6 + cardWidth / 2 + margin;
 
 const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	// Fundamental database concepts.
-	'database': { position: { x: (x3 + x4) / 2, y: y1 } },
-	'database-table': { position: { x: (x3 + x4) / 2, y: y2 } },
+	'database': { position: { x: (x2+x3)/2, y: y1 } },
 	'query-language': { position: { x: x2, y: y2 } },
+	'database-table': { position: { x: x3, y: y2 } },
 	'data-types': { position: { x: x3, y: y3 } },
 	'database-keys': { position: { x: x5, y: y3 } },
 
@@ -47,8 +47,8 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 
 	// SQL fundamentals.
 	'sql': { position: { x: x2, y: y3 } },
-	'choose-columns': { position: { x: x2, y: y4 } },
-	'filter-rows': { position: { x: x3, y: y4 } },
+	'choose-columns': { position: { x: (x2 + x3) / 2, y: y4 } },
+	'filter-rows': { position: { x: (x3 + x4) / 2, y: y4 } },
 	'write-single-criterion-query': { position: { x: x3, y: y5 } },
 
 	// Single-table SQL querying.
