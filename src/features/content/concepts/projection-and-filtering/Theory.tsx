@@ -20,7 +20,7 @@ export function Theory() {
     </Section>
 
     <Section title="Filtering: choosing rows">
-      <Par>Alternatively, we may only need a subset of the rows. For example, we want to find all companies having more than 2000 employees. In that case, we apply <Term>filtering</Term>: we set up a <Term>condition</Term> (at least 2000 employees) and only keep the rows matching this filtering condition.</Par>
+      <Par>Alternatively, we may only need a subset of the rows. For example, we want to find all companies having more than 200000 employees. In that case, we apply <Term>filtering</Term>: we set up a <Term>condition</Term> (at least 200000 employees) and only keep the rows matching this filtering condition.</Par>
       <Filtering />
     </Section>
 
