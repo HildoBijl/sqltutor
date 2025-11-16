@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
-import { Page, Par, Section, Warning } from '@/components';
+import { Page, Par, Section, Warning, Term } from '@/components';
 import { type DrawingData, Drawing, Element, Rectangle, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
@@ -11,15 +11,16 @@ import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
-    <Par>When we receive a result set from a query, it is rarely in the exact order we need. SQL lets us describe how rows should be sorted, and optionally how to pick rows from this sorting.</Par>
+    <Par>We know how in SQL we can retrieve an entire table. The rows then usually appear in the order in which they are added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
 
     <Section title="Sort on a single column">
       <Par>To sort your results, add an <SQLDisplay inline>ORDER BY</SQLDisplay> clause to the end of the query and specify the column to sort by. Optionally, add <SQLDisplay inline>ASC</SQLDisplay> (ascending, default) or <SQLDisplay inline>DESC</SQLDisplay> (descending) to choose the sorting direction.</Par>
       <SingleColumnSortingDiagram />
+      <Par>The exact sorting method depends on the <Term>data type</Term>. For numbers, we sort by magnitude. For text, we sort alphabetically. For dates/times, we sort by which date/time is earlier or later.</Par>
     </Section>
 
     <Section title="Sort based on multiple columns">
-      <Par>When the first column contains ties, you can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
+      <Par>When the first column contains sorting ties, then you can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
       <SqlDrawing code={`SELECT *
 FROM companies
 ORDER BY
