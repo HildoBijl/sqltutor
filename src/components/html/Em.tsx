@@ -8,7 +8,10 @@ export type EmProps = TypographyProps & {
 export function Em({ children, sx, ...props }: EmProps) {
   return <Typography
     component="em"
-    sx={{ ...sx }}
+    sx={{
+      fontSize: 'inherit',
+      ...sx,
+    }}
     {...props}
   >
     {children}
