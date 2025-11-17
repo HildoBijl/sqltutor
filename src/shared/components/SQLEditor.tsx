@@ -213,7 +213,7 @@ export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplay
   }
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box>
       <SQLEditor
         value={children.trim()}
         readOnly

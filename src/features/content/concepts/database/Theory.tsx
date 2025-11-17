@@ -28,7 +28,7 @@ export function Theory() {
     <Section title="Database: a collection of tables">
       <Par>A <Term>database</Term> stores data. Most databases do so purely in table form. The easiest way to picture a database is therefore as a collection of tables, each filled with potentially large amounts of entries. A small database consists of a few small tables, but bigger databases can have dozens of enormous tables that are all linked to each other in some way.</Par>
       <SecondTable />
-      <Info>There are a few databases that deviate from this set-up and don't use tables. They for example store graphs (like <Link to="https://neo4j.com/">Neo4j</Link>), JSON objects (like <Link to="https://www.mongodb.com/">MongoDB</Link>) or key-value pairs (like <Link to="https://redis.io/">Redis</Link>). Since this only involves a small subset of all databases, we focus on table-based databases for now.</Info>
+      <Info>Most databases, the so-called <Term>relational databases</Term>, use tables. (A "relation" is, roughly put, a mathematical term for a table.) There are a few databases that deviate from this and don't use tables. They for example store graphs (like <Link to="https://neo4j.com/">Neo4j</Link>), JSON objects (like <Link to="https://www.mongodb.com/">MongoDB</Link>) or key-value pairs (like <Link to="https://redis.io/">Redis</Link>). Since this only involves a small subset of all databases, we focus on relational databases for now.</Info>
     </Section>
 
     <Section title="The database management system">

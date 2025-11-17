@@ -1,39 +1,76 @@
 import { contentItems } from "@/features/content";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
-import { cardHeight } from "./settings";
+import { cardWidth, cardHeight } from "./settings";
 import { computeConnectorPath } from "./pathCalculations";
 
 export interface ContentPositionMetaRaw {
 	position: VectorInput;
 }
 
+const margin = 20;
+
+const dy = cardHeight * 1.5;
+const y1 = margin + cardHeight / 2;
+const y2 = y1 + dy;
+const y3 = y2 + dy;
+const y4 = y3 + dy;
+const y5 = y4 + dy;
+const y6 = y5 + dy;
+const y7 = y6 + dy;
+const y8 = y7 + dy;
+export const treeHeight = y8 + cardHeight / 2 + margin;
+
+const dx = cardWidth * 1.5;
+const x1 = margin + cardWidth / 2;
+const x2 = x1 + dx;
+const x3 = x2 + dx;
+const x4 = x3 + dx;
+const x5 = x4 + dx;
+const x6 = x5 + dx;
+// const x7 = x6 + dx;
+export const treeWidth = x6 + cardWidth / 2 + margin;
+
 const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
-	'database': { position: { x: 624, y: 24 } },
-	'database-table': { position: { x: 624, y: 144 } },
-	'data-types': { position: { x: 624, y: 264 } },
-	'database-keys': { position: { x: 1176, y: 264 } },
-	'projection-and-filtering': { position: { x: 900, y: 264 } },
-	'join-and-decomposition': { position: { x: 900, y: 384 } },
-	'inner-and-outer-join': { position: { x: 900, y: 504 } },
-	'aggregation': { position: { x: 1176, y: 504 } },
-	'pivot-table': { position: { x: 1440, y: 624 } },
-	'query-language': { position: { x: 300, y: 144 } },
-	'sql': { position: { x: 300, y: 264 } },
-	'filter-rows': { position: { x: 300, y: 384 } },
-	'filter-rows-on-multiple-criteria': { position: { x: 300, y: 624 } },
-	'choose-columns': { position: { x: 624, y: 384 } },
-	'create-processed-columns': { position: { x: 624, y: 624 } },
-	'sort-rows': { position: { x: 60, y: 624 } },
-	'write-single-criterion-query': { position: { x: 450, y: 504 } },
-	'write-multi-criterion-query': { position: { x: 300, y: 744 } },
-	'join-tables': { position: { x: 624, y: 744 } },
-	'write-multi-table-query': { position: { x: 624, y: 864 } },
-	'write-multi-layered-query': { position: { x: 624, y: 984 } },
-	'aggregate-columns': { position: { x: 1176, y: 624 } },
-	'use-filtered-aggregation': { position: { x: 900, y: 744 } },
-	'use-dynamic-aggregation': { position: { x: 1176, y: 744 } },
-	'create-pivot-table': { position: { x: 1440, y: 744 } },
+	// Fundamental database concepts.
+	'database': { position: { x: (x2+x3)/2, y: y1 } },
+	'query-language': { position: { x: x2, y: y2 } },
+	'database-table': { position: { x: x3, y: y2 } },
+	'data-types': { position: { x: x3, y: y3 } },
+	'database-keys': { position: { x: x5, y: y3 } },
+
+	// Database table manipulation.
+	'projection-and-filtering': { position: { x: x4, y: y3 } },
+	'foreign-key': { position: { x: x5, y: y4 } },
+	'join-and-decomposition': { position: { x: x5, y: y5 } },
+	'aggregation': { position: { x: x6, y: y4 } },
+
+	// SQL fundamentals.
+	'sql': { position: { x: x2, y: y3 } },
+	'choose-columns': { position: { x: (x2 + x3) / 2, y: y4 } },
+	'filter-rows': { position: { x: (x3 + x4) / 2, y: y4 } },
+	'write-single-criterion-query': { position: { x: x3, y: y5 } },
+
+	// Single-table SQL querying.
+	'sort-rows': { position: { x: x1, y: y5 } },
+	'create-processed-columns': { position: { x: x2, y: y5 } },
+	'filter-rows-on-multiple-criteria': { position: { x: x4, y: y5 } },
+	'write-multi-criterion-query': { position: { x: x2, y: y6 } },
+
+	// Aggregation in SQL.
+	'aggregate-columns': { position: { x: x6, y: y5 } },
+	'use-filtered-aggregation': { position: { x: x5, y: y6 } },
+	// 'use-dynamic-aggregation': { position: { x: x6, y: y6 } },
+
+	// Multi-table SQL querying.
+	'write-look-up-query': { position: { x: x3, y: y6 } },
+	'join-tables': { position: { x: x4, y: y6 } },
+	'write-multi-table-query': { position: { x: (x3 + x4) / 2, y: y7 } },
+	'write-multi-layered-query': { position: { x: (x3 + x4) / 2, y: y8 } },
+
+	// Pivot tables in SQL.
+	// 'pivot-table': { position: { x: x7, y: y5 } },
+	// 'create-pivot-table': { position: { x: x7, y: y6 } },
 }
 
 export interface ContentPositionMeta extends Omit<ContentPositionMetaRaw, 'position'> {

@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
+import { Box } from '@mui/material';
 
 import { Vector } from '@/utils/geometry';
 import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Rectangle, Line, Curve, useTextNodeBounds } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds, useElementBounds } from '@/components/figures';
 import { Page, Section, Par } from '@/components';
 import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { useConceptDatabase } from '@/shared/hooks/useDatabase';
+import { useQueryResult } from '@/shared/hooks/useQuery';
+import { DataTable } from '@/shared/components/DataTable';
 
 export function Summary() {
   return <Page>
@@ -15,10 +19,29 @@ export function Summary() {
   </Page>
 }
 
+const query = `
+SELECT *
+FROM companies
+ORDER BY country ASC,
+  num_employees DESC
+LIMIT 3
+OFFSET 1`
+
 function MainFigure() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
   const [editor, setEditor] = useState<HTMLElement | null>(null);
+  const editorRect = useElementBounds(editor, drawingRef);
+  const editorHeight = editorRect?.height || 200;
+
+  // Set up data for the two tables.
+  const db = useConceptDatabase();
+  const data1 = useQueryResult(db?.database, 'SELECT * FROM companies LIMIT 6');
+  const data2 = useQueryResult(db?.database, query);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const t1Height = t1Bounds?.height || 400;
+  const t2Height = t2Bounds?.height || 300;
 
   // Find bounds of existing elements.
   const ascBounds = useTextNodeBounds(editor, 'ASC', drawingRef);
@@ -27,26 +50,17 @@ function MainFigure() {
   const offsetBounds = useTextNodeBounds(editor, '1', drawingRef);
 
   // Define position data.
-  const offset = 28 // Between text lines.
-  const b1 = new Vector([450, 16])
-  const b2 = new Vector([b1.x, b1.y + offset])
-  const b3 = new Vector([b2.x, b2.y + offset])
-  const b4 = new Vector([b3.x, b3.y + offset])
-  const tableBase = 140
-  const tableHeight = 160
+  const offset = 28; // Between text lines.
+  const b1 = new Vector([450, 16]);
+  const b2 = new Vector([b1.x, b1.y + offset]);
+  const b3 = new Vector([b2.x, b2.y + offset]);
+  const b4 = new Vector([b3.x, b3.y + offset]);
 
-  // Render the figuire.
-  return <Drawing width={1000} height={300} ref={drawingRef}>
+  // Render the figure.
+  return <Drawing ref={drawingRef} width={1000} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={1000} disableSVGPointerEvents>
     {/* Query. */}
     <Element position={[150, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{`
-SELECT *
-FROM companies
-ORDER BY country ASC,
-  numEmployees DESC
-LIMIT 3
-OFFSET 1
-			`}</SQLDisplay>
+      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
     {/* Explainer text. */}
@@ -61,17 +75,21 @@ OFFSET 1
     {limitBounds && <Curve points={[limitBounds.middleRight.add([5, 1]), limitBounds.middleRight.add([123, 1]), b3.add([-22, 0]), b3.add([-2, 0])]} endArrow={true} color={themeColor} />}
     {offsetBounds && <Curve points={[offsetBounds.middleRight.add([5, 1]), offsetBounds.middleRight.add([123, 1]), b4.add([-22, 0]), b4.add([-2, 0])]} endArrow={true} color={themeColor} />}
 
-    {/* Dummy table 1. */}
-    <Rectangle dimensions={[[0, tableBase], [140, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[150, tableBase], [290, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[300, tableBase], [440, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    {/* Table 1. */}
+    <Element position={[0, editorHeight + 20]} anchor={[-1, -1]}>
+      <Box sx={{ width: 800 }}>
+        <DataTable ref={t1Ref} data={data1} showPagination={false} compact />
+      </Box>
+    </Element>
 
     {/* Arrow between tables. */}
-    <Line points={[[450, tableBase + tableHeight / 2], [550, tableBase + tableHeight / 2]]} endArrow={true} color={themeColor} />
+    {t1Bounds && t2Bounds ? <Curve points={[[100, t1Bounds.bottom + 10], [100, t2Bounds.middle.y], t2Bounds.leftMiddle.add([-10, 0])]} color={themeColor} endArrow /> : null}
 
     {/* Dummy table 2. */}
-    <Rectangle dimensions={[[560, tableBase], [700, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[710, tableBase], [850, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
-    <Rectangle dimensions={[[860, tableBase], [1000, tableBase + tableHeight]]} style={{ fill: themeColor, opacity: 0.2 }} />
+    <Element position={[200, editorHeight + 20 + t1Height + 20]} anchor={[-1, -1]}>
+      <Box sx={{ width: 800 }}>
+        <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
+      </Box>
+    </Element>
   </Drawing>
 }

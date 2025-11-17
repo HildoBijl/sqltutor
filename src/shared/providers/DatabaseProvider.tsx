@@ -1,21 +1,30 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 
-import { useLatest } from '@/utils/dom';
-
 import { useSQLJS } from './SQLJSProvider';
+import type { DatabaseRole, DatasetSize } from '@/features/database/schemas';
 
-export type DatabaseContextType = 'playground' | 'exercise' | 'concept';
+interface ManagedDatabase {
+  instance: any | null;
+  persistent: boolean;
+  createdAt: number | null;
+  role?: DatabaseRole;
+  skillId?: string;
+  size?: DatasetSize;
+}
 
-interface DatabaseState {
-  playground: any | null;
-  exercise: any | null;
-  concept: any | null;
+type DatabaseState = Record<string, ManagedDatabase | null>;
+
+interface GetDatabaseOptions {
+  persistent?: boolean;
+  role?: DatabaseRole;
+  skillId?: string;
+  size?: DatasetSize;
 }
 
 interface DatabaseContextValue {
   databases: DatabaseState;
-  getDatabase: (context: DatabaseContextType, schema: string) => any | null;
-  resetDatabase: (context: DatabaseContextType) => void;
+  getDatabase: (key: string, schema: string, options?: GetDatabaseOptions) => any | null;
+  resetDatabase: (key: string) => void;
   resetAllDatabases: () => void;
   isReady: boolean;
 }
@@ -36,20 +45,10 @@ interface DatabaseProviderProps {
 
 export function DatabaseProvider({ children }: DatabaseProviderProps) {
   const SQLJS = useSQLJS();
-  const [databases, setDatabases] = useState<DatabaseState>({
-    playground: null,
-    exercise: null,
-    concept: null,
-  });
-  const databasesRef = useLatest<DatabaseState>(databases);
-  const [isReady, setIsReady] = useState(false);
+  const [databases, setDatabases] = useState<DatabaseState>({});
+  const databasesRef = useRef<DatabaseState>({});
 
-  // Track creation timestamps for cleanup policies
-  const createdAtRef = useRef<Record<DatabaseContextType, number | null>>({
-    playground: null,
-    exercise: null,
-    concept: null,
-  });
+  const [isReady, setIsReady] = useState(false);
 
   // Initialize readiness when SQLJS is available
   useEffect(() => {
@@ -57,134 +56,162 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   }, [SQLJS]);
 
   // Create a database with the given schema and context-specific setup
-  const createDatabase = useCallback((schema: string, context: DatabaseContextType) => {
+  const createDatabase = useCallback((schema: string) => {
     if (!SQLJS) return null;
 
     try {
       const db = new SQLJS.Database();
       db.run(schema);
-
-      // Add context-specific setup
-      switch (context) {
-        case 'playground':
-          // Add helpful comments for playground
-          db.run(`-- SQL Playground - Experiment freely!
--- Your changes will persist until you reset the database.
--- Available tables: ${getTableNamesFromSchema(schema).join(', ')}`);
-          break;
-        case 'exercise':
-          // Clean slate for exercises
-          break;
-        case 'concept':
-          // Read-only demonstrations
-          break;
-      }
-
       return db;
     } catch (error) {
-      console.error(`Failed to create ${context} database:`, error);
+      console.error('Failed to create database instance:', error);
       return null;
     }
   }, [SQLJS]);
 
-  // Get or create a database for the given context and schema
-  const getDatabase = useCallback((context: DatabaseContextType, schema: string) => {
-    const existingDb = databasesRef.current[context];
+  const updateDatabases = useCallback((updater: (prev: DatabaseState) => DatabaseState) => {
+    setDatabases((prev) => {
+      const next = updater(prev);
+      databasesRef.current = next;
+      return next;
+    });
+  }, []);
 
-    // Reuse existing database or create new one if missing
-    if (!existingDb) {
-      const newDb = createDatabase(schema, context);
-      setDatabases(prev => ({ ...prev, [context]: newDb }));
-      // Record creation time for cleanup logic
-      createdAtRef.current[context] = newDb ? Date.now() : null;
-      return newDb;
+  // Get or create a database for the given context key and schema
+  const getDatabase = useCallback((key: string, schema: string, options?: GetDatabaseOptions) => {
+    const existing = databasesRef.current[key];
+    if (existing?.instance) {
+      return existing.instance;
     }
 
-    return existingDb;
-  }, [createDatabase]);
+    const newInstance = createDatabase(schema);
+    const entry: ManagedDatabase | null = newInstance
+      ? {
+          instance: newInstance,
+          persistent: options?.persistent ?? false,
+          role: options?.role,
+          skillId: options?.skillId,
+          size: options?.size,
+          createdAt: Date.now(),
+        }
+      : null;
+
+    updateDatabases((prev) => ({
+      ...prev,
+      [key]: entry,
+    }));
+
+    return newInstance;
+  }, [createDatabase, updateDatabases]);
 
   // Reset a specific database context
-  const resetDatabase = useCallback((context: DatabaseContextType) => {
-    const db = databasesRef.current[context];
-    if (db && typeof db.close === 'function') {
+  const resetDatabase = useCallback((key: string) => {
+    const entry = databasesRef.current[key];
+    if (entry?.instance && typeof entry.instance.close === 'function') {
       try {
-        db.close();
+        entry.instance.close();
       } catch (error) {
-        console.warn(`Error closing ${context} database:`, error);
+        console.warn(`Error closing database "${key}":`, error);
       }
     }
 
-    setDatabases(prev => ({ ...prev, [context]: null }));
-    createdAtRef.current[context] = null;
-  }, []);
+    updateDatabases((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, [updateDatabases]);
 
   // Reset all databases
   const resetAllDatabases = useCallback(() => {
-    Object.entries(databasesRef.current).forEach(([context, db]) => {
-      if (db && typeof db.close === 'function') {
+    Object.entries(databasesRef.current).forEach(([key, entry]) => {
+      if (entry?.instance && typeof entry.instance.close === 'function') {
         try {
-          db.close();
+          entry.instance.close();
         } catch (error) {
-          console.warn(`Error closing ${context} database:`, error);
+          console.warn(`Error closing database "${key}":`, error);
         }
       }
     });
 
-    setDatabases({
-      playground: null,
-      exercise: null,
-      concept: null,
-    });
-    createdAtRef.current = { playground: null, exercise: null, concept: null };
+    databasesRef.current = {};
+    setDatabases({});
   }, []);
 
-  // Reset only transient (non-persistent) databases: exercise + concept
+  // Reset only transient (non-persistent) databases
   const resetTransientDatabases = useCallback(() => {
-    (['exercise', 'concept'] as DatabaseContextType[]).forEach((ctx) => {
-      const db = databasesRef.current[ctx];
-      if (db && typeof db.close === 'function') {
+    const next: DatabaseState = { ...databasesRef.current };
+    Object.entries(databasesRef.current).forEach(([key, entry]) => {
+      if (!entry) {
+        delete next[key];
+        return;
+      }
+      if (entry.persistent) {
+        return;
+      }
+
+      if (entry.instance && typeof entry.instance.close === 'function') {
         try {
-          db.close();
+          entry.instance.close();
         } catch (error) {
-          console.warn(`Error closing ${ctx} database:`, error);
+          console.warn(`Error closing transient database "${key}":`, error);
         }
       }
-      databasesRef.current[ctx] = null;
-      createdAtRef.current[ctx] = null;
+      delete next[key];
     });
-    setDatabases(prev => ({ ...prev, exercise: null, concept: null }));
+
+    databasesRef.current = next;
+    setDatabases(next);
   }, []);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Keep playground persistent; cleanup transient DBs only
+      // Keep persistent databases alive; cleanup transient DBs only
       resetTransientDatabases();
     };
   }, [resetTransientDatabases]);
 
-  // Auto-cleanup: exercise databases older than 30 minutes
+  // Auto-cleanup: drop transient databases older than 30 minutes
   useEffect(() => {
     const CHECK_INTERVAL_MS = 60_000; // 1 minute
     const MAX_AGE_MS = 30 * 60_000; // 30 minutes
 
     const interval = setInterval(() => {
-      const createdAt = createdAtRef.current.exercise;
-      const db = databasesRef.current.exercise;
-      if (db && createdAt && Date.now() - createdAt > MAX_AGE_MS) {
-        try {
-          db.close?.();
-        } catch (error) {
-          console.warn('Error closing stale exercise database:', error);
+      const now = Date.now();
+      const keysToRemove: string[] = [];
+
+      Object.entries(databasesRef.current).forEach(([key, entry]) => {
+        if (!entry || entry.persistent) return;
+        if (!entry.createdAt) return;
+        if (now - entry.createdAt <= MAX_AGE_MS) return;
+
+        if (entry.instance && typeof entry.instance.close === 'function') {
+          try {
+            entry.instance.close();
+          } catch (error) {
+            console.warn(`Error closing stale database "${key}":`, error);
+          }
         }
-        databasesRef.current.exercise = null;
-        createdAtRef.current.exercise = null;
-        setDatabases(prev => ({ ...prev, exercise: null }));
+        keysToRemove.push(key);
+      });
+
+      if (keysToRemove.length === 0) {
+        return;
       }
+
+      updateDatabases((prev) => {
+        const next = { ...prev };
+        keysToRemove.forEach((key) => {
+          delete next[key];
+        });
+        return next;
+      });
     }, CHECK_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [updateDatabases]);
 
   // Cleanup on tab visibility change (keep playground persistent)
   useEffect(() => {
@@ -209,15 +236,5 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     <DatabaseContext.Provider value={value}>
       {children}
     </DatabaseContext.Provider>
-  );
-}
-
-// Helper function to extract table names from schema
-function getTableNamesFromSchema(schema: string): string[] {
-  const matches = schema.match(/CREATE TABLE (\w+)/gi);
-  if (!matches) return [];
-
-  return matches.map(match =>
-    match.replace(/CREATE TABLE /i, '').trim()
   );
 }
