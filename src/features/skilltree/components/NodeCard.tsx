@@ -119,12 +119,12 @@ export function NodeCard({
         }}
       />
 
-      {/* Text label */}
+      {/* Text label and clickable overlay */}
       <Element
         position={positionData.position}
         anchor={[0, 0]}
         passive={false}
-        style={{ opacity: nodeOpacity }}
+        style={{ opacity: nodeOpacity, cursor: "pointer" }}
       >
         <div
           style={{
@@ -134,9 +134,10 @@ export function NodeCard({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            pointerEvents: "none",
+            pointerEvents: "auto",
             textAlign: "center",
             fontWeight: 500,
+            cursor: "pointer",
           }}
         >
           <div
