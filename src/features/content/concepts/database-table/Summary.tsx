@@ -1,4 +1,4 @@
-import { Page, Section, Par, Warning, Info, Term } from '@/components';
+import { Box, Typography } from '@mui/material';
 
 export function Summary() {
   return <Page>

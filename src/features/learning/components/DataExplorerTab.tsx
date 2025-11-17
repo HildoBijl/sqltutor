@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -17,10 +17,11 @@ import {
 import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/shared/components/DataTable';
 import { useDatabase } from '@/shared/hooks/useDatabase';
-import { buildSchema, resolveDatasetSize, resolveSkillTables } from '@/features/database/schemas';
+import type { SchemaKey } from '@/features/database/schemas';
+import { schemas } from '@/features/database/schemas';
 
 interface DataExplorerTabProps {
-  skillId: string;
+  schema: SchemaKey;
 }
 
 interface TableInfo {
@@ -44,25 +45,19 @@ interface Relationship {
   toColumn: string;
 }
 
-export function DataExplorerTab({ skillId }: DataExplorerTabProps) {
+export function DataExplorerTab({ schema }: DataExplorerTabProps) {
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [isErDiagramOpen, setIsErDiagramOpen] = useState(false);
-
-  const resolvedTables = useMemo(() => resolveSkillTables('display', skillId), [skillId]);
-  const resolvedSize = useMemo(() => resolveDatasetSize('display', skillId), [skillId]);
-  const schemaSource = useMemo(
-    () => buildSchema({ tables: resolvedTables, size: resolvedSize }),
-    [resolvedTables, resolvedSize],
-  );
   
   const { tableNames, executeQuery, queryResult } = useDatabase({
-    role: 'display',
-    skillId,
+    context: 'concept',
+    schema,
     resetOnSchemaChange: false,
+    persistent: true,
   });
 
   // Parse schema to extract table information
-  const tableInfo = useMemo(() => parseSchemaForERDiagram(schemaSource || ''), [schemaSource]);
+  const tableInfo = parseSchemaForERDiagram(schemas[schema] || '');
   
   useEffect(() => {
     if (tableNames.length === 0) {

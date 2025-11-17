@@ -17,7 +17,6 @@ export function List({ items, useNumbers = false, sx, itemSx }: ListProps) {
     sx={{
       textAlign: 'justify',
       listStyleType: useNumbers ? 'decimal' : 'disc',
-      paddingY: 0,
       paddingLeft: 3,
       ...sx,
     }}
@@ -27,7 +26,7 @@ export function List({ items, useNumbers = false, sx, itemSx }: ListProps) {
         key={index}
         sx={{
           display: 'list-item',
-          paddingY: 0.3,
+          paddingY: 0.2,
           paddingLeft: 0,
           ...itemSx,
         }}

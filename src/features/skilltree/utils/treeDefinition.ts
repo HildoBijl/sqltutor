@@ -1,7 +1,7 @@
 import { contentItems } from "@/features/content";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
-import { cardWidth, cardHeight } from "./settings";
+import { cardHeight, cardWidth} from "./settings";
 import { computeConnectorPath } from "./pathCalculations";
 
 export interface ContentPositionMetaRaw {
@@ -41,7 +41,7 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 
 	// Database table manipulation.
 	'projection-and-filtering': { position: { x: x4, y: y3 } },
-	'foreign-key': { position: { x: x5, y: y4 } },
+	'inner-and-outer-join': { position: { x: x5, y: y4 } },
 	'join-and-decomposition': { position: { x: x5, y: y5 } },
 	'aggregation': { position: { x: x6, y: y4 } },
 
@@ -63,7 +63,6 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	// 'use-dynamic-aggregation': { position: { x: x6, y: y6 } },
 
 	// Multi-table SQL querying.
-	'write-look-up-query': { position: { x: x3, y: y6 } },
 	'join-tables': { position: { x: x4, y: y6 } },
 	'write-multi-table-query': { position: { x: (x3 + x4) / 2, y: y7 } },
 	'write-multi-layered-query': { position: { x: (x3 + x4) / 2, y: y8 } },

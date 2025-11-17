@@ -12,12 +12,6 @@ export function Link({ to, children, ...props }: LinkProps) {
     target="_blank"
     rel="noopener noreferrer"
     {...props}
-    sx={{
-      ...(props.sx || {}),
-      fontWeight: 500,
-      textDecoration: 'none',
-      '&:hover': { textDecoration: 'none' },
-    }}
   >
     {children}
   </MuiLink>;

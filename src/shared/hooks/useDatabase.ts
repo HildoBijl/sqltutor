@@ -1,15 +1,6 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { useDatabaseContext } from '@/shared/providers/DatabaseProvider';
-import {
-  buildSchema,
-  getTablesForSchema,
-  resolveDatasetSize,
-  resolveSkillTables,
-  type DatabaseRole,
-  type DatasetSize,
-  type SchemaKey,
-  type TableKey,
-} from '@/features/database/schemas';
+import { useState, useCallback, useEffect } from 'react';
+import { useDatabaseContext, DatabaseContextType } from '@/shared/providers/DatabaseProvider';
+import { schemas } from '@/features/database/schemas';
 
 export interface QueryResult {
   columns: string[];
@@ -17,14 +8,10 @@ export interface QueryResult {
 }
 
 interface DatabaseOptions {
-  role: DatabaseRole;
-  skillId?: string;
-  schema?: SchemaKey;
-  tables?: TableKey[];
-  size?: DatasetSize;
-  cacheKey?: string;
+  context: DatabaseContextType;
+  schema?: keyof typeof schemas;
   resetOnSchemaChange?: boolean;
-  persistent?: boolean;
+  persistent?: boolean; // Only applies to playground context
 }
 
 interface UseDatabaseReturn {
@@ -42,14 +29,10 @@ interface UseDatabaseReturn {
 
 export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   const {
-    role,
-    skillId,
+    context,
     schema,
-    tables,
-    size,
-    cacheKey,
     resetOnSchemaChange = true,
-    persistent = false,
+    persistent = false
   } = options;
 
   const { databases: contextDatabases, getDatabase, resetDatabase: resetContextDatabase, isReady: contextReady } = useDatabaseContext();
@@ -67,54 +50,27 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     setQueryError(null);
   }, []);
 
-  const resolvedSize = useMemo(() => resolveDatasetSize(role, skillId, size), [role, skillId, size]);
-
-  const resolvedTables = useMemo(() => {
-    const sourceTables: TableKey[] | undefined = tables?.length
-      ? tables
-      : schema
-        ? getTablesForSchema(schema)
-        : resolveSkillTables(role, skillId);
-
-    const baseTables = (sourceTables && sourceTables.length > 0 ? sourceTables : ['companies']) as TableKey[];
-    const deduped = Array.from(new Set(baseTables));
-    return deduped as TableKey[];
-  }, [tables, schema, role, skillId]);
-
-  const resolvedSchema = useMemo(() => {
-    return buildSchema({ tables: resolvedTables, size: resolvedSize, role });
-  }, [resolvedTables, resolvedSize, role]);
-
-  const contextKey = useMemo(() => {
-    const base = cacheKey ?? `${role}:${skillId ?? 'global'}`;
-    const tablesSignature = resolvedTables.join('|');
-    return `${base}:size=${resolvedSize}:tables=${tablesSignature}`;
-  }, [cacheKey, role, skillId, resolvedTables, resolvedSize]);
+  // Determine which schema to use
+  const resolvedSchema = schema ? schemas[schema] : schemas.companies;
 
   // Update database when schema changes, provider DB instance changes, or context is ready
   useEffect(() => {
     if (!contextReady || !resolvedSchema) return;
 
     const schemaChanged = currentSchema !== resolvedSchema;
-    const providerEntry = contextDatabases[contextKey];
-    const providerDb = providerEntry?.instance ?? null;
+    const providerDb = contextDatabases[context];
     const shouldResetForSchema = resetOnSchemaChange && schemaChanged;
 
-    if (shouldResetForSchema && providerDb) {
+    if (shouldResetForSchema && contextDatabases[context]) {
       // Only reset early if there is an existing provider DB to close
-      resetContextDatabase(contextKey);
+      resetContextDatabase(context);
       setDatabase(null);
       return;
     }
 
     // If provider has no DB for this context, create it
     if (!providerDb) {
-      const db = getDatabase(contextKey, resolvedSchema, {
-        persistent,
-        role,
-        skillId,
-        size: resolvedSize,
-      });
+      const db = getDatabase(context, resolvedSchema);
       setDatabase(db);
       setCurrentSchema(resolvedSchema);
       setError(null);
@@ -159,11 +115,8 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     contextReady,
     resolvedSchema,
     currentSchema,
-    contextKey,
+    context,
     persistent,
-    role,
-    skillId,
-    resolvedSize,
     resetOnSchemaChange,
     getDatabase,
     resetContextDatabase,
@@ -174,7 +127,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   // Execute query function
   const executeQuery = useCallback(async (query: string): Promise<QueryResult[]> => {
     if (!database) {
-      throw new Error(`Database not ready for ${contextKey}`);
+      throw new Error(`Database not ready for ${context} context`);
     }
 
     setIsExecuting(true);
@@ -202,16 +155,16 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     } finally {
       setIsExecuting(false);
     }
-  }, [database, contextKey]);
+  }, [database, context]);
 
   // Reset current database
   const resetDatabase = useCallback(() => {
-    resetContextDatabase(contextKey);
+    resetContextDatabase(context);
     // Clear local ref so effect reinitializes a new DB instance
     setDatabase(null);
     clearQueryState();
     setError(null);
-  }, [contextKey, resetContextDatabase, clearQueryState]);
+  }, [context, resetContextDatabase, clearQueryState]);
 
   return {
     database,
@@ -228,20 +181,20 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
 }
 
 // Convenience hooks for specific contexts
-export function usePlaygroundDatabase(schema: SchemaKey = 'companiesAndPositions') {
+export function usePlaygroundDatabase(schema: keyof typeof schemas = 'companiesAndPositions') {
   return useDatabase({
-    role: 'display',
-    skillId: 'playground',
+    context: 'playground',
     schema,
     persistent: true,
     resetOnSchemaChange: true,
   });
 }
 
-export function useConceptDatabase(schema: SchemaKey = 'companies') {
+export function useConceptDatabase(schema: keyof typeof schemas = 'companies') {
   return useDatabase({
-    role: 'theory',
+    context: 'concept',
     schema,
     resetOnSchemaChange: true,
+    persistent: false,
   });
 }

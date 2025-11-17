@@ -1,4 +1,3 @@
-import type { SVGProps, CanvasHTMLAttributes } from 'react';
 import type { Vector, Rectangle } from '@/utils';
 
 import { type FigureProps, type FigureData, getDefaultFigure } from '../Figure';
@@ -24,10 +23,7 @@ export interface DrawingProps<TRef = DrawingData> extends Omit<FigureProps<TRef>
 	height: number;
 	autoScale?: boolean;
 	useSvg?: boolean;
-	svgProps?: SVGProps<SVGSVGElement>;
-	disableSVGPointerEvents?: boolean;
 	useCanvas?: boolean;
-	canvasProps?: CanvasHTMLAttributes<HTMLCanvasElement>;
 }
 
 export const getDefaultDrawing = (): DrawingProps => {

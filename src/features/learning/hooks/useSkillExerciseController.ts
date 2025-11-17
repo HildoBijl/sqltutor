@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import type { SchemaKey } from '@/features/database/schemas';
 import type { ExecutionResult as SqlExecutionResult } from '@/features/content/types';
 import type { SkillComponentState } from '@/store';
 import { useDatabase } from '@/shared/hooks/useDatabase';
@@ -19,6 +20,7 @@ const normalizeForHistory = (value: string) =>
 interface UseSkillExerciseControllerParams {
   skillId: string;
   skillModule: SkillExerciseModuleLike | null;
+  schema: SchemaKey;
   requiredCount: number;
   componentState: SkillComponentState;
   setComponentState: (
@@ -79,37 +81,27 @@ interface SkillExerciseControllerState {
 export function useSkillExerciseController({
   skillId,
   skillModule,
+  schema,
   requiredCount,
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
   const {
-    executeQuery: executeDisplayQuery,
+    database,
+    executeQuery,
     queryResult,
     queryError,
-    isReady: displayDbReady,
+    isReady: dbReady,
     isExecuting,
     tableNames,
-    resetDatabase: resetDisplayDatabase,
+    resetDatabase,
     clearQueryState,
   } = useDatabase({
-    role: 'display',
-    skillId,
+    context: 'exercise',
+    schema,
     resetOnSchemaChange: true,
+    persistent: false,
   });
-
-  const {
-    database: gradingDatabase,
-    executeQuery: executeGradingQuery,
-    isReady: gradingDbReady,
-    resetDatabase: resetGradingDatabase,
-  } = useDatabase({
-    role: 'grading',
-    skillId,
-    resetOnSchemaChange: true,
-  });
-
-  const dbReady = displayDbReady && gradingDbReady;
 
   const {
     progress: exerciseProgress,
@@ -167,10 +159,9 @@ export function useSkillExerciseController({
 
   useEffect(() => {
     return () => {
-      resetDisplayDatabase();
-      resetGradingDatabase();
+      resetDatabase();
     };
-  }, [resetDisplayDatabase, resetGradingDatabase]);
+  }, [resetDatabase]);
 
   useEffect(() => {
     if (!dbReady || !skillModule) return;
@@ -191,13 +182,13 @@ export function useSkillExerciseController({
       }
 
       try {
-        await executeDisplayQuery(liveQuery);
+        await executeQuery(liveQuery);
         setHasExecutedQuery(true);
       } catch (error) {
         console.debug('Live query execution failed:', error);
       }
     },
-    [clearQueryState, dbReady, exerciseCompleted, currentExercise, executeDisplayQuery, updateFeedback],
+    [clearQueryState, dbReady, exerciseCompleted, currentExercise, executeQuery, updateFeedback],
   );
 
   const handleExecute = useCallback(
@@ -265,7 +256,7 @@ export function useSkillExerciseController({
       try {
         let execution: SqlExecutionResult;
         try {
-          const output = await executeDisplayQuery(effectiveQuery);
+          const output = await executeQuery(effectiveQuery);
           execution = { success: true, output };
         } catch (error: any) {
           const err = error instanceof Error ? error : new Error(String(error));
@@ -286,7 +277,7 @@ export function useSkillExerciseController({
           return;
         }
 
-        if (!gradingDatabase) {
+        if (!database) {
           updateFeedback(
             {
               message: 'Database is not ready for verification. Please try again in a moment.',
@@ -297,33 +288,8 @@ export function useSkillExerciseController({
           return;
         }
 
-        let gradingExecution: SqlExecutionResult;
-        try {
-          const gradingOutput = await executeGradingQuery(effectiveQuery);
-          gradingExecution = { success: true, output: gradingOutput };
-        } catch (error: any) {
-          const err = error instanceof Error ? error : new Error(String(error));
-          gradingExecution = { success: false, error: err };
-        }
-
-        if (!gradingExecution.success || !gradingExecution.output) {
-          updateFeedback(
-            {
-              message:
-                gradingExecution.error?.message ??
-                'Unable to verify results because the grading database query failed.',
-              type: 'error',
-            },
-            { normalizedQuery: normalized },
-          );
-          return;
-        }
-
-        const verification = skillModule!.verifyOutput!(
-          currentExercise,
-          gradingExecution.output,
-          gradingDatabase,
-        );
+        const outputForVerification = execution.output ?? [];
+        const verification = skillModule!.verifyOutput!(currentExercise, outputForVerification, database);
 
         recordAttempt({
           input: effectiveQuery,
@@ -385,15 +351,14 @@ export function useSkillExerciseController({
       exerciseDispatch,
       skillModule,
       skillId,
-      executeDisplayQuery,
+      executeQuery,
       recordAttempt,
+      database,
       componentState.numSolved,
       requiredCount,
       queueComponentStateUpdate,
       hasGivenUp,
       updateFeedback,
-      executeGradingQuery,
-      gradingDatabase,
     ],
   );
 

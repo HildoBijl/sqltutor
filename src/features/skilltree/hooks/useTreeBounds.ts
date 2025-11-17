@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ContentPositionMeta, treeHeight, treeWidth } from "../utils/treeDefinition";
+import { ContentPositionMeta } from "../utils/treeDefinition";
 
 // Constants for card dimensions and tree padding (unused in hardcoded version)
 // const CARD_WIDTH = 160;
@@ -17,12 +17,12 @@ export function useTreeBounds(contentPositions: Record<string, ContentPositionMe
   return useMemo(() => {
     // Hardcoded bounds for testing
     return {
-      minX: 0,
+      minX: -200,
       minY: 0,
-      maxX: treeWidth,
-      maxY: treeHeight,
-      width: treeWidth,
-      height: treeHeight
+      maxX: 1800,
+      maxY: 1200,
+      width: 1800,
+      height: 1200
     };
 
     // Original dynamic calculation (commented out)

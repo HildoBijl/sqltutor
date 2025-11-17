@@ -3,7 +3,6 @@ export * from './Par';
 export * from './Page';
 export * from './Section';
 export * from './Term';
-export * from './Em';
 export * from './Link';
 export * from './List';
 export * from './Info';

@@ -1,10 +1,9 @@
-import { type ReactNode } from 'react';
 import { type BoxProps, Box } from '@mui/material';
 
 import { Head } from './Head';
 
-export type SectionProps = Omit<BoxProps, 'title'> & {
-	title?: ReactNode;
+export type SectionProps = BoxProps & {
+	title?: string;
 };
 
 export function Section({ title, children, ...props }: SectionProps) {

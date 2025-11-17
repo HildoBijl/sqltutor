@@ -25,7 +25,7 @@ const canvasStyle: CSSProperties = {
 };
 
 export function Drawing(props: DrawingProps) {
-	const { maxWidth, width, height, autoScale, useSvg, svgProps, disableSVGPointerEvents, useCanvas, canvasProps, ref, style, children, ...figureProps } = { ...getDefaultDrawing(), ...props };
+	const { maxWidth, width, height, autoScale, useSvg, useCanvas, ref, style, children, ...figureProps } = { ...getDefaultDrawing(), ...props };
 	if (!useSvg && !useCanvas)
 		throw new Error('Drawing error: cannot generate a drawing without either an SVG or a canvas present.');
 
@@ -79,14 +79,10 @@ export function Drawing(props: DrawingProps) {
 	return <DrawingContext.Provider value={drawingData}>
 		<Figure ref={figureRef} aspectRatio={aspectRatio} maxWidth={figureMaxWidth} {...figureProps} innerProps={{ style: { zIndex: 0, ...(figureProps?.innerProps?.style || {}) }, ...(figureProps?.innerProps || {}) }}>
 			{/* Containers that portals can place elements into. */}
-			{useSvg ? <svg ref={svgRef} viewBox={`0 0 ${width} ${height}`} style={{
-				...svgStyle,
-				...(disableSVGPointerEvents ? { pointerEvents: 'none' } : {}),
-				...(svgProps?.style || {}),
-			}} {...svgProps}>
+			{useSvg ? <svg ref={svgRef} viewBox={`0 0 ${width} ${height}`} style={svgStyle}>
 				<defs ref={svgDefsRef} />
 			</svg> : null}
-			{useCanvas ? <canvas ref={canvasRef} width={width} height={height} style={{ ...canvasStyle, ...(canvasProps?.style || {}) }} {...canvasProps} /> : null}
+			{useCanvas ? <canvas ref={canvasRef} width={width} height={height} style={canvasStyle} /> : null}
 			<div ref={htmlContentsRef} />
 			{children}
 

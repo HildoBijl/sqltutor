@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Button, Alert } from '@mui/material';
-import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
+import { CheckCircle, School, Lightbulb, MenuBook, Bolt, OndemandVideo } from '@mui/icons-material';
 
 import { useAppStore, type ConceptComponentState } from '@/store';
 import { contentIndex, type ContentMeta } from '@/features/content';
@@ -25,7 +25,7 @@ export default function ConceptPage() {
   const allTabs: TabConfig[] = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
-    // { key: 'video', label: 'Video', icon: <OndemandVideo /> },
+    { key: 'video', label: 'Video', icon: <OndemandVideo /> },
     { key: 'summary', label: 'Summary', icon: <Bolt /> },
   ];
 
