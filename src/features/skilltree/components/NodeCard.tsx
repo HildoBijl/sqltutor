@@ -6,7 +6,7 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
-import { useTheme } from "@mui/material/";
+import { useTheme, ButtonBase } from "@mui/material/";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -20,6 +20,7 @@ interface NodeCardProps {
   readyToLearn?: boolean;
   isPrerequisite?: boolean;
   isSomethingHovered?: boolean;
+  onClick?: () => void;
 }
 
 export function NodeCard({
@@ -30,10 +31,21 @@ export function NodeCard({
   readyToLearn = false,
   isPrerequisite = false,
   isSomethingHovered = false,
+  onClick,
 }: NodeCardProps) {
   const theme = useTheme();
   const type = item.type;
   const cornerRadius = type === "concept" ? 4 : 12;
+
+  const handleClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    // Wait for animation to complete before calling onClick
+    setTimeout(() => {
+      if (onClick) {
+        onClick();
+      }
+    }, 200);
+  };
 
   // Calculate rectangle bounds from position (top-left corner)
   const rectStart = new Vector(
@@ -124,36 +136,57 @@ export function NodeCard({
         position={positionData.position}
         anchor={[0, 0]}
         passive={false}
-        style={{ opacity: nodeOpacity, cursor: "pointer" }}
+        style={{ opacity: nodeOpacity }}
       >
-        <div
-          style={{
+        <ButtonBase
+          onClick={handleClick}
+          focusRipple
+          centerRipple
+          sx={{
             width: cardWidth,
             height: cardHeight,
             position: "relative",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            pointerEvents: "auto",
             textAlign: "center",
-            fontWeight: 500,
             cursor: "pointer",
+            borderRadius: `${cornerRadius}px`,
+            "&:hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.04)",
+            },
+          }}
+          TouchRippleProps={{
+            style: {
+              opacity: 0.3,
+            },
           }}
         >
           <div
             style={{
-              position: "absolute",
-              top: -10,
-              left: -5,
-              width: iconSize,
-              height: iconSize,
-              backgroundColor: theme.palette.background.paper,
-              borderRadius: "50%",
+              width: cardWidth,
+              height: cardHeight,
+              position: "relative",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              pointerEvents: "none",
             }}
           >
+            <div
+              style={{
+                position: "absolute",
+                top: -10,
+                left: -5,
+                width: iconSize,
+                height: iconSize,
+                backgroundColor: theme.palette.background.paper,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
             {type === "concept" ? (
               <MenuBookIcon
                 style={{
@@ -197,11 +230,13 @@ export function NodeCard({
               width: cardWidth - 20,
               textAlign: "center",
               fontWeight: 500,
+              fontSize: "15px",
             }}
           >
             {item.name}
           </div>
         </div>
+      </ButtonBase>
       </Element>
     </>
   );
