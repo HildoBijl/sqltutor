@@ -4,7 +4,7 @@ import useResizeObserver from '@react-hook/resize-observer';
 import { getWindowSize } from '../dom';
 
 import { useConsistentValue } from './consistency';
-import { useEventListener, useDebouncedFunction } from './events';
+import { useEventListener } from './events';
 
 // When the window or given element resizes, the given function is called.
 export function useResizeListener(
@@ -45,9 +45,7 @@ export function useBoundingClientRects(elements: (Element | Text | null | undefi
 	}, [stableElements]);
 
 	// Get a debounced updater.
-	const updateElementPosition = useDebouncedFunction(() => {
-		setRects(getRects());
-	}, 0);
+	const updateElementPosition = useCallback(() => setRects(getRects()), [setRects, getRects]);
 
 	// Update when elements change.
 	useEffect(() => {

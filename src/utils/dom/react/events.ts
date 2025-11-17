@@ -86,17 +86,16 @@ export function useRefWithEventListeners<T extends HTMLElement = HTMLElement, H 
 
 // Turn a function into a debounced function: even if the debounced function is called multiple times quickly, the original function is only called once per delay window.
 export function useDebouncedFunction<T extends (...args: any[]) => void>(
-  func: T,
-  delay: number = 0,
+	func: T,
+	delay: number = 0,
 ): (...args: Parameters<T>) => void {
-  const funcRef = useLatest(func);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  return useStableCallback((...args: Parameters<T>) => {
-    if (timeoutRef.current === undefined) {
-      timeoutRef.current = setTimeout(() => {
-        funcRef.current(...args);
-        timeoutRef.current = undefined;
-      }, delay);
-    }
-  }, [funcRef, delay]);
+	const funcRef = useLatest(func);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+	return useStableCallback((...args: Parameters<T>) => {
+		if (timeoutRef.current !== undefined)
+			clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(() => {
+			funcRef.current(...args);
+		}, delay);
+	}, [funcRef, delay]);
 }

@@ -30,7 +30,7 @@ export function ContentHeader({
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <Button startIcon={<ArrowBack />} onClick={onBack} sx={{ mr: 2 }}>
           Back to Learning
         </Button>
@@ -78,8 +78,8 @@ export function ContentHeader({
       </Box>
 
       {description && (
-        <Box sx={{ mb: 2, pl: 2 }}>
-          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem' }}>
+        <Box sx={{ mb: 3, pl: 0.5 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
             {description}
           </Typography>
         </Box>

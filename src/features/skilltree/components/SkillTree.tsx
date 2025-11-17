@@ -1,6 +1,4 @@
 import { type RefObject, type ReactNode, useState, useEffect } from "react";
-import { useTransformContext } from "react-zoom-pan-pinch";
-import { useDebouncedFunction } from "@/utils/dom";
 import type { Vector } from "@/utils/geometry";
 import {
   Drawing,
@@ -12,6 +10,8 @@ import { ContentMeta } from "@/features/content";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
+import { useTransformContext } from "react-zoom-pan-pinch";
+import { useDebouncedFunction } from "@/utils/dom";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -289,3 +289,4 @@ function Tooltip({ children }: TooltipProps) {
     </Element>
   );
 }
+

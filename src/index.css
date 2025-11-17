@@ -177,7 +177,6 @@ pre {
   border-radius: 8px;
   border: 1px solid var(--color-divider);
   overflow-x: auto;
-  margin: 1rem 0;
 }
 
 pre code {

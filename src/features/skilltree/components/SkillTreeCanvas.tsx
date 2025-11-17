@@ -1,6 +1,7 @@
 import { RefObject } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
+import { useDebouncedFunction } from "@/utils/dom";
 import { ContentMeta } from "@/features/content";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
@@ -56,6 +57,8 @@ export function SkillTreeCanvas({
 }: SkillTreeCanvasProps) {
   const theme = useTheme();
 
+  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
+
   return (
     <div
       style={{
@@ -84,6 +87,7 @@ export function SkillTreeCanvas({
           velocityDisabled: false,
           excluded: ["a", "button", "input"],
         }}
+        onTransformed={dispatchScrollEvent}
       >
         {({ zoomIn, zoomOut, resetTransform, centerView }) => (
           <div style={{ position: "relative", width: "100%", height: "100%" }}>
