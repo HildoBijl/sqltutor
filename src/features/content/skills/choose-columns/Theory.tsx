@@ -12,7 +12,7 @@ FROM companies;`}</SQLDisplay></Info>
       <Warning>It is strongly recommended to always pick column and table names that have no spaces and are in lower case. If you really want to deviate from this, you need to wrap the names in double quotation marks, like <SQLDisplay inline>SELECT "Num Employees" FROM companies;</SQLDisplay> or similar. For proper column names these quotation marks are allowed but unnecessary.</Warning>
     </Section>
 
-    <Section title="Selecting unique values">
+    <Section title="Select unique values">
       <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is possible, but it is not a good habit. When you select columns, it often does occur that you get duplicate rows. To filter those out, add the keyword <SQLDisplay inline>DISTINCT</SQLDisplay> right after <SQLDisplay inline>SELECT</SQLDisplay>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
       <Info>ToDo: add figure where we use distinct. <SQLDisplay>{`SELECT DISTINCT industry
 FROM companies;`}</SQLDisplay></Info>
