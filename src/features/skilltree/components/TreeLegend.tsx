@@ -23,7 +23,6 @@ export function TreeLegend() {
           p: 2,
           backgroundColor: "background.paper",
           borderRadius: 2,
-          boxShadow: 2,
         }}
       >
         <Typography variant="subtitle2" fontWeight={600}>

@@ -181,6 +181,9 @@ SkillTreeProps) {
       if (bothCompleted) {
         return "#4CAF50";
       }
+      if (isNextToLearn) {
+      return "#FFD700";
+    }
       return "#E84421";
     }
     // No hover active
