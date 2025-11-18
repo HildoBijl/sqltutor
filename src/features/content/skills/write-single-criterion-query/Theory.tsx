@@ -28,7 +28,7 @@ WHERE industry='Consulting;`}</SQLDisplay></Warning>
         <>If we specifically want <Term>unique values</Term>, add <SQLDisplay inline>DISTINCT</SQLDisplay>. For the example, we indeed need this.</>
       ]} />
       <Par>Note that the steps above are not in the order in which the query is eventually written. The start of the query (the <SQLDisplay inline>SELECT</SQLDisplay> part) is usually only added at the end. Starting with <SQLDisplay inline>FROM</SQLDisplay>, continuing with <SQLDisplay inline>WHERE</SQLDisplay> and ending up with <SQLDisplay inline>SELECT</SQLDisplay> is a very normal way of writing queries.</Par>
-      <Info>Sadly SQL does not allow another keyword order. It requires the action <SQLDisplay inline>SELECT</SQLDisplay> to be at the start. So the query <SQLDisplay inline>FROM companies WHERE industry='Consulting' SELECT DISINCT country</SQLDisplay> is not valid.</Info>
+      <Info>Sadly SQL does not allow another keyword order. It requires the action <SQLDisplay inline>SELECT</SQLDisplay> to be at the start. The query <SQLDisplay inline>FROM companies WHERE industry='Consulting' SELECT DISINCT country</SQLDisplay> is not valid.</Info>
     </Section>
   </Page >;
 }
