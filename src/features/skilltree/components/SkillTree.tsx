@@ -181,6 +181,9 @@ SkillTreeProps) {
       if (bothCompleted) {
         return "#4CAF50";
       }
+      if (isNextToLearn) {
+      return "#FFD700";
+    }
       return "#E84421";
     }
     // No hover active
@@ -236,8 +239,6 @@ SkillTreeProps) {
               key={item.id}
               onMouseEnter={() => handleHoverStart(item.id)}
               onMouseLeave={handleHoverEnd}
-              onClick={() => handleNodeClick(item)}
-              style={{ cursor: "pointer" }}
             >
               <NodeCard
                 item={item}
@@ -247,6 +248,7 @@ SkillTreeProps) {
                 readyToLearn={readyToLearn}
                 isPrerequisite={prerequisites.has(item.id)}
                 isSomethingHovered={localHoveredId !== null}
+                onClick={() => handleNodeClick(item)}
               />
             </g>
           );
@@ -264,19 +266,23 @@ interface TooltipProps {
 }
 function Tooltip({ children }: TooltipProps) {
   const mousePosition = useDrawingMousePosition();
+  const theme = useTheme();
+
   if (!children || !mousePosition) return null;
+
   return (
     <Element anchor={[-1, -1]} position={mousePosition.add([20, 10])}>
       <div
         style={{
-          border: "1px solid #ccc",
-          backgroundColor: "rgba(255, 255, 255, 0.75)",
-          color: "black",
+          border: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
           padding: "8px 12px",
           borderRadius: "4px",
           fontSize: "14px",
           maxWidth: "300px",
           zIndex: 1000,
+          boxShadow: theme.shadows[4],
         }}
       >
         {children}

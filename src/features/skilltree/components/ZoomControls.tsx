@@ -39,7 +39,7 @@ export function ZoomControls({
         gap: 1,
         backgroundColor: "background.paper",
         borderRadius: 2,
-        boxShadow: 2,
+        // boxShadow: 2,
         p: 1,
       }}
     >
