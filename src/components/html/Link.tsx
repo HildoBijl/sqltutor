@@ -7,10 +7,11 @@ export type LinkProps = MuiLinkProps & {
 };
 
 export function Link({ to, children, ...props }: LinkProps) {
+  const external = (to[0] !== '/');
   return <MuiLink
     href={to}
-    target="_blank"
-    rel="noopener noreferrer"
+    target={external ? '_blank' : 'self'}
+    rel={external ? 'noopener noreferrer' : ''}
     {...props}
     sx={{
       ...(props.sx || {}),

@@ -224,3 +224,7 @@ export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplay
     </Box>
   );
 }
+
+export function ISQL(props: SQLDisplayProps) {
+  return <SQLDisplay {...props} inline />
+}
