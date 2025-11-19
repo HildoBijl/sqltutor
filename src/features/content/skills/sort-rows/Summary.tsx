@@ -16,7 +16,7 @@ export function Summary() {
       <Par>To sort rows in tables, and/or limit the number of given rows, there is a variety of options we can add to the end of an SQL query.</Par>
       <MainFigure />
     </Section>
-  </Page>
+  </Page>;
 }
 
 const query = `
@@ -91,5 +91,5 @@ function MainFigure() {
         <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
       </Box>
     </Element>
-  </Drawing>
+  </Drawing>;
 }

@@ -3,7 +3,9 @@ import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
-    <Par>We know how we can retrieve an entire table in <Term>SQL</Term>, but how do we select only a few of the columns? We'll study the commands needed for it and the options that can be added.</Par>
+    <Section>
+      <Par>We know how we can retrieve an entire table in <Term>SQL</Term>, but how do we select only a few of the columns? We'll study the commands needed for it and the options that can be added.</Par>
+    </Section>
 
     <Section title="Select columns (projection)">
       <Par>To retrieve all columns from a table, we use <SQLDisplay inline>SELECT *</SQLDisplay> which means "select all". If we only want to select certain columns (apply <Term>projection</Term>) then we have to specify the column names, separated by commas.</Par>
@@ -12,7 +14,7 @@ FROM companies;`}</SQLDisplay></Info>
       <Warning>It is strongly recommended to always pick column and table names that have no spaces and are in lower case. If you really want to deviate from this, you need to wrap the names in double quotation marks, like <SQLDisplay inline>SELECT "Num Employees" FROM companies;</SQLDisplay> or similar. For proper column names these quotation marks are allowed but unnecessary.</Warning>
     </Section>
 
-    <Section title="Selecting unique values">
+    <Section title="Select unique values">
       <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is possible, but it is not a good habit. When you select columns, it often does occur that you get duplicate rows. To filter those out, add the keyword <SQLDisplay inline>DISTINCT</SQLDisplay> right after <SQLDisplay inline>SELECT</SQLDisplay>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
       <Info>ToDo: add figure where we use distinct. <SQLDisplay>{`SELECT DISTINCT industry
 FROM companies;`}</SQLDisplay></Info>

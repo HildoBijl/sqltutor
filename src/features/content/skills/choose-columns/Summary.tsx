@@ -19,5 +19,5 @@ FROM companies;`}</SQLDisplay></Warning>
 FROM companies AS c;`}</SQLDisplay></Warning>
       <Info>Ideally table/column names are without spaces and in lower case. If you deviate from this (not recommended) then you may use double quotation marks to make this work, like in <SQLDisplay inline>SELECT "Num Employees" FROM companies;</SQLDisplay>. For regular column names, double quotation marks are optional and unnecessary.</Info>
     </Section>
-  </Page>
+  </Page>;
 }
