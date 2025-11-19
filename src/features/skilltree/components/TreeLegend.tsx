@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { MenuBook, EditNote } from "@mui/icons-material";
+import { EditNote, School } from "@mui/icons-material";
 
 
 /*
@@ -41,7 +41,7 @@ export function TreeLegend() {
               justifyContent: "center",
             }}
           >
-            <MenuBook fontSize="small" color="action" />
+            <School fontSize="small" color="action" />
           </Box>
           <Typography variant="body2">Concept</Typography>
         </Box>

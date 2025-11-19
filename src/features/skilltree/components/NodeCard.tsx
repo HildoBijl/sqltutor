@@ -3,9 +3,9 @@ import { Rectangle, Element } from "@/components/figures";
 import { ContentMeta } from "@/features/content";
 import { cardWidth, cardHeight } from "../utils/settings";
 import { ContentPositionMeta } from "../utils/treeDefinition";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
 
 /*
@@ -193,7 +193,7 @@ export function NodeCard({
               }}
             >
               {type === "concept" ? (
-                <MenuBookIcon
+                <School
                   style={{
                     fontSize: iconSize,
                     color: completed ? "#757575" : "#616161",

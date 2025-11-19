@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
@@ -56,6 +56,7 @@ export function SkillTreeCanvas({
   nodeRefs,
 }: SkillTreeCanvasProps) {
   const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
+  const [isPanning, setIsPanning] = useState(false);
 
   const theme = useTheme();
 
@@ -102,10 +103,16 @@ export function SkillTreeCanvas({
               wrapperStyle={{
                 width: "100%",
                 height: "100%",
+                cursor: isPanning ? "grabbing" : "grab",
               }}
               contentStyle={{
                 width: "100%",
                 height: "100%",
+              }}
+              wrapperProps={{
+                onMouseDown: () => setIsPanning(true),
+                onMouseUp: () => setIsPanning(false),
+                onMouseLeave: () => setIsPanning(false),
               }}
             >
               <SkillTree
