@@ -15,7 +15,7 @@ export function Summary() {
       <ProjectionAndFiltering />
       <Par>Other operations include renaming columns, copying columns, and applying an operation to all the values in a column.</Par>
     </Section>
-  </Page>
+  </Page>;
 }
 
 function ProjectionAndFiltering() {

@@ -12,5 +12,5 @@ WHERE num_employees > 200000
 `}</code></pre></Par>
       <Par>The <Term>query language</Term> describes the exact way in which a query has to be set up. Every DBMS has its own query language, although the most commonly used databases use (some dialect of) the query language SQL.</Par>
     </Section>
-  </Page>
+  </Page>;
 }

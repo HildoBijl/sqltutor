@@ -3,7 +3,9 @@ import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
-    <Par>We know how we can select the columns from a table (<Term>projection</Term>, possibly coupled with <Term>renaming</Term>), and we know how to <Term>filter</Term> the rows based on some condition. If we combine these two skills, we can extract very specific data. Let's take a look at how we can do that.</Par>
+    <Section>
+      <Par>We know how we can select the columns from a table (<Term>projection</Term>, possibly coupled with <Term>renaming</Term>), and we know how to <Term>filter</Term> the rows based on some condition. If we combine these two skills, we can extract very specific data. Let's take a look at how we can do that.</Par>
+    </Section>
 
     <Section title="The steps for a specific example">
       <Par>Suppose that we specifically want a list of all countries having consultancy companies. To extract this data, we have to go through the following steps.</Par>
@@ -30,5 +32,5 @@ WHERE industry='Consulting;`}</SQLDisplay></Warning>
       <Par>Note that the steps above are not in the order in which the query is eventually written. The start of the query (the <SQLDisplay inline>SELECT</SQLDisplay> part) is usually only added at the end. Starting with <SQLDisplay inline>FROM</SQLDisplay>, continuing with <SQLDisplay inline>WHERE</SQLDisplay> and ending up with <SQLDisplay inline>SELECT</SQLDisplay> is a very normal way of writing queries.</Par>
       <Info>Sadly SQL does not allow another keyword order. It requires the action <SQLDisplay inline>SELECT</SQLDisplay> to be at the start. The query <SQLDisplay inline>FROM companies WHERE industry='Consulting' SELECT DISINCT country</SQLDisplay> is not valid.</Info>
     </Section>
-  </Page >;
+  </Page>;
 }

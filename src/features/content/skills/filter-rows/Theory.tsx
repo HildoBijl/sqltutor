@@ -7,7 +7,9 @@ export function Theory() {
   const time = now.toLocaleTimeString('en-GB', { hour12: false });
 
   return <Page>
-    <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by appending the query with the keyword <SQLDisplay inline>WHERE</SQLDisplay>, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
+    <Section>
+      <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by appending the query with the keyword <SQLDisplay inline>WHERE</SQLDisplay>, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
+    </Section>
 
     <Section title="Set up equality-based conditions">
       <Par>The most common filter is on equality: we want some row property to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <SQLDisplay inline>column_name = some_value</SQLDisplay>. We can for instance find all companies with exactly 200.000 employees.</Par>
@@ -24,6 +26,7 @@ export function Theory() {
     <Section title="Set up larger/smaller than conditions">
       <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <SQLDisplay inline>{`>`}</SQLDisplay> for <Term>larger than</Term> and <SQLDisplay inline>{`<`}</SQLDisplay> for <Term>smaller than</Term>. We could for instance find all companies having <Em>more</Em> than 200.000 employees.</Par>
       <Warning>ToDo: add integer comparison figure.</Warning>
+      <Info>You use <SQLDisplay inline>{`>=`}</SQLDisplay> for <Term>larger than or equal to</Term> and you use <SQLDisplay inline>{`<=`}</SQLDisplay> for <Term>smaller than or equal to</Term>. The = symbol that indicates "or equal" should always come at the end, and never at the start.</Info>
       <Par>This works similarly for text. SQL compares text lexicographically: whichever entry comes first in the dictionary is considered smaller. So one way to find all companies starting with an A is the following.</Par>
       <Warning>ToDo: add text comparison figure.</Warning>
       <Par>For dates/times, the comparison is done using earlier/later than. Earlier dates are considered smaller and later dates are considered larger.</Par>

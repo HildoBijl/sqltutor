@@ -3,7 +3,9 @@ import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
-    <Par>We know how we can retrieve an entire table in <Term>SQL</Term>, but how do we select only a few of the columns? We'll study the commands needed for it and the options that can be added.</Par>
+    <Section>
+      <Par>We know how we can retrieve an entire table in <Term>SQL</Term>, but how do we select only a few of the columns? We'll study the commands needed for it and the options that can be added.</Par>
+    </Section>
 
     <Section title="Select columns (projection)">
       <Par>To retrieve all columns from a table, we use <SQLDisplay inline>SELECT *</SQLDisplay> which means "select all". If we only want to select certain columns (apply <Term>projection</Term>) then we have to specify the column names, separated by commas.</Par>
