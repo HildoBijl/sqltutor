@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button } from '@mui/material';
 import { MenuBook, Lightbulb, Bolt, Edit, Storage } from '@mui/icons-material';
@@ -30,9 +31,9 @@ export default function SkillPage() {
     { key: 'story', label: 'Story', icon: <MenuBook /> },
     { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
     // { key: 'video', label: 'Video', icon: <OndemandVideo /> },
-    { key: 'summary', label: 'Summary', icon: <Bolt /> },
     { key: 'practice', label: 'Practice', icon: <Edit /> },
     { key: 'data', label: 'Data Explorer', icon: <Storage /> },
+    { key: 'summary', label: 'Summary', icon: <Bolt /> },
   ];
 
   const availableTabs = hideStories ? allTabs.filter((tab) => tab.key !== 'story') : allTabs;
@@ -58,6 +59,23 @@ export default function SkillPage() {
     setComponentState,
   });
 
+  const isSkillMastered = (componentState.numSolved || 0) >= REQUIRED_EXERCISE_COUNT;
+
+  const visibleTabs = useMemo(
+    () => (isSkillMastered ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
+    [isSkillMastered, tabs],
+  );
+
+  useEffect(() => {
+    if (!isSkillMastered && currentTab === 'summary') {
+      const fallbackTab =
+        tabs.find((tab) => tab.key === 'practice')?.key ??
+        tabs.find((tab) => tab.key !== 'summary')?.key ??
+        'practice';
+      selectTab(fallbackTab);
+    }
+  }, [currentTab, isSkillMastered, selectTab, tabs]);
+
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ py: 3, display: 'flex', justifyContent: 'center' }}>
@@ -76,8 +94,6 @@ export default function SkillPage() {
     );
   }
 
-  const isSkillMastered = (componentState.numSolved || 0) >= REQUIRED_EXERCISE_COUNT;
-
   const progressInfo =
     currentTab === 'practice'
       ? {
@@ -87,7 +103,7 @@ export default function SkillPage() {
       : undefined;
 
   const { practice, status, actions } = controller;
-  const showStoryButton = tabs.some((tab) => tab.key === 'story');
+  const showStoryButton = visibleTabs.some((tab) => tab.key === 'story');
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
@@ -106,8 +122,8 @@ export default function SkillPage() {
         </Alert>
       )}
 
-      {tabs.length > 0 && (
-        <ContentTabs value={currentTab} tabs={tabs} onChange={handleTabChange}>
+      {visibleTabs.length > 0 && (
+        <ContentTabs value={currentTab} tabs={visibleTabs} onChange={handleTabChange}>
           {currentTab === 'practice' && (
             <SkillPracticeTab
               practice={practice}
@@ -120,7 +136,7 @@ export default function SkillPage() {
 
           {currentTab === 'theory' && <TheoryTab contentId={skillMeta.id} />}
           {currentTab === 'video' && <VideoTab contentId={skillMeta.id} />}
-          {currentTab === 'summary' && <SummaryTab contentId={skillMeta.id} />}
+          {currentTab === 'summary' && isSkillMastered && <SummaryTab contentId={skillMeta.id} />}
           {currentTab === 'story' && <StoryTab contentId={skillMeta.id} />}
           {currentTab === 'data' &&
             (status.dbReady ? (

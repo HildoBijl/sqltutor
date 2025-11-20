@@ -14,16 +14,20 @@ export function ContentTabs({ value, tabs, onChange, children }: ContentTabsProp
     <Card>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
         <Tabs value={value} onChange={onChange}>
-          {tabs.map((tab) => (
-            <Tab
-              key={tab.key}
-              value={tab.key}
-              label={tab.label}
-              icon={tab.icon}
-              iconPosition={tab.icon ? 'start' : undefined}
-              disabled={tab.disabled}
-            />
-          ))}
+          {tabs.map((tab) => {
+            const isSummary = tab.key === 'summary';
+            return (
+              <Tab
+                key={tab.key}
+                value={tab.key}
+                label={tab.label}
+                icon={tab.icon}
+                iconPosition={tab.icon ? 'start' : undefined}
+                disabled={tab.disabled}
+                sx={isSummary ? { ml: 'auto' } : undefined}
+              />
+            );
+          })}
         </Tabs>
       </Box>
       <Box sx={{ p: 3 }}>

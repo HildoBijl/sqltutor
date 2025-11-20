@@ -31,15 +31,20 @@ export function CompletionDialog({
         }),
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 2 }}>
+      <DialogTitle component="div" sx={{ textAlign: 'center', pt: 4, pb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
           <EmojiEvents sx={{ fontSize: 48, color: 'success.main' }} />
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>
+        <Typography variant="h5" component="p" sx={{ fontWeight: 600 }}>
           Skill mastered
         </Typography>
         {skillName && (
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography
+            variant="subtitle1"
+            component="p"
+            color="text.secondary"
+            sx={{ mt: 0.5 }}
+          >
             {skillName}
           </Typography>
         )}

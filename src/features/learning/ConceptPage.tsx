@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
@@ -34,12 +34,30 @@ export default function ConceptPage() {
   const {
     currentTab,
     handleTabChange,
+    selectTab,
     tabs,
     componentState,
     setComponentState,
   } = useContentTabs<ConceptComponentState>(conceptId, 'concept', availableTabs, {
     defaultTab: 'theory',
   });
+
+  const isCompleted = componentState.understood ?? false;
+
+  const visibleTabs = useMemo(
+    () => (isCompleted ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
+    [isCompleted, tabs],
+  );
+
+  useEffect(() => {
+    if (!isCompleted && currentTab === 'summary') {
+      const fallbackTab =
+        tabs.find((tab) => tab.key === 'theory')?.key ??
+        tabs.find((tab) => tab.key !== 'summary')?.key ??
+        'theory';
+      selectTab(fallbackTab);
+    }
+  }, [currentTab, isCompleted, selectTab, tabs]);
 
   if (!conceptMeta) {
     return (
@@ -51,8 +69,6 @@ export default function ConceptPage() {
       </Container>
     );
   }
-
-  const isCompleted = componentState.understood ?? false;
 
   const handleComplete = () => {
     setComponentState({ understood: true });
@@ -71,11 +87,11 @@ export default function ConceptPage() {
         isCompleted={isCompleted}
       />
 
-      {tabs.length > 0 && (
-        <ContentTabs value={currentTab} tabs={tabs} onChange={handleTabChange}>
+      {visibleTabs.length > 0 && (
+        <ContentTabs value={currentTab} tabs={visibleTabs} onChange={handleTabChange}>
           {currentTab === 'theory' && <TheoryTab contentId={conceptMeta.id} />}
           {currentTab === 'video' && <VideoTab contentId={conceptMeta.id} />}
-          {currentTab === 'summary' && <SummaryTab contentId={conceptMeta.id} />}
+          {currentTab === 'summary' && isCompleted && <SummaryTab contentId={conceptMeta.id} />}
           {currentTab === 'story' && <StoryTab contentId={conceptMeta.id} />}
         </ContentTabs>
       )}
