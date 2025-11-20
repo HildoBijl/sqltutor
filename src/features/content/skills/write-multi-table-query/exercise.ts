@@ -19,7 +19,6 @@ type ScenarioId = 'multi-table-projects' | 'multi-table-active' | 'multi-table-h
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -32,7 +31,6 @@ export interface WriteMultiTableState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: WriteMultiTableState;
 }
 
@@ -61,7 +59,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'multi-table-projects',
-    description: MESSAGES.descriptions['multi-table-projects'],
     columns: ['name', 'project_name'],
     expectedRows: EMPLOYEE_PROJECTS.map((assignment) => {
       const employee = EMPLOYEE_LOOKUP.get(assignment.employee_id);
@@ -73,7 +70,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'multi-table-active',
-    description: MESSAGES.descriptions['multi-table-active'],
     columns: ['name', 'employee_name'],
     expectedRows: EMPLOYEE_PROJECTS.map((assignment) => {
       const employee = EMPLOYEE_LOOKUP.get(assignment.employee_id);
@@ -86,7 +82,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'multi-table-hours',
-    description: MESSAGES.descriptions['multi-table-hours'],
     columns: ['name', 'project_name', 'hours_allocated'],
     expectedRows: EMPLOYEE_PROJECTS.map((assignment) => {
       const employee = EMPLOYEE_LOOKUP.get(assignment.employee_id);
@@ -103,13 +98,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

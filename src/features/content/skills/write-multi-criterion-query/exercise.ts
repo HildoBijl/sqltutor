@@ -14,7 +14,6 @@ type ScenarioId = 'multi-criterion-europe' | 'multi-criterion-tech-regions' | 'm
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -27,7 +26,6 @@ export interface WriteMultiCriterionState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: WriteMultiCriterionState;
 }
 
@@ -55,7 +53,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'multi-criterion-europe',
-    description: MESSAGES.descriptions['multi-criterion-europe'],
     columns: ALL_COLUMNS,
     expectedRows: COMPANIES.filter(
       (company) =>
@@ -75,7 +72,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'multi-criterion-tech-regions',
-    description: MESSAGES.descriptions['multi-criterion-tech-regions'],
     columns: ALL_COLUMNS,
     expectedRows: COMPANIES.filter(
       (company) =>
@@ -95,7 +91,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'multi-criterion-older',
-    description: MESSAGES.descriptions['multi-criterion-older'],
     columns: ['company_name', 'country'],
     expectedRows: COMPANIES.filter(
       (company) =>
@@ -112,13 +107,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

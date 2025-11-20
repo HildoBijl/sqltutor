@@ -15,7 +15,6 @@ type ScenarioId = 'single-criterion-country' | 'single-criterion-founded' | 'sin
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -28,7 +27,6 @@ export interface WriteSingleCriterionState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: WriteSingleCriterionState;
 }
 
@@ -56,7 +54,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'single-criterion-country',
-    description: MESSAGES.descriptions['single-criterion-country'],
     columns: ['company_name', 'country'],
     expectedRows: COMPANIES.filter((company) => company.country === 'Netherlands')
       .map((company) => [company.company_name, company.country])
@@ -64,7 +61,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'single-criterion-founded',
-    description: MESSAGES.descriptions['single-criterion-founded'],
     columns: ALL_COLUMNS,
     expectedRows: COMPANIES.filter((company) => (company.founded_year ?? Number.MAX_SAFE_INTEGER) < 1980)
       .map((company) => [
@@ -79,7 +75,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'single-criterion-industry',
-    description: MESSAGES.descriptions['single-criterion-industry'],
     columns: ['company_name', 'num_employees'],
     expectedRows: COMPANIES.filter((company) => company.industry === 'Technology')
       .map((company) => [company.company_name, company.num_employees])
@@ -92,13 +87,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

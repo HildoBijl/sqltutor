@@ -17,7 +17,6 @@ interface FieldDescriptor {
 }
 
 interface ScenarioBuildResult {
-  description: string;
   fields: FieldDescriptor[];
 }
 
@@ -34,7 +33,6 @@ export interface ChooseColumnsState {
 
 export interface ExerciseState {
   id: ChooseColumnsState['scenario'];
-  description: string;
   state: ChooseColumnsState;
 }
 
@@ -63,7 +61,6 @@ const SCENARIOS: ScenarioDefinition[] = [
     id: 'choose-columns-basic',
     build() {
       return {
-        description: MESSAGES.descriptions['choose-columns-basic'],
         fields: [
           { column: 'company_name', property: 'company_name' },
           { column: 'industry', property: 'industry' },
@@ -75,7 +72,6 @@ const SCENARIOS: ScenarioDefinition[] = [
     id: 'choose-columns-alias',
     build() {
       return {
-        description: MESSAGES.descriptions['choose-columns-alias'],
         fields: [
           { column: 'company_name', property: 'company_name' },
           { column: 'employees', property: 'num_employees' },
@@ -87,7 +83,6 @@ const SCENARIOS: ScenarioDefinition[] = [
     id: 'choose-columns-location',
     build() {
       return {
-        description: MESSAGES.descriptions['choose-columns-location'],
         fields: [
           { column: 'company_name', property: 'company_name' },
           { column: 'country', property: 'country' },
@@ -100,7 +95,7 @@ const SCENARIOS: ScenarioDefinition[] = [
 
 export function generate(utils: Utils): ExerciseState {
   const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
-  const { description, fields } = scenario.build(utils);
+  const { fields } = scenario.build(utils);
 
   const columns = fields.map((field) => field.column);
   const expectedValues = COMPANIES.map((company) =>
@@ -109,13 +104,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description,
     state: {
       scenario: scenario.id,
       columns,
       expectedValues,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

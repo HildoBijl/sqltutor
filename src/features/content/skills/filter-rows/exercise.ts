@@ -57,12 +57,10 @@ export interface FilterRowsState {
 
 export interface ExerciseState {
   id: FilterRowsState['scenario'];
-  description: string;
   state: FilterRowsState;
 }
 
 interface ScenarioBuildResult {
-  description: string;
   state: Omit<FilterRowsState, 'scenario'>;
 }
 
@@ -79,7 +77,6 @@ const SCENARIOS: ScenarioDefinition[] = [
       const expectedRows = [...(COUNTRY_GROUPS.get(country) ?? [])];
 
       return {
-        description: template(MESSAGES.descriptions['filter-by-country'], { country }),
         state: { country, expectedRows },
       };
     },
@@ -91,7 +88,6 @@ const SCENARIOS: ScenarioDefinition[] = [
       const expectedRows = [...(LETTER_GROUPS.get(letter) ?? [])];
 
       return {
-        description: template(MESSAGES.descriptions['filter-with-pattern'], { letter }),
         state: { letter, expectedRows },
       };
     },
@@ -122,12 +118,27 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: result.description,
     state: {
       scenario: scenario.id,
       ...result.state,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  const { state } = exercise;
+
+  if (state.scenario === 'filter-by-country') {
+    const country = state.country ?? 'the specified country';
+    return template(MESSAGES.descriptions['filter-by-country'], { country });
+  }
+
+  if (state.scenario === 'filter-with-pattern') {
+    const letter = state.letter ?? 'the specified letter';
+    return template(MESSAGES.descriptions['filter-with-pattern'], { letter });
+  }
+
+  return 'Filter the rows based on the given criteria.';
 }
 
 // ============================================================================

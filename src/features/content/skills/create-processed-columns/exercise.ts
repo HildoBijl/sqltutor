@@ -15,7 +15,6 @@ type ScenarioId = 'processed-columns-employees' | 'processed-columns-age';
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   buildState(): CreateProcessedColumnsState;
 }
 
@@ -29,7 +28,6 @@ export interface CreateProcessedColumnsState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: CreateProcessedColumnsState;
 }
 
@@ -54,7 +52,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'processed-columns-employees',
-    description: MESSAGES.descriptions['processed-columns-employees'],
     buildState(): CreateProcessedColumnsState {
       const expectedValues: Record<string, number | null> = {};
 
@@ -74,7 +71,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'processed-columns-age',
-    description: MESSAGES.descriptions['processed-columns-age'],
     buildState(): CreateProcessedColumnsState {
       const expectedValues: Record<string, number | null> = {};
 
@@ -98,9 +94,12 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state,
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

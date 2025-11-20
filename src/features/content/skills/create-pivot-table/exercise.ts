@@ -14,7 +14,6 @@ type ScenarioId = 'pivot-country-counts' | 'pivot-employee-sum';
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   compute(rows: readonly CompanyRow[]): unknown[][];
 }
@@ -27,7 +26,6 @@ export interface CreatePivotTableState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: CreatePivotTableState;
 }
 
@@ -52,7 +50,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'pivot-country-counts',
-    description: MESSAGES.descriptions['pivot-country-counts'],
     columns: ['industry', 'nl_companies', 'us_companies'],
     compute(rows) {
       const grouped = new Map<string, { nl: number; us: number }>();
@@ -70,7 +67,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'pivot-employee-sum',
-    description: MESSAGES.descriptions['pivot-employee-sum'],
     columns: ['industry', 'nl_employees', 'uk_employees'],
     compute(rows) {
       const grouped = new Map<string, { nl: number; uk: number }>();
@@ -95,13 +91,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

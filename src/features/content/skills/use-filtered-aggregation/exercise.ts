@@ -18,7 +18,6 @@ type ScenarioId =
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -31,7 +30,6 @@ export interface UseFilteredAggregationState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: UseFilteredAggregationState;
 }
 
@@ -57,7 +55,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'filtered-aggregation-avg',
-    description: MESSAGES.descriptions['filtered-aggregation-avg'],
     columns: ['industry', 'avg_employees'],
     expectedRows: (() => {
       const aggregates = new Map<string, { sum: number; count: number }>();
@@ -82,7 +79,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'filtered-aggregation-country',
-    description: MESSAGES.descriptions['filtered-aggregation-country'],
     columns: ['country', 'tech_companies'],
     expectedRows: (() => {
       const counts = new Map<string, number>();
@@ -97,7 +93,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'filtered-aggregation-total',
-    description: MESSAGES.descriptions['filtered-aggregation-total'],
     columns: ['industry', 'total_employees'],
     expectedRows: (() => {
       const totals = new Map<string, number>();
@@ -119,13 +114,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

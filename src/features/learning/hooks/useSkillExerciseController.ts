@@ -40,6 +40,7 @@ interface SkillExerciseControllerState {
     exerciseCompleted: boolean;
     queryResult: ReadonlyArray<QueryResultSet> | null;
     queryError: Error | null;
+    description: string;
     tableNames: string[];
     canSubmit: boolean;
     canGiveUp: boolean;
@@ -499,6 +500,20 @@ export function useSkillExerciseController({
     ? (currentExercise as SkillExercise)
     : null;
 
+  const exerciseDescription = useMemo(() => {
+    if (!normalizedExercise) {
+      return '';
+    }
+    if (typeof skillModule?.getDescription === 'function') {
+      const value = skillModule.getDescription(normalizedExercise);
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value;
+      }
+    }
+    const fallback = normalizedExercise.description;
+    return typeof fallback === 'string' ? fallback : '';
+  }, [normalizedExercise, skillModule]);
+
   const normalizedResults = queryResult as ReadonlyArray<QueryResultSet> | null;
 
   const canSubmit =
@@ -521,6 +536,7 @@ export function useSkillExerciseController({
       exerciseCompleted,
       queryResult: normalizedResults,
       queryError,
+      description: exerciseDescription,
       tableNames,
       canSubmit,
       canGiveUp,

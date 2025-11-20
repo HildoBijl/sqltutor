@@ -14,7 +14,6 @@ type ScenarioId = 'multi-filter-us-large' | 'multi-filter-netherlands-tech' | 'm
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   predicate: (company: CompanyRow) => boolean;
 }
 
@@ -25,7 +24,6 @@ export interface FilterRowsMultiState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: FilterRowsMultiState;
 }
 
@@ -53,17 +51,14 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'multi-filter-us-large',
-    description: MESSAGES.descriptions['multi-filter-us-large'],
     predicate: (company) => company.country === 'United States' && (company.num_employees ?? 0) > 100000,
   },
   {
     id: 'multi-filter-netherlands-tech',
-    description: MESSAGES.descriptions['multi-filter-netherlands-tech'],
     predicate: (company) => company.country === 'Netherlands' && company.industry === 'Technology',
   },
   {
     id: 'multi-filter-uk-or-us',
-    description: MESSAGES.descriptions['multi-filter-uk-or-us'],
     predicate: (company) =>
       (company.country === 'United Kingdom' || company.country === 'United States') &&
       (company.founded_year ?? 0) > 2000,
@@ -76,12 +71,15 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       expectedIds,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

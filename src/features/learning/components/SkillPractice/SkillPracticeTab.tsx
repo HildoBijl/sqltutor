@@ -25,7 +25,7 @@ export function SkillPracticeTab({
   dialogs,
   isAdmin,
 }: SkillPracticeTabProps) {
-  const description = practice.currentExercise?.description ?? '';
+  const description = practice.description;
   const isSolvedOrGivenUp = practice.exerciseCompleted || practice.hasGivenUp;
   const showSolution = isSolvedOrGivenUp && Boolean(practice.solution?.query);
   const hasFeedback = Boolean(practice.feedback || practice.queryError);

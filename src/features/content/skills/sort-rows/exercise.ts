@@ -14,7 +14,6 @@ import { COMPANIES } from '../shared';
 type ScenarioId = 'sort-by-employees' | 'sort-by-country-name' | 'sort-offset';
 
 interface ScenarioBuildResult {
-  description: string;
   expectedOrder: number[];
 }
 
@@ -30,7 +29,6 @@ export interface SortRowsState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: SortRowsState;
 }
 
@@ -65,7 +63,6 @@ const SCENARIOS: ScenarioDefinition[] = [
         .map((company) => company.id);
 
       return {
-        description: MESSAGES.descriptions['sort-by-employees'],
         expectedOrder,
       };
     },
@@ -82,7 +79,6 @@ const SCENARIOS: ScenarioDefinition[] = [
         .map((company) => company.id);
 
       return {
-        description: MESSAGES.descriptions['sort-by-country-name'],
         expectedOrder,
       };
     },
@@ -94,7 +90,6 @@ const SCENARIOS: ScenarioDefinition[] = [
       const expectedOrder = sorted.slice(1, 3).map((company) => company.id);
 
       return {
-        description: MESSAGES.descriptions['sort-offset'],
         expectedOrder,
       };
     },
@@ -103,16 +98,19 @@ const SCENARIOS: ScenarioDefinition[] = [
 
 export function generate(utils: Utils): ExerciseState {
   const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
-  const { description, expectedOrder } = scenario.build(utils);
+  const { expectedOrder } = scenario.build(utils);
 
   return {
     id: scenario.id,
-    description,
     state: {
       scenario: scenario.id,
       expectedOrder,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

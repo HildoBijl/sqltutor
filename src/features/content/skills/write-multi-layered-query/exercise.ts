@@ -19,7 +19,6 @@ type ScenarioId = 'multi-layered-department-average' | 'multi-layered-project-ho
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -32,7 +31,6 @@ export interface WriteMultiLayeredState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: WriteMultiLayeredState;
 }
 
@@ -57,7 +55,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'multi-layered-department-average',
-    description: MESSAGES.descriptions['multi-layered-department-average'],
     columns: ['name', 'department', 'salary'],
     expectedRows: (() => {
       const stats = new Map<string, { sum: number; count: number }>();
@@ -85,7 +82,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'multi-layered-project-hours',
-    description: MESSAGES.descriptions['multi-layered-project-hours'],
     columns: ['name', 'budget'],
     expectedRows: (() => {
       const totals = new Map<number, number>();
@@ -108,13 +104,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

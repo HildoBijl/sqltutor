@@ -40,6 +40,9 @@ export function normalizeSkillExerciseModule(
     getSolution: isCallable<NonNullable<SkillExerciseModuleLike['getSolution']>>(candidate.getSolution)
       ? candidate.getSolution
       : undefined,
+    getDescription: isCallable<NonNullable<SkillExerciseModuleLike['getDescription']>>(candidate.getDescription)
+      ? candidate.getDescription
+      : undefined,
     runDemo: isCallable<NonNullable<SkillExerciseModuleLike['runDemo']>>(candidate.runDemo)
       ? candidate.runDemo
       : undefined,
@@ -47,4 +50,3 @@ export function normalizeSkillExerciseModule(
     messages: isExerciseMessages(candidate.messages) ? candidate.messages : undefined,
   };
 }
-

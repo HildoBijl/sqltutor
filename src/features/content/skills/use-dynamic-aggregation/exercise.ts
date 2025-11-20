@@ -14,7 +14,6 @@ type ScenarioId = 'dynamic-industry' | 'dynamic-country' | 'dynamic-founded';
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   compute(rows: readonly CompanyRow[]): unknown[][];
 }
@@ -27,7 +26,6 @@ export interface UseDynamicAggregationState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: UseDynamicAggregationState;
 }
 
@@ -53,7 +51,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'dynamic-industry',
-    description: MESSAGES.descriptions['dynamic-industry'],
     columns: ['industry', 'company_count'],
     compute(rows) {
       const counts = new Map<string, number>();
@@ -68,7 +65,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'dynamic-country',
-    description: MESSAGES.descriptions['dynamic-country'],
     columns: ['country', 'company_count'],
     compute(rows) {
       const counts = new Map<string, number>();
@@ -82,7 +78,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'dynamic-founded',
-    description: MESSAGES.descriptions['dynamic-founded'],
     columns: ['founded_year', 'avg_employees'],
     compute(rows) {
       const aggregates = new Map<number, { sum: number; count: number }>();
@@ -106,13 +101,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(

@@ -19,7 +19,6 @@ type ScenarioId = 'join-company-positions' | 'join-left' | 'join-filtered';
 
 interface ScenarioDefinition {
   id: ScenarioId;
-  description: string;
   columns: string[];
   expectedRows: unknown[][];
 }
@@ -32,7 +31,6 @@ export interface JoinTablesState {
 
 export interface ExerciseState {
   id: ScenarioId;
-  description: string;
   state: JoinTablesState;
 }
 
@@ -60,7 +58,6 @@ export const MESSAGES = {
 const SCENARIOS: ScenarioDefinition[] = [
   {
     id: 'join-company-positions',
-    description: MESSAGES.descriptions['join-company-positions'],
     columns: ['company_name', 'position', 'salary'],
     expectedRows: POSITIONS.map((position) => {
       const company = COMPANY_LOOKUP.get(position.company_id);
@@ -71,7 +68,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'join-left',
-    description: MESSAGES.descriptions['join-left'],
     columns: ['company_name', 'position'],
     expectedRows: COMPANIES.flatMap((company) => {
       const companyPositions = POSITIONS.filter((position) => position.company_id === company.id);
@@ -83,7 +79,6 @@ const SCENARIOS: ScenarioDefinition[] = [
   },
   {
     id: 'join-filtered',
-    description: MESSAGES.descriptions['join-filtered'],
     columns: ['company_name', 'position', 'city'],
     expectedRows: POSITIONS.filter((position) => position.country === 'Netherlands')
       .map((position) => {
@@ -100,13 +95,16 @@ export function generate(utils: Utils): ExerciseState {
 
   return {
     id: scenario.id,
-    description: scenario.description,
     state: {
       scenario: scenario.id,
       columns: scenario.columns,
       expectedRows: scenario.expectedRows,
     },
   };
+}
+
+export function getDescription(exercise: ExerciseState): string {
+  return MESSAGES.descriptions[exercise.state.scenario];
 }
 
 export function validateOutput(
