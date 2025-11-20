@@ -95,7 +95,7 @@ export default function HomePage() {
             >
               Start Learning
             </Button>
-            <Button
+            {/* <Button
               variant="outlined"
               size="large"
               startIcon={<Code />}
@@ -112,7 +112,7 @@ export default function HomePage() {
               }}
             >
               SQL Playground
-            </Button>
+            </Button> */}
           </Stack>
         </Container>
       </Box>
