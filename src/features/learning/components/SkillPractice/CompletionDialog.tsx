@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogActions, Button, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogActions, Button, Typography, Box, Stack } from '@mui/material';
 import { ArrowBack, EmojiEvents, MenuBook, Replay } from '@mui/icons-material';
 
 interface CompletionDialogProps {
@@ -45,44 +45,27 @@ export function CompletionDialog({
         )}
       </DialogTitle>
 
-      <DialogActions
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          gap: 1.5,
-          px: 4,
-          pb: 4,
-        }}
-      >
-        {showStoryButton && onViewStory && (
+      <DialogActions sx={{ px: 4, pb: 4 }}>
+        <Stack spacing={1.5} sx={{ width: '100%' }}>
+          {showStoryButton && onViewStory && (
+            <Button onClick={onViewStory} variant="contained" startIcon={<MenuBook />} fullWidth>
+              Check out the story
+            </Button>
+          )}
+
           <Button
-            onClick={onViewStory}
-            variant="contained"
-            startIcon={<MenuBook />}
-            sx={{ width: '100%', textTransform: 'none' }}
+            onClick={onContinueLearning}
+            variant={showStoryButton && onViewStory ? 'outlined' : 'contained'}
+            startIcon={<ArrowBack />}
+            fullWidth
           >
-            Check out the story
+            Back to learning overview
           </Button>
-        )}
 
-        <Button
-          onClick={onContinueLearning}
-          variant={showStoryButton && onViewStory ? 'outlined' : 'contained'}
-          startIcon={<ArrowBack />}
-          sx={{ width: '100%', textTransform: 'none' }}
-        >
-          Back to learning overview
-        </Button>
-
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          startIcon={<Replay />}
-          sx={{ width: '100%', textTransform: 'none' }}
-        >
-          Stay at this exercise
-        </Button>
+          <Button onClick={onClose} variant="outlined" startIcon={<Replay />} fullWidth>
+            Stay at this exercise
+          </Button>
+        </Stack>
       </DialogActions>
     </Dialog>
   );
