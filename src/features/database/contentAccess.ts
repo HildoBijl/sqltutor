@@ -24,7 +24,7 @@ const contentTableAccess: Record<string, ContentTableConfig> = {
   'filter-rows': ['companies'],
   'filter-rows-on-multiple-criteria': ['companies'],
   'choose-columns': ['companies'],
-  'create-processed-columns': ['companies'],
+  'process-columns': ['companies'],
   'sort-rows': ['companies'],
   'write-single-criterion-query': ['companies'],
   'write-multi-criterion-query': ['companies'],

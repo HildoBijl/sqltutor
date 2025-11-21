@@ -123,8 +123,8 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['filter-rows'],
   },
   {
-    id: 'create-processed-columns',
-    name: 'Create Processed Columns',
+    id: 'process-columns',
+    name: 'Process Columns',
     type: 'skill',
     description: 'How do we create new derived columns from existing columns?',
     prerequisites: ['data-types', 'choose-columns'],
@@ -141,7 +141,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     name: 'Write Multi-Criterion Query',
     type: 'skill',
     description: 'How do we set up advanced queries extracting data from a single table in various ways?',
-    prerequisites: ['sort-rows', 'create-processed-columns', 'filter-rows-on-multiple-criteria'],
+    prerequisites: ['sort-rows', 'process-columns', 'filter-rows-on-multiple-criteria'],
   },
 
   // Aggregation in SQL.
@@ -157,7 +157,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     name: 'Use Filtered Aggregation',
     type: 'skill',
     description: 'How do we select which rows to aggregate, and/or subsequently filter aggregated results?',
-    prerequisites: ['aggregate-columns', 'filter-rows-on-multiple-criteria', 'create-processed-columns'],
+    prerequisites: ['aggregate-columns', 'filter-rows-on-multiple-criteria', 'process-columns'],
   },
   {
     id: 'use-dynamic-aggregation',

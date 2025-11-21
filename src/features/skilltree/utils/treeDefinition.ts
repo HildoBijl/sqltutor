@@ -53,7 +53,7 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 
 	// Single-table SQL querying.
 	'sort-rows': { position: { x: x1, y: y5 } },
-	'create-processed-columns': { position: { x: x2, y: y5 } },
+	'process-columns': { position: { x: x2, y: y5 } },
 	'filter-rows-on-multiple-criteria': { position: { x: x4, y: y5 } },
 	'write-multi-criterion-query': { position: { x: x2, y: y6 } },
 
