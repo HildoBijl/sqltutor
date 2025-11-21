@@ -38,7 +38,7 @@ WHERE num_employees > 200000
         <>The so-called <Term>Data Definition Language</Term> (DDL) revolves around defining the structure of data: creating tables, adjusting tables, etcetera.</>,
         <>The <Term>Data Manipulation Language</Term> (DML) focuses on working with data: adding/updating records, retrieving the right data, and so forth.</>,
       ]} />
-      <Par>When learning a query language, you usually start with the DML, and then you continue with the DDL. But in theory you could even learn the DDL without knowing the DML.</Par>
+      <Par>When learning a query language, you usually start with the DML, and then you continue with the DDL. But in theory you could also learn the DDL without knowing the DML.</Par>
       <Info>Here at SQL Valley we obviously focus on the SQL query language. On top of this, we mainly focus on the DML side.</Info>
     </Section>
   </Page>;

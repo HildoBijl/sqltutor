@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
-import { Page, Par, Section, Warning, Term } from '@/components';
+import { Page, Par, Section, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Rectangle, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
@@ -45,7 +45,7 @@ LIMIT 2 OFFSET 1;`} />
     </Section>
 
     <Section title="Deal with NULL values">
-      <Par>NULLs are treated as the <strong>largest</strong> possible values when sorting. They appear last with ascending order and first with descending order. If you want this to be different, you can override this behaviour with <SQLDisplay inline>NULLS FIRST</SQLDisplay> or <SQLDisplay inline>NULLS LAST</SQLDisplay>, specified per sorting attribute.</Par>
+      <Par>When sorting, <SQLDisplay inline>NULL</SQLDisplay> values either come at the start or at the end. About half of the DBMSs (including SQLite) treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>smallest</Em> possible value: it comes first on ascending order and last on descending order. The other half of the DBMSs have it the other way around, and treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>largest</Em> possible value. If you want to flip this default behavior, you can override it using <SQLDisplay inline>NULLS FIRST</SQLDisplay> or <SQLDisplay inline>NULLS LAST</SQLDisplay>, specified per sorting attribute.</Par>
       <SqlDrawing code={`SELECT *
 FROM companies
 ORDER BY country ASC NULLS FIRST;`} />

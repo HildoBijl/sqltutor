@@ -20,7 +20,7 @@ export function Theory() {
       <Warning>ToDo: set up figure showing this. <SQLDisplay>{`SELECT name, price, 1.2*price AS price_with_tax
 FROM inventory`}</SQLDisplay></Warning>
       <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use these calculated quantities in the filter too. Just add <ISQL>{`WHERE 1.2*price < 1000`}</ISQL> or similar to your query. And identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 1.2*price DESC`}</ISQL> or similar.</Par>
-      <Info>You usually <Em>cannot</Em> use newly created column names like <ISQL>price_with_tax</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. You <Em>can</Em> use these new columns in your sorting though, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
+      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>price_with_tax</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. You <Em>can</Em> use these new columns in your sorting though, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
     </Section>
 
     <Section title="Process numerical values">
@@ -45,7 +45,7 @@ FROM inventory`}</SQLDisplay></Warning>
     </Section>
 
     <Section title="Process text values">
-      <Par>The most common thing to do with text is concatenate multiple pieces of text. This is formally done through <ISQL>||</ISQL>.</Par>
+      <Par>The most common thing to do with text is concatenate multiple pieces of text. This is done through <ISQL>||</ISQL>.</Par>
       <Warning>ToDo: add example of concatenating names. <SQLDisplay>{`SELECT
   first_name,
   last_name,
@@ -53,7 +53,7 @@ FROM inventory`}</SQLDisplay></Warning>
 FROM customers;`}</SQLDisplay>
       </Warning>
       <Info>The notation with <ISQL>||</ISQL> works in all large DBMSs. Some DBMSs also allow <ISQL>CONCAT(first_name, ' ', last_name)</ISQL> while others allow <ISQL>first_name + ' ' + last_name</ISQL>. As usual, things vary per DBMS.</Info>
-      <Par>Then there is a large variety of text processing functions.</Par>
+      <Par>There is a large variety of further text processing functions.</Par>
       <List items={[
         <><Term>Text length</Term>: <ISQL>LENGTH('Hello world')</ISQL> becomes <ISQL>11</ISQL>.</>,
         <><Term>Trimming</Term>: <ISQL>TRIM(' user input ')</ISQL> becomes <ISQL>'user input'</ISQL>, removing spaces at the start/end.</>,
@@ -65,12 +65,33 @@ FROM customers;`}</SQLDisplay>
     </Section>
 
     <Section title="Process date/time values">
-      <Par>Working with dates and times is always tricky in SQL, since the various DBMSs have implemented things rather differently. The only thing they agree on is how to get the <Term>current time</Term>. This is done using the keywords <ISQL>CURRENT_DATE</ISQL> for <ISQL>{date}</ISQL>, <ISQL>CURRENT_TIME</ISQL> for <ISQL>{time}</ISQL>, or <ISQL>CURRENT_TIMESTAMP</ISQL> for <ISQL>{`${date} ${time}`}</ISQL>. Although some DBMSs also use the short-hand <ISQL>NOW()</ISQL>.</Par>
-      <Par>Often we want to do <Term>arithmetics with time</Term>. For instance, we want to see if something happened in the past week, which means we need the time of last week. In SQLite (which is used here on SQL Valley) this is done through the <ISQL>DATE</ISQL> function, the <ISQL>TIME</ISQL> function, or the <ISQL>DATETIME</ISQL> function, depending on which data type you're using. You pass this function the given date/time, and then add one or more modifiers like <ISQL>'-7days'</ISQL>. So <ISQL>{`DATE(${date}, '-7days')`}</ISQL> becomes <ISQL>{dateLastWeek}</ISQL>. Other DBMSs have different time manipulation functions.</Par>
-      <Par>If we have a time, we can also <Term>display</Term>/<Term>format</Term> it in various ways. In SQLite this is done using the <ISQL>STRFTIME(format, datetime)</ISQL> function. For instance <ISQL>STRFTIME('%Y-%m-%d %H:%M:%S', DATETIME(CURRENT_TIMESTAMP, '-7 days'))</ISQL> gives <ISQL>{`${dateLastWeek} ${timeLastWeek}`}</ISQL>. The special characters like <ISQL>%H</ISQL> denote things like "Two-digit hour".</Par>
-      <Par>A final thing that is often done with dates is extract certain parameters, for instance the month or the year. Pretty much <Em>all</Em> DBMSs use the <ISQL>EXTRACT</ISQL> function for this, except for SQLite. To get for instance the month in SQLite, you can use the by now familiar <ISQL>STRFTIME</ISQL> function. For instance <ISQL>STRFTIME('%m', CURRENT_DATE)</ISQL> gives the text <ISQL>{`'${now.getMonth()+1}'`}</ISQL>. Note that this is stored as <Em>text</Em>. If you want to do arithmetics with this, you first have to tell SQLite that it is indeed a number, which is done through a so-called type cast. Then <ISQL>CAST(STRFTIME('%m', CURRENT_DATE) AS INT)</ISQL> becomes the number <ISQL>{`${now.getMonth()+1}`}</ISQL> which we can then for instance calculate with.</Par>
-      <Warning>You notice: working with dates is tricky. Always check the specifications of your DBMS, and test your queries well!</Warning>
+      <Par>Working with dates and times is always tricky in SQL, since the various DBMSs have implemented things rather differently. The only thing they agree on is how to get the <Term>current time</Term>. This is done using the keywords <ISQL>CURRENT_DATE</ISQL> for <ISQL>{date}</ISQL>, <ISQL>CURRENT_TIME</ISQL> for <ISQL>{time}</ISQL>, or <ISQL>CURRENT_TIMESTAMP</ISQL> for <ISQL>{`${date} ${time}`}</ISQL>, although many DBMSs also use the short-hand <ISQL>NOW()</ISQL>.</Par>
+      <Par>Often we want to do <Term>arithmetics with time</Term>. For instance, we want to take a date and subtract a week. In SQLite (which is used here on SQL Valley) this is done through the <ISQL>DATE</ISQL> function, the <ISQL>TIME</ISQL> function, or the <ISQL>DATETIME</ISQL> function, depending on which data type you're using. You pass this function the given date/time, and then add one or more modifiers like <ISQL>'-7days'</ISQL>. So <ISQL>{`DATE(${date}, '-7days')`}</ISQL> becomes <ISQL>{dateLastWeek}</ISQL>. Other DBMSs have different time manipulation functions.</Par>
+      <Par>If we have a date/time value, we can <Term>display</Term>/<Term>format</Term> this in various ways. In SQLite this is done using the <ISQL>STRFTIME(format, datetime)</ISQL> function. For instance <ISQL>STRFTIME('%Y-%m-%d %H:%M:%S', DATETIME(CURRENT_TIMESTAMP, '-7days'))</ISQL> gives <ISQL>{`${dateLastWeek} ${timeLastWeek}`}</ISQL>. The special characters like <ISQL>%H</ISQL> denote things like "Two-digit hour".</Par>
+      <Par>A final thing that is often done with dates is extract certain parameters, for instance the month or the year. Pretty much <Em>all</Em> DBMSs use the <ISQL>EXTRACT</ISQL> function for this, except for SQLite. To get for instance the month in SQLite, you can use the by now familiar <ISQL>STRFTIME</ISQL> function. For instance <ISQL>STRFTIME('%m', CURRENT_DATE)</ISQL> gives the text <ISQL>{`'${now.getMonth() + 1}'`}</ISQL>. Note that this is stored as <Em>text</Em>. If you want to calculate with this, you first have to tell SQLite that it is indeed a number, which is done through a so-called type cast. Then <ISQL>CAST(STRFTIME('%m', CURRENT_DATE) AS INT)</ISQL> becomes the number <ISQL>{`${now.getMonth() + 1}`}</ISQL> which we can then do calculations with.</Par>
+      <Warning>You notice: working with dates/times is tricky. Always check the specifications of your DBMS, and test your queries well!</Warning>
       <Par></Par>
+    </Section>
+
+    <Section title="Conditionally process values">
+      <Par>It is possible to adjust column values based on various conditions. We could for instance distinguish companies as small, medium or large, using the <ISQL>CASE</ISQL> keyword.</Par>
+      <Warning>ToDo: set up example query. <SQLDisplay>{`SELECT
+  company_name,
+  num_employees,
+  CASE
+    WHEN num_employees > 200000 THEN 'large'
+    WHEN num_employees > 40000 THEN 'medium'
+    ELSE 'small'
+  END AS company_size
+FROM companies`}</SQLDisplay></Warning>
+      <Info>When using <ISQL>CASE</ISQL>, we can add as many <ISQL>WHEN ... THEN ...</ISQL> conditions as we like. It looks for the <Em>first</Em> condition that matches. If no conditions match, then the <ISQL>ELSE</ISQL> outcome is used (or when <ISQL>ELSE</ISQL> is omitted then <ISQL>NULL</ISQL> is used).</Info>
+      <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value given that is not <ISQL>NULL</ISQL>. A (somewhat non-sensible) example is the following.</Par>
+      <Warning>ToDo: set up example query. <SQLDisplay>{`SELECT
+  company_name,
+  founded_year,
+  num_employees,
+  COALESCE(num_employees, 10*founded_year, 1000) AS employees
+FROM companies`}</SQLDisplay></Warning>
     </Section>
   </Page>;
 }
