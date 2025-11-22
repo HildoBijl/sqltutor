@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+﻿import { useMemo, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
@@ -12,12 +12,14 @@ import { ContentTabs } from './components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
 import type { TabConfig } from './types';
 import { markPrerequisitesComplete } from './utils/markPrerequisitesComplete';
+import { ConceptCompletionDialog } from './components/ConceptCompletionDialog';
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
   const hideStories = useAppStore((state) => state.hideStories);
   const isAdmin = useAdminMode();
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
@@ -76,8 +78,10 @@ export default function ConceptPage() {
   const handleComplete = () => {
     setComponentState({ understood: true });
 
-    //Mark all prerequisites as complete 
+    // Mark all prerequisites as complete
     markPrerequisitesComplete(conceptMeta.id);
+
+    setShowCompletionDialog(true);
   };
 
   return (
@@ -114,6 +118,17 @@ export default function ConceptPage() {
           )}
         </Box>
       </Box>
+
+      <ConceptCompletionDialog
+        open={showCompletionDialog}
+        conceptName={conceptMeta.name}
+        onClose={() => setShowCompletionDialog(false)}
+        onViewSummary={() => {
+          setShowCompletionDialog(false);
+          selectTab('summary');
+        }}
+        onReturnToOverview={() => navigate('/learn')}
+      />
     </Container>
   );
 }
