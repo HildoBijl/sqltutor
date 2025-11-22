@@ -6,6 +6,7 @@ import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-mater
 import { useAppStore, type ConceptComponentState } from '@/store';
 import { contentIndex, type ContentMeta } from '@/features/content';
 import { useContentTabs } from './hooks/useContentTabs';
+import { useAdminMode } from './hooks/useAdminMode';
 import { ContentHeader } from './components/ContentHeader';
 import { ContentTabs } from './components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
@@ -16,6 +17,7 @@ export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
   const hideStories = useAppStore((state) => state.hideStories);
+  const isAdmin = useAdminMode();
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
@@ -43,21 +45,22 @@ export default function ConceptPage() {
   });
 
   const isCompleted = componentState.understood ?? false;
+  const summaryUnlocked = isCompleted || isAdmin;
 
   const visibleTabs = useMemo(
-    () => (isCompleted ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
-    [isCompleted, tabs],
+    () => (summaryUnlocked ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
+    [summaryUnlocked, tabs],
   );
 
   useEffect(() => {
-    if (!isCompleted && currentTab === 'summary') {
+    if (!summaryUnlocked && currentTab === 'summary') {
       const fallbackTab =
         tabs.find((tab) => tab.key === 'theory')?.key ??
         tabs.find((tab) => tab.key !== 'summary')?.key ??
         'theory';
       selectTab(fallbackTab);
     }
-  }, [currentTab, isCompleted, selectTab, tabs]);
+  }, [currentTab, summaryUnlocked, selectTab, tabs]);
 
   if (!conceptMeta) {
     return (
@@ -91,7 +94,7 @@ export default function ConceptPage() {
         <ContentTabs value={currentTab} tabs={visibleTabs} onChange={handleTabChange}>
           {currentTab === 'theory' && <TheoryTab contentId={conceptMeta.id} />}
           {currentTab === 'video' && <VideoTab contentId={conceptMeta.id} />}
-          {currentTab === 'summary' && isCompleted && <SummaryTab contentId={conceptMeta.id} />}
+          {currentTab === 'summary' && summaryUnlocked && <SummaryTab contentId={conceptMeta.id} />}
           {currentTab === 'story' && <StoryTab contentId={conceptMeta.id} />}
         </ContentTabs>
       )}

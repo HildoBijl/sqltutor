@@ -60,21 +60,22 @@ export default function SkillPage() {
   });
 
   const isSkillMastered = (componentState.numSolved || 0) >= REQUIRED_EXERCISE_COUNT;
+  const summaryUnlocked = isSkillMastered || isAdmin;
 
   const visibleTabs = useMemo(
-    () => (isSkillMastered ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
-    [isSkillMastered, tabs],
+    () => (summaryUnlocked ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
+    [summaryUnlocked, tabs],
   );
 
   useEffect(() => {
-    if (!isSkillMastered && currentTab === 'summary') {
+    if (!summaryUnlocked && currentTab === 'summary') {
       const fallbackTab =
         tabs.find((tab) => tab.key === 'practice')?.key ??
         tabs.find((tab) => tab.key !== 'summary')?.key ??
         'practice';
       selectTab(fallbackTab);
     }
-  }, [currentTab, isSkillMastered, selectTab, tabs]);
+  }, [currentTab, summaryUnlocked, selectTab, tabs]);
 
   if (isLoading) {
     return (
@@ -136,7 +137,7 @@ export default function SkillPage() {
 
           {currentTab === 'theory' && <TheoryTab contentId={skillMeta.id} />}
           {currentTab === 'video' && <VideoTab contentId={skillMeta.id} />}
-          {currentTab === 'summary' && isSkillMastered && <SummaryTab contentId={skillMeta.id} />}
+          {currentTab === 'summary' && summaryUnlocked && <SummaryTab contentId={skillMeta.id} />}
           {currentTab === 'story' && <StoryTab contentId={skillMeta.id} />}
           {currentTab === 'data' &&
             (status.dbReady ? (
@@ -161,6 +162,10 @@ export default function SkillPage() {
             }
             : undefined
         }
+        onViewSummary={() => {
+          controller.dialogs.completion.close();
+          selectTab('summary');
+        }}
         onContinueLearning={() => navigate('/learn')}
         showStoryButton={showStoryButton}
       />

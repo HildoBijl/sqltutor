@@ -1,11 +1,12 @@
 import { Dialog, DialogTitle, DialogActions, Button, Typography, Box, Stack } from '@mui/material';
-import { ArrowBack, EmojiEvents, MenuBook, Replay } from '@mui/icons-material';
+import { ArrowBack, Bolt, EmojiEvents, MenuBook, Replay } from '@mui/icons-material';
 
 interface CompletionDialogProps {
   open: boolean;
   skillName?: string;
   onClose: () => void;
   onViewStory?: () => void;
+  onViewSummary?: () => void;
   onContinueLearning: () => void;
   showStoryButton: boolean;
 }
@@ -15,6 +16,7 @@ export function CompletionDialog({
   skillName,
   onClose,
   onViewStory,
+  onViewSummary,
   onContinueLearning,
   showStoryButton,
 }: CompletionDialogProps) {
@@ -52,6 +54,17 @@ export function CompletionDialog({
 
       <DialogActions sx={{ px: 4, pb: 4 }}>
         <Stack spacing={1.5} sx={{ width: '100%' }}>
+          {onViewSummary && (
+            <Button
+              onClick={onViewSummary}
+              variant="contained"
+              startIcon={<Bolt />}
+              fullWidth
+            >
+              View summary
+            </Button>
+          )}
+
           {showStoryButton && onViewStory && (
             <Button onClick={onViewStory} variant="contained" startIcon={<MenuBook />} fullWidth>
               Check out the story
