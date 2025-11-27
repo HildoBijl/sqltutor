@@ -170,24 +170,24 @@ SkillTreeProps) {
   };
 
   const getConnectorColor = (connector: { from: string; to: string }) => {
-    const bothCompleted =
-      isCompleted(connector.from) && isCompleted(connector.to);
+    const fromCompleted = isCompleted(connector.from);
+    const toCompleted = isCompleted(connector.to);
+    const bothCompleted = fromCompleted && toCompleted;
     const isNextToLearn =
-      isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
+      isReadyToLearn(contentItems[connector.to]) && fromCompleted;
 
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
-      // Color the connectors green if both completed, red otherwise
       if (bothCompleted) {
         return "#4CAF50";
       }
-      if (isNextToLearn) {
-      return "#FFD700";
-    }
+      if (fromCompleted && !toCompleted) {
+        return "#FFD700";
+      }
       return "#E84421";
     }
+
     // No hover active
-    // Color based on completion status: green if both are completed, yellow if next to learn, gray otherwise
     if (bothCompleted) {
       return "#4CAF50";
     }
