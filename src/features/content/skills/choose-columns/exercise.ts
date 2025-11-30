@@ -1,218 +1,38 @@
-import { COMMON_MESSAGES } from '../../messages';
-import { template } from '../../utils';
-import type {
-  ExecutionResult,
-  QueryResult,
-  Utils,
-  ValidationResult,
-  VerificationResult,
-} from '../../types';
-import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
+import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '../shared/simpleExercise';
 
-import { COMPANIES, type CompanyRow } from '../shared';
-
-interface FieldDescriptor {
-  column: string;
-  property: keyof CompanyRow;
-}
-
-interface ScenarioBuildResult {
-  fields: FieldDescriptor[];
-}
-
-interface ScenarioDefinition {
-  id: ChooseColumnsState['scenario'];
-  build(utils: Utils): ScenarioBuildResult;
-}
-
-export interface ChooseColumnsState {
-  scenario: 'choose-columns-basic' | 'choose-columns-alias' | 'choose-columns-location';
-  columns: string[];
-  expectedValues: unknown[][];
-}
-
-export interface ExerciseState {
-  id: ChooseColumnsState['scenario'];
-  state: ChooseColumnsState;
-}
-
-export const MESSAGES = {
-  descriptions: {
-    'choose-columns-basic': 'Return company name and industry from the companies table.',
-    'choose-columns-alias': 'Select company name and number of employees, renaming the numeric column to employees.',
-    'choose-columns-location': 'Retrieve company name together with country and founded year.',
-  },
-  validation: {
-    ...COMMON_MESSAGES.validation,
-    noResultSet: 'Query returned no data.',
-    missingColumns: 'Select exactly the requested columns in the correct order.',
-    unexpectedColumns: 'Remove any extra columns from your result.',
-  },
-  verification: {
-    ...COMMON_MESSAGES.verification,
-    correct: 'Perfect! Those columns look great.',
-    wrongRowCount: 'Expected {expected} rows but got {actual}.',
-    wrongValues: 'Some rows do not match the expected results.',
-  },
-} as const;
-
-const SCENARIOS: ScenarioDefinition[] = [
+const EXERCISES: StaticExercise[] = [
   {
-    id: 'choose-columns-basic',
-    build() {
-      return {
-        fields: [
-          { column: 'company_name', property: 'company_name' },
-          { column: 'industry', property: 'industry' },
-        ],
-      };
-    },
+    id: 'choose-columns-contacts',
+    prompt: 'List the first name, last name, email, and phone number of all employees.',
+    solution: `
+SELECT first_name, last_name, email, phone
+FROM employees;
+    `,
   },
   {
-    id: 'choose-columns-alias',
-    build() {
-      return {
-        fields: [
-          { column: 'company_name', property: 'company_name' },
-          { column: 'employees', property: 'num_employees' },
-        ],
-      };
-    },
+    id: 'choose-columns-emp-rating',
+    prompt: 'Retrieve the employee ID, position, salary, and performance score (as rating) of all employees.',
+    solution: `
+SELECT e_id, position, salary, perf_score AS rating
+FROM emp_data;
+    `,
   },
   {
-    id: 'choose-columns-location',
-    build() {
-      return {
-        fields: [
-          { column: 'company_name', property: 'company_name' },
-          { column: 'country', property: 'country' },
-          { column: 'founded_year', property: 'founded_year' },
-        ],
-      };
-    },
+    id: 'choose-columns-cities',
+    prompt: 'Find the list of all cities in which the employees of the company live, without duplicates.',
+    solution: `
+SELECT DISTINCT city
+FROM employees;
+    `,
   },
 ];
 
-export function generate(utils: Utils): ExerciseState {
-  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
-  const { fields } = scenario.build(utils);
+export type ExerciseState = StaticExerciseState;
 
-  const columns = fields.map((field) => field.column);
-  const expectedValues = COMPANIES.map((company) =>
-    fields.map((field) => company[field.property] ?? null),
-  );
-
-  return {
-    id: scenario.id,
-    state: {
-      scenario: scenario.id,
-      columns,
-      expectedValues,
-    },
-  };
-}
-
-export function getDescription(exercise: ExerciseState): string {
-  return MESSAGES.descriptions[exercise.state.scenario];
-}
-
-export function validateOutput(
-  exercise: ExerciseState,
-  result: ExecutionResult<QueryResult[]>,
-): ValidationResult {
-  if (!result.success) {
-    return {
-      ok: false,
-      message: template(MESSAGES.validation.syntaxError, {
-        error: result.error?.message || 'Unknown error',
-      }),
-    };
-  }
-
-  const firstResult = result.output?.[0];
-  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (firstResult.columns.length !== exercise.state.columns.length) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.missingColumns,
-    };
-  }
-
-  for (let index = 0; index < exercise.state.columns.length; index += 1) {
-    if (firstResult.columns[index] !== exercise.state.columns[index]) {
-      return {
-        ok: false,
-        message: MESSAGES.validation.missingColumns,
-      };
-    }
-  }
-
-  return { ok: true };
-}
-
-export function verifyOutput(
-  exercise: ExerciseState,
-  output: QueryResult[] | undefined,
-  database: any,
-): VerificationResult {
-  const actualResult = output?.[0];
-
-  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
-    return {
-      correct: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (!database || typeof database.exec !== 'function') {
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const solutionQuery = getSolution(exercise);
-
-  let expectedResult: QueryResult | undefined;
-  try {
-    const result = database.exec(solutionQuery);
-    expectedResult = result?.[0];
-  } catch (error) {
-    console.error('Failed to execute solution query:', error);
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const comparison = compareQueryResults(expectedResult, actualResult, {
-    ignoreRowOrder: true,
-    ignoreColumnOrder: false,
-    caseSensitive: false,
-  });
-
-  return {
-    correct: comparison.match,
-    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
-    details: comparison.details,
-  };
-}
-
-export function getSolution(exercise: ExerciseState): string {
-  switch (exercise.state.scenario) {
-    case 'choose-columns-basic':
-      return 'SELECT company_name, industry FROM companies';
-    case 'choose-columns-alias':
-      return 'SELECT company_name, num_employees AS employees FROM companies';
-    case 'choose-columns-location':
-      return 'SELECT company_name, country, founded_year FROM companies';
-    default:
-      return 'SELECT company_name FROM companies';
-  }
-}
+export const {
+  generate,
+  getDescription,
+  validateOutput,
+  verifyOutput,
+  getSolution,
+} = buildStaticExerciseModule(EXERCISES);

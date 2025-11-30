@@ -35,6 +35,7 @@ interface SkillExerciseControllerState {
     query: string;
     feedback: PracticeFeedback | null;
     currentExercise: SkillExercise | null;
+    unavailableMessage?: string;
     solution: PracticeSolution | null;
     hasGivenUp: boolean;
     exerciseCompleted: boolean;
@@ -496,6 +497,10 @@ export function useSkillExerciseController({
     [componentState.numSolved, requiredCount],
   );
 
+  const practiceUnavailableMessage = skillModule
+    ? null
+    : 'Practice exercises are not available yet. Explore the data while we prepare new challenges.';
+
   const normalizedExercise = currentExercise
     ? (currentExercise as SkillExercise)
     : null;
@@ -511,7 +516,15 @@ export function useSkillExerciseController({
       }
     }
     const fallback = normalizedExercise.description;
-    return typeof fallback === 'string' ? fallback : '';
+    if (typeof fallback === 'string' && fallback.trim().length > 0) {
+      return fallback;
+    }
+    // Handle older/stale exercise shapes that may not carry a description.
+    const prompt = (normalizedExercise as Record<string, unknown>).prompt;
+    if (typeof prompt === 'string' && prompt.trim().length > 0) {
+      return prompt;
+    }
+    return 'Practice exercise';
   }, [normalizedExercise, skillModule]);
 
   const normalizedResults = queryResult as ReadonlyArray<QueryResultSet> | null;
@@ -531,6 +544,7 @@ export function useSkillExerciseController({
       query,
       feedback: feedbackHidden ? null : feedback,
       currentExercise: normalizedExercise,
+      unavailableMessage: practiceUnavailableMessage ?? undefined,
       solution: revealedSolution ?? exerciseSolution ?? null,
       hasGivenUp,
       exerciseCompleted,

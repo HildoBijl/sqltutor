@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 
 import { ExerciseControls } from './ExerciseControls';
 import { ExerciseDescription } from './ExerciseDescription';
@@ -25,6 +25,17 @@ export function SkillPracticeTab({
   dialogs,
   isAdmin,
 }: SkillPracticeTabProps) {
+  if (practice.unavailableMessage) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+        <Alert severity="info">{practice.unavailableMessage}</Alert>
+        <Typography variant="body2" color="text.secondary">
+          In the meantime, use the Data Explorer tab to browse the dataset.
+        </Typography>
+      </Box>
+    );
+  }
+
   const description = practice.description;
   const isSolvedOrGivenUp = practice.exerciseCompleted || practice.hasGivenUp;
   const showSolution = isSolvedOrGivenUp && Boolean(practice.solution?.query);

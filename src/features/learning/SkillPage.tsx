@@ -51,6 +51,7 @@ export default function SkillPage() {
 
   const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId);
 
+  const practiceAvailable = Boolean(skillModule);
   const controller = useSkillExerciseController({
     skillId: skillId ?? '',
     skillModule,
@@ -96,7 +97,7 @@ export default function SkillPage() {
   }
 
   const progressInfo =
-    currentTab === 'practice'
+    practiceAvailable && currentTab === 'practice'
       ? {
         current: componentState.numSolved ?? 0,
         required: REQUIRED_EXERCISE_COUNT,

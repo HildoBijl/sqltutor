@@ -62,28 +62,28 @@ function mapEmployeeProjectRow(raw: Record<string, unknown>): EmployeeProjectRow
   };
 }
 
-export function parseEmployees(schemaSource: string = schemas.employees): EmployeeRow[] {
+export function parseEmployees(schemaSource: string = schemas.full ?? ''): EmployeeRow[] {
   return parseSchemaRows(schemaSource, 'employees').map(mapEmployeeRow);
 }
 
-export function parseProjects(schemaSource: string = schemas.employees): ProjectRow[] {
+export function parseProjects(schemaSource: string = schemas.full ?? ''): ProjectRow[] {
   return parseSchemaRows(schemaSource, 'projects').map(mapProjectRow);
 }
 
-export function parseEmployeeProjects(schemaSource: string = schemas.employees): EmployeeProjectRow[] {
+export function parseEmployeeProjects(schemaSource: string = schemas.full ?? ''): EmployeeProjectRow[] {
   return parseSchemaRows(schemaSource, 'employee_projects').map(mapEmployeeProjectRow);
 }
 
 export function loadEmployees(schemaKey: SchemaKey): EmployeeRow[] {
-  return parseEmployees(schemas[schemaKey]);
+  return parseEmployees(schemas[schemaKey] ?? '');
 }
 
 export function loadProjects(schemaKey: SchemaKey): ProjectRow[] {
-  return parseProjects(schemas[schemaKey]);
+  return parseProjects(schemas[schemaKey] ?? '');
 }
 
 export function loadEmployeeProjects(schemaKey: SchemaKey): EmployeeProjectRow[] {
-  return parseEmployeeProjects(schemas[schemaKey]);
+  return parseEmployeeProjects(schemas[schemaKey] ?? '');
 }
 
 export const EMPLOYEES: readonly EmployeeRow[] = parseEmployees();

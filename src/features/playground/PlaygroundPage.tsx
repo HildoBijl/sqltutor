@@ -34,8 +34,8 @@ import {
 } from '@/store';
 
 export default function PlaygroundPage() {
-  const [selectedSchema, setSelectedSchema] = useState<SchemaKey>('companiesAndPositions');
-  const [query, setQuery] = useState('SELECT * FROM companies LIMIT 10;');
+  const [selectedSchema, setSelectedSchema] = useState<SchemaKey>('full');
+  const [query, setQuery] = useState('SELECT * FROM employees LIMIT 10;');
   const [currentTab, setCurrentTab] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -181,7 +181,7 @@ export default function PlaygroundPage() {
   const getFirstTableFromSchema = (schemaKey: SchemaKey): string => {
     const schema = schemas[schemaKey];
     const match = schema.match(/CREATE TABLE (\w+)/);
-    return match ? match[1] : 'companies';
+    return match ? match[1] : 'employees';
   };
 
   return (

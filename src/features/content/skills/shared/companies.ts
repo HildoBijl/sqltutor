@@ -24,12 +24,12 @@ function mapCompanyRow(raw: Record<string, unknown>): CompanyRow {
   };
 }
 
-export function parseCompanies(schemaSource: string = schemas.companies): CompanyRow[] {
+export function parseCompanies(schemaSource: string = schemas.full ?? ''): CompanyRow[] {
   return parseSchemaRows(schemaSource, 'companies').map(mapCompanyRow);
 }
 
 export function loadCompanies(schemaKey: SchemaKey): CompanyRow[] {
-  return parseCompanies(schemas[schemaKey]);
+  return parseCompanies(schemas[schemaKey] ?? '');
 }
 
 export const COMPANIES: readonly CompanyRow[] = parseCompanies();

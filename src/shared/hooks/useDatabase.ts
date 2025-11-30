@@ -76,7 +76,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
         ? getTablesForSchema(schema)
         : resolveSkillTables(role, skillId);
 
-    const baseTables = (sourceTables && sourceTables.length > 0 ? sourceTables : ['companies']) as TableKey[];
+    const baseTables = (sourceTables && sourceTables.length > 0 ? sourceTables : ['employees']) as TableKey[];
     const deduped = Array.from(new Set(baseTables));
     return deduped as TableKey[];
   }, [tables, schema, role, skillId]);
@@ -228,7 +228,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
 }
 
 // Convenience hooks for specific contexts
-export function usePlaygroundDatabase(schema: SchemaKey = 'companiesAndPositions') {
+export function usePlaygroundDatabase(schema: SchemaKey = 'full') {
   return useDatabase({
     role: 'display',
     skillId: 'playground',
@@ -238,7 +238,7 @@ export function usePlaygroundDatabase(schema: SchemaKey = 'companiesAndPositions
   });
 }
 
-export function useConceptDatabase(schema: SchemaKey = 'companies') {
+export function useConceptDatabase(schema: SchemaKey = 'core') {
   return useDatabase({
     role: 'theory',
     schema,

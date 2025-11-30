@@ -65,7 +65,7 @@ export function useSkillContent(skillId?: string): SkillContentState {
       updateState({
         skillModule: null,
         isLoading: false,
-        error: 'No exercise module is registered for this skill.',
+        error: 'Practice for this skill is coming soon.',
       });
       return () => {
         cancelled = true;

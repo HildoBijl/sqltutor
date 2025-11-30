@@ -31,7 +31,7 @@ function mapPositionRow(raw: Record<string, unknown>): PositionRow {
   };
 }
 
-export function parsePositions(schemaSource: string = schemas.companiesAndPositions): PositionRow[] {
+export function parsePositions(schemaSource: string = schemas.full): PositionRow[] {
   return parseSchemaRows(schemaSource, 'positions').map(mapPositionRow);
 }
 

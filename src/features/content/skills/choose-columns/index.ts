@@ -1,11 +1,5 @@
 export { Story } from './Story';
-export { Theory } from './Theory';
 export { Summary } from './Summary';
-export {
-  generate,
-  validateOutput,
-  verifyOutput,
-  getSolution,
-  MESSAGES,
-} from './exercise';
-export type { ExerciseState, ChooseColumnsState } from './exercise';
+export { Theory } from './Theory';
+export { generate, getDescription, validateOutput, verifyOutput, getSolution } from './exercise';
+export type { ExerciseState } from './exercise';

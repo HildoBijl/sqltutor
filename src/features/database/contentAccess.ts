@@ -3,10 +3,22 @@ import type { DatabaseRole, DatasetSize, TableKey } from './types';
 type RoleSpecificTables = Partial<Record<DatabaseRole, TableKey[]>>;
 type ContentTableConfig = TableKey[] | RoleSpecificTables;
 
+const ALL_TABLES: TableKey[] = [
+  'employees',
+  'departments',
+  'emp_data',
+  'clock_in_out',
+  'accounts',
+  'transactions',
+  'products',
+  'expenses',
+  'quarterly_performance',
+];
+
 const DEFAULT_ROLE_TABLES: Record<DatabaseRole, TableKey[]> = {
-  display: ['companies'],
-  grading: ['companies'],
-  theory: ['companies'],
+  display: ALL_TABLES,
+  grading: ALL_TABLES,
+  theory: ['employees', 'departments', 'emp_data'],
 };
 
 const DEFAULT_ROLE_SIZES: Record<DatabaseRole, DatasetSize> = {
@@ -15,26 +27,9 @@ const DEFAULT_ROLE_SIZES: Record<DatabaseRole, DatasetSize> = {
   theory: 'small',
 };
 
-const TABLE_ACCESS_FULL: TableKey[] = ['companies', 'positions', 'employees', 'projects', 'employee_projects'];
-
 const contentTableAccess: Record<string, ContentTableConfig> = {
-  default: ['companies'],
-  playground: TABLE_ACCESS_FULL,
-  // Skills
-  'filter-rows': ['companies'],
-  'filter-rows-on-multiple-criteria': ['companies'],
-  'choose-columns': ['companies'],
-  'process-columns': ['companies'],
-  'sort-rows': ['companies'],
-  'write-single-criterion-query': ['companies'],
-  'write-multi-criterion-query': ['companies'],
-  'aggregate-columns': ['companies'],
-  'use-filtered-aggregation': ['companies'],
-  'use-dynamic-aggregation': ['companies'],
-  'create-pivot-table': ['companies'],
-  'join-tables': ['companies', 'positions'],
-  'write-multi-table-query': TABLE_ACCESS_FULL,
-  'write-multi-layered-query': TABLE_ACCESS_FULL,
+  default: ALL_TABLES,
+  playground: ALL_TABLES,
 };
 
 const contentSizeOverrides: Record<string, Partial<Record<DatabaseRole, DatasetSize>>> = {

@@ -1,221 +1,46 @@
-import { COMMON_MESSAGES } from '../../messages';
-import { template } from '../../utils';
-import type {
-  ExecutionResult,
-  QueryResult,
-  Utils,
-  ValidationResult,
-  VerificationResult,
-} from '../../types';
-import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-import { COMPANIES, compareRows } from '../shared';
+import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '../shared/simpleExercise';
 
-type ScenarioId = 'multi-criterion-europe' | 'multi-criterion-tech-regions' | 'multi-criterion-older';
-
-interface ScenarioDefinition {
-  id: ScenarioId;
-  columns: string[];
-  expectedRows: unknown[][];
-}
-
-export interface WriteMultiCriterionState {
-  scenario: ScenarioId;
-  columns: string[];
-  expectedRows: unknown[][];
-}
-
-export interface ExerciseState {
-  id: ScenarioId;
-  state: WriteMultiCriterionState;
-}
-
-const ALL_COLUMNS = ['id', 'company_name', 'country', 'founded_year', 'num_employees', 'industry'];
-
-export const MESSAGES = {
-  descriptions: {
-    'multi-criterion-europe': 'Find consulting companies in the Netherlands with more than 50000 employees.',
-    'multi-criterion-tech-regions': 'List technology companies from the Netherlands or United States that were founded after 1995.',
-    'multi-criterion-older': 'Show companies founded before 1980 that are not based in the United States.',
-  },
-  validation: {
-    ...COMMON_MESSAGES.validation,
-    noResultSet: 'Query returned no data.',
-    wrongColumns: 'Return the requested columns in the correct order.',
-  },
-  verification: {
-    ...COMMON_MESSAGES.verification,
-    correct: 'Multi-criteria filter is spot on!',
-    wrongRowCount: 'Expected {expected} rows but got {actual}.',
-    wrongValues: 'Some returned rows do not satisfy the filters.',
-  },
-} as const;
-
-const SCENARIOS: ScenarioDefinition[] = [
+const EXERCISES: StaticExercise[] = [
   {
-    id: 'multi-criterion-europe',
-    columns: ALL_COLUMNS,
-    expectedRows: COMPANIES.filter(
-      (company) =>
-        company.country === 'Netherlands' &&
-        company.industry === 'Consulting' &&
-        (company.num_employees ?? 0) > 50000,
-    )
-      .map((company) => [
-        company.id,
-        company.company_name,
-        company.country,
-        company.founded_year,
-        company.num_employees,
-        company.industry,
-      ])
-      .sort(compareRows),
+    id: 'multi-criterion-start-date-range',
+    prompt: 'Retrieve the first 10 employees whose start date falls between January 1 and September 30 of 2025, sorted by start date.',
+    solution: `
+SELECT e_id, start_date, position, perf_score
+FROM emp_data
+WHERE start_date BETWEEN '2025-01-01' AND '2025-09-30'
+ORDER BY start_date
+LIMIT 10;
+    `,
   },
   {
-    id: 'multi-criterion-tech-regions',
-    columns: ALL_COLUMNS,
-    expectedRows: COMPANIES.filter(
-      (company) =>
-        company.industry === 'Technology' &&
-        (company.country === 'Netherlands' || company.country === 'United States') &&
-        (company.founded_year ?? 0) > 1995,
-    )
-      .map((company) => [
-        company.id,
-        company.company_name,
-        company.country,
-        company.founded_year,
-        company.num_employees,
-        company.industry,
-      ])
-      .sort(compareRows),
+    id: 'multi-criterion-work-status-leave',
+    prompt: 'Retrieve the employee ID, status, and monthly salary of employees whose work_status contains leave and whose monthly salary is either above 10,000 or below 1,000.',
+    solution: `
+SELECT e_id, work_status, salary / 12 AS monthly_salary
+FROM emp_data
+WHERE work_status LIKE '%leave%'
+  AND (salary / 12 > 10000 OR salary / 12 < 1000);
+    `,
   },
   {
-    id: 'multi-criterion-older',
-    columns: ['company_name', 'country'],
-    expectedRows: COMPANIES.filter(
-      (company) =>
-        (company.founded_year ?? Number.MAX_SAFE_INTEGER) < 1980 &&
-        company.country !== 'United States',
-    )
-      .map((company) => [company.company_name, company.country])
-      .sort(compareRows),
+    id: 'multi-criterion-departments-expenditure',
+    prompt: 'Retrieve department names (excluding a set) and list their budget per employee, sorted from highest to lowest.',
+    solution: `
+SELECT d_name AS name,
+       budget / nr_employees AS expenditure
+FROM departments
+WHERE d_name NOT IN ('Human Resources', 'Customer Support', 'Public Relations', 'Tech Support')
+ORDER BY expenditure DESC;
+    `,
   },
 ];
 
-export function generate(utils: Utils): ExerciseState {
-  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
+export type ExerciseState = StaticExerciseState;
 
-  return {
-    id: scenario.id,
-    state: {
-      scenario: scenario.id,
-      columns: scenario.columns,
-      expectedRows: scenario.expectedRows,
-    },
-  };
-}
-
-export function getDescription(exercise: ExerciseState): string {
-  return MESSAGES.descriptions[exercise.state.scenario];
-}
-
-export function validateOutput(
-  exercise: ExerciseState,
-  result: ExecutionResult<QueryResult[]>,
-): ValidationResult {
-  if (!result.success) {
-    return {
-      ok: false,
-      message: template(MESSAGES.validation.syntaxError, {
-        error: result.error?.message || 'Unknown error',
-      }),
-    };
-  }
-
-  const firstResult = result.output?.[0];
-  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (firstResult.columns.length !== exercise.state.columns.length) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.wrongColumns,
-    };
-  }
-
-  for (let index = 0; index < exercise.state.columns.length; index += 1) {
-    if (firstResult.columns[index] !== exercise.state.columns[index]) {
-      return {
-        ok: false,
-        message: MESSAGES.validation.wrongColumns,
-      };
-    }
-  }
-
-  return { ok: true };
-}
-
-export function verifyOutput(
-  exercise: ExerciseState,
-  output: QueryResult[] | undefined,
-  database: any,
-): VerificationResult {
-  const actualResult = output?.[0];
-
-  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
-    return {
-      correct: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (!database || typeof database.exec !== 'function') {
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const solutionQuery = getSolution(exercise);
-
-  let expectedResult: QueryResult | undefined;
-  try {
-    const result = database.exec(solutionQuery);
-    expectedResult = result?.[0];
-  } catch (error) {
-    console.error('Failed to execute solution query:', error);
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const comparison = compareQueryResults(expectedResult, actualResult, {
-    ignoreRowOrder: true,
-    ignoreColumnOrder: false,
-    caseSensitive: false,
-  });
-
-  return {
-    correct: comparison.match,
-    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
-    details: comparison.details,
-  };
-}
-
-export function getSolution(exercise: ExerciseState): string {
-  switch (exercise.state.scenario) {
-    case 'multi-criterion-europe':
-      return "SELECT * FROM companies WHERE country = 'Netherlands' AND industry = 'Consulting' AND num_employees > 50000";
-    case 'multi-criterion-tech-regions':
-      return "SELECT * FROM companies WHERE industry = 'Technology' AND (country = 'Netherlands' OR country = 'United States') AND founded_year > 1995";
-    case 'multi-criterion-older':
-      return "SELECT company_name, country FROM companies WHERE founded_year < 1980 AND country <> 'United States'";
-    default:
-      return "SELECT company_name FROM companies WHERE country = 'Netherlands'";
-  }
-}
+export const {
+  generate,
+  getDescription,
+  validateOutput,
+  verifyOutput,
+  getSolution,
+} = buildStaticExerciseModule(EXERCISES);

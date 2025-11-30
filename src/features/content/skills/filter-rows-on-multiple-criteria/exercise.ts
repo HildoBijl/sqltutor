@@ -1,177 +1,53 @@
-import { COMMON_MESSAGES } from '../../messages';
-import { template } from '../../utils';
-import type {
-  ExecutionResult,
-  QueryResult,
-  Utils,
-  ValidationResult,
-  VerificationResult,
-} from '../../types';
-import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-import { COMPANIES, type CompanyRow } from '../shared';
+import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '../shared/simpleExercise';
 
-type ScenarioId = 'multi-filter-us-large' | 'multi-filter-netherlands-tech' | 'multi-filter-uk-or-us';
-
-interface ScenarioDefinition {
-  id: ScenarioId;
-  predicate: (company: CompanyRow) => boolean;
-}
-
-export interface FilterRowsMultiState {
-  scenario: ScenarioId;
-  expectedIds: number[];
-}
-
-export interface ExerciseState {
-  id: ScenarioId;
-  state: FilterRowsMultiState;
-}
-
-const REQUIRED_COLUMNS = ['id', 'company_name', 'country', 'founded_year', 'num_employees', 'industry'];
-
-export const MESSAGES = {
-  descriptions: {
-    'multi-filter-us-large': 'List companies from the United States with more than 100000 employees.',
-    'multi-filter-netherlands-tech': 'Find Dutch companies in the Technology industry.',
-    'multi-filter-uk-or-us': 'Return companies based in the United Kingdom or the United States that were founded after 2000.',
-  },
-  validation: {
-    ...COMMON_MESSAGES.validation,
-    noResultSet: 'Query returned no data.',
-    missingColumns: 'Include all columns from the companies table (use SELECT *).',
-  },
-  verification: {
-    ...COMMON_MESSAGES.verification,
-    correct: 'Perfect! Your filter is spot on.',
-    wrongRowCount: 'Expected {expected} rows but got {actual}.',
-    wrongRows: 'Some returned rows do not meet the required conditions.',
-  },
-} as const;
-
-const SCENARIOS: ScenarioDefinition[] = [
+const EXERCISES: StaticExercise[] = [
   {
-    id: 'multi-filter-us-large',
-    predicate: (company) => company.country === 'United States' && (company.num_employees ?? 0) > 100000,
+    id: 'multi-filter-amount-between',
+    prompt: 'Retrieve all transactions where the amount is not between 100 and 1000 and were not validated by any employee.',
+    solution: `
+SELECT *
+FROM transactions
+WHERE amount NOT BETWEEN 100 AND 1000
+  AND validated_by IS NULL;
+    `,
   },
   {
-    id: 'multi-filter-netherlands-tech',
-    predicate: (company) => company.country === 'Netherlands' && company.industry === 'Technology',
+    id: 'multi-filter-approved-null',
+    prompt: 'Retrieve all transactions with status approved where either the buyer or the vendor are undefined.',
+    solution: `
+SELECT *
+FROM transactions
+WHERE (vendor_id IS NULL OR buyer_id IS NULL)
+  AND status = 'approved';
+    `,
   },
   {
-    id: 'multi-filter-uk-or-us',
-    predicate: (company) =>
-      (company.country === 'United Kingdom' || company.country === 'United States') &&
-      (company.founded_year ?? 0) > 2000,
+    id: 'multi-filter-expenses-first-day',
+    prompt: 'Retrieve the id of the departments that have registered expenses on the first day of any month of 2025, requested and approved by the same employee.',
+    solution: `
+SELECT d_id
+FROM expenses
+WHERE date LIKE '2025-__-01'
+  AND requested_by = approved_by;
+    `,
+  },
+  {
+    id: 'multi-filter-expenses-lorem',
+    prompt: 'Retrieve all expenses with descriptions starting with Lorem or which occurred before 2005-09-20.',
+    solution: `
+SELECT *
+FROM expenses
+WHERE description LIKE 'Lorem%' OR date < '2005-09-20';
+    `,
   },
 ];
 
-export function generate(utils: Utils): ExerciseState {
-  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
-  const expectedIds = COMPANIES.filter(scenario.predicate).map((company) => company.id);
+export type ExerciseState = StaticExerciseState;
 
-  return {
-    id: scenario.id,
-    state: {
-      scenario: scenario.id,
-      expectedIds,
-    },
-  };
-}
-
-export function getDescription(exercise: ExerciseState): string {
-  return MESSAGES.descriptions[exercise.state.scenario];
-}
-
-export function validateOutput(
-  _exercise: ExerciseState,
-  result: ExecutionResult<QueryResult[]>,
-): ValidationResult {
-  if (!result.success) {
-    return {
-      ok: false,
-      message: template(MESSAGES.validation.syntaxError, {
-        error: result.error?.message || 'Unknown error',
-      }),
-    };
-  }
-
-  const firstResult = result.output?.[0];
-
-  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  const hasAllColumns = REQUIRED_COLUMNS.every((column) => firstResult.columns.includes(column));
-  if (!hasAllColumns) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.missingColumns,
-    };
-  }
-
-  return { ok: true };
-}
-
-export function verifyOutput(
-  exercise: ExerciseState,
-  output: QueryResult[] | undefined,
-  database: any,
-): VerificationResult {
-  const actualResult = output?.[0];
-
-  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
-    return {
-      correct: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (!database || typeof database.exec !== 'function') {
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const solutionQuery = getSolution(exercise);
-
-  let expectedResult: QueryResult | undefined;
-  try {
-    const result = database.exec(solutionQuery);
-    expectedResult = result?.[0];
-  } catch (error) {
-    console.error('Failed to execute solution query:', error);
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const comparison = compareQueryResults(expectedResult, actualResult, {
-    ignoreRowOrder: true,
-    ignoreColumnOrder: true,
-    caseSensitive: false,
-  });
-
-  return {
-    correct: comparison.match,
-    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
-    details: comparison.details,
-  };
-}
-
-export function getSolution(exercise: ExerciseState): string {
-  switch (exercise.state.scenario) {
-    case 'multi-filter-us-large':
-      return "SELECT * FROM companies WHERE country = 'United States' AND num_employees > 100000";
-    case 'multi-filter-netherlands-tech':
-      return "SELECT * FROM companies WHERE country = 'Netherlands' AND industry = 'Technology'";
-    case 'multi-filter-uk-or-us':
-      return "SELECT * FROM companies WHERE (country = 'United Kingdom' OR country = 'United States') AND founded_year > 2000";
-    default:
-      return 'SELECT * FROM companies';
-  }
-}
+export const {
+  generate,
+  getDescription,
+  validateOutput,
+  verifyOutput,
+  getSolution,
+} = buildStaticExerciseModule(EXERCISES);

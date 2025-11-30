@@ -1,3 +1,5 @@
+import mockDataCsv from '../../../mock_data.csv?raw';
+
 import type { DatasetSize, DatabaseRole, TableKey } from './types';
 import { resolveContentTables, resolveContentSize } from './contentAccess';
 
@@ -20,184 +22,333 @@ interface TableDefinition {
 }
 
 const DEFAULT_ROW_LIMITS: Record<DatasetSize, number> = {
-  small: 8,
-  medium: 48,
+  small: 50,
+  medium: Number.POSITIVE_INFINITY,
   large: Number.POSITIVE_INFINITY,
 };
 
-const companiesRows: SqlCell[][] = [
-  [1, 'LinkedIn', 'United States', 2003, 20000, 'Social Media'],
-  [2, 'Meta', 'United States', 2004, 77000, 'Social Media'],
-  [3, 'ING', 'Netherlands', 1991, 57000, 'Banking'],
-  [4, 'KPMG', 'Netherlands', 1987, 236000, 'Consulting'],
-  [5, 'PwC', 'Netherlands', 1998, 328000, 'Consulting'],
-  [6, 'Deloitte', 'Netherlands', 1845, 415000, 'Consulting'],
-  [7, 'EY', 'Netherlands', 1989, 365000, 'Consulting'],
-  [8, 'TikTok', 'United States', 2016, 150000, 'Social Media'],
-  [9, 'Twitter', 'United States', 2006, 7500, 'Social Media'],
-  [10, 'Google', 'United States', 1998, 190000, 'Technology'],
-  [11, 'Apple', 'United States', 1976, 164000, 'Technology'],
-  [12, 'Microsoft', 'United States', 1975, 221000, 'Technology'],
-  [13, 'Rabobank', 'Netherlands', 1972, 43000, 'Banking'],
-  [14, 'ASML', 'Netherlands', 1984, 40000, 'Technology'],
-  [15, 'Philips', 'Netherlands', 1891, 78000, 'Healthcare'],
-  [16, 'NXP', 'Netherlands', 2006, 34000, 'Semiconductors'],
-  [17, 'Unilever', 'United Kingdom', 1929, 128000, 'Consumer Goods'],
-  [18, 'Shell', 'Netherlands', 1907, 86000, 'Energy'],
-];
+type SalaryRecord = { date: string; salary: number };
 
-const positionsRows: SqlCell[][] = [
-  [1, 1, 'LinkedIn', 'United States', 'San Francisco', 'ML Engineer', 'Engineering', 140000, true],
-  [2, 1, 'LinkedIn', 'United States', 'New York', 'ML Engineer', 'Engineering', 100000, true],
-  [3, 1, 'LinkedIn', 'United States', 'Sunnyvale', 'Data Engineer', 'Data', 110000, false],
-  [4, 2, 'Meta', 'United States', 'New York', 'Data Analyst', 'Analytics', 130000, true],
-  [5, 2, 'Meta', 'United States', 'San Francisco', 'Data Engineer', 'Data', 130000, true],
-  [6, 2, 'Meta', 'United Kingdom', 'London', 'Data Engineer', 'Data', 130000, false],
-  [7, 3, 'ING', 'Netherlands', 'Amsterdam', 'Data Engineer', 'Data', 80000, false],
-  [8, 3, 'ING', 'Netherlands', 'Amsterdam', 'Data Analyst', 'Analytics', 80000, false],
-  [9, 3, 'ING', 'Netherlands', 'Amsterdam', 'Data Scientist', 'Data Science', 82000, true],
-  [10, 4, 'KPMG', 'Netherlands', 'Amsterdam', 'Data Engineer', 'Data', 87000, true],
-  [11, 4, 'KPMG', 'Netherlands', 'Rotterdam', 'Data Analyst', 'Analytics', 80000, false],
-  [12, 4, 'KPMG', 'Netherlands', 'Amsterdam', 'Data Scientist', 'Data Science', 80000, true],
-  [13, 5, 'PwC', 'Netherlands', 'Amsterdam', 'Data Engineer', 'Data', 83000, true],
-  [14, 5, 'PwC', 'Netherlands', 'Amsterdam', 'Data Analyst', 'Analytics', 80000, false],
-  [15, 6, 'Deloitte', 'Netherlands', 'Amsterdam', 'Data Engineer', 'Data', 95000, true],
-  [16, 6, 'Deloitte', 'Netherlands', 'Amsterdam', 'AI Consultant', 'Consulting', 90000, true],
-  [17, 6, 'Deloitte', 'Netherlands', 'Amsterdam', 'Data Scientist', 'Data Science', 95000, false],
-  [18, 7, 'EY', 'Netherlands', 'Amsterdam', 'Data Engineer', 'Data', 85000, true],
-  [19, 7, 'EY', 'Netherlands', 'Rotterdam', 'Data Scientist', 'Data Science', 84000, false],
-  [20, 8, 'TikTok', 'United States', 'Los Angeles', 'Data Engineer', 'Data', 125000, false],
-  [21, 8, 'TikTok', 'United States', 'New York', 'ML Engineer', 'Engineering', 120000, true],
-  [22, 8, 'TikTok', 'United States', 'Los Angeles', 'Data Scientist', 'Data Science', 122000, false],
-  [23, 9, 'Twitter', 'United States', 'San Francisco', 'Data Engineer', 'Data', 130000, true],
-  [24, 9, 'Twitter', 'United States', 'New York', 'Data Analyst', 'Analytics', 120000, true],
-  [25, 9, 'Twitter', 'United States', 'San Francisco', 'Data Scientist', 'Data Science', 125000, true],
-  [26, 10, 'Google', 'United States', 'Mountain View', 'Data Engineer', 'Data', 140000, false],
-  [27, 10, 'Google', 'United States', 'New York', 'Data Analyst', 'Analytics', 130000, true],
-  [28, 10, 'Google', 'United States', 'Mountain View', 'Data Scientist', 'Data Science', 135000, false],
-  [29, 11, 'Apple', 'United States', 'Cupertino', 'Data Engineer', 'Data', 145000, false],
-  [30, 11, 'Apple', 'United States', 'New York', 'Data Analyst', 'Analytics', 135000, false],
-  [31, 11, 'Apple', 'United States', 'Cupertino', 'Data Scientist', 'Data Science', 140000, false],
-  [32, 12, 'Microsoft', 'United States', 'Redmond', 'Data Engineer', 'Data', 150000, true],
-  [33, 12, 'Microsoft', 'United States', 'New York', 'Data Analyst', 'Analytics', 140000, true],
-  [34, 12, 'Microsoft', 'United States', 'Redmond', 'Data Scientist', 'Data Science', 145000, true],
-  [35, 13, 'Rabobank', 'Netherlands', 'Utrecht', 'Data Engineer', 'Data', 80000, false],
-  [36, 13, 'Rabobank', 'Netherlands', 'Amsterdam', 'Data Analyst', 'Analytics', 80000, true],
-];
+interface MockRow {
+  eId: number;
+  position: string | null;
+  salary: number | null;
+  startDate: string | null;
+  endDate: string | null;
+  perfScore: number | null;
+  status: string | null;
+  deptId: number | null;
+  deptName: string | null;
+  name: string | null;
+}
 
-const employeesRows: SqlCell[][] = [
-  [1, 'Alice Johnson', 'Engineering', 'Director', 150000, '2019-01-15', null],
-  [2, 'Bob Smith', 'Engineering', 'Senior Engineer', 120000, '2019-03-20', 1],
-  [3, 'Carol White', 'Engineering', 'Engineer', 95000, '2020-06-10', 2],
-  [4, 'David Brown', 'Engineering', 'Junior Engineer', 75000, '2021-08-01', 2],
-  [5, 'Eve Davis', 'Product', 'Product Manager', 130000, '2019-11-05', null],
-  [6, 'Frank Wilson', 'Product', 'Senior PM', 110000, '2020-02-15', 5],
-  [7, 'Grace Lee', 'Data', 'Data Scientist', 125000, '2020-04-20', null],
-  [8, 'Henry Martin', 'Data', 'Data Analyst', 90000, '2021-01-10', 7],
-  [9, 'Iris Chen', 'Data', 'ML Engineer', 135000, '2019-09-01', 7],
-  [10, 'Jack Taylor', 'HR', 'HR Manager', 95000, '2018-12-01', null],
-];
+function toNumber(value: string | null | undefined): number | null {
+  if (value === undefined || value === null) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
-const projectsRows: SqlCell[][] = [
-  [1, 'Website Redesign', 500000, '2024-01-01', '2024-06-30', 'Active'],
-  [2, 'Mobile App v2.0', 750000, '2024-03-01', '2024-12-31', 'Active'],
-  [3, 'Data Pipeline', 300000, '2023-09-01', '2024-03-31', 'Completed'],
-  [4, 'ML Platform', 1000000, '2024-06-01', '2025-05-31', 'Planning'],
-  [5, 'Customer Analytics', 400000, '2024-02-01', '2024-08-31', 'Active'],
-];
+function normalizeStatus(status: string | null): string | null {
+  if (!status) return null;
+  const normalized = status.trim().toLowerCase();
+  const map: Record<string, string> = {
+    'sick leave': 'sick_leave',
+    'paid leave': 'paid_leave',
+    'parental leave': 'parental_leave',
+    'unpaid personal leave': 'unpaid_leave',
+    fmla: 'fmla',
+    sabbatical: 'sabbatical',
+    'bereavement leave': 'bereavement_leave',
+  };
+  return map[normalized] ?? normalized.replace(/\s+/g, '_');
+}
 
-const employeeProjectsRows: SqlCell[][] = [
-  [2, 1, 'Tech Lead', 400],
-  [3, 1, 'Developer', 600],
-  [4, 1, 'Developer', 800],
-  [2, 2, 'Architect', 200],
-  [3, 2, 'Developer', 400],
-  [6, 2, 'Product Owner', 300],
-  [7, 3, 'Lead', 600],
-  [8, 3, 'Analyst', 800],
-  [7, 5, 'Data Scientist', 400],
-  [8, 5, 'Analyst', 600],
-  [9, 4, 'ML Lead', 500],
-];
+function splitName(name: string | null, fallbackId: number): { first: string; last: string } {
+  if (!name) {
+    return { first: `Employee ${fallbackId}`, last: '' };
+  }
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) {
+    return { first: `Employee ${fallbackId}`, last: '' };
+  }
+  const [first, ...rest] = parts;
+  return { first, last: rest.join(' ') };
+}
+
+function pickLatestSalary(salaries: SalaryRecord[]): number | null {
+  if (!salaries.length) return null;
+  const sorted = [...salaries].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  return sorted[sorted.length - 1]?.salary ?? null;
+}
+
+function parseMockData(raw: string): MockRow[] {
+  if (!raw) return [];
+
+  const lines = raw.trim().split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return [];
+
+  const header = lines[0].replace(/^\uFEFF/, '').split(',');
+  const rows: MockRow[] = [];
+
+  const getCell = (line: string, index: number): string | null => {
+    const parts = line.split(',');
+    if (index >= parts.length) return null;
+    const value = parts[index]?.trim() ?? '';
+    return value.length > 0 ? value : null;
+  };
+
+  const eIdIndex = header.indexOf('e_id');
+  const positionIndex = header.indexOf('position');
+  const salaryIndex = header.indexOf('salary');
+  const startDateIndex = header.indexOf('start_date');
+  const endDateIndex = header.indexOf('end_date');
+  const perfIndex = header.indexOf('perf_score');
+  const statusIndex = header.indexOf('status');
+  const deptIdIndex = header.indexOf('dept_id');
+  const deptNameIndex = header.indexOf('dept_name');
+  const nameIndex = header.indexOf('name');
+
+  lines.slice(1).forEach((line) => {
+    const eId = toNumber(getCell(line, eIdIndex));
+    if (!eId) return;
+
+    rows.push({
+      eId,
+      position: getCell(line, positionIndex),
+      salary: toNumber(getCell(line, salaryIndex)),
+      startDate: getCell(line, startDateIndex),
+      endDate: getCell(line, endDateIndex),
+      perfScore: toNumber(getCell(line, perfIndex)),
+      status: getCell(line, statusIndex),
+      deptId: toNumber(getCell(line, deptIdIndex)),
+      deptName: getCell(line, deptNameIndex),
+      name: getCell(line, nameIndex),
+    });
+  });
+
+  return rows;
+}
+
+const mockRows = parseMockData(mockDataCsv);
+
+type DepartmentAggregate = { name: string; employeeIds: Set<number> };
+type EmployeeAggregate = { firstName: string; lastName: string; salaries: SalaryRecord[] };
+
+const departments = new Map<number, DepartmentAggregate>();
+const employees = new Map<number, EmployeeAggregate>();
+const empDataRows: SqlCell[][] = [];
+
+mockRows.forEach((row) => {
+  const status = normalizeStatus(row.status);
+
+  empDataRows.push([
+    row.eId,
+    row.deptId,
+    row.position,
+    row.salary,
+    row.startDate,
+    row.endDate,
+    row.perfScore,
+    null,
+    status,
+  ]);
+
+  if (row.deptId !== null) {
+    const existingDept = departments.get(row.deptId) ?? {
+      name: row.deptName || `Department ${row.deptId}`,
+      employeeIds: new Set<number>(),
+    };
+    if (row.deptName) {
+      existingDept.name = row.deptName;
+    }
+    existingDept.employeeIds.add(row.eId);
+    departments.set(row.deptId, existingDept);
+  }
+
+  const existingEmployee = employees.get(row.eId) ?? {
+    firstName: '',
+    lastName: '',
+    salaries: [],
+  };
+  if (!existingEmployee.firstName || !existingEmployee.lastName) {
+    const names = splitName(row.name, row.eId);
+    existingEmployee.firstName = names.first;
+    existingEmployee.lastName = names.last;
+  }
+  if (row.salary !== null) {
+    existingEmployee.salaries.push({
+      salary: row.salary,
+      date: row.startDate || row.endDate || '',
+    });
+  }
+  employees.set(row.eId, existingEmployee);
+});
+
+const employeesRows: SqlCell[][] = Array.from(employees.entries())
+  .sort(([a], [b]) => a - b)
+  .map(([eId, data]) => [
+    eId,
+    data.firstName || `Employee ${eId}`,
+    data.lastName || '',
+    null,
+    null,
+    null,
+    null,
+    pickLatestSalary(data.salaries),
+  ]);
+
+const departmentsRows: SqlCell[][] = Array.from(departments.entries())
+  .sort(([a], [b]) => a - b)
+  .map(([dId, data]) => [
+    dId,
+    data.name,
+    null,
+    null,
+    data.employeeIds.size || null,
+  ]);
 
 const tableDefinitions: Record<TableKey, TableDefinition> = {
-  companies: {
-    name: 'companies',
-    createStatement: `
-  CREATE TABLE companies (
-    id INTEGER PRIMARY KEY,
-    company_name TEXT NOT NULL,
-    country TEXT NOT NULL,
-    founded_year INTEGER,
-    num_employees INTEGER,
-    industry TEXT
-  );`.trim(),
-    rows: companiesRows,
-  },
-  positions: {
-    name: 'positions',
-    createStatement: `
-  CREATE TABLE positions (
-    id INTEGER PRIMARY KEY,
-    company_id INTEGER,
-    company_name TEXT,
-    country TEXT,
-    city TEXT,
-    position TEXT,
-    department TEXT,
-    salary INTEGER,
-    remote_allowed BOOLEAN,
-    FOREIGN KEY (company_id) REFERENCES companies(id)
-  );`.trim(),
-    rows: positionsRows,
-  },
   employees: {
     name: 'employees',
     createStatement: `
   CREATE TABLE employees (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    department TEXT,
-    position TEXT,
-    salary INTEGER,
-    hire_date DATE,
-    manager_id INTEGER,
-    FOREIGN KEY (manager_id) REFERENCES employees(id)
+    e_id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    phone TEXT,
+    email TEXT,
+    address TEXT,
+    city TEXT,
+    current_salary REAL
   );`.trim(),
     rows: employeesRows,
   },
-  projects: {
-    name: 'projects',
+  departments: {
+    name: 'departments',
     createStatement: `
-  CREATE TABLE projects (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    budget INTEGER,
+  CREATE TABLE departments (
+    d_id INTEGER PRIMARY KEY,
+    d_name TEXT NOT NULL,
+    managed_by INTEGER,
+    budget REAL,
+    nr_employees INTEGER,
+    FOREIGN KEY (managed_by) REFERENCES employees(e_id)
+  );`.trim(),
+    rows: departmentsRows,
+  },
+  emp_data: {
+    name: 'emp_data',
+    createStatement: `
+  CREATE TABLE emp_data (
+    e_id INTEGER NOT NULL,
+    d_id INTEGER,
+    position TEXT,
+    salary REAL,
     start_date DATE,
     end_date DATE,
-    status TEXT CHECK(status IN ('Planning', 'Active', 'Completed', 'Cancelled'))
+    perf_score INTEGER,
+    other_info TEXT,
+    work_status TEXT,
+    PRIMARY KEY (e_id, start_date, end_date),
+    FOREIGN KEY (e_id) REFERENCES employees(e_id),
+    FOREIGN KEY (d_id) REFERENCES departments(d_id)
   );`.trim(),
-    rows: projectsRows,
-    rowLimits: {
-      small: 3,
-    },
+    rows: empDataRows,
   },
-  employee_projects: {
-    name: 'employee_projects',
+  clock_in_out: {
+    name: 'clock_in_out',
     createStatement: `
-  CREATE TABLE employee_projects (
-    employee_id INTEGER,
-    project_id INTEGER,
-    role TEXT,
-    hours_allocated INTEGER,
-    PRIMARY KEY (employee_id, project_id),
-    FOREIGN KEY (employee_id) REFERENCES employees(id),
-    FOREIGN KEY (project_id) REFERENCES projects(id)
+  CREATE TABLE clock_in_out (
+    entry_id INTEGER PRIMARY KEY,
+    e_id INTEGER NOT NULL,
+    in_time DATETIME NOT NULL,
+    out_time DATETIME,
+    on_site BOOLEAN,
+    FOREIGN KEY (e_id) REFERENCES employees(e_id)
   );`.trim(),
-    rows: employeeProjectsRows,
-    rowLimits: {
-      small: 5,
-    },
+    rows: [],
+  },
+  accounts: {
+    name: 'accounts',
+    createStatement: `
+  CREATE TABLE accounts (
+    acct_id INTEGER PRIMARY KEY,
+    username TEXT,
+    phone TEXT,
+    email TEXT,
+    email_verified BOOLEAN,
+    full_name TEXT,
+    created_at DATETIME,
+    last_login_at DATETIME
+  );`.trim(),
+    rows: [],
+  },
+  products: {
+    name: 'products',
+    createStatement: `
+  CREATE TABLE products (
+    p_id INTEGER PRIMARY KEY,
+    name TEXT,
+    category TEXT,
+    owner_id INTEGER,
+    est_value REAL,
+    status TEXT,
+    FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)
+  );`.trim(),
+    rows: [],
+  },
+  transactions: {
+    name: 'transactions',
+    createStatement: `
+  CREATE TABLE transactions (
+    t_id INTEGER PRIMARY KEY,
+    vendor_id INTEGER,
+    buyer_id INTEGER,
+    prod_id INTEGER,
+    date_time DATETIME,
+    amount REAL,
+    validated_by INTEGER,
+    status TEXT,
+    FOREIGN KEY (vendor_id) REFERENCES accounts(acct_id),
+    FOREIGN KEY (buyer_id) REFERENCES accounts(acct_id),
+    FOREIGN KEY (prod_id) REFERENCES products(p_id),
+    FOREIGN KEY (validated_by) REFERENCES employees(e_id)
+  );`.trim(),
+    rows: [],
+  },
+  expenses: {
+    name: 'expenses',
+    createStatement: `
+  CREATE TABLE expenses (
+    exp_id INTEGER PRIMARY KEY,
+    amount REAL,
+    d_id INTEGER,
+    description TEXT,
+    date DATE,
+    requested_by INTEGER,
+    approved_by INTEGER,
+    FOREIGN KEY (d_id) REFERENCES departments(d_id),
+    FOREIGN KEY (requested_by) REFERENCES employees(e_id),
+    FOREIGN KEY (approved_by) REFERENCES employees(e_id)
+  );`.trim(),
+    rows: [],
+  },
+  quarterly_performance: {
+    name: 'quarterly_performance',
+    createStatement: `
+  CREATE TABLE quarterly_performance (
+    quarter INTEGER,
+    fiscal_year INTEGER,
+    revenue REAL,
+    operating_expenses REAL,
+    total_transactions INTEGER,
+    growth_rate REAL,
+    updated_at DATETIME,
+    PRIMARY KEY (quarter, fiscal_year)
+  );`.trim(),
+    rows: [],
   },
 };
 
@@ -280,10 +431,20 @@ export function buildSchema({ tables, size, role }: BuildSchemaOptions): string 
 }
 
 const schemaTableGroups: Record<string, TableKey[]> = {
-  companies: ['companies'],
-  positions: ['positions'],
-  companiesAndPositions: ['companies', 'positions'],
-  employees: ['employees', 'projects', 'employee_projects'],
+  core: ['employees', 'departments', 'emp_data', 'clock_in_out'],
+  commerce: ['accounts', 'products', 'transactions'],
+  finance: ['expenses', 'quarterly_performance'],
+  full: [
+    'employees',
+    'departments',
+    'emp_data',
+    'clock_in_out',
+    'accounts',
+    'products',
+    'transactions',
+    'expenses',
+    'quarterly_performance',
+  ],
 };
 
 export const schemas = Object.entries(schemaTableGroups).reduce<Record<string, string>>(
@@ -297,7 +458,7 @@ export const schemas = Object.entries(schemaTableGroups).reduce<Record<string, s
 export type SchemaKey = keyof typeof schemas;
 
 export function getTablesForSchema(schemaKey: SchemaKey): TableKey[] {
-  return schemaTableGroups[schemaKey] ?? ['companies'];
+  return schemaTableGroups[schemaKey] ?? schemaTableGroups.core;
 }
 
 export function getTableNames(schema: string): string[] {
@@ -308,10 +469,10 @@ export function getTableNames(schema: string): string[] {
 
 export function getSchemaDescription(schemaKey: SchemaKey): string {
   const descriptions: Record<SchemaKey, string> = {
-    companies: 'Company information with basic details',
-    positions: 'Job positions and salary information',
-    companiesAndPositions: 'Companies and their available positions',
-    employees: 'Employee management with projects and hierarchies',
+    core: 'Employee records and department assignments',
+    commerce: 'Accounts, products, and transactions',
+    finance: 'Expenses and quarterly performance',
+    full: 'Combined operational data set',
   };
 
   return descriptions[schemaKey] ?? 'Database schema';

@@ -1,225 +1,59 @@
-import { COMMON_MESSAGES } from '../../messages';
-import { template } from '../../utils';
-import type {
-  ExecutionResult,
-  QueryResult,
-  Utils,
-  ValidationResult,
-  VerificationResult,
-} from '../../types';
-import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
-import { COMPANIES, type CompanyRow } from '../shared';
+import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '../shared/simpleExercise';
 
-type ScenarioId =
-  | 'aggregate-count-country'
-  | 'aggregate-average-employees'
-  | 'aggregate-max-founded';
-
-interface ScenarioDefinition {
-  id: ScenarioId;
-  columns: string[];
-  compute(rows: readonly CompanyRow[]): unknown[][];
-}
-
-export interface AggregateColumnsState {
-  scenario: ScenarioId;
-  columns: string[];
-  expectedRows: unknown[][];
-}
-
-export interface ExerciseState {
-  id: ScenarioId;
-  state: AggregateColumnsState;
-}
-
-export const MESSAGES = {
-  descriptions: {
-    'aggregate-count-country': 'Count how many companies exist in each country.',
-    'aggregate-average-employees': 'Calculate the average number of employees per industry.',
-    'aggregate-max-founded': 'Find the most recent founding year per country.',
-  },
-  validation: {
-    ...COMMON_MESSAGES.validation,
-    noResultSet: 'Query returned no data.',
-    wrongColumns: 'Return exactly the expected columns with the correct aliases.',
-  },
-  verification: {
-    ...COMMON_MESSAGES.verification,
-    correct: 'Perfect aggregation!',
-    wrongRowCount: 'Expected {expected} rows but got {actual}.',
-    wrongValues: 'Some grouped values are incorrect.',
-  },
-} as const;
-
-const SCENARIOS: ScenarioDefinition[] = [
+const EXERCISES: StaticExercise[] = [
   {
-    id: 'aggregate-count-country',
-    columns: ['country', 'company_count'],
-    compute(rows) {
-      const counts = new Map<string, number>();
-      rows.forEach((company) => {
-        const key = company.country;
-        counts.set(key, (counts.get(key) ?? 0) + 1);
-      });
-      return [...counts.entries()]
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([country, count]) => [country, count]);
-    },
+    id: 'aggregate-revenue-year',
+    prompt: 'Retrieve the total revenue for each fiscal year.',
+    solution: `
+SELECT fiscal_year, SUM(revenue)
+FROM quarterly_performance
+GROUP BY fiscal_year;
+    `,
   },
   {
-    id: 'aggregate-average-employees',
-    columns: ['industry', 'avg_employees'],
-    compute(rows) {
-      const sums = new Map<string, { sum: number; count: number }>();
-      rows.forEach((company) => {
-        const key = company.industry ?? '';
-        const current = sums.get(key) ?? { sum: 0, count: 0 };
-        if (company.num_employees !== null) {
-          current.sum += company.num_employees;
-          current.count += 1;
-        }
-        sums.set(key, current);
-      });
-      return [...sums.entries()]
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([industry, { sum, count }]) => [industry || null, count === 0 ? null : sum / count]);
-    },
+    id: 'aggregate-avg-growth',
+    prompt: 'Retrieve the average growth rate for each quarter of every fiscal year.',
+    solution: `
+SELECT fiscal_year, quarter, AVG(growth_rate)
+FROM quarterly_performance
+GROUP BY fiscal_year, quarter;
+    `,
   },
   {
-    id: 'aggregate-max-founded',
-    columns: ['country', 'latest_founded_year'],
-    compute(rows) {
-      const latest = new Map<string, number | null>();
-      rows.forEach((company) => {
-        const key = company.country;
-        const current = latest.get(key);
-        if (company.founded_year === null) return;
-        if (current === undefined || current === null || company.founded_year > current) {
-          latest.set(key, company.founded_year);
-        }
-      });
-      return [...latest.entries()]
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([country, year]) => [country, year]);
-    },
+    id: 'aggregate-max-min-revenue',
+    prompt: 'Retrieve the maximum and minimum revenue for each fiscal year.',
+    solution: `
+SELECT fiscal_year, MAX(revenue) AS max_revenue, MIN(revenue) AS min_revenue
+FROM quarterly_performance
+GROUP BY fiscal_year;
+    `,
+  },
+  {
+    id: 'aggregate-total-expenses',
+    prompt: 'Retrieve the total expenses for each department.',
+    solution: `
+SELECT d_id, SUM(amount) AS total_expenses
+FROM expenses
+GROUP BY d_id;
+    `,
+  },
+  {
+    id: 'aggregate-negative-growth-count',
+    prompt: 'Count the number of quarters with negative growth.',
+    solution: `
+SELECT COUNT(*) AS low_growth_quarters
+FROM quarterly_performance
+WHERE growth_rate < 0.0;
+    `,
   },
 ];
 
-export function generate(utils: Utils): ExerciseState {
-  const scenario = utils.selectRandomly(SCENARIOS as readonly ScenarioDefinition[]);
-  const expectedRows = scenario.compute(COMPANIES);
+export type ExerciseState = StaticExerciseState;
 
-  return {
-    id: scenario.id,
-    state: {
-      scenario: scenario.id,
-      columns: scenario.columns,
-      expectedRows,
-    },
-  };
-}
-
-export function getDescription(exercise: ExerciseState): string {
-  return MESSAGES.descriptions[exercise.state.scenario];
-}
-
-export function validateOutput(
-  exercise: ExerciseState,
-  result: ExecutionResult<QueryResult[]>,
-): ValidationResult {
-  if (!result.success) {
-    return {
-      ok: false,
-      message: template(MESSAGES.validation.syntaxError, {
-        error: result.error?.message || 'Unknown error',
-      }),
-    };
-  }
-
-  const firstResult = result.output?.[0];
-  if (!firstResult || !Array.isArray(firstResult.columns) || !Array.isArray(firstResult.values)) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (firstResult.columns.length !== exercise.state.columns.length) {
-    return {
-      ok: false,
-      message: MESSAGES.validation.wrongColumns,
-    };
-  }
-
-  for (let index = 0; index < exercise.state.columns.length; index += 1) {
-    if (firstResult.columns[index] !== exercise.state.columns[index]) {
-      return {
-        ok: false,
-        message: MESSAGES.validation.wrongColumns,
-      };
-    }
-  }
-
-  return { ok: true };
-}
-
-export function verifyOutput(
-  exercise: ExerciseState,
-  output: QueryResult[] | undefined,
-  database: any,
-): VerificationResult {
-  const actualResult = output?.[0];
-
-  if (!actualResult || !Array.isArray(actualResult.columns) || !Array.isArray(actualResult.values)) {
-    return {
-      correct: false,
-      message: MESSAGES.validation.noResultSet,
-    };
-  }
-
-  if (!database || typeof database.exec !== 'function') {
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const solutionQuery = getSolution(exercise);
-
-  let expectedResult: QueryResult | undefined;
-  try {
-    const result = database.exec(solutionQuery);
-    expectedResult = result?.[0];
-  } catch (error) {
-    console.error('Failed to execute solution query:', error);
-    return {
-      correct: false,
-      message: 'Unable to verify results. Please try again.',
-    };
-  }
-
-  const comparison = compareQueryResults(expectedResult, actualResult, {
-    ignoreRowOrder: true,
-    ignoreColumnOrder: false,
-    caseSensitive: false,
-  });
-
-  return {
-    correct: comparison.match,
-    message: comparison.match ? MESSAGES.verification.correct : comparison.feedback,
-    details: comparison.details,
-  };
-}
-
-export function getSolution(exercise: ExerciseState): string {
-  switch (exercise.state.scenario) {
-    case 'aggregate-count-country':
-      return 'SELECT country, COUNT(*) AS company_count FROM companies GROUP BY country';
-    case 'aggregate-average-employees':
-      return 'SELECT industry, AVG(num_employees) AS avg_employees FROM companies GROUP BY industry';
-    case 'aggregate-max-founded':
-      return 'SELECT country, MAX(founded_year) AS latest_founded_year FROM companies GROUP BY country';
-    default:
-      return 'SELECT country FROM companies GROUP BY country';
-  }
-}
+export const {
+  generate,
+  getDescription,
+  validateOutput,
+  verifyOutput,
+  getSolution,
+} = buildStaticExerciseModule(EXERCISES);
