@@ -129,7 +129,7 @@ export const useAppStore = create<AppState>()(
       components: {},
       sidebarOpen: true,
       currentTheme: 'light',
-      hideStories: false,
+      hideStories: true,
       _hasHydrated: false,
 
       updateComponent: (id, data) =>

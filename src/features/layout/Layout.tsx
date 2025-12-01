@@ -18,11 +18,10 @@ import {
   School as LearnIcon,
   // PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
-import { DarkMode, LightMode, RestartAlt, CenterFocusStrong, Settings, Check, AdminPanelSettings } from '@mui/icons-material';
+import { DarkMode, LightMode, RestartAlt, Settings, Check, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { ColorModeContext } from '@/theme';
-import { useAppStore } from '@/store';
 
 export function Layout() {
   const navigate = useNavigate();
@@ -129,10 +128,6 @@ function SettingsMenu() {
   const { mode, toggleColorMode } = useContext(ColorModeContext);
   const isLight = mode === 'light';
   
-  // Hide stories state
-  const hideStories = useAppStore((state) => state.hideStories);
-  const toggleHideStories = useAppStore((state) => state.toggleHideStories);
-
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -143,11 +138,6 @@ function SettingsMenu() {
 
   const handleThemeToggle = () => {
     toggleColorMode();
-    // Don't close menu - allow multiple toggles
-  };
-
-  const handleHideStoriesToggle = () => {
-    toggleHideStories();
     // Don't close menu - allow multiple toggles
   };
 
@@ -235,22 +225,7 @@ function SettingsMenu() {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={handleHideStoriesToggle}>
-          <ListItemIcon>
-            <CenterFocusStrong 
-              sx={{ color: hideStories ? 'primary.main' : 'inherit' }} 
-            />
-          </ListItemIcon>
-          <ListItemText>Hide Stories</ListItemText>
-          <Check 
-            sx={{ 
-              color: 'primary.main', 
-              ml: 1,
-              visibility: hideStories ? 'visible' : 'hidden'
-            }} 
-          />
-        </MenuItem>
-
+        {typeof window !== 'undefined' && window.location.hostname === 'localhost' ? (
         <MenuItem onClick={handleAdminToggle}>
           <ListItemIcon>
             <AdminPanelSettings
@@ -261,11 +236,12 @@ function SettingsMenu() {
           <Check
             sx={{
               color: 'primary.main',
-              ml: 1,
-              visibility: adminEnabled ? 'visible' : 'hidden',
-            }}
-          />
+            ml: 1,
+            visibility: adminEnabled ? 'visible' : 'hidden',
+          }}
+        />
         </MenuItem>
+        ) : null}
         
         <MenuItem onClick={handleThemeToggle}>
           <ListItemIcon>

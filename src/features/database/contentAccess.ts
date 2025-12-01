@@ -3,22 +3,10 @@ import type { DatabaseRole, DatasetSize, TableKey } from './types';
 type RoleSpecificTables = Partial<Record<DatabaseRole, TableKey[]>>;
 type ContentTableConfig = TableKey[] | RoleSpecificTables;
 
-const ALL_TABLES: TableKey[] = [
-  'employees',
-  'departments',
-  'emp_data',
-  'clock_in_out',
-  'accounts',
-  'transactions',
-  'products',
-  'expenses',
-  'quarterly_performance',
-];
-
 const DEFAULT_ROLE_TABLES: Record<DatabaseRole, TableKey[]> = {
-  display: ALL_TABLES,
-  grading: ALL_TABLES,
-  theory: ['employees', 'departments', 'emp_data'],
+  display: ['employees'],
+  grading: ['employees'],
+  theory: ['employees'],
 };
 
 const DEFAULT_ROLE_SIZES: Record<DatabaseRole, DatasetSize> = {
@@ -28,8 +16,24 @@ const DEFAULT_ROLE_SIZES: Record<DatabaseRole, DatasetSize> = {
 };
 
 const contentTableAccess: Record<string, ContentTableConfig> = {
-  default: ALL_TABLES,
-  playground: ALL_TABLES,
+  default: ['employees'],
+  playground: ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
+  // Skills
+  'choose-columns': ['employees'],
+  'filter-rows': ['transactions'],
+  'filter-rows-on-multiple-criteria': ['transactions', 'expenses'],
+  'sort-rows': ['emp_data', 'departments'],
+  'process-columns': ['emp_data', 'departments'],
+  'write-single-criterion-query': ['transactions'],
+  'write-multi-criterion-query': ['emp_data', 'departments'],
+  'write-look-up-query': ['transactions', 'employees', 'accounts'],
+  'join-tables': ['transactions', 'accounts', 'products'],
+  'aggregate-columns': ['quarterly_performance', 'expenses'],
+  'use-filtered-aggregation': ['transactions', 'expenses'],
+  'use-dynamic-aggregation': ['transactions', 'expenses', 'quarterly_performance'],
+  'create-pivot-table': ['emp_data', 'departments'],
+  'write-multi-table-query': ['transactions', 'accounts', 'products'],
+  'write-multi-layered-query': ['transactions', 'accounts', 'products', 'expenses'],
 };
 
 const contentSizeOverrides: Record<string, Partial<Record<DatabaseRole, DatasetSize>>> = {

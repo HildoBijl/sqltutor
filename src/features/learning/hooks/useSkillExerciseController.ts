@@ -527,6 +527,13 @@ export function useSkillExerciseController({
     return 'Practice exercise';
   }, [normalizedExercise, skillModule]);
 
+  useEffect(() => {
+    const description = exerciseDescription?.trim() ?? '';
+    if ((normalizedExercise || exerciseProgress.exercise) && !description) {
+      exerciseDispatch({ type: 'generate' });
+    }
+  }, [exerciseDescription, normalizedExercise, exerciseProgress.exercise, exerciseDispatch]);
+
   const normalizedResults = queryResult as ReadonlyArray<QueryResultSet> | null;
 
   const canSubmit =

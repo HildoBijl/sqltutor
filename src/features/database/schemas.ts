@@ -1,4 +1,10 @@
-import mockDataCsv from '../../../mock_data.csv?raw';
+import accountsCsv from '../../../data/csv/accounts.csv?raw';
+import departmentsCsv from '../../../data/csv/departments.csv?raw';
+import empDataCsv from '../../../data/csv/emp_data.csv?raw';
+import empDeptCsv from '../../../data/csv/emp_dept.csv?raw';
+import employeesCsv from '../../../data/csv/employees.csv?raw';
+import productsCsv from '../../../data/csv/products.csv?raw';
+import transactionsCsv from '../../../data/csv/transactions.csv?raw';
 
 import type { DatasetSize, DatabaseRole, TableKey } from './types';
 import { resolveContentTables, resolveContentSize } from './contentAccess';
@@ -27,187 +33,147 @@ const DEFAULT_ROW_LIMITS: Record<DatasetSize, number> = {
   large: Number.POSITIVE_INFINITY,
 };
 
-type SalaryRecord = { date: string; salary: number };
+function parseCsv(raw: string): Record<string, string>[] {
+  if (!raw) return [];
+  const lines = raw
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 
-interface MockRow {
-  eId: number;
-  position: string | null;
-  salary: number | null;
-  startDate: string | null;
-  endDate: string | null;
-  perfScore: number | null;
-  status: string | null;
-  deptId: number | null;
-  deptName: string | null;
-  name: string | null;
+  if (lines.length === 0) return [];
+
+  const headers = lines[0].split(',').map((h) => h.trim());
+
+  return lines.slice(1).map((line) => {
+    const cells = line.split(',').map((c) => c.trim());
+    const entry: Record<string, string> = {};
+    headers.forEach((header, index) => {
+      entry[header] = cells[index] ?? '';
+    });
+    return entry;
+  });
 }
 
-function toNumber(value: string | null | undefined): number | null {
-  if (value === undefined || value === null) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const parsed = Number(trimmed);
+function numberOrNull(value: string | undefined): number | null {
+  if (!value) return null;
+  const normalized = value.replace(/[^0-9.-]/g, '');
+  if (!normalized) return null;
+  const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function normalizeStatus(status: string | null): string | null {
-  if (!status) return null;
-  const normalized = status.trim().toLowerCase();
-  const map: Record<string, string> = {
-    'sick leave': 'sick_leave',
-    'paid leave': 'paid_leave',
-    'parental leave': 'parental_leave',
-    'unpaid personal leave': 'unpaid_leave',
-    fmla: 'fmla',
-    sabbatical: 'sabbatical',
-    'bereavement leave': 'bereavement_leave',
-  };
-  return map[normalized] ?? normalized.replace(/\s+/g, '_');
+function booleanOrNull(value: string | undefined): boolean | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'true') return true;
+  if (normalized === 'false') return false;
+  return null;
 }
 
-function splitName(name: string | null, fallbackId: number): { first: string; last: string } {
-  if (!name) {
-    return { first: `Employee ${fallbackId}`, last: '' };
-  }
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 0) {
-    return { first: `Employee ${fallbackId}`, last: '' };
-  }
-  const [first, ...rest] = parts;
-  return { first, last: rest.join(' ') };
+function stringOrNull(value: string | undefined): string | null {
+  const trimmed = (value ?? '').trim();
+  return trimmed.length === 0 ? null : trimmed;
 }
 
-function pickLatestSalary(salaries: SalaryRecord[]): number | null {
-  if (!salaries.length) return null;
-  const sorted = [...salaries].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-  return sorted[sorted.length - 1]?.salary ?? null;
+function idOrNull(value: string | undefined): number | string | null {
+  const trimmed = (value ?? '').trim();
+  if (!trimmed) return null;
+  const numeric = Number(trimmed);
+  return Number.isFinite(numeric) ? numeric : trimmed;
 }
 
-function parseMockData(raw: string): MockRow[] {
-  if (!raw) return [];
+const employeesRecords = parseCsv(employeesCsv);
+const empDataRecords = parseCsv(empDataCsv);
+const empDeptRecords = parseCsv(empDeptCsv);
+const departmentsRecords = parseCsv(departmentsCsv);
+const accountsRecords = parseCsv(accountsCsv);
+const productsRecords = parseCsv(productsCsv);
+const transactionsRecords = parseCsv(transactionsCsv);
 
-  const lines = raw.trim().split(/\r?\n/).filter((line) => line.trim().length > 0);
-  if (lines.length === 0) return [];
+const employeesRows: SqlCell[][] = employeesRecords.map((row) => [
+  idOrNull(row.e_id),
+  stringOrNull(row.first_name),
+  stringOrNull(row.last_name),
+  stringOrNull(row.phone),
+  stringOrNull(row.email),
+  stringOrNull(row.address),
+  stringOrNull(row.city),
+  stringOrNull(row.hire_date),
+  numberOrNull(row.current_salary),
+]);
 
-  const header = lines[0].replace(/^\uFEFF/, '').split(',');
-  const rows: MockRow[] = [];
+const empDataRows: SqlCell[][] = empDataRecords.map((row) => [
+  idOrNull(row.e_id),
+  stringOrNull(row.position),
+  numberOrNull(row.salary),
+  stringOrNull(row.start_date),
+  stringOrNull(row.end_date),
+  numberOrNull(row.perf_score),
+  stringOrNull(row.status),
+]);
 
-  const getCell = (line: string, index: number): string | null => {
-    const parts = line.split(',');
-    if (index >= parts.length) return null;
-    const value = parts[index]?.trim() ?? '';
-    return value.length > 0 ? value : null;
-  };
+const empDeptRows: SqlCell[][] = empDeptRecords.map((row) => [
+  idOrNull(row.e_id),
+  idOrNull(row.d_id),
+]);
 
-  const eIdIndex = header.indexOf('e_id');
-  const positionIndex = header.indexOf('position');
-  const salaryIndex = header.indexOf('salary');
-  const startDateIndex = header.indexOf('start_date');
-  const endDateIndex = header.indexOf('end_date');
-  const perfIndex = header.indexOf('perf_score');
-  const statusIndex = header.indexOf('status');
-  const deptIdIndex = header.indexOf('dept_id');
-  const deptNameIndex = header.indexOf('dept_name');
-  const nameIndex = header.indexOf('name');
+const departmentsRows: SqlCell[][] = departmentsRecords.map((row) => [
+  idOrNull(row.d_id),
+  stringOrNull(row.d_name),
+  idOrNull(row.manager_id),
+  numberOrNull(row.budget),
+  numberOrNull(row.nr_employees),
+]);
 
-  lines.slice(1).forEach((line) => {
-    const eId = toNumber(getCell(line, eIdIndex));
-    if (!eId) return;
+const accountsRows: SqlCell[][] = accountsRecords.map((row) => [
+  stringOrNull(row.acct_id),
+  stringOrNull(row.username),
+  stringOrNull(row.phone),
+  stringOrNull(row.email),
+  booleanOrNull(row.verified),
+  stringOrNull(row.full_name),
+  stringOrNull(row.address),
+  stringOrNull(row.city),
+  stringOrNull(row.created_at),
+  stringOrNull(row.last_login_at),
+]);
 
-    rows.push({
-      eId,
-      position: getCell(line, positionIndex),
-      salary: toNumber(getCell(line, salaryIndex)),
-      startDate: getCell(line, startDateIndex),
-      endDate: getCell(line, endDateIndex),
-      perfScore: toNumber(getCell(line, perfIndex)),
-      status: getCell(line, statusIndex),
-      deptId: toNumber(getCell(line, deptIdIndex)),
-      deptName: getCell(line, deptNameIndex),
-      name: getCell(line, nameIndex),
-    });
-  });
+const productsRows: SqlCell[][] = productsRecords.map((row) => [
+  idOrNull(row.p_id),
+  stringOrNull(row.name),
+  stringOrNull(row.category),
+  stringOrNull(row.owned_by),
+  numberOrNull(row.est_value),
+  stringOrNull(row.status),
+]);
 
-  return rows;
-}
+const transactionsRows: SqlCell[][] = transactionsRecords.map((row) => [
+  idOrNull(row.t_id),
+  stringOrNull(row.vendor_id),
+  stringOrNull(row.buyer_id),
+  idOrNull(row.prod_id),
+  stringOrNull(row.date_time),
+  numberOrNull(row.amount),
+  idOrNull(row.validated_by),
+  stringOrNull(row.status),
+]);
 
-const mockRows = parseMockData(mockDataCsv);
+// Legacy sample data for exercises without CSVs yet
+const expensesRows: SqlCell[][] = [
+  [3001, 1800.0, departmentsRows[0]?.[0] ?? 1000, 'Team event', '2025-01-15', null, null],
+  [3002, 12000.0, departmentsRows[1]?.[0] ?? 2000, 'teambuilding retreat', '2025-02-01', null, null],
+  [3003, 4200.0, departmentsRows[2]?.[0] ?? 3000, 'Hardware purchase', '2025-02-10', null, null],
+  [3004, 600.0, departmentsRows[3]?.[0] ?? 4000, 'Lorem ipsum supplies', '2024-12-01', null, null],
+];
 
-type DepartmentAggregate = { name: string; employeeIds: Set<number> };
-type EmployeeAggregate = { firstName: string; lastName: string; salaries: SalaryRecord[] };
-
-const departments = new Map<number, DepartmentAggregate>();
-const employees = new Map<number, EmployeeAggregate>();
-const empDataRows: SqlCell[][] = [];
-
-mockRows.forEach((row) => {
-  const status = normalizeStatus(row.status);
-
-  empDataRows.push([
-    row.eId,
-    row.deptId,
-    row.position,
-    row.salary,
-    row.startDate,
-    row.endDate,
-    row.perfScore,
-    null,
-    status,
-  ]);
-
-  if (row.deptId !== null) {
-    const existingDept = departments.get(row.deptId) ?? {
-      name: row.deptName || `Department ${row.deptId}`,
-      employeeIds: new Set<number>(),
-    };
-    if (row.deptName) {
-      existingDept.name = row.deptName;
-    }
-    existingDept.employeeIds.add(row.eId);
-    departments.set(row.deptId, existingDept);
-  }
-
-  const existingEmployee = employees.get(row.eId) ?? {
-    firstName: '',
-    lastName: '',
-    salaries: [],
-  };
-  if (!existingEmployee.firstName || !existingEmployee.lastName) {
-    const names = splitName(row.name, row.eId);
-    existingEmployee.firstName = names.first;
-    existingEmployee.lastName = names.last;
-  }
-  if (row.salary !== null) {
-    existingEmployee.salaries.push({
-      salary: row.salary,
-      date: row.startDate || row.endDate || '',
-    });
-  }
-  employees.set(row.eId, existingEmployee);
-});
-
-const employeesRows: SqlCell[][] = Array.from(employees.entries())
-  .sort(([a], [b]) => a - b)
-  .map(([eId, data]) => [
-    eId,
-    data.firstName || `Employee ${eId}`,
-    data.lastName || '',
-    null,
-    null,
-    null,
-    null,
-    pickLatestSalary(data.salaries),
-  ]);
-
-const departmentsRows: SqlCell[][] = Array.from(departments.entries())
-  .sort(([a], [b]) => a - b)
-  .map(([dId, data]) => [
-    dId,
-    data.name,
-    null,
-    null,
-    data.employeeIds.size || null,
-  ]);
+const quarterlyPerformanceRows: SqlCell[][] = [
+  [1, 2023, 1200000.0, 400000.0, 2400, 0.08, '2024-01-10 10:00:00'],
+  [2, 2023, 1400000.0, 450000.0, 2600, 0.1, '2024-04-10 10:00:00'],
+  [3, 2023, 1350000.0, 430000.0, 2550, -0.02, '2024-07-10 10:00:00'],
+  [4, 2023, 1500000.0, 470000.0, 2800, 0.05, '2024-10-10 10:00:00'],
+  [1, 2024, 1600000.0, 500000.0, 3000, 0.03, '2025-01-10 10:00:00'],
+];
 
 const tableDefinitions: Record<TableKey, TableDefinition> = {
   employees: {
@@ -221,9 +187,37 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     email TEXT,
     address TEXT,
     city TEXT,
+    hire_date DATE,
     current_salary REAL
   );`.trim(),
     rows: employeesRows,
+  },
+  emp_data: {
+    name: 'emp_data',
+    createStatement: `
+  CREATE TABLE emp_data (
+    e_id INTEGER NOT NULL,
+    position TEXT,
+    salary REAL,
+    start_date DATE,
+    end_date DATE,
+    perf_score INTEGER,
+    status TEXT,
+    FOREIGN KEY (e_id) REFERENCES employees(e_id)
+  );`.trim(),
+    rows: empDataRows,
+  },
+  emp_dept: {
+    name: 'emp_dept',
+    createStatement: `
+  CREATE TABLE emp_dept (
+    e_id INTEGER NOT NULL,
+    d_id INTEGER NOT NULL,
+    PRIMARY KEY (e_id, d_id),
+    FOREIGN KEY (e_id) REFERENCES employees(e_id),
+    FOREIGN KEY (d_id) REFERENCES departments(d_id)
+  );`.trim(),
+    rows: empDeptRows,
   },
   departments: {
     name: 'departments',
@@ -231,59 +225,29 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
   CREATE TABLE departments (
     d_id INTEGER PRIMARY KEY,
     d_name TEXT NOT NULL,
-    managed_by INTEGER,
+    manager_id INTEGER,
     budget REAL,
     nr_employees INTEGER,
-    FOREIGN KEY (managed_by) REFERENCES employees(e_id)
+    FOREIGN KEY (manager_id) REFERENCES employees(e_id)
   );`.trim(),
     rows: departmentsRows,
-  },
-  emp_data: {
-    name: 'emp_data',
-    createStatement: `
-  CREATE TABLE emp_data (
-    e_id INTEGER NOT NULL,
-    d_id INTEGER,
-    position TEXT,
-    salary REAL,
-    start_date DATE,
-    end_date DATE,
-    perf_score INTEGER,
-    other_info TEXT,
-    work_status TEXT,
-    PRIMARY KEY (e_id, start_date, end_date),
-    FOREIGN KEY (e_id) REFERENCES employees(e_id),
-    FOREIGN KEY (d_id) REFERENCES departments(d_id)
-  );`.trim(),
-    rows: empDataRows,
-  },
-  clock_in_out: {
-    name: 'clock_in_out',
-    createStatement: `
-  CREATE TABLE clock_in_out (
-    entry_id INTEGER PRIMARY KEY,
-    e_id INTEGER NOT NULL,
-    in_time DATETIME NOT NULL,
-    out_time DATETIME,
-    on_site BOOLEAN,
-    FOREIGN KEY (e_id) REFERENCES employees(e_id)
-  );`.trim(),
-    rows: [],
   },
   accounts: {
     name: 'accounts',
     createStatement: `
   CREATE TABLE accounts (
-    acct_id INTEGER PRIMARY KEY,
+    acct_id TEXT PRIMARY KEY,
     username TEXT,
     phone TEXT,
     email TEXT,
     email_verified BOOLEAN,
     full_name TEXT,
-    created_at DATETIME,
-    last_login_at DATETIME
+    address TEXT,
+    city TEXT,
+    created_at TEXT,
+    last_login_at TEXT
   );`.trim(),
-    rows: [],
+    rows: accountsRows,
   },
   products: {
     name: 'products',
@@ -292,20 +256,20 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     p_id INTEGER PRIMARY KEY,
     name TEXT,
     category TEXT,
-    owner_id INTEGER,
+    owner_id TEXT,
     est_value REAL,
     status TEXT,
     FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)
   );`.trim(),
-    rows: [],
+    rows: productsRows,
   },
   transactions: {
     name: 'transactions',
     createStatement: `
   CREATE TABLE transactions (
     t_id INTEGER PRIMARY KEY,
-    vendor_id INTEGER,
-    buyer_id INTEGER,
+    vendor_id TEXT,
+    buyer_id TEXT,
     prod_id INTEGER,
     date_time DATETIME,
     amount REAL,
@@ -316,7 +280,7 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (prod_id) REFERENCES products(p_id),
     FOREIGN KEY (validated_by) REFERENCES employees(e_id)
   );`.trim(),
-    rows: [],
+    rows: transactionsRows,
   },
   expenses: {
     name: 'expenses',
@@ -333,7 +297,7 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (requested_by) REFERENCES employees(e_id),
     FOREIGN KEY (approved_by) REFERENCES employees(e_id)
   );`.trim(),
-    rows: [],
+    rows: expensesRows,
   },
   quarterly_performance: {
     name: 'quarterly_performance',
@@ -348,7 +312,7 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     updated_at DATETIME,
     PRIMARY KEY (quarter, fiscal_year)
   );`.trim(),
-    rows: [],
+    rows: quarterlyPerformanceRows,
   },
 };
 
@@ -431,20 +395,10 @@ export function buildSchema({ tables, size, role }: BuildSchemaOptions): string 
 }
 
 const schemaTableGroups: Record<string, TableKey[]> = {
-  core: ['employees', 'departments', 'emp_data', 'clock_in_out'],
+  core: ['employees', 'emp_data', 'emp_dept', 'departments'],
   commerce: ['accounts', 'products', 'transactions'],
   finance: ['expenses', 'quarterly_performance'],
-  full: [
-    'employees',
-    'departments',
-    'emp_data',
-    'clock_in_out',
-    'accounts',
-    'products',
-    'transactions',
-    'expenses',
-    'quarterly_performance',
-  ],
+  full: ['employees', 'emp_data', 'emp_dept', 'departments', 'accounts', 'products', 'transactions', 'expenses', 'quarterly_performance'],
 };
 
 export const schemas = Object.entries(schemaTableGroups).reduce<Record<string, string>>(
