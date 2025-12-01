@@ -107,14 +107,12 @@ function normalizeComponentState(id: string, state: Partial<ComponentState> | un
 
 interface AppState {
   components: Record<string, ComponentState>;
-  sidebarOpen: boolean;
   currentTheme: 'light' | 'dark';
   hideStories: boolean;
   _hasHydrated: boolean;
   updateComponent: (id: string, data: Partial<ComponentState>) => void;
   getComponent: (id: string) => ComponentState;
   resetComponent: (id: string, type?: ComponentType) => void;
-  toggleSidebar: () => void;
   toggleHideStories: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setHasHydrated: (hasHydrated: boolean) => void;
@@ -127,7 +125,6 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       components: {},
-      sidebarOpen: true,
       currentTheme: 'light',
       hideStories: true,
       _hasHydrated: false,
@@ -207,9 +204,6 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      toggleSidebar: () =>
-        set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-
       toggleHideStories: () =>
         set((state) => ({ hideStories: !state.hideStories })),
 
@@ -252,7 +246,6 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         components: state.components,
         currentTheme: state.currentTheme,
-        sidebarOpen: state.sidebarOpen,
         hideStories: state.hideStories,
       }),
       onRehydrateStorage: () => (state) => {

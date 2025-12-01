@@ -1,6 +1,5 @@
 import { AppBar, Toolbar, Typography, IconButton, Box, Button } from '@mui/material';
 import {
-  Menu as MenuIcon,
   ArrowBack as BackIcon,
   Home as HomeIcon,
   School as LearnIcon,
@@ -9,12 +8,10 @@ import {
   // Code as PlaygroundIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppStore } from '@/store';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const toggleSidebar = useAppStore((state) => state.toggleSidebar);
 
   const isHome = location.pathname === '/';
 
@@ -49,11 +46,11 @@ export function Header() {
         <IconButton
           edge="start"
           color="inherit"
-          aria-label={isHome ? 'menu' : 'back'}
-          onClick={isHome ? toggleSidebar : handleBack}
+          aria-label={isHome ? 'home' : 'back'}
+          onClick={isHome ? () => navigate('/learn') : handleBack}
           sx={{ mr: 2 }}
         >
-          {isHome ? <MenuIcon /> : <BackIcon />}
+          {isHome ? <HomeIcon /> : <BackIcon />}
         </IconButton>
 
         {/* Title */}
