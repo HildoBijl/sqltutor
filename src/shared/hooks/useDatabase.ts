@@ -245,3 +245,12 @@ export function useConceptDatabase(schema: SchemaKey = 'core') {
     resetOnSchemaChange: true,
   });
 }
+
+// Small, sample-friendly database for theory examples across all tables.
+export function useTheorySampleDatabase(schema: SchemaKey = 'full') {
+  return useDatabase({
+    role: 'theory',
+    schema,
+    resetOnSchemaChange: true,
+  });
+}

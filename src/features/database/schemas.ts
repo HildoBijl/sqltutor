@@ -28,7 +28,8 @@ interface TableDefinition {
 }
 
 const DEFAULT_ROW_LIMITS: Record<DatasetSize, number> = {
-  small: 50,
+  // Keep theory datasets tiny for easy examples; display/grading remain unlimited.
+  small: 10,
   medium: Number.POSITIVE_INFINITY,
   large: Number.POSITIVE_INFINITY,
 };
