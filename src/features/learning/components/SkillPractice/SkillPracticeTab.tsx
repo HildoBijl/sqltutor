@@ -43,13 +43,13 @@ export function SkillPracticeTab({
 
   return (
     <Box>
-      {practice.currentExercise ? (
+      {/* {practice.currentExercise ? (
         <ExerciseDescription title={practice.title} description={description} tableNames={practice.tableNames} />
       ) : (
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           Generating your next exercise...
         </Typography>
-      )}
+      )} */}
 
       <Box sx={{ mb: 3 }}>
         <ExerciseEditor
@@ -70,7 +70,7 @@ export function SkillPracticeTab({
         ) : null}
       </Box>
 
-      <ExerciseControls
+      {/* <ExerciseControls
         exerciseCompleted={practice.exerciseCompleted}
         hasGivenUp={practice.hasGivenUp}
         canSubmit={practice.canSubmit}
@@ -91,12 +91,12 @@ export function SkillPracticeTab({
             />
           ) : null
         }
-      />
+      /> */}
 
-      <ExerciseSolution
+      {/* <ExerciseSolution
         solution={practice.solution ?? undefined}
         show={showSolution}
-      />
+      /> */}
 
       <ExerciseResults
         queryResult={practice.queryResult}

@@ -61,6 +61,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
 
     try {
       const db = new SQLJS.Database();
+      console.log(schema)
       db.run(schema);
       return db;
     } catch (error) {

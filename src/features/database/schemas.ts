@@ -1,10 +1,7 @@
-import accountsCsv from '../../../data/csv/accounts.csv?raw';
-import departmentsCsv from '../../../data/csv/departments.csv?raw';
-import empDataCsv from '../../../data/csv/emp_data.csv?raw';
-import empDeptCsv from '../../../data/csv/emp_dept.csv?raw';
-import employeesCsv from '../../../data/csv/employees.csv?raw';
-import productsCsv from '../../../data/csv/products.csv?raw';
-import transactionsCsv from '../../../data/csv/transactions.csv?raw';
+import employeeCsv from '../../../data/csv/employee.csv?raw';
+import companyCsv from '../../../data/csv/company.csv?raw';
+import worksCsv from '../../../data/csv/works.csv?raw';
+import managesCsv from '../../../data/csv/manages.csv?raw';
 
 import type { DatasetSize, DatabaseRole, TableKey } from './types';
 import { resolveContentTables, resolveContentSize } from './contentAccess';
@@ -64,256 +61,92 @@ function numberOrNull(value: string | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function booleanOrNull(value: string | undefined): boolean | null {
-  if (!value) return null;
-  const normalized = value.trim().toLowerCase();
-  if (normalized === 'true') return true;
-  if (normalized === 'false') return false;
-  return null;
-}
+// function booleanOrNull(value: string | undefined): boolean | null {
+//   if (!value) return null;
+//   const normalized = value.trim().toLowerCase();
+//   if (normalized === 'true') return true;
+//   if (normalized === 'false') return false;
+//   return null;
+// }
 
 function stringOrNull(value: string | undefined): string | null {
   const trimmed = (value ?? '').trim();
   return trimmed.length === 0 ? null : trimmed;
 }
 
-function idOrNull(value: string | undefined): number | string | null {
-  const trimmed = (value ?? '').trim();
-  if (!trimmed) return null;
-  const numeric = Number(trimmed);
-  return Number.isFinite(numeric) ? numeric : trimmed;
-}
+// function idOrNull(value: string | undefined): number | string | null {
+//   const trimmed = (value ?? '').trim();
+//   if (!trimmed) return null;
+//   const numeric = Number(trimmed);
+//   return Number.isFinite(numeric) ? numeric : trimmed;
+// }
 
-const employeesRecords = parseCsv(employeesCsv);
-const empDataRecords = parseCsv(empDataCsv);
-const empDeptRecords = parseCsv(empDeptCsv);
-const departmentsRecords = parseCsv(departmentsCsv);
-const accountsRecords = parseCsv(accountsCsv);
-const productsRecords = parseCsv(productsCsv);
-const transactionsRecords = parseCsv(transactionsCsv);
+const employeeRecords = parseCsv(employeeCsv);
+const companyRecords = parseCsv(companyCsv);
+const worksRecords = parseCsv(worksCsv);
+const managesRecords = parseCsv(managesCsv);
 
-const employeesRows: SqlCell[][] = employeesRecords.map((row) => [
-  idOrNull(row.e_id),
-  stringOrNull(row.first_name),
-  stringOrNull(row.last_name),
-  stringOrNull(row.phone),
-  stringOrNull(row.email),
-  stringOrNull(row.address),
+const employeeRows: SqlCell[][] = employeeRecords.map((row) => [
+  stringOrNull(row.person_name),
+  stringOrNull(row.street),
   stringOrNull(row.city),
-  stringOrNull(row.hire_date),
-  numberOrNull(row.current_salary),
 ]);
 
-const empDataRows: SqlCell[][] = empDataRecords.map((row) => [
-  idOrNull(row.e_id),
-  stringOrNull(row.position),
+const companyRows: SqlCell[][] = companyRecords.map((row) => [
+  stringOrNull(row.company_name),
+  stringOrNull(row.city),
+]);
+
+const worksRows: SqlCell[][] = worksRecords.map((row) => [
+  stringOrNull(row.person_name),
+  stringOrNull(row.company_name),
   numberOrNull(row.salary),
-  stringOrNull(row.start_date),
-  stringOrNull(row.end_date),
-  numberOrNull(row.perf_score),
-  stringOrNull(row.status),
 ]);
 
-const empDeptRows: SqlCell[][] = empDeptRecords.map((row) => [
-  idOrNull(row.e_id),
-  idOrNull(row.d_id),
+const managesRows: SqlCell[][] = managesRecords.map((row) => [
+  stringOrNull(row.person_name),
+  stringOrNull(row.manager_name),
 ]);
-
-const departmentsRows: SqlCell[][] = departmentsRecords.map((row) => [
-  idOrNull(row.d_id),
-  stringOrNull(row.d_name),
-  idOrNull(row.manager_id),
-  numberOrNull(row.budget),
-  numberOrNull(row.nr_employees),
-]);
-
-const accountsRows: SqlCell[][] = accountsRecords.map((row) => [
-  stringOrNull(row.acct_id),
-  stringOrNull(row.username),
-  stringOrNull(row.phone),
-  stringOrNull(row.email),
-  booleanOrNull(row.verified),
-  stringOrNull(row.full_name),
-  stringOrNull(row.address),
-  stringOrNull(row.city),
-  stringOrNull(row.created_at),
-  stringOrNull(row.last_login_at),
-]);
-
-const productsRows: SqlCell[][] = productsRecords.map((row) => [
-  idOrNull(row.p_id),
-  stringOrNull(row.name),
-  stringOrNull(row.category),
-  stringOrNull(row.owned_by),
-  numberOrNull(row.est_value),
-  stringOrNull(row.status),
-]);
-
-const transactionsRows: SqlCell[][] = transactionsRecords.map((row) => [
-  idOrNull(row.t_id),
-  stringOrNull(row.vendor_id),
-  stringOrNull(row.buyer_id),
-  idOrNull(row.prod_id),
-  stringOrNull(row.date_time),
-  numberOrNull(row.amount),
-  idOrNull(row.validated_by),
-  stringOrNull(row.status),
-]);
-
-// Legacy sample data for exercises without CSVs yet
-const expensesRows: SqlCell[][] = [
-  [3001, 1800.0, departmentsRows[0]?.[0] ?? 1000, 'Team event', '2025-01-15', null, null],
-  [3002, 12000.0, departmentsRows[1]?.[0] ?? 2000, 'teambuilding retreat', '2025-02-01', null, null],
-  [3003, 4200.0, departmentsRows[2]?.[0] ?? 3000, 'Hardware purchase', '2025-02-10', null, null],
-  [3004, 600.0, departmentsRows[3]?.[0] ?? 4000, 'Lorem ipsum supplies', '2024-12-01', null, null],
-];
-
-const quarterlyPerformanceRows: SqlCell[][] = [
-  [1, 2023, 1200000.0, 400000.0, 2400, 0.08, '2024-01-10 10:00:00'],
-  [2, 2023, 1400000.0, 450000.0, 2600, 0.1, '2024-04-10 10:00:00'],
-  [3, 2023, 1350000.0, 430000.0, 2550, -0.02, '2024-07-10 10:00:00'],
-  [4, 2023, 1500000.0, 470000.0, 2800, 0.05, '2024-10-10 10:00:00'],
-  [1, 2024, 1600000.0, 500000.0, 3000, 0.03, '2025-01-10 10:00:00'],
-];
 
 const tableDefinitions: Record<TableKey, TableDefinition> = {
-  employees: {
-    name: 'employees',
+  employee: {
+    name: 'employee',
     createStatement: `
-  CREATE TABLE employees (
-    e_id INTEGER PRIMARY KEY,
-    first_name TEXT,
-    last_name TEXT,
-    phone TEXT,
-    email TEXT,
-    address TEXT,
-    city TEXT,
-    hire_date DATE,
-    current_salary REAL
+  CREATE TABLE employee (
+    person_name TEXT PRIMARY KEY,
+    street TEXT,
+    city TEXT
   );`.trim(),
-    rows: employeesRows,
+    rows: employeeRows,
   },
-  emp_data: {
-    name: 'emp_data',
+  company: {
+    name: 'company',
     createStatement: `
-  CREATE TABLE emp_data (
-    e_id INTEGER NOT NULL,
-    position TEXT,
+  CREATE TABLE company (
+    company_name TEXT PRIMARY KEY,
+    city TEXT
+  );`.trim(),
+    rows: companyRows,
+  },
+  works: {
+    name: 'works',
+    createStatement: `
+  CREATE TABLE works (
+    person_name TEXT PRIMARY KEY,
+    company_name TEXT,
     salary REAL,
-    start_date DATE,
-    end_date DATE,
-    perf_score INTEGER,
-    status TEXT,
-    FOREIGN KEY (e_id) REFERENCES employees(e_id)
+    FOREIGN KEY (company_name) REFERENCES company(company_name)
   );`.trim(),
-    rows: empDataRows,
+    rows: worksRows,
   },
-  emp_dept: {
-    name: 'emp_dept',
+  manages: {
+    name: 'manages',
     createStatement: `
-  CREATE TABLE emp_dept (
-    e_id INTEGER NOT NULL,
-    d_id INTEGER NOT NULL,
-    PRIMARY KEY (e_id, d_id),
-    FOREIGN KEY (e_id) REFERENCES employees(e_id),
-    FOREIGN KEY (d_id) REFERENCES departments(d_id)
+  CREATE TABLE manages (
+    person_name TEXT PRIMARY KEY,
+    manage_name TEXT
   );`.trim(),
-    rows: empDeptRows,
-  },
-  departments: {
-    name: 'departments',
-    createStatement: `
-  CREATE TABLE departments (
-    d_id INTEGER PRIMARY KEY,
-    d_name TEXT NOT NULL,
-    manager_id INTEGER,
-    budget REAL,
-    nr_employees INTEGER,
-    FOREIGN KEY (manager_id) REFERENCES employees(e_id)
-  );`.trim(),
-    rows: departmentsRows,
-  },
-  accounts: {
-    name: 'accounts',
-    createStatement: `
-  CREATE TABLE accounts (
-    acct_id TEXT PRIMARY KEY,
-    username TEXT,
-    phone TEXT,
-    email TEXT,
-    email_verified BOOLEAN,
-    full_name TEXT,
-    address TEXT,
-    city TEXT,
-    created_at TEXT,
-    last_login_at TEXT
-  );`.trim(),
-    rows: accountsRows,
-  },
-  products: {
-    name: 'products',
-    createStatement: `
-  CREATE TABLE products (
-    p_id INTEGER PRIMARY KEY,
-    name TEXT,
-    category TEXT,
-    owner_id TEXT,
-    est_value REAL,
-    status TEXT,
-    FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)
-  );`.trim(),
-    rows: productsRows,
-  },
-  transactions: {
-    name: 'transactions',
-    createStatement: `
-  CREATE TABLE transactions (
-    t_id INTEGER PRIMARY KEY,
-    vendor_id TEXT,
-    buyer_id TEXT,
-    prod_id INTEGER,
-    date_time DATETIME,
-    amount REAL,
-    validated_by INTEGER,
-    status TEXT,
-    FOREIGN KEY (vendor_id) REFERENCES accounts(acct_id),
-    FOREIGN KEY (buyer_id) REFERENCES accounts(acct_id),
-    FOREIGN KEY (prod_id) REFERENCES products(p_id),
-    FOREIGN KEY (validated_by) REFERENCES employees(e_id)
-  );`.trim(),
-    rows: transactionsRows,
-  },
-  expenses: {
-    name: 'expenses',
-    createStatement: `
-  CREATE TABLE expenses (
-    exp_id INTEGER PRIMARY KEY,
-    amount REAL,
-    d_id INTEGER,
-    description TEXT,
-    date DATE,
-    requested_by INTEGER,
-    approved_by INTEGER,
-    FOREIGN KEY (d_id) REFERENCES departments(d_id),
-    FOREIGN KEY (requested_by) REFERENCES employees(e_id),
-    FOREIGN KEY (approved_by) REFERENCES employees(e_id)
-  );`.trim(),
-    rows: expensesRows,
-  },
-  quarterly_performance: {
-    name: 'quarterly_performance',
-    createStatement: `
-  CREATE TABLE quarterly_performance (
-    quarter INTEGER,
-    fiscal_year INTEGER,
-    revenue REAL,
-    operating_expenses REAL,
-    total_transactions INTEGER,
-    growth_rate REAL,
-    updated_at DATETIME,
-    PRIMARY KEY (quarter, fiscal_year)
-  );`.trim(),
-    rows: quarterlyPerformanceRows,
+    rows: managesRows,
   },
 };
 
@@ -396,10 +229,10 @@ export function buildSchema({ tables, size, role }: BuildSchemaOptions): string 
 }
 
 const schemaTableGroups: Record<string, TableKey[]> = {
-  core: ['employees', 'emp_data', 'emp_dept', 'departments'],
-  commerce: ['accounts', 'products', 'transactions'],
-  finance: ['expenses', 'quarterly_performance'],
-  full: ['employees', 'emp_data', 'emp_dept', 'departments', 'accounts', 'products', 'transactions', 'expenses', 'quarterly_performance'],
+  core: ['employee', 'company', 'works', 'manages'],
+  commerce: ['employee', 'company', 'works', 'manages'],
+  finance: ['employee', 'company', 'works', 'manages'],
+  full: ['employee', 'company', 'works', 'manages'],
 };
 
 export const schemas = Object.entries(schemaTableGroups).reduce<Record<string, string>>(

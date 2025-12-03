@@ -31,6 +31,7 @@ function ResultsPlaceholder({ message }: { message: string }) {
 }
 
 export function ExerciseResults({ queryResult, queryError, hasExecuted, isComplete }: ExerciseResultsProps) {
+  console.log(queryResult, queryError, hasExecuted, isComplete)
   const [expanded, setExpanded] = useState(() => !isComplete);
   let content: ReactNode = null;
   const emptyMessage = 'Query executed successfully but returned no rows.';

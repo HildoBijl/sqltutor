@@ -53,6 +53,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   } = options;
 
   const { databases: contextDatabases, getDatabase, resetDatabase: resetContextDatabase, isReady: contextReady } = useDatabaseContext();
+  console.log(contextDatabases)
 
   const [currentSchema, setCurrentSchema] = useState<string>('');
   const [database, setDatabase] = useState<any>(null);
