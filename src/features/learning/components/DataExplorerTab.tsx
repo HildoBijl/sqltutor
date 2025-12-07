@@ -314,32 +314,23 @@ function TableDataView({
         <Typography variant="subtitle2" gutterBottom>
           Preview
         </Typography>
-        <Box
-          sx={{
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
-          {selectedTable ? (
-            queryResult && queryResult.length > 0 ? (
-              <DataTable data={queryResult[0]} />
-            ) : (
-              <Box sx={{ py: 4, textAlign: 'center' }}>
-                <Typography color="text.secondary">
-                  Click on a table to view its data.
-                </Typography>
-              </Box>
-            )
+        {selectedTable ? (
+          queryResult && queryResult.length > 0 ? (
+            <DataTable data={queryResult[0]} />
           ) : (
             <Box sx={{ py: 4, textAlign: 'center' }}>
               <Typography color="text.secondary">
-                Select a table to load its rows.
+                Click on a table to view its data.
               </Typography>
             </Box>
-          )}
-        </Box>
+          )
+        ) : (
+          <Box sx={{ py: 4, textAlign: 'center' }}>
+            <Typography color="text.secondary">
+              Select a table to load its rows.
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );
