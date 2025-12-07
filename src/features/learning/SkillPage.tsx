@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button } from '@mui/material';
-import { MenuBook, Lightbulb, Bolt, Edit, Storage } from '@mui/icons-material';
+import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit} from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/store';
 
@@ -113,7 +113,7 @@ export default function SkillPage() {
         title={skillMeta.name}
         description={skillMeta.description}
         onBack={() => navigate('/learn')}
-        icon={<Edit color="primary" sx={{ fontSize: 32 }} />}
+        icon={<EditNote color="primary" sx={{ fontSize: 32 }} />}
         isCompleted={isSkillMastered}
         progress={progressInfo}
       />
