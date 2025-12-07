@@ -55,17 +55,16 @@ export default function HomePage() {
         }}
       >
         <Container maxWidth="md">
-          <Typography
-            variant="h2"
-            gutterBottom
+          <Box
+            component="img"
+            src="/SQLValleyTitle.svg"
+            alt="SQL Valley"
             sx={{
-              fontWeight: 600,
-              fontSize: { xs: '2rem', md: '3rem' },
+              width: { xs: '100%', md: '400px' },
+              height: 'auto',
               mb: 3,
             }}
-          >
-            SQL Valley
-          </Typography>
+          />
           <Typography
             variant="h5"
             sx={{
