@@ -14,9 +14,11 @@ import {
 import {
   PlayArrow,
   Code,
-  School,
   AutoStories,
   TrendingUp,
+  School, 
+  Edit, 
+  CheckCircle
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,17 +28,17 @@ export default function HomePage() {
 
   const steps = [
     {
-      icon: <AutoStories fontSize="large" />,
+      icon: <School fontSize="large" />,
       title: 'Learn Concepts',
       description: 'Start with fundamental database concepts. Each concept includes theory pages and examples to help you understand the underlying principles.',
     },
     {
-      icon: <Code fontSize="large" />,
+      icon: <Edit fontSize="large" />,
       title: 'Practice Skills',
       description: 'Apply what you\'ve learned through skill-specific exercises. Write SQL queries and get immediate feedback on whether they produce the expected results.',
     },
     {
-      icon: <TrendingUp fontSize="large" />,
+      icon: <CheckCircle fontSize="large" />,
       title: 'Track Progress',
       description: 'The skill tree shows which concepts and skills you\'ve completed and which are available next. Prerequisites are clearly marked so you know what to learn first.',
     },
@@ -81,7 +83,7 @@ export default function HomePage() {
             <Button
               variant="contained"
               size="large"
-              startIcon={<School />}
+              startIcon={<AutoStories />}
               onClick={() => navigate('/learn')}
               sx={{
                 bgcolor: 'white',
@@ -138,11 +140,10 @@ export default function HomePage() {
                     justifyContent: 'center',
                     mx: 'auto',
                     mb: 3,
+                    color: 'primary.main',
                   }}
                 >
-                  <Box sx={{ color: 'primary.main' }}>
-                    {step.icon}
-                  </Box>
+                  {step.icon}
                 </Box>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 500, mb: 2 }}>
                   {step.title}

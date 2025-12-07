@@ -15,7 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 import {
-  School as LearnIcon,
+  AutoStories as LearnIcon,
   // PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
 import { DarkMode, LightMode, RestartAlt, Settings, Check, AdminPanelSettings } from '@mui/icons-material';
