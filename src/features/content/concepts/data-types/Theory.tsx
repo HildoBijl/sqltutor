@@ -24,7 +24,7 @@ export function Theory() {
       <Par>In a database table, every column has a specific <Term>data type</Term>. Consider for instance a table showing the employees of a company.</Par>
       <FigureDataTypeDemo />
       <Par>Note that some columns contain <Term>numbers</Term>, others contain <Term>text</Term>, and others have <Term>date/time</Term> values. A column with a certain type <Em>cannot</Em> contain values of another type!</Par>
-      <Par>Optionally, columns may be given further restrictions. For instance, the <SQLDisplay inline>current_salary</SQLDisplay> column may be set up to only allow positive values, and the <SQLDisplay inline>city</SQLDisplay> column may be set up to only take values from a list of existing cities. The set of all possible values that can be put in a column is called the <Term>domain</Term> of that column.</Par>
+      <Par>Optionally, columns may be given further restrictions. For instance, the <SQLDisplay inline>current_salary</SQLDisplay> column may be set up to only allow positive numbers, and the <SQLDisplay inline>city</SQLDisplay> column may be set up to only take values from a list of existing cities. The set of all possible values that can be put in a column is formally called the <Term>domain</Term> of that column.</Par>
     </Section>
 
     <Section title={<>The <SQLDisplay inline>NULL</SQLDisplay> value</>}>
