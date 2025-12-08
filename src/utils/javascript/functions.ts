@@ -15,11 +15,11 @@ export function repeatWithMinMax<T>(min: number, max: number, func: (index: numb
   // Process the input.
   const start = ensureInt(min);
   const end = ensureInt(max);
-  if (start > end)
-    throw new Error(`Invalid range: min (${start}) cannot be greater than max (${end}).`);
+  const times = end - start + 1;
+  if (times < 0)
+    throw new Error(`Invalid range: min (${start}) cannot be greater than max (${end}) plus one.`);
 
   // Set up the array.
-  const times = end - start + 1;
   return Array.from({ length: times }, (_, i) => func(start + i));
 }
 

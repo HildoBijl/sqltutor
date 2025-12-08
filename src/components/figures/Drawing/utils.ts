@@ -1,4 +1,5 @@
 import { type Ref } from 'react';
+import { repeat } from '@/utils/javascript';
 import { Vector, type VectorInput, ensureVector, Rectangle, type RectangleInput, ensureRectangle } from '@/utils/geometry';
 import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useBoundingClientRects, useRefWithElement, useTextNode } from '@/utils/dom';
 
@@ -68,7 +69,12 @@ export function useDrawingMousePosition(): Vector | undefined {
 export function useElementBounds(
 	element?: Element | Text | null,
 	drawingRef?: Ref<DrawingData | null>,
+	numUp = 0,
 ): Rectangle | undefined {
+	repeat(numUp, () => {
+		if (element?.parentElement)
+			element = element?.parentElement;
+	})
 	const clientRect = useBoundingClientRect(element);
 	const drawingData = useDrawingData(drawingRef);
 	return transformRectangle(clientRect, drawingData);
@@ -80,9 +86,10 @@ export function useTextNodeBounds(
 	condition: string | ((node: Text) => boolean),
 	drawingRef?: Ref<DrawingData | null>,
 	index = 0,
+	numUp = 0,
 ): Rectangle | undefined {
 	const textNode = useTextNode(container, condition, index);
-	return useElementBounds(textNode, drawingRef);
+	return useElementBounds(textNode, drawingRef, numUp);
 }
 
 // Get the bounding rectangle of an element in drawing coordinates.
