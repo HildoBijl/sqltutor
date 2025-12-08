@@ -14,7 +14,7 @@ export function Summary() {
   return <Page>
     <Section>
       <Par>To sort rows in tables, and/or limit the number of given rows, there is a variety of options we can add to the end of an SQL query.</Par>
-      <MainFigure />
+      <FigureSorting />
     </Section>
   </Page>;
 }
@@ -28,7 +28,7 @@ ORDER BY
 LIMIT 3
 OFFSET 1;`
 
-function MainFigure() {
+function FigureSorting() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
   const [editor, setEditor] = useState<HTMLElement | null>(null);

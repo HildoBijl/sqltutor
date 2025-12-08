@@ -16,31 +16,31 @@ export function Theory() {
 
     <Section title="Sort on a single column">
       <Par>To sort your results, add an <SQLDisplay inline>ORDER BY</SQLDisplay> clause to the end of the query and specify the column to sort by. Optionally, add <SQLDisplay inline>ASC</SQLDisplay> (ascending, default) or <SQLDisplay inline>DESC</SQLDisplay> (descending) to choose the sorting direction.</Par>
-      <DiagramSortOnSingleColumn />
+      <FigureSortOnSingleColumn />
       <Par>The exact sorting method depends on the <Term>data type</Term>. For numbers, we sort by magnitude. For text, we sort alphabetically. For dates/times, we sort by which date/time is earlier or later.</Par>
     </Section>
 
     <Section title="Sort based on multiple columns">
       <Par>When the first column contains sorting ties, then you can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
-      <DiagramSortOnMultipleColumns />
+      <FigureSortOnMultipleColumns />
     </Section>
 
     <Section title="Limit the number of rows">
       <Par>To limit the number of rows that are returned, add a <SQLDisplay inline>LIMIT</SQLDisplay> clause, followed by how many rows you want to be returned.</Par>
-      <DiagramLimitRows />
+      <FigureLimitRows />
       <Par>Combine <SQLDisplay inline>LIMIT</SQLDisplay> with <SQLDisplay inline>OFFSET</SQLDisplay> to skip a number of rows before returning results.</Par>
-      <DiagramLimitRowsWithOffset />
+      <FigureLimitRowsWithOffset />
       <Warning>Most database management systems support <SQLDisplay inline>LIMIT</SQLDisplay> and <SQLDisplay inline>OFFSET</SQLDisplay>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the preferred syntax.</Warning>
     </Section>
 
     <Section title="Deal with NULL values">
       <Par>When sorting, <SQLDisplay inline>NULL</SQLDisplay> values either come at the start or at the end. About half of the DBMSs (including SQLite) treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>smallest</Em> possible value: it comes first on ascending order and last on descending order. The other half of the DBMSs have it the other way around, and treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>largest</Em> possible value. If you want to flip this default behavior, you can override it using <SQLDisplay inline>NULLS FIRST</SQLDisplay> or <SQLDisplay inline>NULLS LAST</SQLDisplay>, specified per sorting attribute.</Par>
-      <DiagramSortNullValues />
+      <FigureSortNullValues />
     </Section>
   </Page>;
 }
 
-function DiagramSortOnSingleColumn() {
+function FigureSortOnSingleColumn() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -77,7 +77,7 @@ ORDER BY ${sortColumn} DESC;`
   </Drawing>;
 }
 
-function DiagramSortOnMultipleColumns() {
+function FigureSortOnMultipleColumns() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -122,7 +122,7 @@ ORDER BY
   </Drawing>;
 }
 
-function DiagramLimitRows() {
+function FigureLimitRows() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -166,7 +166,7 @@ LIMIT 3;`
   </Drawing>;
 }
 
-function DiagramLimitRowsWithOffset() {
+function FigureLimitRowsWithOffset() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -210,7 +210,7 @@ LIMIT 3 OFFSET ${offset};`
   </Drawing>;
 }
 
-function DiagramSortNullValues() {
+function FigureSortNullValues() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 

@@ -11,23 +11,23 @@ import { DataTable } from '@/shared/components/DataTable';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>Suppose that we have a list of all the tech companies in the world, including a large number of properties of each. How would we store this data? Could we just put it in something like an Excel file?</Par>
-      <FirstTable />
+      <Par>Suppose that we are working for a company that's looking to keep track of their internal departments. How would we store this data? Could we just put it in something like an Excel file?</Par>
+      <FigureOneTable />
     </Section>
 
-    <Section title="Why databases? A list of requirements">
+    <Section title="Why databases: a list of requirements">
       <Par>For many small-scale use cases, storing data in a single file would work. When scaling up, there are various reasons why this fails.</Par>
       <List items={[
-        <>When the number of records gets into the millions, it becomes too big for one file. Computers cannot keep it all in their working memory. We need a solution that can <strong>deal with large amounts of data</strong>.</>,
-        <>Finding any desired records will be a challenge. We need a solution that we can <strong>easily ask questions extracting data</strong>, like "How many data science companies are there in the Netherlands right now?"</>,
-        <>Perhaps we want to build a website where users can add new tech companies. This website (basically a computer script) should be able to adjust the data, also when multiple users use it at the same time. We hence need a solution in which <strong>applications can adjust data concurrently</strong>.</>,
+        <>When the number of records gets into the millions, it becomes too big for one file. Computers cannot keep it all in their working memory. We need a solution that can <strong>deal with large amounts of data</strong> that doesn't overload the file system.</>,
+        <>Finding any desired records will be a challenge. We need a solution that we can <strong>easily ask questions extracting data</strong>, like "Which departments are going over budget?"</>,
+        <>Perhaps we want to build a website where users can add new departments, add employees to those departments, and so forth. This website (basically a computer script) should be able to adjust the data, also when multiple users use it at the same time. We hence need a solution in which <strong>applications can adjust data concurrently</strong>.</>,
       ]} />
       <Par>To meet all these requirements, databases and corresponding software tools have been created.</Par>
     </Section>
 
     <Section title="Database: a collection of tables">
       <Par>A <Term>database</Term> stores data. Most databases do so purely in table form. The easiest way to picture a database is therefore as a collection of tables, each filled with potentially large amounts of entries. A small database consists of a few small tables, but bigger databases can have dozens of enormous tables that are all linked to each other in some way.</Par>
-      <SecondTable />
+      <FigureTwoTables />
       <Info>Most databases, the so-called <Term>relational databases</Term>, use tables. (A "relation" is, roughly put, a mathematical term for a table.) There are a few databases that deviate from this and don't use tables. They for example store graphs (like <Link to="https://neo4j.com/">Neo4j</Link>), JSON objects (like <Link to="https://www.mongodb.com/">MongoDB</Link>) or key-value pairs (like <Link to="https://redis.io/">Redis</Link>). Since this only involves a small subset of all databases, we focus on relational databases for now.</Info>
     </Section>
 
@@ -40,14 +40,14 @@ export function Theory() {
   </Page>;
 }
 
-function FirstTable() {
+function FigureOneTable() {
   const db = useConceptDatabase();
-  const data = useQueryResult(db?.database, 'SELECT * FROM companies LIMIT 6');
+  const data = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const drawingRef = useRef<DrawingData>(null);
   const [tRef, tBounds] = useRefWithBounds(drawingRef);
 
-  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height ?? 200)} maxWidth={800}>
-    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example list of tech companies</span></Element>
+  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
+    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of departments</span></Element>
     <Element position={[0, 25]} anchor={[-1, -1]}>
       <Box sx={{ width: 800 }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
@@ -56,8 +56,31 @@ function FirstTable() {
   </Drawing>;
 }
 
-function SecondTable() {
-  return <FirstTable />;
+export function FigureTwoTables() {
+  const db = useConceptDatabase();
+  const drawingRef = useRef<DrawingData>(null);
+
+  const data1 = useQueryResult(db?.database, 'SELECT * FROM departments;');
+  const data2 = useQueryResult(db?.database, 'SELECT * FROM employees;');
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const x = 160;
+  const y = 150;
+
+  return <Drawing ref={drawingRef} width={800} height={y + (t2Bounds?.height ?? 200)} maxWidth={800}>
+    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of departments</span></Element>
+    <Element position={[0, 25]} anchor={[-1, -1]} scale={0.6}>
+      <Box sx={{ width: 800 }}>
+        <DataTable data={data1} showPagination={false} compact />
+      </Box>
+    </Element>
+
+    <Element position={[790, y - 25]} anchor={[1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of employees</span></Element>
+    <Element position={[x, y]} anchor={[-1, -1]} scale={0.6}>
+      <Box sx={{ width: (800 - x) / 0.6 }}>
+        <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
+      </Box>
+    </Element>
+  </Drawing>;
 }
 
 export function FigureDatabaseUsage() {
@@ -80,7 +103,7 @@ export function FigureDatabaseUsage() {
     <Element position={[xDatabase, y + 38]}><span style={{ fontSize: '1em', fontWeight: 500 }}>Database</span></Element>
 
     <Curve points={[[xUser + 26, y - 70], [(xUser + xServer) / 2, y - 120], [xServer - 35, y - 70]]} endArrow={true} color={themeColor} />
-    <Element position={[(xUser + xServer) / 2, y - 102]} anchor={[0, 1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>"Get me the country with the<br />most Data Science vacancies"</p></Element>
+    <Element position={[(xUser + xServer) / 2, y - 102]} anchor={[0, 1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>"Get me the departments<br />that are going over budget"</p></Element>
 
     <Curve points={[[xServer + 35, y - 70], [(xServer + xDatabase) / 2, y - 120], [xDatabase - 50, y - 70]]} endArrow={true} color={themeColor} />
     <Element position={[(xServer + xDatabase) / 2, y - 102]} anchor={[0, 1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>Pull up all relevant records</p></Element>
@@ -89,6 +112,6 @@ export function FigureDatabaseUsage() {
     <Element position={[(xServer + xDatabase) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>Give all requested records</p></Element>
 
     <Curve points={[[xServer - 35, y + 20], [(xUser + xServer) / 2, y + 70], [xUser + 50, y + 20]]} endArrow={true} color={themeColor} />
-    <Element position={[(xUser + xServer) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>"The Netherlands"</p></Element>
+    <Element position={[(xUser + xServer) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>["Security", "Tech Support"]</p></Element>
   </Drawing>;
 }
