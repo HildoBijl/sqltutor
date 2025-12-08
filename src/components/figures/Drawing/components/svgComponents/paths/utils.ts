@@ -1,6 +1,6 @@
 import { mod, firstOf, lastOf, repeat, type VectorInput, Vector, ensureVectorArray, Span } from '@/utils';
 
-import { type ArrowHeadProps, type LinePropsWithoutArrows, type CurvePropsWithoutArrows } from './types';
+import { type ArrowHeadProps, type LineWithoutArrowsProps, type CurveWithoutArrowsProps } from './types';
 import { defaultArrowHeadPullIn } from './ArrowHead';
 
 // Make sure that the given set of points are Vectors and satisfy basic properties.
@@ -136,13 +136,13 @@ export function getControlPoints(points: Vector[], close = false, curveRatio = 0
 
 // Prepare arrow heads and points for Line or Curve components.
 export function processCurveArrows(
-	props: LinePropsWithoutArrows | CurvePropsWithoutArrows,
+	props: LineWithoutArrowsProps | CurveWithoutArrowsProps,
 	startArrow?: ArrowHeadProps,
 	endArrow?: ArrowHeadProps,
 	arrowHeadPullIn = defaultArrowHeadPullIn,
 ): { points: Vector[]; startArrow?: ArrowHeadProps; endArrow?: ArrowHeadProps } {
 	// Extract/check input.
-	const { points, size, color, close, through, curveRatio, curveDistance } = props as CurvePropsWithoutArrows;
+	const { points, size, color, close, through, curveRatio, curveDistance } = props as CurveWithoutArrowsProps;
 	let p = ensurePathPoints(points);
 	if (curveRatio !== undefined && curveDistance !== undefined)
 		throw new Error(`Invalid path input: cannot define both curveRatio and curveDistance.`);

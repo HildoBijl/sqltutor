@@ -34,8 +34,8 @@ function ProjectionAndFiltering() {
   const w3 = w1 / 3;
   const arrowMargin = 10;
   const arrowHeight = 80;
-  const h1 = Math.max(t1Bounds?.height || 200, t2Bounds?.height || 200);
-  const h2 = t3Bounds?.height || 200;
+  const h1 = Math.max(t1Bounds?.height ?? 200, t2Bounds?.height ?? 200);
+  const h2 = t3Bounds?.height ?? 200;
 
   return <Drawing ref={drawingRef} width={w1 + w2 + w3} height={h1 + arrowHeight + h2} maxWidth={800}>
     <Element position={[0, 0]} anchor={[-1, -1]}>

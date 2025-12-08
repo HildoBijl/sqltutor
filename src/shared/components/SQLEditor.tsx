@@ -213,7 +213,7 @@ export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplay
   }
 
   return (
-    <Box>
+    <Box ref={ref}>
       <SQLEditor
         value={children.trim()}
         readOnly

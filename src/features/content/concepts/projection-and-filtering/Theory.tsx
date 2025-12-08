@@ -45,7 +45,7 @@ function Projection() {
 
   const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
   const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
-  const height = Math.max(t1Bounds?.height || 200, t2Bounds?.height || 200);
+  const height = Math.max(t1Bounds?.height ?? 200, t2Bounds?.height ?? 200);
   const w1 = 800;
   const w2 = w1 / 6;
   const w3 = w1 / 3;
@@ -81,8 +81,8 @@ function Filtering() {
   const w = 800;
   const arrowHeight = 80;
   const arrowMargin = 10;
-  const h1 = t1Bounds?.height || 200;
-  const h2 = t2Bounds?.height || 200;
+  const h1 = t1Bounds?.height ?? 200;
+  const h2 = t2Bounds?.height ?? 200;
 
   return <Drawing ref={drawingRef} width={w} height={h1 + arrowHeight + h2} maxWidth={800 * 2 / 3}>
     <Element position={[0, 0]} anchor={[-1, -1]}>

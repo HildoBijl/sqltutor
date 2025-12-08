@@ -46,7 +46,7 @@ function FirstTable() {
   const drawingRef = useRef<DrawingData>(null);
   const [tRef, tBounds] = useRefWithBounds(drawingRef);
 
-  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
+  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height ?? 200)} maxWidth={800}>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>Example list of tech companies</span></Element>
     <Element position={[0, 25]} anchor={[-1, -1]}>
       <Box sx={{ width: 800 }}>

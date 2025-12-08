@@ -9,27 +9,26 @@ export interface ArrowHeadProps extends DefaultObjectProps<SVGPolygonElement> {
 	color?: string;
 }
 
-export interface LinePropsWithoutArrows extends DefaultObjectProps<SVGPathElement> {
+export interface LineWithoutArrowsProps extends DefaultObjectProps<SVGPathElement> {
 	points: VectorInput[];
 	close?: boolean;
 	size?: number;
 	color?: string;
 }
 
-export interface LineProps extends LinePropsWithoutArrows {
+export interface ArrowLineExtras {
 	arrow?: Partial<ArrowHeadProps> | boolean;
 	startArrow?: Partial<ArrowHeadProps> | boolean;
 	endArrow?: Partial<ArrowHeadProps> | boolean;
+	lineStyle?: React.CSSProperties;
 }
 
-export interface CurvePropsWithoutArrows extends LinePropsWithoutArrows {
+export interface LineProps extends LineWithoutArrowsProps, ArrowLineExtras {}
+
+export interface CurveWithoutArrowsProps extends LineWithoutArrowsProps {
 	through?: boolean;
 	curveRatio?: number;
 	curveDistance?: number;
 }
 
-export interface CurveProps extends CurvePropsWithoutArrows {
-	arrow?: Partial<ArrowHeadProps> | boolean;
-	startArrow?: Partial<ArrowHeadProps> | boolean;
-	endArrow?: Partial<ArrowHeadProps> | boolean;
-}
+export interface CurveProps extends CurveWithoutArrowsProps, ArrowLineExtras {}
