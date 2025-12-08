@@ -10,7 +10,7 @@ export function Theory() {
     <Section title="A simple example query">
       <Par>A very basic SQL query is the following.</Par>
       <SQLDisplay>{`SELECT *
-FROM companies;`}</SQLDisplay>
+FROM employees;`}</SQLDisplay>
       <Par>This query instructs the DBMS to take all columns (the star means "all") from the table named <SQLDisplay inline>companies</SQLDisplay> and return them. So effectively, this query loads in the full table. It is always wise to run this query at the start of an exercise (of course with the respective table name) just to see what data there is.</Par>
       <Info>One of the reasons why SQL is popular is its readability. Even without ever having seen SQL, you probably had an idea what the above query was for.</Info>
       </Section>

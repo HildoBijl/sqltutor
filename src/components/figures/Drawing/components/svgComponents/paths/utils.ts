@@ -144,8 +144,6 @@ export function processCurveArrows(
 	// Extract/check input.
 	const { points, size, color, close, through, curveRatio, curveDistance } = props as CurveWithoutArrowsProps;
 	let p = ensurePathPoints(points);
-	if (curveRatio !== undefined && curveDistance !== undefined)
-		throw new Error(`Invalid path input: cannot define both curveRatio and curveDistance.`);
 
 	// Find control points to aim for, for the given settings.
 	const controlPoints = through ? getControlPoints(p, close, curveRatio, curveDistance) : points.map(p => [p, p]);
