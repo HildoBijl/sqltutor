@@ -4,7 +4,7 @@ export function Summary() {
   return (
     <Box display="flex" flexDirection="column" gap={1.5}>
       <Typography variant="body1">
-        Some summary will appear here.
+        This summary is still under development. It should come in the next few weeks.
       </Typography>
     </Box>
   );

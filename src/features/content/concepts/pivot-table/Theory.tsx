@@ -4,7 +4,8 @@ export function Theory() {
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <Typography variant="body1">
-        When you have data that depends on multiple parameters, you can turn a key-value database into a pivot table.
+        Theory for this concept will come soon.
+        {/* When you have data that depends on multiple parameters, you can turn a key-value database into a pivot table. */}
       </Typography>
     </Box>
   );

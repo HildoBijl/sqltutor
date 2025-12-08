@@ -29,9 +29,6 @@ export function SkillPracticeTab({
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         <Alert severity="info">{practice.unavailableMessage}</Alert>
-        <Typography variant="body2" color="text.secondary">
-          In the meantime, use the Data Explorer tab to browse the dataset.
-        </Typography>
       </Box>
     );
   }
