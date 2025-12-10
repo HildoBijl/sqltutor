@@ -13,9 +13,7 @@ import {
 } from '@mui/material';
 import {
   PlayArrow,
-  Code,
   AutoStories,
-  TrendingUp,
   School, 
   Edit, 
   CheckCircle
