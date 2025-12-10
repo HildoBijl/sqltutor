@@ -18,14 +18,14 @@ export function Theory() {
     </Section>
 
     <Section title="Set up and apply processed columns">
-      <Par>Suppose that we have a list of employee data with corresponding salaris. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
+      <Par>Suppose that we have a list of employee data with corresponding salaries. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,
   0.3*salary AS taxes
 FROM emp_data;`} tableWidth={350} />
-      <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use these calculated quantities in the filter too. You can add <ISQL>{`WHERE 0.3*salary < 20000`}</ISQL> or similar to your query. And identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 0.3*salary DESC`}</ISQL> or similar. (Admittedly this is not the best example: you might as well sort by the salary then.)</Par>
-      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>taxes</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. You <Em>can</Em> use these new columns in your sorting though, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
+      <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use calculations and such in the filter too. So you can add <ISQL>{`WHERE 0.3*salary < 20000`}</ISQL> to your query. Identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 0.3*salary DESC`}</ISQL>. (Admittedly this is not the best example for sorting: you might as well sort by the salary then.)</Par>
+      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>taxes</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. So using <ISQL>{`WHERE taxes < 20000`}</ISQL> will likely fail. (Some DBMSs have work-arounds and do allow this.) You <Em>can</Em> use these new columns in your sorting though, like through <ISQL>ORDER BY taxes DESC</ISQL>, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
     </Section>
 
     <Section title="Process numerical values">
