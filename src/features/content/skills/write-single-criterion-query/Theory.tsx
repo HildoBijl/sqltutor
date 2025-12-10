@@ -1,14 +1,7 @@
-import { useRef } from 'react';
-import { Box } from '@mui/material';
-
-import { useThemeColor } from '@/theme';
 import { Page, Par, List, Section, Info, Term } from '@/components';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
-import { useConceptDatabase } from '@/shared/hooks/useDatabase';
-import { useQueryResult } from '@/shared/hooks/useQuery';
-import { DataTable } from '@/shared/components/DataTable';
-import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/shared/components/SQLEditor';
 
+import { FigureExampleQuery } from '../../components';
 
 export function Theory() {
   return <Page>
@@ -24,7 +17,10 @@ export function Theory() {
         <>Make sure all the cities we have are unique. (Removing duplicates)</>,
       ]} />
       <Par>This gets us the following query.</Par>
-      <FigureExampleQuery />
+      <FigureExampleQuery query={`
+SELECT DISTINCT city
+FROM employees
+WHERE hire_date < '2015-01-01';`} tableWidth={160} />
       <Par>This works, but what are the steps we have taken inside our mind to get here?</Par>
     </Section>
 
@@ -40,44 +36,4 @@ export function Theory() {
       <Info>Sadly SQL does not allow another keyword order. It requires the action <ISQL>SELECT</ISQL> to be at the start. The query <ISQL>{`FROM employees WHERE hire_date < '2015-01-01' SELECT DISINCT city`}</ISQL> is not valid.</Info>
     </Section>
   </Page>;
-}
-
-export function FigureExampleQuery() {
-  const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
-
-  // Set up query data.
-  const query = `
-SELECT DISTINCT city
-FROM employees
-WHERE hire_date < '2015-01-01';`;
-  const db = useConceptDatabase();
-  const data = useQueryResult(db?.database, query);
-
-  // Find the table column name bounds.
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
-
-  // Set up dimensions.
-  const w1 = eBounds?.width || 100;
-  const w2 = tBounds?.width || 100;
-  const delta = 20;
-  const width = w1 + w2 + delta;
-  const height = Math.max(eBounds?.height || 100, tBounds?.height || 200);
-
-  return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width} disableSVGPointerEvents>
-    <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay>{query}</SQLDisplay>
-    </Element>
-
-    <Element position={[w1 + delta, 0]} anchor={[-1, -1]} scale={0.8} behind>
-      <Box sx={{ width: 160 / 0.8 }}>
-        <DataTable ref={tRef} data={data} showPagination={false} compact />
-      </Box>
-    </Element>
-
-    {eBounds && tBounds ? <>
-      <Curve points={[eBounds.bottomMiddle.add([0, 5]), [eBounds.middle.x, tBounds.middle.y + eBounds.height / 2], tBounds.leftMiddle.add([-4, eBounds.height / 2])]} color={themeColor} curveDistance={30} endArrow />
-    </> : null}
-  </Drawing>;
 }

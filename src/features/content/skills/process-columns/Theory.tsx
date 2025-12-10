@@ -1,5 +1,7 @@
 import { Page, Section, Par, List, Warning, Info, Term, Em, Link } from '@/components';
-import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/shared/components/SQLEditor';
+
+import { FigureExampleQuery } from '../../components';
 
 export function Theory() {
   const now = new Date();
@@ -16,11 +18,14 @@ export function Theory() {
     </Section>
 
     <Section title="Set up and apply processed columns">
-      <Par>Suppose that we have a list of goods with corresponding prices before tax. We could calculate their prices after tax by multiplying them by a factor, for instance <ISQL>1.2</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>price_with_tax</ISQL> whose value is <ISQL>1.2 * price</ISQL>. This is done through the following query.</Par>
-      <Warning>ToDo: set up figure showing this. <SQLDisplay>{`SELECT name, price, 1.2*price AS price_with_tax
-FROM inventory`}</SQLDisplay></Warning>
-      <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use these calculated quantities in the filter too. Just add <ISQL>{`WHERE 1.2*price < 1000`}</ISQL> or similar to your query. And identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 1.2*price DESC`}</ISQL> or similar.</Par>
-      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>price_with_tax</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. You <Em>can</Em> use these new columns in your sorting though, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
+      <Par>Suppose that we have a list of employee data with corresponding salaris. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
+      <FigureExampleQuery query={`SELECT
+  position,
+  salary,
+  0.3*salary AS taxes
+FROM emp_data;`} tableWidth={350} />
+      <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use these calculated quantities in the filter too. You can add <ISQL>{`WHERE 0.3*salary < 20000`}</ISQL> or similar to your query. And identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 0.3*salary DESC`}</ISQL> or similar. (Admittedly this is not the best example: you might as well sort by the salary then.)</Par>
+      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>taxes</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. You <Em>can</Em> use these new columns in your sorting though, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
     </Section>
 
     <Section title="Process numerical values">
@@ -44,12 +49,11 @@ FROM inventory`}</SQLDisplay></Warning>
 
     <Section title="Process text values">
       <Par>The most common thing to do with text is concatenate multiple pieces of text. This is done through <ISQL>||</ISQL>.</Par>
-      <Warning>ToDo: add example of concatenating names. <SQLDisplay>{`SELECT
+      <FigureExampleQuery query={`SELECT
   first_name,
   last_name,
   first_name || ' ' || last_name AS full_name
-FROM customers;`}</SQLDisplay>
-      </Warning>
+FROM employees;`} tableWidth={350} />
       <Info>The notation with <ISQL>||</ISQL> works in all large DBMSs. Some DBMSs also allow <ISQL>CONCAT(first_name, ' ', last_name)</ISQL> while others allow <ISQL>first_name + ' ' + last_name</ISQL>. As usual, things vary per DBMS.</Info>
       <Par>There is a large variety of further text processing functions.</Par>
       <List items={[
@@ -72,24 +76,24 @@ FROM customers;`}</SQLDisplay>
     </Section>
 
     <Section title="Conditionally process values">
-      <Par>It is possible to adjust column values based on various conditions. We could for instance distinguish companies as small, medium or large, using the <ISQL>CASE</ISQL> keyword.</Par>
-      <Warning>ToDo: set up example query. <SQLDisplay>{`SELECT
-  company_name,
-  num_employees,
+      <Par>It is possible to adjust column values based on various conditions. We could for instance designate departments as being small, medium or large, using the <ISQL>CASE</ISQL> keyword.</Par>
+      <FigureExampleQuery query={`SELECT
+  d_name,
+  nr_employees,
   CASE
-    WHEN num_employees > 200000 THEN 'large'
-    WHEN num_employees > 40000 THEN 'medium'
+    WHEN nr_employees > 25 THEN 'large'
+    WHEN nr_employees > 10 THEN 'medium'
     ELSE 'small'
-  END AS company_size
-FROM companies`}</SQLDisplay></Warning>
+  END AS dep_size
+FROM departments;`} tableWidth={350} />
       <Info>When using <ISQL>CASE</ISQL>, add as many <ISQL>WHEN ... THEN ...</ISQL> conditions as needed. SQL looks for the <Em>first</Em> condition that matches. If no condition matches, then the <ISQL>ELSE</ISQL> outcome is used. (Or when <ISQL>ELSE</ISQL> is omitted, then <ISQL>NULL</ISQL> is returned.)</Info>
-      <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value that is not <ISQL>NULL</ISQL>. An example (albeit somewhat non-sensible) is the following.</Par>
-      <Warning>ToDo: set up example query. <SQLDisplay>{`SELECT
-  company_name,
-  founded_year,
-  num_employees,
-  COALESCE(num_employees, 10*founded_year, 1000) AS employees
-FROM companies`}</SQLDisplay></Warning>
+      <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value that is not <ISQL>NULL</ISQL>. An example (albeit a not very sensible one) is the following.</Par>
+      <FigureExampleQuery query={`SELECT
+  position,
+  salary,
+  perf_score,
+  COALESCE(perf_score, salary/1000, 20) AS backup_score
+FROM emp_data;`} tableWidth={400} />
     </Section>
   </Page>;
 }

@@ -1,7 +1,7 @@
 import { Page, Section, Par, List, Term } from '@/components';
 import { ISQL } from '@/shared/components/SQLEditor';
 
-import { FigureExampleQuery } from './Theory';
+import { FigureExampleQuery } from '../../components';
 
 export function Summary() {
   return <Page>
@@ -13,7 +13,10 @@ export function Summary() {
         <>Pick the specific output <Term>columns</Term>: put in a <ISQL>SELECT</ISQL> at the start (possibly with <ISQL>DISTINCT</ISQL>).</>,
       ]} />
       <Par>So even though the finished query has to start with <ISQL>SELECT</ISQL>, this part is usually only added at the end of the writing process.</Par>
-      <FigureExampleQuery />
+      <FigureExampleQuery query={`
+SELECT DISTINCT city
+FROM employees
+WHERE hire_date < '2015-01-01';`} tableWidth={160} />
     </Section>
   </Page>
 }
