@@ -22,7 +22,6 @@ interface DataTableProps {
   showPagination?: boolean;
   highlightHeader?: boolean;
   compact?: boolean;
-  maxHeight?: number | string;
   ref?: Ref<HTMLDivElement>;
 }
 
@@ -32,7 +31,6 @@ export function DataTable({
   showPagination = true,
   highlightHeader = true,
   compact = false,
-  maxHeight = 400,
   ref,
 }: DataTableProps) {
   const [page, setPage] = useState(0);
@@ -88,7 +86,7 @@ export function DataTable({
           component="span"
           sx={{ fontFamily: 'monospace', color: 'info.main' }}
         >
-          {value.toLocaleString()}
+          {String(value)}
         </Typography>
       );
     }
@@ -125,29 +123,9 @@ export function DataTable({
           stickyHeader
           size={compact ? 'small' : 'medium'}
           sx={{
+            tableLayout: 'auto',
             '& .MuiTableHead-root': {
-              position: 'sticky',
-              top: 0,
-              zIndex: 2,
               backgroundColor: 'background.paper',
-            },
-            '& .MuiTableBody-root': {
-              display: 'block',
-              maxHeight: maxHeight,
-              overflowY: 'auto',
-              '&::-webkit-scrollbar': {
-                width: 8,
-                height: 8,
-              },
-              '&::-webkit-scrollbar-thumb': {
-                bgcolor: 'action.hover',
-                borderRadius: 1,
-              },
-            },
-            '& .MuiTableHead-root, & .MuiTableBody-root .MuiTableRow-root': {
-              display: 'table',
-              width: '100%',
-              tableLayout: 'fixed',
             },
           }}
         >
