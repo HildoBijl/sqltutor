@@ -6,7 +6,7 @@ import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/componen
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
-import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
@@ -18,7 +18,7 @@ export function Theory() {
       <Par>A very basic SQL query is the following.</Par>
       <SQLDisplay>{`SELECT *
 FROM employees;`}</SQLDisplay>
-      <Par>This query instructs the DBMS to take all columns (the star means "all") from the table named <SQLDisplay inline>employees</SQLDisplay> and return them. So effectively, this query loads in the full table. The result would be the following.</Par>
+      <Par>This query instructs the DBMS to take all columns (the star means "all") from the table named <ISQL>employees</ISQL> and return them. So effectively, this query loads in the full table. The result would be the following.</Par>
       <FigureEmployeeTable />
       <Par>The above query (with whatever table name applies) is used very often. It's a quick way to check out the data in a table. Use it at the start of exercise, as a starting point.</Par>
       <Info>One of the reasons why SQL is popular is its readability. Even without ever having seen SQL, you probably had an idea what the above query was for.</Info>
@@ -27,9 +27,9 @@ FROM employees;`}</SQLDisplay>
     <Section title="Properties of SQL queries">
       <Par>There are a few important things to keep in mind for SQL queries.</Par>
       <List items={[
-        <>Superfluous <Term>white-space</Term> is ignored. So the above query without the linebreak <SQLDisplay inline>SELECT * FROM companies;</SQLDisplay> does exactly the same. Enters and tabs (indentation), though useless in execution, are very commonly used to display queries in a more clear manner.</>,
-        <>SQL keywords are <Em>not</Em> <Term>case sensitive</Term>. So <SQLDisplay inline>select * from companies;</SQLDisplay> would do the same thing. Nevertheless, it is common to write keywords in upper case, to clearly distinguish them from table and column names.</>,
-        <>Queries usually end with a <Term>semi-colon</Term>. This is to distinguish where one query ends and the next one begins. If you only have one query, this semi-colon is optional: writing <SQLDisplay inline>SELECT * FROM companies</SQLDisplay> is fine. Always adding a semi-colon is a good habit though, so at SQL Valley we usually use one anyway.</>,
+        <>Superfluous <Term>white-space</Term> is ignored. So the above query without the linebreak <ISQL>SELECT * FROM companies;</ISQL> does exactly the same. Enters and tabs (indentation), though useless in execution, are very commonly used to display queries in a more clear manner.</>,
+        <>SQL keywords are <Em>not</Em> <Term>case sensitive</Term>. So <ISQL>select * from companies;</ISQL> would do the same thing. Nevertheless, it is common to write keywords in upper case, to clearly distinguish them from table and column names.</>,
+        <>Queries usually end with a <Term>semi-colon</Term>. This is to distinguish where one query ends and the next one begins. If you only have one query, this semi-colon is optional: writing <ISQL>SELECT * FROM companies</ISQL> is fine. Always adding a semi-colon is a good habit though, so at SQL Valley we usually use one anyway.</>,
       ]} />
     </Section>
 
@@ -52,7 +52,7 @@ function FigureEmployeeTable() {
   return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>The full employees table</span></Element>
     <Element position={[0, 25]} anchor={[-1, -1]} scale={0.6}>
-      <Box sx={{ width: 800/0.6 }}>
+      <Box sx={{ width: 800 / 0.6 }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>

@@ -1,5 +1,5 @@
 import { Page, Par, Section, Warning, Info, Term, Em } from '@/components';
-import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   const now = new Date();
@@ -8,25 +8,25 @@ export function Theory() {
 
   return <Page>
     <Section>
-      <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by appending the query with the keyword <SQLDisplay inline>WHERE</SQLDisplay>, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
+      <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by appending the query with the keyword <ISQL>WHERE</ISQL>, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
     </Section>
 
     <Section title="Set up equality-based conditions">
-      <Par>The most common filter is on equality: we want some row property to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <SQLDisplay inline>column_name = some_value</SQLDisplay>. We can for instance find all companies with exactly 200.000 employees.</Par>
+      <Par>The most common filter is on equality: we want some row property to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <ISQL>column_name = some_value</ISQL>. We can for instance find all companies with exactly 200.000 employees.</Par>
       <Warning>ToDo: add integer comparison figure.</Warning>
-      <Par>Let's study what the DBMS does internally when it receives a query like this. First it pulls the table from memory. (Or at least, the necessary parts of it.) Then, for every row, it evaluates the condition. To do so, it replaces the column name <SQLDisplay inline>num_employees</SQLDisplay> by the respective value <Em>of that row</Em>. Then it checks if the left and right side of the equals sign have the same value. If so, the condition evaluates as <SQLDisplay inline>TRUE</SQLDisplay> and the DBMS keeps it around. If not, the condition evaluates as <SQLDisplay inline>FALSE</SQLDisplay> and the DBMS removes it from the output. After doing this for all rows, the remaining output is sent back.</Par>
-      <Info>Note that this mechanism also allows us to compare two different columns with each other. We can set up a condition <SQLDisplay inline>column1 = column2</SQLDisplay>, which gets us all the rows where these two columns have equal value.</Info>
+      <Par>Let's study what the DBMS does internally when it receives a query like this. First it pulls the table from memory. (Or at least, the necessary parts of it.) Then, for every row, it evaluates the condition. To do so, it replaces the column name <ISQL>num_employees</ISQL> by the respective value <Em>of that row</Em>. Then it checks if the left and right side of the equals sign have the same value. If so, the condition evaluates as <ISQL>TRUE</ISQL> and the DBMS keeps it around. If not, the condition evaluates as <ISQL>FALSE</ISQL> and the DBMS removes it from the output. After doing this for all rows, the remaining output is sent back.</Par>
+      <Info>Note that this mechanism also allows us to compare two different columns with each other. We can set up a condition <ISQL>column1 = column2</ISQL>, which gets us all the rows where these two columns have equal value.</Info>
       <Par>We can set up a similar comparison with text. We could for instance find all companies in the 'Entertainment' industry. This comparison is case sensitive.</Par>
       <Warning>ToDo: add string comparison figure.</Warning>
       <Warning>When entering text in SQL, always use <Em>single</Em> quotation marks. This is how SQL recognizes it is a piece of text, and not a column name or similar. (Both "no quotation marks" and "double quotation marks" indicate column/table names in SQL.)</Warning>
-      <Par>We could also do the opposite, and find all companies <Em>not</Em> in the Entertainment industry. In this case, we use the <Term>unequals sign</Term>, which in SQL is <SQLDisplay inline>{`<>`}</SQLDisplay>.</Par>
+      <Par>We could also do the opposite, and find all companies <Em>not</Em> in the Entertainment industry. In this case, we use the <Term>unequals sign</Term>, which in SQL is <ISQL>{`<>`}</ISQL>.</Par>
       <Warning>ToDo: add string unequals figure.</Warning>
     </Section>
 
     <Section title="Set up larger/smaller than conditions">
-      <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <SQLDisplay inline>{`>`}</SQLDisplay> for <Term>larger than</Term> and <SQLDisplay inline>{`<`}</SQLDisplay> for <Term>smaller than</Term>. We could for instance find all companies having <Em>more</Em> than 200.000 employees.</Par>
+      <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <ISQL>{`>`}</ISQL> for <Term>larger than</Term> and <ISQL>{`<`}</ISQL> for <Term>smaller than</Term>. We could for instance find all companies having <Em>more</Em> than 200.000 employees.</Par>
       <Warning>ToDo: add integer comparison figure.</Warning>
-      <Info>You use <SQLDisplay inline>{`>=`}</SQLDisplay> for <Term>larger than or equal to</Term> and you use <SQLDisplay inline>{`<=`}</SQLDisplay> for <Term>smaller than or equal to</Term>. The = symbol that indicates "or equal" should always come at the end, and never at the start.</Info>
+      <Info>You use <ISQL>{`>=`}</ISQL> for <Term>larger than or equal to</Term> and you use <ISQL>{`<=`}</ISQL> for <Term>smaller than or equal to</Term>. The = symbol that indicates "or equal" should always come at the end, and never at the start.</Info>
       <Par>This works similarly for text. SQL compares text lexicographically: whichever entry comes first in the dictionary is considered smaller. So one way to find all companies starting with an A is the following.</Par>
       <Warning>ToDo: add text comparison figure.</Warning>
       <Par>For dates/times, the comparison is done using earlier/later than. Earlier dates are considered smaller and later dates are considered larger.</Par>
@@ -35,15 +35,15 @@ export function Theory() {
     </Section>
 
     <Section title="Compare text">
-      <Par>The <SQLDisplay inline>LIKE</SQLDisplay> comparison is a useful extra method for comparing text. Using <SQLDisplay inline>LIKE</SQLDisplay> is like using <SQLDisplay inline>=</SQLDisplay>, but it allows us to use the <SQLDisplay inline>%</SQLDisplay> symbol as a filler to represent "any text". We could for instance find all companies having "the" anywhere in their name.</Par>
+      <Par>The <ISQL>LIKE</ISQL> comparison is a useful extra method for comparing text. Using <ISQL>LIKE</ISQL> is like using <ISQL>=</ISQL>, but it allows us to use the <ISQL>%</ISQL> symbol as a filler to represent "any text". We could for instance find all companies having "the" anywhere in their name.</Par>
       <Warning>ToDo: add like comparison figure.</Warning>
-      <Info>For most DBMSs the <SQLDisplay inline>LIKE</SQLDisplay> comparison is case insensitive. For some DBMSs it is case sensitive, but there is a case insensitive <SQLDisplay inline>ILIKE</SQLDisplay> equivalent. To invert the result, you can use <SQLDisplay inline>NOT LIKE</SQLDisplay>.</Info>
+      <Info>For most DBMSs the <ISQL>LIKE</ISQL> comparison is case insensitive. For some DBMSs it is case sensitive, but there is a case insensitive <ISQL>ILIKE</ISQL> equivalent. To invert the result, you can use <ISQL>NOT LIKE</ISQL>.</Info>
     </Section>
 
-    <Section title={<>Compare with <SQLDisplay inline>NULL</SQLDisplay></>}>
-      <Par>You may remember that table cells can have the special value <SQLDisplay inline>NULL</SQLDisplay>, which means "unknown" or "not applicable". If you want to find all rows where some column has <SQLDisplay inline>NULL</SQLDisplay>, you <Em>cannot</Em> use the condition <SQLDisplay inline>column_name = NULL</SQLDisplay>. Instead, you have to use the special <SQLDisplay inline>IS</SQLDisplay> comparison, for instance through <SQLDisplay inline>column_name IS NULL</SQLDisplay> or similarly <SQLDisplay inline>column_name IS NOT NULL</SQLDisplay>.</Par>
+    <Section title={<>Compare with <ISQL>NULL</ISQL></>}>
+      <Par>You may remember that table cells can have the special value <ISQL>NULL</ISQL>, which means "unknown" or "not applicable". If you want to find all rows where some column has <ISQL>NULL</ISQL>, you <Em>cannot</Em> use the condition <ISQL>column_name = NULL</ISQL>. Instead, you have to use the special <ISQL>IS</ISQL> comparison, for instance through <ISQL>column_name IS NULL</ISQL> or similarly <ISQL>column_name IS NOT NULL</ISQL>.</Par>
       <Warning>ToDo: add IS NULL figure.</Warning>
-      <Info>Because <SQLDisplay inline>NULL</SQLDisplay> means "unknown", any comparison involving <SQLDisplay inline>NULL</SQLDisplay> like for instance <SQLDisplay inline>{`NULL < 10`}</SQLDisplay> always resolves to <SQLDisplay inline>NULL</SQLDisplay>, and never to <SQLDisplay inline>TRUE</SQLDisplay> or <SQLDisplay inline>FALSE</SQLDisplay>. After all, it is also unknown whether "some unknown value" is smaller than <SQLDisplay inline>10</SQLDisplay>. Even the comparison <SQLDisplay inline>NULL = NULL</SQLDisplay> resolves to <SQLDisplay inline>NULL</SQLDisplay>, since two unknown values are not necessarily equal. Only <SQLDisplay inline>NULL IS NULL</SQLDisplay> resolves to <SQLDisplay inline>TRUE</SQLDisplay>.</Info>
+      <Info>Because <ISQL>NULL</ISQL> means "unknown", any comparison involving <ISQL>NULL</ISQL> like for instance <ISQL>{`NULL < 10`}</ISQL> always resolves to <ISQL>NULL</ISQL>, and never to <ISQL>TRUE</ISQL> or <ISQL>FALSE</ISQL>. After all, it is also unknown whether "some unknown value" is smaller than <ISQL>10</ISQL>. Even the comparison <ISQL>NULL = NULL</ISQL> resolves to <ISQL>NULL</ISQL>, since two unknown values are not necessarily equal. Only <ISQL>NULL IS NULL</ISQL> resolves to <ISQL>TRUE</ISQL>.</Info>
     </Section>
   </Page>;
 }

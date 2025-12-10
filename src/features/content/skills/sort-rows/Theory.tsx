@@ -8,14 +8,14 @@ import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWit
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
-import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
     <Par>We know how in SQL we can retrieve an entire table. The rows then usually appear in the order in which they are added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
 
     <Section title="Sort on a single column">
-      <Par>To sort your results, add an <SQLDisplay inline>ORDER BY</SQLDisplay> clause to the end of the query and specify the column to sort by. Optionally, add <SQLDisplay inline>ASC</SQLDisplay> (ascending, default) or <SQLDisplay inline>DESC</SQLDisplay> (descending) to choose the sorting direction.</Par>
+      <Par>To sort your results, add an <ISQL>ORDER BY</ISQL> clause to the end of the query and specify the column to sort by. Optionally, add <ISQL>ASC</ISQL> (ascending, default) or <ISQL>DESC</ISQL> (descending) to choose the sorting direction.</Par>
       <FigureSortOnSingleColumn />
       <Par>The exact sorting method depends on the <Term>data type</Term>. For numbers, we sort by magnitude. For text, we sort alphabetically. For dates/times, we sort by which date/time is earlier or later.</Par>
     </Section>
@@ -26,15 +26,15 @@ export function Theory() {
     </Section>
 
     <Section title="Limit the number of rows">
-      <Par>To limit the number of rows that are returned, add a <SQLDisplay inline>LIMIT</SQLDisplay> clause, followed by how many rows you want to be returned. Only the <Em>first</Em> couple of rows will then be returned.</Par>
+      <Par>To limit the number of rows that are returned, add a <ISQL>LIMIT</ISQL> clause, followed by how many rows you want to be returned. Only the <Em>first</Em> couple of rows will then be returned.</Par>
       <FigureLimitRows />
-      <Par>Combine <SQLDisplay inline>LIMIT</SQLDisplay> with <SQLDisplay inline>OFFSET</SQLDisplay> to skip a number of rows before returning results.</Par>
+      <Par>Combine <ISQL>LIMIT</ISQL> with <ISQL>OFFSET</ISQL> to skip a number of rows before returning results.</Par>
       <FigureLimitRowsWithOffset />
-      <Warning>Most database management systems support <SQLDisplay inline>LIMIT</SQLDisplay> and <SQLDisplay inline>OFFSET</SQLDisplay>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the preferred syntax.</Warning>
+      <Warning>Most database management systems support <ISQL>LIMIT</ISQL> and <ISQL>OFFSET</ISQL>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the preferred syntax.</Warning>
     </Section>
 
     <Section title="Deal with NULL values">
-      <Par>When sorting, <SQLDisplay inline>NULL</SQLDisplay> values either come at the start or at the end. About half of the DBMSs (including SQLite) treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>smallest</Em> possible value: it comes first on ascending order and last on descending order. The other half of the DBMSs have it the other way around, and treat <SQLDisplay inline>NULL</SQLDisplay> values as the <Em>largest</Em> possible value. If you want to flip this default behavior, you can override it using <SQLDisplay inline>NULLS FIRST</SQLDisplay> or <SQLDisplay inline>NULLS LAST</SQLDisplay>, specified per sorting attribute.</Par>
+      <Par>When sorting, <ISQL>NULL</ISQL> values either come at the start or at the end. About half of the DBMSs (including SQLite) treat <ISQL>NULL</ISQL> values as the <Em>smallest</Em> possible value: it comes first on ascending order and last on descending order. The other half of the DBMSs have it the other way around, and treat <ISQL>NULL</ISQL> values as the <Em>largest</Em> possible value. If you want to flip this default behavior, you can override it using <ISQL>NULLS FIRST</ISQL> or <ISQL>NULLS LAST</ISQL>, specified per sorting attribute.</Par>
       <FigureSortNullValues />
     </Section>
   </Page>;
@@ -63,7 +63,7 @@ ORDER BY ${sortColumn} DESC;`
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+      <ISQL onLoad={setEditor}>{query}</ISQL>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
@@ -105,7 +105,7 @@ ORDER BY
   const drawingHeight = 20 + (tBounds?.height ?? 200) + 20
   return <Drawing ref={drawingRef} width={800} height={drawingHeight} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+      <ISQL onLoad={setEditor}>{query}</ISQL>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
@@ -151,7 +151,7 @@ LIMIT 3;`
   const x = (tBounds?.left ?? 320) - 10;
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
+      <ISQL ref={qRef} onLoad={setEditor}>{query}</ISQL>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -193,7 +193,7 @@ LIMIT 3 OFFSET ${offset};`
   const point = tBounds && sortColumnNameBounds && new Vector(tBounds.left - 4, sortColumnNameBounds.bottom + 10);
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
+      <ISQL ref={qRef} onLoad={setEditor}>{query}</ISQL>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -233,7 +233,7 @@ ORDER BY ${sortColumn} ASC NULLS LAST;`
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+      <ISQL onLoad={setEditor}>{query}</ISQL>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
