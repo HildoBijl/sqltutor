@@ -1,4 +1,4 @@
-import { Page, Section, Par, Warning, Info, Term, Em } from '@/components';
+import { Page, Section, Par, Warning, Term, Em } from '@/components';
 import { ISQL } from '@/shared/components/SQLEditor';
 
 import { FigureFiltering } from './Theory';

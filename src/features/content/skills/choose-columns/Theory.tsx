@@ -23,7 +23,7 @@ export function Theory() {
 
     <Section title="Select unique values">
       <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is possible, but it is not a good habit. When you select columns, it often does occur that you get duplicate rows. To filter those out, add the keyword <ISQL>DISTINCT</ISQL> right after <ISQL>SELECT</ISQL>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
-      <FigureApplyDistinct />
+      <FigureSelectUnique />
     </Section>
 
     <Section title="Rename columns">
@@ -97,7 +97,7 @@ FROM employees;`
   </Drawing>;
 }
 
-function FigureApplyDistinct() {
+function FigureSelectUnique() {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -105,10 +105,10 @@ function FigureApplyDistinct() {
   const c = 'city';
   const query1 = `
 SELECT ${c}
-FROM employees;`
+FROM employees;`;
   const query2 = `
 SELECT DISTINCT ${c}
-FROM employees;`
+FROM employees;`;
   const db = useConceptDatabase();
   const data1 = useQueryResult(db?.database, query1);
   const data2 = useQueryResult(db?.database, query2);
