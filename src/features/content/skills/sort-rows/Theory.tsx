@@ -26,7 +26,7 @@ export function Theory() {
     </Section>
 
     <Section title="Limit the number of rows">
-      <Par>To limit the number of rows that are returned, add a <SQLDisplay inline>LIMIT</SQLDisplay> clause, followed by how many rows you want to be returned.</Par>
+      <Par>To limit the number of rows that are returned, add a <SQLDisplay inline>LIMIT</SQLDisplay> clause, followed by how many rows you want to be returned. Only the <Em>first</Em> couple of rows will then be returned.</Par>
       <FigureLimitRows />
       <Par>Combine <SQLDisplay inline>LIMIT</SQLDisplay> with <SQLDisplay inline>OFFSET</SQLDisplay> to skip a number of rows before returning results.</Par>
       <FigureLimitRowsWithOffset />

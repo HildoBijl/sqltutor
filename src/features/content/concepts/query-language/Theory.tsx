@@ -25,16 +25,16 @@ export function Theory() {
       <Par>Suppose that we want to get a list of companies with more than 200.000 employees. In the <Term>SQL</Term> query language (the query language used by the most common/popular databases) that would be done through</Par>
       <Par><pre><code>{`SELECT first_name, last_name
 FROM employees
-WHERE current_salary > 200000
+WHERE current_salary > 180000
 `}</code></pre></Par>
       <Par>In <Term>Datalog</Term> (a more modern and up-and-coming query language) this would be done with</Par>
-      <Par><pre><code>{`highEarners(fn, ln) :- employees(_, fn, ln, _, _, _, _, _, s), s > 200000.
+      <Par><pre><code>{`highEarners(fn, ln) :- employees(_, fn, ln, _, _, _, _, _, s), s > 180000.
 ?- highEarners(fn, ln).`}</code></pre></Par>
       <Par>In <Term>relational algebra</Term> (a more theoretical and mathematical query language) this is done using</Par>
-      <Par><pre><code>highEarners ← ∏<sub>first_name,last_name</sub>(σ<sub>current_salary &gt; 200000</sub>(employees))</code></pre></Par>
+      <Par><pre><code>highEarners ← ∏<sub>first_name,last_name</sub>(σ<sub>current_salary &gt; 180000</sub>(employees))</code></pre></Par>
       <Par>Or in an object-database like <Link to="https://www.mongodb.com/">MongoDB</Link> the query looks like this.</Par>
       <Par><pre><code>{`db.employees.find(
-  { current_salary: { $gt: 200000 } }, 
+  { current_salary: { $gt: 180000 } }, 
   { first_name: 1, last_name: 1, _id: 0 }
 )`}</code></pre></Par>
       <Par>You see that there is a large variety of query languages.</Par>
@@ -59,7 +59,7 @@ export function FigureQueryExample() {
   // Set up query data.
   const db = useConceptDatabase();
   const data1 = useQueryResult(db?.database, `SELECT * FROM employees;`);
-  const data2 = useQueryResult(db?.database, `SELECT first_name, last_name FROM employees WHERE current_salary > 200000;`);
+  const data2 = useQueryResult(db?.database, `SELECT first_name, last_name FROM employees WHERE current_salary > 180000;`);
 
   // Find the bounds for "d_name".
   const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
@@ -84,7 +84,7 @@ export function FigureQueryExample() {
     {t1Bounds ? <>
       <Curve points={[t1Bounds.middleBottom.add([0, arrowMargin]), t1Bounds.middleBottom.add([0, arrowHeight - arrowMargin])]} color={themeColor} endArrow />
       <Element position={[408, (t1Bounds?.height ?? 200) + arrowHeight / 2 - 4]} anchor={[-1, 0]}>
-        <p style={{ fontSize: '0.8rem', fontStyle: 'italic', margin: 0, lineHeight: 1.4 }}>"Find the names of all employees earning<br />more than two hundred thousand per year."</p>
+        <p style={{ fontSize: '0.8rem', fontStyle: 'italic', margin: 0, lineHeight: 1.4 }}>"Find the names of all employees earning<br />more than 180,000 per year."</p>
       </Element>
     </> : null}
   </Drawing>;

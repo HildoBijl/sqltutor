@@ -56,7 +56,6 @@ export function Theory() {
 
 export function FigureTerminology({ terminology }: { terminology?: { [key: string]: React.ReactNode } }) {
   const themeColor = useThemeColor();
-  console.log(terminology)
 
   // Get data.
   const db = useConceptDatabase();
