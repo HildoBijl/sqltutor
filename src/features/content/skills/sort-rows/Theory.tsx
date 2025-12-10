@@ -8,7 +8,7 @@ import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWit
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
-import { ISQL } from '@/shared/components/SQLEditor';
+import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
@@ -63,7 +63,7 @@ ORDER BY ${sortColumn} DESC;`
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <ISQL onLoad={setEditor}>{query}</ISQL>
+      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
@@ -102,23 +102,33 @@ ORDER BY
   const sortColumn1NameBounds = useTextNodeBounds(table, sortColumn1, drawingRef);
   const sortColumn2NameBounds = useTextNodeBounds(table, sortColumn2, drawingRef);
 
-  const drawingHeight = 20 + (tBounds?.height ?? 200) + 20
+  const drawingHeight = 20 + (tBounds?.height ?? 200) + 20;
   return <Drawing ref={drawingRef} width={800} height={drawingHeight} maxWidth={800} disableSVGPointerEvents>
+    {/* SQL query */}
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <ISQL onLoad={setEditor}>{query}</ISQL>
+      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
+    {/* Table */}
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
       <Box sx={{ width: 800 }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>
 
-    {ascBounds && sortColumn1NameBounds ? <Curve points={[ascBounds.topRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.leftBottom.add([-16, 8])]} color={themeColor} endArrow /> : null}
-    {sortColumn1NameBounds && tBounds ? <Curve points={[sortColumn1NameBounds.leftBottom.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.bottom - 6]]} color={themeColor} endArrow /> : null}
+    {/* First sorting arrows */}
+    {ascBounds && sortColumn1NameBounds && tBounds ? <>
+      <Element position={sortColumn1NameBounds.leftTop.add([-36, -6])} anchor={[-1, 1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem' }}>Primary sorting</span></Element>
+      <Curve points={[ascBounds.topRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.leftBottom.add([-16, 8])]} color={themeColor} endArrow />
+      <Curve points={[sortColumn1NameBounds.leftBottom.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.bottom - 6]]} color={themeColor} endArrow />
+    </> : null}
 
-    {descBounds && sortColumn2NameBounds ? <Curve points={[descBounds.bottomRight.add([0, 3]), [descBounds.right + 120, drawingHeight], [sortColumn2NameBounds.left - 40, drawingHeight], [sortColumn2NameBounds.left - 14, drawingHeight - 24]]} color={themeColor} endArrow style={{ opacity: 0.5 }} /> : null}
-    {sortColumn2NameBounds && tBounds ? <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.bottom - 6], sortColumn2NameBounds.leftBottom.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} /> : null}
+    {/* Second sorting arrows */}
+    {descBounds && sortColumn2NameBounds && tBounds ? <>
+      <Element position={[sortColumn2NameBounds.left - 34, drawingHeight - 16]} anchor={[-1, -1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem', opacity: 0.5 }}>Secondary sorting</span></Element>
+      <Curve points={[descBounds.bottomRight.add([0, 3]), [descBounds.right + 120, drawingHeight], [sortColumn2NameBounds.left - 40, drawingHeight], [sortColumn2NameBounds.left - 14, drawingHeight - 24]]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
+      <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.bottom - 6], sortColumn2NameBounds.leftBottom.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
+    </> : null}
   </Drawing>;
 }
 
@@ -151,7 +161,7 @@ LIMIT 3;`
   const x = (tBounds?.left ?? 320) - 10;
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <ISQL ref={qRef} onLoad={setEditor}>{query}</ISQL>
+      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -193,7 +203,7 @@ LIMIT 3 OFFSET ${offset};`
   const point = tBounds && sortColumnNameBounds && new Vector(tBounds.left - 4, sortColumnNameBounds.bottom + 10);
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <ISQL ref={qRef} onLoad={setEditor}>{query}</ISQL>
+      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -233,7 +243,7 @@ ORDER BY ${sortColumn} ASC NULLS LAST;`
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <ISQL onLoad={setEditor}>{query}</ISQL>
+      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
