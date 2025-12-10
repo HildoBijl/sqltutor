@@ -107,7 +107,7 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
       <Curve points={[[x - 20 + r, textNodeBounds.top], [x - 20, textNodeBounds.top], [x - 20, textNodeBounds.bottom], [x - 20 + r, textNodeBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Cell marker. */}
-      <Element position={textNodeBounds.middleLeft.add([-4, -1])} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.cell}</span></Element>
+      <Element position={textNodeBounds.topRight.add([-8, 3])} anchor={[1, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.cell}</span></Element>
       <Rectangle dimensions={textNodeBounds} cornerRadius={r} style={{ stroke: themeColor, strokeWidth: 2, fill: 'none' }} />
     </> : null}
   </Drawing>;
