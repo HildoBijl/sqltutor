@@ -13,7 +13,7 @@ export function Summary() {
   phone AS number
 FROM employees;`} />
       <Info>The output may have <Term>duplicate rows</Term>. Use <ISQL>SELECT DISTINCT</ISQL> rather than just <ISQL>SELECT</ISQL> to filter out any potential duplicates.</Info>
-      <Par>In case there are multiple tables involved in your query, it is recommended (and in case of duplicate names obligatory) to specify which column comes from which table. This is done through the notation <ISQL>table_name.column_name</ISQL>. Optionally, you can <Term>rename the tables</Term> to shorten this notation.</Par>
+      <Par>In case there are multiple tables involved in your query, it is recommended (and in case of duplicate names obligatory) to specify which column comes from which table. This is done through the notation <ISQL>table_name.column_name</ISQL>. Optionally, you can give tables an <Term>alias</Term> (temporary rename) to shorten this notation.</Par>
       <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,

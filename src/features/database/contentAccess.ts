@@ -20,8 +20,8 @@ const contentTableAccess: Record<string, ContentTableConfig> = {
   playground: ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
   // Skills
   'choose-columns': ['departments', 'employees'],
-  'filter-rows': ['departments', 'employees'],
-  'filter-rows-on-multiple-criteria': ['departments', 'employees', 'transactions', 'expenses'],
+  'filter-rows': ['departments', 'employees', 'emp_data', 'transactions'],
+  'filter-rows-on-multiple-criteria': ['departments', 'employees', 'emp_data', 'transactions', 'expenses'],
   'sort-rows': ['departments', 'employees', 'emp_data'],
   'process-columns': ['departments', 'employees'],
   'write-single-criterion-query': ['departments', 'employees', 'emp_data'],

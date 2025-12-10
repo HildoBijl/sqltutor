@@ -44,7 +44,7 @@ FROM employees;`} />
   employees.phone AS number
 FROM employees;`} />
       <Par>When the two tables don't have duplicate column names, this table specification is generally not needed, but it is still recommended for clarity. When the two tables do have duplicate column names, this notation is obligatory.</Par>
-      <Par>In case your table names are rather long, you can also rename your tables. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
+      <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: rename them for within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
       <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,
