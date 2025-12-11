@@ -11,14 +11,16 @@ export interface ComparisonResult {
   };
 }
 
-interface CompareOptions {
-  ignoreColumnOrder?: boolean;
+export interface CompareOptions {
+  requireEqualColumnOrder?: boolean;
+  requireEqualColumnNames?: boolean;
   ignoreRowOrder?: boolean;
   caseSensitive?: boolean;
 }
 
 const DEFAULT_OPTIONS: Required<CompareOptions> = {
-  ignoreColumnOrder: false,
+  requireEqualColumnOrder: false,
+  requireEqualColumnNames: false,
   ignoreRowOrder: true,
   caseSensitive: false,
 };
@@ -36,6 +38,26 @@ const normalizeValue = (value: unknown, caseSensitive: boolean): string => {
 const normalizeColumn = (column: string, caseSensitive: boolean): string =>
   caseSensitive ? column : column.toLowerCase();
 
+const buildColumnSignatures = (
+  rows: unknown[][],
+  caseSensitive: boolean,
+  ignoreRowOrder: boolean,
+): string[] => {
+  const columnCount = rows[0]?.length ?? 0;
+  const columns: string[][] = Array.from({ length: columnCount }, () => []);
+
+  for (const row of rows) {
+    for (let index = 0; index < columnCount; index += 1) {
+      columns[index].push(normalizeValue(row[index], caseSensitive));
+    }
+  }
+
+  return columns.map((values) => {
+    const orderedValues = ignoreRowOrder ? [...values].sort() : values;
+    return orderedValues.join('|');
+  });
+};
+
 const normalizeRow = (
   row: unknown[],
   mapping: number[],
@@ -47,7 +69,13 @@ export function compareQueryResults(
   actual: QueryResult | undefined,
   options: CompareOptions = {},
 ): ComparisonResult {
-  const { ignoreColumnOrder, ignoreRowOrder, caseSensitive } = { ...DEFAULT_OPTIONS, ...options };
+  const { requireEqualColumnOrder, requireEqualColumnNames, ignoreRowOrder, caseSensitive } =
+    {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
+  const ignoreColumnOrder = !requireEqualColumnOrder;
+  const ignoreColumnNames = !requireEqualColumnNames;
 
   if (!expected || !actual) {
     return {
@@ -73,38 +101,85 @@ export function compareQueryResults(
   const expectedCols = expected.columns.map((col) => normalizeColumn(col, caseSensitive));
   const actualCols = actual.columns.map((col) => normalizeColumn(col, caseSensitive));
 
-  if (ignoreColumnOrder) {
-    const missingCols = expectedCols.filter((col) => !actualCols.includes(col));
-    const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
+  const identityMapping = expected.columns.map((_, idx) => idx);
+  let columnMapping = identityMapping;
 
-    if (missingCols.length > 0 || extraCols.length > 0) {
-      let feedbackMessage = 'Your query did not return the expected set of columns.';
-      if (missingCols.length > 0 && extraCols.length === 0) {
-        feedbackMessage = 'Some expected columns are missing from your results.';
-      } else if (missingCols.length === 0 && extraCols.length > 0) {
-        feedbackMessage = 'Your results include columns that should not be there.';
-      }
-      return {
-        match: false,
-        feedback: feedbackMessage,
-        details: {
-          expectedRows: expectedRowCount,
-          actualRows: actualRowCount,
-          columnMismatch: [...missingCols, ...extraCols],
-        },
-      };
-    }
-  } else {
-    for (let index = 0; index < expectedCols.length; index += 1) {
-      if (expectedCols[index] !== actualCols[index]) {
+  if (!ignoreColumnNames) {
+    if (ignoreColumnOrder) {
+      const missingCols = expectedCols.filter((col) => !actualCols.includes(col));
+      const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
+
+      if (missingCols.length > 0 || extraCols.length > 0) {
+        let feedbackMessage = 'Your query did not return the expected set of columns.';
+        if (missingCols.length > 0 && extraCols.length === 0) {
+          feedbackMessage = 'Some expected columns are missing from your results.';
+        } else if (missingCols.length === 0 && extraCols.length > 0) {
+          feedbackMessage = 'Your results include columns that should not be there.';
+        }
         return {
           match: false,
-          feedback: 'Your columns are not in the expected order.',
+          feedback: feedbackMessage,
+          details: {
+            expectedRows: expectedRowCount,
+            actualRows: actualRowCount,
+            columnMismatch: [...missingCols, ...extraCols],
+          },
+        };
+      }
+
+      columnMapping = expectedCols.map((col) => actualCols.indexOf(col));
+    } else {
+      for (let index = 0; index < expectedCols.length; index += 1) {
+        if (expectedCols[index] !== actualCols[index]) {
+          return {
+            match: false,
+            feedback: 'Your columns are not in the expected order.',
+            details: {
+              expectedRows: expectedRowCount,
+              actualRows: actualRowCount,
+            },
+          };
+        }
+      }
+    }
+  } else {
+    const expectedSignatures = buildColumnSignatures(expected.values, caseSensitive, ignoreRowOrder);
+    const actualSignatures = buildColumnSignatures(actual.values, caseSensitive, ignoreRowOrder);
+
+    if (ignoreColumnOrder) {
+      const usedActualColumns = new Set<number>();
+      columnMapping = expectedSignatures.map((signature) => {
+        const matchIndex = actualSignatures.findIndex(
+          (candidate, idx) => !usedActualColumns.has(idx) && candidate === signature,
+        );
+        if (matchIndex !== -1) {
+          usedActualColumns.add(matchIndex);
+        }
+        return matchIndex;
+      });
+
+      if (columnMapping.some((index) => index === -1)) {
+        return {
+          match: false,
+          feedback: 'Your query did not return the expected set of columns.',
           details: {
             expectedRows: expectedRowCount,
             actualRows: actualRowCount,
           },
         };
+      }
+    } else {
+      for (let index = 0; index < expectedSignatures.length; index += 1) {
+        if (expectedSignatures[index] !== actualSignatures[index]) {
+          return {
+            match: false,
+            feedback: 'Your results include different columns than expected.',
+            details: {
+              expectedRows: expectedRowCount,
+              actualRows: actualRowCount,
+            },
+          };
+        }
       }
     }
   }
@@ -124,10 +199,8 @@ export function compareQueryResults(
     };
   }
 
-  const columnMapping = expectedCols.map((col) => actualCols.indexOf(col));
-
   const expectedRows = expected.values.map((row) =>
-    normalizeRow(row, ignoreColumnOrder ? columnMapping : columnMapping.map((_, idx) => idx), caseSensitive),
+    normalizeRow(row, ignoreColumnOrder ? columnMapping : identityMapping, caseSensitive),
   );
 
   const actualRows = actual.values.map((row) =>

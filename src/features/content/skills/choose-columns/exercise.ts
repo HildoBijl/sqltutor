@@ -16,6 +16,10 @@ FROM employees;
 SELECT e_id, position, salary, perf_score AS rating
 FROM emp_data;
     `,
+    comparisonOptions: {
+      requireEqualColumnNames: true,
+      requireEqualColumnOrder: false,
+    },
   },
   {
     id: 'choose-columns-cities',

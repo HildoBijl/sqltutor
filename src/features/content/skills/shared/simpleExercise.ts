@@ -1,4 +1,4 @@
-import { compareQueryResults } from '@/features/learning/exerciseEngine/resultComparison';
+import { compareQueryResults, type CompareOptions } from '@/features/learning/exerciseEngine/resultComparison';
 import type {
   ExecutionResult,
   QueryResult,
@@ -12,6 +12,7 @@ export interface StaticExercise {
   prompt: string;
   solution: string;
   description?: string;
+  comparisonOptions?: CompareOptions;
 }
 
 export interface ExerciseState {
@@ -19,6 +20,7 @@ export interface ExerciseState {
   prompt: string;
   solution: string;
   description: string;
+  comparisonOptions?: CompareOptions;
 }
 
 const MESSAGES = {
@@ -41,6 +43,13 @@ function formatMessage(template: string, context: Record<string, unknown>): stri
 }
 
 export function buildStaticExerciseModule(exercises: StaticExercise[]) {
+  const DEFAULT_COMPARISON_OPTIONS: CompareOptions = {
+    ignoreRowOrder: true,
+    requireEqualColumnOrder: false,
+    requireEqualColumnNames: false,
+    caseSensitive: false,
+  };
+
   function generate(utils: Utils): ExerciseState {
     const exercise = utils.selectRandomly(exercises as readonly StaticExercise[]);
     const description = (exercise.description ?? exercise.prompt).trim();
@@ -49,6 +58,7 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
       prompt: exercise.prompt,
       description,
       solution: exercise.solution.trim(),
+      comparisonOptions: exercise.comparisonOptions,
     };
   }
 
@@ -111,9 +121,8 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     }
 
     const comparison = compareQueryResults(expectedResult, actualResult, {
-      ignoreRowOrder: true,
-      ignoreColumnOrder: false,
-      caseSensitive: false,
+      ...DEFAULT_COMPARISON_OPTIONS,
+      ...(exercise.comparisonOptions ?? {}),
     });
 
     return {
