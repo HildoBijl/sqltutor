@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
-import { Page, Par, Section, Warning, Term, Em } from '@/components';
+import { Page, Par, Section, Info, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';
@@ -33,18 +33,18 @@ export function Theory() {
   last_name AS family_name,
   phone AS number
 FROM employees;`} />
-      <Par>The addendum <ISQL>AS</ISQL> is optional here, and it works just as well without. For readability, it is still recommended to add it.</Par>
+      <Info>The addendum <ISQL>AS</ISQL> is optional, and it works just as well without. For readability, it is still recommended to add it.</Info>
     </Section>
 
     <Section title="Deal with multiple tables">
       <Par>So far we have run queries that only request a single table. Later on we will encounter queries involving multiple tables. In that case it may be confusing which column comes from which table, especially if the two tables have columns with the same name. We can indicate what specific table to select a column from through the format <ISQL>table_name.column_name</ISQL>.</Par>
       <FigureRenameColumns query={`SELECT
-  first_name,
+  employees.first_name,
   employees.last_name AS family_name,
   employees.phone AS number
 FROM employees;`} />
       <Par>When the two tables don't have duplicate column names, this table specification is generally not needed, but it is still recommended for clarity. When the two tables do have duplicate column names, this notation is obligatory.</Par>
-      <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: rename them for within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
+      <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: temporarily rename them within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
       <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,

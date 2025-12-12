@@ -17,6 +17,9 @@ const svgStyle: CSSProperties = {
 	width: '100%',
 	zIndex: 2,
 };
+const htmlStyle: CSSProperties = {
+	fontSize: '16px', // Fix font size to prevent jumps on window resize.
+};
 const canvasStyle: CSSProperties = {
 	height: '100%',
 	...notSelectable,
@@ -25,7 +28,7 @@ const canvasStyle: CSSProperties = {
 };
 
 export function Drawing(props: DrawingProps) {
-	const { maxWidth, width, height, autoScale, useSvg, svgProps, disableSVGPointerEvents, useCanvas, canvasProps, ref, style, children, ...figureProps } = { ...getDefaultDrawing(), ...props };
+	const { maxWidth, width, height, autoScale, useSvg, svgProps, disableSVGPointerEvents, htmlProps, useCanvas, canvasProps, ref, style, children, ...figureProps } = { ...getDefaultDrawing(), ...props };
 	if (!useSvg && !useCanvas)
 		throw new Error('Drawing error: cannot generate a drawing without either an SVG or a canvas present.');
 
@@ -78,7 +81,8 @@ export function Drawing(props: DrawingProps) {
 	// Render figure with SVG and Canvas properly placed.
 	return <DrawingContext.Provider value={drawingData}>
 		<Figure ref={figureRef} aspectRatio={aspectRatio} maxWidth={figureMaxWidth} {...figureProps} innerProps={{ style: { zIndex: 0, ...(figureProps?.innerProps?.style || {}) }, ...(figureProps?.innerProps || {}) }}>
-			{/* Containers that portals can place elements into. */}
+
+			{/* SVG container */}
 			{useSvg ? <svg ref={svgRef} viewBox={`0 0 ${width} ${height}`} style={{
 				...svgStyle,
 				...(disableSVGPointerEvents ? { pointerEvents: 'none' } : {}),
@@ -86,16 +90,23 @@ export function Drawing(props: DrawingProps) {
 			}} {...svgProps}>
 				<defs ref={svgDefsRef} />
 			</svg> : null}
+
+			{/* HTML container */}
+			<div ref={htmlContentsRef} style={{ ...htmlStyle, ...(htmlProps?.style || {}) }} />
+
+			{/* Canvas */}
 			{useCanvas ? <canvas ref={canvasRef} width={width} height={height} style={{ ...canvasStyle, ...(canvasProps?.style || {}) }} {...canvasProps} /> : null}
-			<div ref={htmlContentsRef} />
+
+			{/* Put children here, but portals will move them */}
 			{children}
 
-			{/* Clip path to prevent overflow. */}
+			{/* Clip path to prevent overflow */}
 			<SvgDefsPortal>
 				<clipPath id={`noOverflow${id}`}>
 					<rect x="0" y="0" width={width} height={height} fill="#fff" rx={7} />
 				</clipPath>
 			</SvgDefsPortal>
+
 		</Figure>
 	</DrawingContext.Provider>
 }

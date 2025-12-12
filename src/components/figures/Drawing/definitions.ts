@@ -1,4 +1,4 @@
-import type { SVGProps, CanvasHTMLAttributes } from 'react';
+import type { SVGProps, HTMLAttributes, CanvasHTMLAttributes } from 'react';
 import type { Vector, Rectangle } from '@/utils';
 
 import { type FigureProps, type FigureData, getDefaultFigure } from '../Figure';
@@ -25,6 +25,7 @@ export interface DrawingProps<TRef = DrawingData> extends Omit<FigureProps<TRef>
 	autoScale?: boolean;
 	useSvg?: boolean;
 	svgProps?: SVGProps<SVGSVGElement>;
+	htmlProps?: HTMLAttributes<HTMLDivElement>;
 	disableSVGPointerEvents?: boolean;
 	useCanvas?: boolean;
 	canvasProps?: CanvasHTMLAttributes<HTMLCanvasElement>;
