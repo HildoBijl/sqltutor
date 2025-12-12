@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Box } from '@mui/material';
 
 import { useThemeColor } from '@/theme';
-import { Page, Par, List, Section, Info, Warning, Term, Em } from '@/components';
+import { Page, Par, List, Section, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
 import { useQueryResult } from '@/shared/hooks/useQuery';

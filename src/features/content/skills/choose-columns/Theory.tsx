@@ -16,7 +16,7 @@ export function Theory() {
     </Section>
 
     <Section title="Select columns (projection)">
-      <Par>To retrieve all columns from a table, we use <ISQL>SELECT *</ISQL> which means "select all". If we only want to select certain columns (apply <Term>projection</Term>) then we have to specify the column names, separated by commas.</Par>
+      <Par>To retrieve <Em>all</Em> columns from a table, we use <ISQL>SELECT *</ISQL> which means "select all". If we only want to select <Em>specific</Em> columns (apply <Term>projection</Term>) then we have to specify the column names, separated by commas.</Par>
       <FigureSelectColumns />
       <Warning>It is strongly recommended to always pick column and table names that have no spaces and are in lower case. Instead of spaces, use underscores "_". If you really want to deviate from this, you need to wrap the names in <Em>double</Em> quotation marks, like <ISQL>SELECT "First Name" FROM "All Employees";</ISQL> or similar. For column and table names without spaces/uppercase, these quotation marks are allowed but unnecessary.</Warning>
     </Section>

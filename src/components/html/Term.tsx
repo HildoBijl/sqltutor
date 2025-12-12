@@ -8,6 +8,7 @@ export type TermProps = TypographyProps & {
 export function Term({ children, sx, ...props }: TermProps) {
   return <Typography
     component="strong"
+    variant="inherit"
     fontWeight="bold"
     sx={{ ...sx }}
     {...props}
