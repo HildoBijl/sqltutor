@@ -41,9 +41,9 @@ export function Theory() {
     </Section>
 
     <Section title={<>Negate conditions using <ISQL>NOT</ISQL></>}>
-      <Par>Suppose that we want to find all employees that are <Em>not</Em> active logistics specialists. To do so, we can use the <ISQL>NOT</ISQL> keyword. When doing so, it is common to use brackets to indicate which condition should be flipped around.</Par>
+      <Par>Suppose that we want to find all employees that are <Em>not</Em> active logistics specialists. To do so, we can use the <ISQL>NOT</ISQL> keyword.</Par>
       <FigureCombinedCondition c1="status" v1="active" c2="position" v2="logistics specialist" combiner="AND" addNot={true} />
-      <Par>The <ISQL>NOT</ISQL> keyword expects a <ISQL>TRUE</ISQL>/<ISQL>FALSE</ISQL>/<ISQL>NULL</ISQL> value after it. It then flips this value around: <ISQL>NOT TRUE</ISQL> resolves to <ISQL>FALSE</ISQL> and <ISQL>NOT FALSE</ISQL> resolves as <ISQL>TRUE</ISQL>. (<ISQL>NOT NULL</ISQL> reduces to <ISQL>NULL</ISQL>, since the opposite of an unknown result is still unknown.)</Par>
+      <Par>The <ISQL>NOT</ISQL> keyword expects a <ISQL>TRUE</ISQL>/<ISQL>FALSE</ISQL>/<ISQL>NULL</ISQL> value after it. It then inverts this value: <ISQL>NOT TRUE</ISQL> resolves to <ISQL>FALSE</ISQL> and <ISQL>NOT FALSE</ISQL> resolves as <ISQL>TRUE</ISQL>. (<ISQL>NOT NULL</ISQL> reduces to <ISQL>NULL</ISQL>, since the opposite of an unknown result is still unknown.)</Par>
     </Section>
 
     <Section title="Use logic theory to rewrite conditions">
@@ -58,7 +58,7 @@ export function Theory() {
 SELECT *
 FROM emp_data
 WHERE NOT status = 'active' OR NOT position = 'logistics specialist';`} />
-      <Info>The <ISQL>NOT</ISQL> keyword is evaluated <Em>after</Em> the comparison, but <Em>before</Em> the <ISQL>OR</ISQL> keyword. The above condition is equivalent to <ISQL>{`(NOT (status = 'active')) OR (NOT (position = 'logistics specialist'))`}</ISQL>. The brackets can be added for clarity, but SQL programmers should know the evaluation orders, so usually they are omitted.</Info>
+      <Info>The <ISQL>NOT</ISQL> keyword is evaluated <Em>after</Em> the comparison, but <Em>before</Em> the <ISQL>OR</ISQL> keyword. The above condition is equivalent to <ISQL>{`(NOT (status = 'active')) OR (NOT (position = 'logistics specialist'))`}</ISQL>. The brackets here can be added for clarity, but SQL programmers should know the evaluation orders, so usually they are omitted.</Info>
     </Section>
 
     <Section title="Use common SQL short-cuts to simplify conditions">
@@ -73,11 +73,11 @@ WHERE perf_score BETWEEN 60 AND 70;`} />
 SELECT *
 FROM emp_data
 WHERE status IN ('sick leave', 'paid leave');`} />
-      <Par>Given how broad SQL is, there are dozens more short-cuts like this. If you ever see a command you don't recognize, simply look up its specifications to see how it works.</Par>
+      <Par>Given how broad SQL is, there are dozens more short-cuts like this. If you ever see a keyword you don't recognize, simply look up its specifications to see how it works. In this way, you learn more and more commands as you go.</Par>
     </Section>
 
     <Section title={<>Merge tables using <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL></>}>
-      <Par>If we have two tables with <Em>identical columns</Em>, we can <Term>merge</Term> them together. There are various ways to do so. The first is through the <ISQL>UNION</ISQL> operator. This operator merges two tables, and it keeps a row if it is in <Em>either</Em> (or both) of the given tables. So it kind of functions like an <ISQL>OR</ISQL>.</Par>
+      <Par>A completely different way to combine different conditions is through <Term>merging tables</Term>. If we have two tables with <Em>identical columns</Em>, we can merge them together. One way to do so is through the <ISQL>UNION</ISQL> operator. This operator merges two tables, and it keeps a row if it is in <Em>either</Em> (or both) of the given tables. So it kind of functions like an <ISQL>OR</ISQL>.</Par>
       <FigureMergingTables query1={`SELECT *
 FROM emp_data
 WHERE status = 'sick leave'`} query2={`SELECT *
@@ -280,7 +280,7 @@ function FigureRewrittenQuery({ query = '' }) {
   </Drawing>;
 }
 
-function FigureMergingTables({ query1 = '', query2 = '', operator = 'UNION' }) {
+export function FigureMergingTables({ query1 = '', query2 = '', operator = 'UNION' }) {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -303,9 +303,9 @@ ${query2}`);
   const [tRef, tBounds] = useRefWithBounds(drawingRef);
 
   const h1 = Math.max(e1Bounds?.height || 200, t1Bounds?.height || 200);
-  const delta1 = 20;
+  const delta1 = 15;
   const h2 = Math.max(e2Bounds?.height || 200, t2Bounds?.height || 200);
-  const delta2 = 50;
+  const delta2 = 55;
   const h3 = Math.max(eBounds?.height || 200, tBounds?.height || 200);
   const height = h1 + delta1 + h2 + delta2 + h3;
 
@@ -355,7 +355,7 @@ ${query2}`}</SQLDisplay>
     {/* Operator arrow */}
     {t2Bounds && tBounds ? <>
       <Curve points={[t2Bounds.middleBottom.add([0, 2]), tBounds.middleTop.add([0, -2])]} color={themeColor} endArrow />
-      <Element position={[tBounds.middle.x + 8, (t2Bounds.bottom + tBounds.top) / 2 - 4]} anchor={[-1, 0]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.8em' }}>{operator}</span></Element>
+      <Element position={[tBounds.middle.x + 8, (t2Bounds.bottom + tBounds.top) / 2 - 4]} anchor={[-1, 0]}><ISQL>{operator}</ISQL></Element>
     </> : null}
   </Drawing>;
 }
