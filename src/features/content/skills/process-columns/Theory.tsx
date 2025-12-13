@@ -40,11 +40,10 @@ FROM emp_data;`} tableWidth={350} />
       <Par>Next to general arithmetic, there is a wide variety of functions that can be used.</Par>
       <List items={[
         <><Term>Rounding</Term>: <ISQL>ROUND(x)</ISQL> rounds <ISQL>x</ISQL> to the nearest integer. <ISQL>ROUND(x, 2)</ISQL> rounds <ISQL>x</ISQL> to two decimals. <ISQL>FLOOR(x)</ISQL> rounds <ISQL>x</ISQL> <Em>down</Em> to the nearest integer lower than <ISQL>x</ISQL>. <ISQL>CEIL(x)</ISQL> rounds <ISQL>x</ISQL> <Em>up</Em> to the nearest integer higher than <ISQL>x</ISQL>.</>,
-        <><Term>Maximum</Term>/<Term>Minimum</Term>: <ISQL>GREATEST(x1, x2, ...)</ISQL> gives the highest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, and so forth. <ISQL>LEAST(x1, x2, ...)</ISQL> gives the lowest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, etcetera.</>,
+        <><Term>Maximum</Term>/<Term>Minimum</Term>: <ISQL>GREATEST(x1, x2, ...)</ISQL> gives the highest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, and so forth. <ISQL>LEAST(x1, x2, ...)</ISQL> gives the lowest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, etcetera. (Except in SQLite, where we use <ISQL>MAX</ISQL> and <ISQL>MIN</ISQL> instead.)</>,
         <><Term>Mathematical functions</Term>: <ISQL>POWER(x, y)</ISQL> calculates <ISQL>x^y</ISQL>. <ISQL>SQRT(x)</ISQL> calculates the square root of <ISQL>x</ISQL>. <ISQL>EXP(x)</ISQL> calculates <ISQL>e^x</ISQL>. <ISQL>ABS(x)</ISQL> gives the absolute value of <ISQL>x</ISQL>. And there is a wide variety of other functions, like, <ISQL>LOG(x)</ISQL>, <ISQL>SIN(x)</ISQL>, <ISQL>ATAN(x)</ISQL>, and so forth.</>
       ]} />
       <Warning>Every DBMS has its own variations of these functions. For instance, <ISQL>LOG(x)</ISQL> is a base-10 logarithm in MySQL and a natural logarithm in PostgreSQL. Always check out the specifications for your DBMS.</Warning>
-      <Par></Par>
     </Section>
 
     <Section title="Process text values">
@@ -72,7 +71,6 @@ FROM employees;`} tableWidth={350} />
       <Par>If we have a date/time value, we can <Term>display</Term>/<Term>format</Term> this in various ways. In SQLite this is done using the <ISQL>STRFTIME(format, datetime)</ISQL> function. For instance <ISQL>STRFTIME('%Y-%m-%d %H:%M:%S', DATETIME(CURRENT_TIMESTAMP, '-7days'))</ISQL> gives <ISQL>{`${dateLastWeek} ${timeLastWeek}`}</ISQL>. The special characters like <ISQL>%H</ISQL> denote things like "Two-digit hour".</Par>
       <Par>A final thing that is often done with dates is <Term>extract parameters</Term> from it, like the month or the year. Pretty much <Em>all</Em> DBMSs use the <ISQL>EXTRACT</ISQL> function for this, except for SQLite. To get for instance the month in SQLite, you can use the by now familiar <ISQL>STRFTIME</ISQL> function. For instance <ISQL>STRFTIME('%m', CURRENT_DATE)</ISQL> gives the text <ISQL>{`'${now.getMonth() + 1}'`}</ISQL>. Note that this is stored as <Em>text</Em>. If you want to calculate with this, you first have to tell SQLite that it is indeed a number, which is done through a so-called <Term>type cast</Term>. <ISQL>CAST(STRFTIME('%m', CURRENT_DATE) AS INT)</ISQL> gives the number <ISQL>{`${now.getMonth() + 1}`}</ISQL>, which we can then do calculations with.</Par>
       <Warning>You probably notice: working with dates/times is tricky. Always check the specifications of your DBMS, and test your queries well!</Warning>
-      <Par></Par>
     </Section>
 
     <Section title="Conditionally process values">
