@@ -43,6 +43,7 @@ interface SkillExerciseControllerState {
     queryError: Error | null;
     description: string;
     tableNames: string[];
+    completionSchema: Record<string, string[]>;
     canSubmit: boolean;
     canGiveUp: boolean;
     hasExecutedQuery: boolean;
@@ -92,6 +93,7 @@ export function useSkillExerciseController({
     isReady: displayDbReady,
     isExecuting,
     tableNames,
+    completionSchema,
     resetDatabase: resetDisplayDatabase,
     clearQueryState,
   } = useDatabase({
@@ -559,6 +561,7 @@ export function useSkillExerciseController({
       queryError,
       description: exerciseDescription,
       tableNames,
+      completionSchema,
       canSubmit,
       canGiveUp,
       hasExecutedQuery,

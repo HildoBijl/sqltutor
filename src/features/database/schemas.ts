@@ -416,6 +416,45 @@ export function getTablesForSchema(schemaKey: SchemaKey): TableKey[] {
   return schemaTableGroups[schemaKey] ?? schemaTableGroups.core;
 }
 
+function extractColumns(createStatement: string): string[] {
+  const body = createStatement.match(/\(([\s\S]+)\)/)?.[1];
+  if (!body) return [];
+
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/,$/, ''))
+    .filter((line) => line.length > 0)
+    .filter((line) => !/^(primary|foreign|unique|constraint|check)\b/i.test(line))
+    .map((line) => line.split(/\s+/)[0])
+    .map((column) => column.replace(/^[`"[]?(.+?)[`"\]]?$/, '$1'))
+    .filter(Boolean);
+}
+
+export function getCompletionSchemaForTables(tables: TableKey[], role?: DatabaseRole): Record<string, string[]> {
+  const schema: Record<string, string[]> = {};
+  const seen = new Set<string>();
+
+  tables.forEach((tableKey) => {
+    const source = tableDefinitions[tableKey];
+    if (!source) return;
+    const definition = resolveDefinitionForRole(source, role);
+    if (!definition || seen.has(definition.name)) return;
+
+    const columns = extractColumns(definition.createStatement);
+    if (columns.length === 0) return;
+
+    schema[definition.name] = columns;
+    seen.add(definition.name);
+  });
+
+  return schema;
+}
+
+export function getCompletionSchemaForKey(schemaKey: SchemaKey, role?: DatabaseRole): Record<string, string[]> {
+  const tables = getTablesForSchema(schemaKey);
+  return getCompletionSchemaForTables(tables, role);
+}
+
 export function getTableNames(schema: string): string[] {
   const matches = schema.match(/CREATE TABLE (\w+)/gi);
   if (!matches) return [];
