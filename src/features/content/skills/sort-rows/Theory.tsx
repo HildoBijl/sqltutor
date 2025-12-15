@@ -12,7 +12,7 @@ import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function Theory() {
   return <Page>
-    <Par>We know how in SQL we can retrieve an entire table. The rows then usually appear in the order in which they are added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
+    <Par>We know how to use SQL to retrieve an entire table. The rows then usually appear in the order in which they have originally been added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
 
     <Section title="Sort on a single column">
       <Par>To sort your results, add an <ISQL>ORDER BY</ISQL> clause to the end of the query and specify the column to sort by. Optionally, add <ISQL>ASC</ISQL> (ascending, default) or <ISQL>DESC</ISQL> (descending) to choose the sorting direction.</Par>

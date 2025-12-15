@@ -29,16 +29,16 @@ function FigureProjectionAndFiltering() {
   const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
   const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
   const [t3Ref, t3Bounds] = useRefWithBounds(drawingRef);
-  const w1 = 800;
-  const w2 = w1 / 6;
-  const w3 = w1 / 3;
+  const w1 = 600;
+  const w2 = 120;
+  const w3 = 340;
   const width = w1 + w2 + w3;
   const arrowMargin = 10;
   const arrowHeight = 80;
   const h1 = Math.max(t1Bounds?.height || 200, t2Bounds?.height || 200);
   const h2 = t3Bounds?.height || 200;
 
-  return <Drawing ref={drawingRef} width={width} height={h1 + arrowHeight + h2} maxWidth={width * 2 / 3}>
+  return <Drawing ref={drawingRef} width={width} height={h1 + arrowHeight + h2} maxWidth={width * 0.8}>
     <Element position={[0, 0]} anchor={[-1, -1]}>
       <Box sx={{ width: w1 }}>
         <DataTable ref={t1Ref} data={dataFull} showPagination={false} compact />

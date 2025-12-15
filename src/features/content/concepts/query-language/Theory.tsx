@@ -15,14 +15,14 @@ export function Theory() {
     </Section>
 
     <Section title="The idea behind a query language">
-      <Par>Databases usually don't have a flashy interface with clear graphics, useful buttons and more. To interact with the database and make it do anything, we have to give the DBMS commands. Think of "Create a new table 'employees'", "Add a new record to the 'employees' table" or "Find the names of all employees earning more than two hundred thousand per year." Such commands are known as <Term>queries</Term>: structured commands to extract/adjust data.</Par>
+      <Par>Databases usually don't have a flashy interface with clear graphics, useful buttons and such. To interact with the database and make it do anything, we have to give the DBMS specific commands. Think of "Create a new table 'employees'", "Add a new record to the 'employees' table" or "Find the names of all employees earning more than 180 thousand per year." Such commands are known as <Term>queries</Term>: structured commands to extract/adjust data.</Par>
       <FigureQueryExample />
       <Par>Sadly DBMSs do not understand English, or any spoken language for that matter. Spoken languages are far too ambiguous. Queries must therefore follow a very specific format. The exact format of how to set up queries and what can be put in them is known as the <Term>query language</Term>.</Par>
     </Section>
 
     <Section title="Examples of query languages">
       <Par>So what does a query look like? This depends on the query language. There is a large variety of query languages: every DBMS pretty much has its own query language. But to get a feeling of what queries may look like, we study a few examples.</Par>
-      <Par>Suppose that we want to get a list of companies with more than 200.000 employees. In the <Term>SQL</Term> query language (the query language used by the most common/popular databases) that would be done through</Par>
+      <Par>Suppose that we want to get a list of companies with more than 180.000 employees. In the <Term>SQL</Term> query language (the query language used by the most common/popular databases) that would be done through</Par>
       <Par><pre><code>{`SELECT first_name, last_name
 FROM employees
 WHERE current_salary > 180000
@@ -34,7 +34,7 @@ WHERE current_salary > 180000
       <Par><pre><code>highEarners ← ∏<sub>first_name,last_name</sub>(σ<sub>current_salary &gt; 180000</sub>(employees))</code></pre></Par>
       <Par>Or in an object-database like <Link to="https://www.mongodb.com/">MongoDB</Link> the query looks like this.</Par>
       <Par><pre><code>{`db.employees.find(
-  { current_salary: { $gt: 180000 } }, 
+  { current_salary: { $gt: 180000 } },
   { first_name: 1, last_name: 1, _id: 0 }
 )`}</code></pre></Par>
       <Par>You see that there is a large variety of query languages.</Par>

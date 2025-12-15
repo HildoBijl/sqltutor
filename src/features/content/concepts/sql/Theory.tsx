@@ -20,7 +20,7 @@ export function Theory() {
 FROM employees;`}</SQLDisplay>
       <Par>This query instructs the DBMS to take all columns (the star means "all") from the table named <ISQL>employees</ISQL> and return them. So effectively, this query loads in the full table. The result would be the following.</Par>
       <FigureEmployeeTable />
-      <Par>The above query (with whatever table name applies) is used very often. It's a quick way to check out the data in a table. Use it at the start of exercise, as a starting point.</Par>
+      <Par>The above query (with whatever table name applies) is used very often. It's a quick way to check out the data in a table. Use it at the start of every exercise you make here at SQL Valley, just to get started.</Par>
       <Info>One of the reasons why SQL is popular is its readability. Even without ever having seen SQL, you probably had an idea what the above query was for.</Info>
     </Section>
 
@@ -36,9 +36,9 @@ FROM employees;`}</SQLDisplay>
     <Section title="The name and history of SQL">
       <Par>There is quite some confusion about the name SQL, how you pronounce it, and what it stands for. To clarify this, we need to understand the history behind the name.</Par>
       <Par>Back in the early 1970s, some engineers at IBM created the <Term>Structured English QUEry Language</Term> SEQUEL. It turned out that the name SEQUEL was already a registered trademark, so they shortened it to <Term>Structured Query Language</Term> (SQL). In ordinary speech, some people then started pronouncing the letters of the acronym (S-Q-L), while others still call it "Sequel". This divide is still present today: both pronunciations are used in practice.</Par>
-      <Par>In 1986 ANSI (the American National Standars Institute) and ISO (the International Organization for Standardization) decided to adopt SQL. They wrote a standard for it, deciding how it should work for all relevant databases. In this standard, the name is simply "SQL" without specifying what this stands for. So officially, the name SQL is not an acronym, but a name in itself.</Par>
-      <Par>The SQL standard has since been updated and expanded numerous time. Creators of DBMSs often work together with ANSI/ISO to make the standard both easier and more powerful to use. These DBMS creators then attempt to conform their system to the standard. After all, it makes it easier for users of other DBMSs to switch to their DBMS. This conformation to the SQL standard is the reason that SQL is the most commonly used database language in the world.</Par>
-      <Warning>Adoption of DBMSs to the SQL standard is not perfect. In practice every DBMS uses its own dialect of SQL. At SQL Valley, we mainly focus on the parts of SQL that work for all DBMSs. Sometimes we add a note "The way this works does vary slightly (or a lot) per DBMS."</Warning>
+      <Par>In 1986 ANSI (the American National Standards Institute) and ISO (the International Organization for Standardization) decided to adopt SQL. They wrote a standard for it, deciding how it should work for all relevant databases. In this standard, the name is simply "SQL" without specifying what this stands for. So officially, the name SQL is not an acronym, but a name in itself.</Par>
+      <Par>The SQL standard has since been updated and expanded numerous time. Creators of DBMSs often work together with ANSI/ISO to make the standard both easier and more powerful to use. These DBMS creators then attempt to conform their system to the standard. After all, it makes it easier for users of other DBMSs to switch to their DBMS. This conformance to the SQL standard is the reason that SQL is the most commonly used query language in the world.</Par>
+      <Warning>The conformance of DBMSs to the SQL standard is not perfect. In practice every DBMS uses its own dialect of SQL. At SQL Valley, we mainly focus on the parts of SQL that work for all DBMSs. Sometimes we add a note "The way this works does vary slightly (or a lot) per DBMS."</Warning>
     </Section>
   </Page>;
 }

@@ -15,7 +15,7 @@ export function Theory() {
     </Section>
 
     <Section title="Projection: choosing columns">
-      <Par>Suppose that we have a table and we are only interested in a few of the columns. For instance, we only want to get an overview of the number of employees per company. In that case, we can choose to use those columns and throw out the rest. This operation is called <Term>projection</Term>.</Par>
+      <Par>Suppose that we have a table and we are only interested in a few of the columns. For instance, we have a list of company departments and only want to get an overview of the number of employees per department. In that case, we can choose to use those columns and throw out the rest. This operation is called <Term>projection</Term>.</Par>
       <FigureProjection />
     </Section>
 
@@ -46,13 +46,13 @@ function FigureProjection() {
   const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
   const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
   const height = Math.max(t1Bounds?.height || 200, t2Bounds?.height || 200);
-  const w1 = 800;
-  const w2 = w1 / 6;
-  const w3 = w1 / 3;
+  const w1 = 600;
+  const w2 = 120;
+  const w3 = 340;
   const arrowMargin = 10;
   const width = w1 + w2 + w3;
 
-  return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width * 2 / 3}>
+  return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width * 0.8}>
     <Element position={[0, 0]} anchor={[-1, -1]}>
       <Box sx={{ width: w1 }}>
         <DataTable ref={t1Ref} data={dataFull} showPagination={false} compact />
@@ -85,7 +85,7 @@ function FigureFiltering() {
   const h1 = t1Bounds?.height ?? 200;
   const h2 = t2Bounds?.height ?? 200;
 
-  return <Drawing ref={drawingRef} width={w} height={h1 + arrowHeight + h2} maxWidth={w * 2 / 3}>
+  return <Drawing ref={drawingRef} width={w} height={h1 + arrowHeight + h2} maxWidth={w * 0.8}>
     <Element position={[0, 0]} anchor={[-1, -1]}>
       <Box sx={{ width: w }}>
         <DataTable ref={t1Ref} data={dataFull} showPagination={false} compact />

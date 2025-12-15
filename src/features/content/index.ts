@@ -87,7 +87,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
   // SQL fundamentals.
   {
     id: 'sql',
-    name: 'SQL Fundamentals',
+    name: 'SQL',
     type: 'concept',
     description: 'What is the SQL query language, and what should I know about it?',
     prerequisites: ['query-language'],

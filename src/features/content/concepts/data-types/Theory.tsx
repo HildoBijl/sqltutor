@@ -54,7 +54,7 @@ export function Theory() {
         <><strong>Other</strong>
           <List items={[
             <>The <ISQL>BOOLEAN</ISQL> type stores either <ISQL>TRUE</ISQL> or <ISQL>FALSE</ISQL>.</>,
-            <>Depending on which DBMS you are using, you may use the <ISQL>JSON</ISQL> type, the <ISQL>XML</ISQL> type, the <ISQL>INTEGER[]</ISQL> or <ISQL>TEXT[]</ISQL> types for lists, and many other options.</>,
+            <>Depending on which DBMS you are using, you may use the the <ISQL>INTEGER[]</ISQL> or <ISQL>TEXT[]</ISQL> types for lists, the <ISQL>JSON</ISQL> type for Javascript objects, the <ISQL>XML</ISQL> type for XML data, and various other options.</>,
           ]} /></>,
       ]} />
       <Par>It's not necessary to remember all these types. The main lesson is that every data type has limitations on exactly what it can store and with what precision. These limitations should be taken into account.</Par>
@@ -89,8 +89,8 @@ export function FigureDataTypeDemo() {
 
   return <Drawing ref={drawingRef} width={800} height={25 + height + 48} maxWidth={800} disableSVGPointerEvents>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>The emp_data table</span></Element>
-    <Element position={[0, 25]} anchor={[-1, -1]} scale={0.6} behind>
-      <Box sx={{ width: 800 / 0.6 }}>
+    <Element position={[0, 25]} anchor={[-1, -1]} scale={0.8} behind>
+      <Box sx={{ width: 800 / 0.8 }}>
         <DataTable ref={tableRef} data={data} showPagination={false} compact />
       </Box>
     </Element>
