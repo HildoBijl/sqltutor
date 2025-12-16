@@ -6,6 +6,16 @@ import employeesCsv from '../../../data/csv/employees.csv?raw';
 import productsCsv from '../../../data/csv/products.csv?raw';
 import transactionsCsv from '../../../data/csv/transactions.csv?raw';
 
+import theoryAccountsCsv from '../../../data/theory-sample/accounts.csv?raw';
+import theoryDepartmentsCsv from '../../../data/theory-sample/departments.csv?raw';
+import theoryEmpDataCsv from '../../../data/theory-sample/emp_data.csv?raw';
+import theoryEmpDeptCsv from '../../../data/theory-sample/emp_dept.csv?raw';
+import theoryEmployeesCsv from '../../../data/theory-sample/employees.csv?raw';
+import theoryProductsCsv from '../../../data/theory-sample/products.csv?raw';
+import theoryTransactionsCsv from '../../../data/theory-sample/transactions.csv?raw';
+import theoryExpensesCsv from '../../../data/theory-sample/expenses.csv?raw';
+import theoryQuarterlyPerformanceCsv from '../../../data/theory-sample/quarterly_performance.csv?raw';
+
 import type { DatasetSize, DatabaseRole, TableKey } from './types';
 import { resolveContentTables, resolveContentSize } from './contentAccess';
 
@@ -36,24 +46,66 @@ const DEFAULT_ROW_LIMITS: Record<DatasetSize, number> = {
 
 function parseCsv(raw: string): Record<string, string>[] {
   if (!raw) return [];
-  const lines = raw
-    .replace(/^\uFEFF/, '')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+  const source = raw.replace(/^\uFEFF/, '');
+  const rows: string[][] = [];
+  let currentCell = '';
+  let currentRow: string[] = [];
+  let inQuotes = false;
 
-  if (lines.length === 0) return [];
+  for (let i = 0; i < source.length; i += 1) {
+    const char = source[i];
+    const next = source[i + 1];
 
-  const headers = lines[0].split(',').map((h) => h.trim());
+    if (char === '"' && inQuotes && next === '"') {
+      currentCell += '"';
+      i += 1;
+      continue;
+    }
 
-  return lines.slice(1).map((line) => {
-    const cells = line.split(',').map((c) => c.trim());
-    const entry: Record<string, string> = {};
-    headers.forEach((header, index) => {
-      entry[header] = cells[index] ?? '';
-    });
-    return entry;
-  });
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      currentRow.push(currentCell);
+      currentCell = '';
+      continue;
+    }
+
+    if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && next === '\n') {
+        i += 1;
+      }
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+      currentRow = [];
+      currentCell = '';
+      continue;
+    }
+
+    currentCell += char;
+  }
+
+  if (currentCell.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentCell);
+    rows.push(currentRow);
+  }
+
+  if (rows.length === 0) return [];
+
+  const headers = rows[0].map((header) => header.trim());
+
+  return rows
+    .slice(1)
+    .map((cells) => {
+      const entry: Record<string, string> = {};
+      headers.forEach((header, index) => {
+        entry[header] = (cells[index] ?? '').trim();
+      });
+      return entry;
+    })
+    .filter((entry) => headers.some((header) => (entry[header] ?? '').trim().length > 0));
 }
 
 function numberOrNull(value: string | undefined): number | null {
@@ -91,74 +143,115 @@ const departmentsRecords = parseCsv(departmentsCsv);
 const accountsRecords = parseCsv(accountsCsv);
 const productsRecords = parseCsv(productsCsv);
 const transactionsRecords = parseCsv(transactionsCsv);
+const theoryEmployeesRecords = parseCsv(theoryEmployeesCsv);
+const theoryEmpDataRecords = parseCsv(theoryEmpDataCsv);
+const theoryEmpDeptRecords = parseCsv(theoryEmpDeptCsv);
+const theoryDepartmentsRecords = parseCsv(theoryDepartmentsCsv);
+const theoryAccountsRecords = parseCsv(theoryAccountsCsv);
+const theoryProductsRecords = parseCsv(theoryProductsCsv);
+const theoryTransactionsRecords = parseCsv(theoryTransactionsCsv);
+const theoryExpensesRecords = parseCsv(theoryExpensesCsv);
+const theoryQuarterlyPerformanceRecords = parseCsv(theoryQuarterlyPerformanceCsv);
 
-const employeesRows: SqlCell[][] = employeesRecords.map((row) => [
-  idOrNull(row.e_id),
-  stringOrNull(row.first_name),
-  stringOrNull(row.last_name),
-  stringOrNull(row.phone),
-  stringOrNull(row.email),
-  stringOrNull(row.address),
-  stringOrNull(row.city),
-  stringOrNull(row.hire_date),
-  numberOrNull(row.current_salary),
-]);
+function buildEmployeeRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    idOrNull(row.e_id),
+    stringOrNull(row.first_name),
+    stringOrNull(row.last_name),
+    stringOrNull(row.phone),
+    stringOrNull(row.email),
+    stringOrNull(row.address),
+    stringOrNull(row.city),
+    stringOrNull(row.hire_date),
+    numberOrNull(row.current_salary),
+  ]);
+}
 
-const empDataRows: SqlCell[][] = empDataRecords.map((row) => [
-  idOrNull(row.e_id),
-  stringOrNull(row.position),
-  numberOrNull(row.salary),
-  stringOrNull(row.start_date),
-  stringOrNull(row.end_date),
-  numberOrNull(row.perf_score),
-  stringOrNull(row.status),
-]);
+function buildEmpDataRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    idOrNull(row.e_id),
+    stringOrNull(row.position),
+    numberOrNull(row.salary),
+    stringOrNull(row.start_date),
+    stringOrNull(row.end_date),
+    numberOrNull(row.perf_score),
+    stringOrNull(row.status),
+  ]);
+}
 
-const empDeptRows: SqlCell[][] = empDeptRecords.map((row) => [
-  idOrNull(row.e_id),
-  idOrNull(row.d_id),
-]);
+function buildEmpDeptRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [idOrNull(row.e_id), idOrNull(row.d_id)]);
+}
 
-const departmentsRows: SqlCell[][] = departmentsRecords.map((row) => [
-  idOrNull(row.d_id),
-  stringOrNull(row.d_name),
-  idOrNull(row.manager_id),
-  numberOrNull(row.budget),
-  numberOrNull(row.nr_employees),
-]);
+function buildDepartmentsRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    idOrNull(row.d_id),
+    stringOrNull(row.d_name),
+    idOrNull(row.manager_id),
+    numberOrNull(row.budget),
+    numberOrNull(row.nr_employees),
+  ]);
+}
 
-const accountsRows: SqlCell[][] = accountsRecords.map((row) => [
-  stringOrNull(row.acct_id),
-  stringOrNull(row.username),
-  stringOrNull(row.phone),
-  stringOrNull(row.email),
-  booleanOrNull(row.verified),
-  stringOrNull(row.full_name),
-  stringOrNull(row.address),
-  stringOrNull(row.city),
-  stringOrNull(row.created_at),
-  stringOrNull(row.last_login_at),
-]);
+function buildAccountsRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    stringOrNull(row.acct_id),
+    stringOrNull(row.username),
+    stringOrNull(row.phone),
+    stringOrNull(row.email),
+    booleanOrNull(row.verified),
+    stringOrNull(row.full_name),
+    stringOrNull(row.address),
+    stringOrNull(row.city),
+    stringOrNull(row.created_at),
+    stringOrNull(row.last_login_at),
+  ]);
+}
 
-const productsRows: SqlCell[][] = productsRecords.map((row) => [
-  idOrNull(row.p_id),
-  stringOrNull(row.name),
-  stringOrNull(row.category),
-  stringOrNull(row.owned_by),
-  numberOrNull(row.est_value),
-  stringOrNull(row.status),
-]);
+function buildProductsRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    idOrNull(row.p_id),
+    stringOrNull(row.name),
+    stringOrNull(row.category),
+    stringOrNull(row.owner_id ?? row.owned_by),
+    numberOrNull(row.est_value),
+    stringOrNull(row.status),
+  ]);
+}
 
-const transactionsRows: SqlCell[][] = transactionsRecords.map((row) => [
-  idOrNull(row.t_id),
-  stringOrNull(row.vendor_id),
-  stringOrNull(row.buyer_id),
-  idOrNull(row.prod_id),
-  stringOrNull(row.date_time),
-  numberOrNull(row.amount),
-  idOrNull(row.validated_by),
-  stringOrNull(row.status),
-]);
+function buildTransactionsRows(records: Record<string, string>[]): SqlCell[][] {
+  return records.map((row) => [
+    idOrNull(row.t_id),
+    stringOrNull(row.vendor_id),
+    stringOrNull(row.buyer_id),
+    idOrNull(row.prod_id),
+    stringOrNull(row.date_time),
+    numberOrNull(row.amount ?? row.price),
+    idOrNull(row.validated_by),
+    stringOrNull(row.status),
+  ]);
+}
+
+const employeesRows = buildEmployeeRows(employeesRecords);
+const theoryEmployeesRows = buildEmployeeRows(theoryEmployeesRecords);
+
+const empDataRows = buildEmpDataRows(empDataRecords);
+const theoryEmpDataRows = buildEmpDataRows(theoryEmpDataRecords);
+
+const empDeptRows = buildEmpDeptRows(empDeptRecords);
+const theoryEmpDeptRows = buildEmpDeptRows(theoryEmpDeptRecords);
+
+const departmentsRows = buildDepartmentsRows(departmentsRecords);
+const theoryDepartmentsRows = buildDepartmentsRows(theoryDepartmentsRecords);
+
+const accountsRows = buildAccountsRows(accountsRecords);
+const theoryAccountsRows = buildAccountsRows(theoryAccountsRecords);
+
+const productsRows = buildProductsRows(productsRecords);
+const theoryProductsRows = buildProductsRows(theoryProductsRecords);
+
+const transactionsRows = buildTransactionsRows(transactionsRecords);
+const theoryTransactionsRows = buildTransactionsRows(theoryTransactionsRecords);
 
 // Legacy sample data for exercises without CSVs yet
 const expensesRows: SqlCell[][] = [
@@ -168,6 +261,16 @@ const expensesRows: SqlCell[][] = [
   [3004, 600.0, departmentsRows[3]?.[0] ?? 4000, 'Lorem ipsum supplies', '2024-12-01', null, null],
 ];
 
+const theoryExpensesRows: SqlCell[][] = theoryExpensesRecords.map((row) => [
+  idOrNull(row.exp_id),
+  numberOrNull(row.amount),
+  idOrNull(row.d_id),
+  stringOrNull(row.description),
+  stringOrNull(row.date),
+  idOrNull(row.requested_by),
+  idOrNull(row.approved_by),
+]);
+
 const quarterlyPerformanceRows: SqlCell[][] = [
   [1, 2023, 1200000.0, 400000.0, 2400, 0.08, '2024-01-10 10:00:00'],
   [2, 2023, 1400000.0, 450000.0, 2600, 0.1, '2024-04-10 10:00:00'],
@@ -175,6 +278,20 @@ const quarterlyPerformanceRows: SqlCell[][] = [
   [4, 2023, 1500000.0, 470000.0, 2800, 0.05, '2024-10-10 10:00:00'],
   [1, 2024, 1600000.0, 500000.0, 3000, 0.03, '2025-01-10 10:00:00'],
 ];
+
+const theoryQuarterlyPerformanceRows: SqlCell[][] = theoryQuarterlyPerformanceRecords.map((row) => [
+  numberOrNull(row.quarter),
+  numberOrNull(row.fiscal_year),
+  numberOrNull(row.revenue),
+  numberOrNull(row.operating_expenses),
+  numberOrNull(row.total_transactions),
+  numberOrNull(row.growth_rate),
+  stringOrNull(row.updated_at),
+]);
+
+const THEORY_ROW_LIMITS: Partial<Record<DatasetSize, number>> = {
+  small: Number.POSITIVE_INFINITY,
+};
 
 const tableDefinitions: Record<TableKey, TableDefinition> = {
   employees: {
@@ -192,6 +309,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     current_salary REAL
   );`.trim(),
     rows: employeesRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryEmployeesRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   emp_data: {
     name: 'emp_data',
@@ -207,6 +330,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (e_id) REFERENCES employees(e_id)
   );`.trim(),
     rows: empDataRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryEmpDataRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   emp_dept: {
     name: 'emp_dept',
@@ -219,6 +348,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (d_id) REFERENCES departments(d_id)
   );`.trim(),
     rows: empDeptRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryEmpDeptRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   departments: {
     name: 'departments',
@@ -232,6 +367,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (manager_id) REFERENCES employees(e_id)
   );`.trim(),
     rows: departmentsRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryDepartmentsRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   accounts: {
     name: 'accounts',
@@ -249,6 +390,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     last_login_at TEXT
   );`.trim(),
     rows: accountsRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryAccountsRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   products: {
     name: 'products',
@@ -263,6 +410,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)
   );`.trim(),
     rows: productsRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryProductsRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   transactions: {
     name: 'transactions',
@@ -282,6 +435,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (validated_by) REFERENCES employees(e_id)
   );`.trim(),
     rows: transactionsRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryTransactionsRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   expenses: {
     name: 'expenses',
@@ -299,6 +458,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     FOREIGN KEY (approved_by) REFERENCES employees(e_id)
   );`.trim(),
     rows: expensesRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryExpensesRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
   quarterly_performance: {
     name: 'quarterly_performance',
@@ -314,6 +479,12 @@ const tableDefinitions: Record<TableKey, TableDefinition> = {
     PRIMARY KEY (quarter, fiscal_year)
   );`.trim(),
     rows: quarterlyPerformanceRows,
+    roleOverrides: {
+      theory: {
+        rows: theoryQuarterlyPerformanceRows,
+        rowLimits: THEORY_ROW_LIMITS,
+      },
+    },
   },
 };
 
