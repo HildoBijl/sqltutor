@@ -71,16 +71,16 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
   const columnNameNodeBounds = useTextNodeBounds(table, 'd_id', drawingRef, 0, 1);
 
   // Define coordinates.
-  const x = 150;
+  const x = 180;
   const y = 60;
-  const w = 600;
+  const w = 700;
   const r = 10;
 
   // Render the drawing.
-  return <Drawing ref={drawingRef} width={w} height={y + (tBounds?.height || 200)} maxWidth={600} disableSVGPointerEvents>
+  return <Drawing ref={drawingRef} width={w} height={y + (tBounds?.height || 200)} maxWidth={w} disableSVGPointerEvents>
     {/* Table. */}
-    <Element position={[x, y]} anchor={[-1, -1]} scale={0.6} behind>
-      <Box sx={{ width: (w - x) / 0.6 }}>
+    <Element position={[x, y]} anchor={[-1, -1]} scale={0.8} behind>
+      <Box sx={{ width: (w - x) / 0.8 }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>

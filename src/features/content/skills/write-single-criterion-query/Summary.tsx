@@ -16,7 +16,7 @@ export function Summary() {
       <FigureExampleQuery query={`
 SELECT DISTINCT city
 FROM employees
-WHERE hire_date < '2015-01-01';`} tableWidth={160} />
+WHERE hire_date < '2025-01-01';`} tableWidth={160} />
     </Section>
   </Page>
 }

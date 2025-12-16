@@ -10,7 +10,7 @@ export function Summary() {
       <Par>Since DBMSs do not speak English, queries usually look like a piece of computer code. An example (in SQL) is </Par>
       <Par><pre><code>{`SELECT first_name, last_name
 FROM employees
-WHERE current_salary > 180000
+WHERE current_salary > 200000
 `}</code></pre></Par>
       <Par>The <Term>query language</Term> describes the exact way in which a query has to be set up. Every DBMS has its own query language, although the most commonly used databases use (some dialect of) the query language SQL.</Par>
     </Section>

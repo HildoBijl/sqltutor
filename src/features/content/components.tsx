@@ -8,7 +8,7 @@ import { useQueryResult } from '@/shared/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
 import { SQLDisplay } from '@/shared/components/SQLEditor';
 
-export function FigureExampleQuery({ query = '', tableWidth = 300 }) {
+export function FigureExampleQuery({ query = '', tableWidth = 300, shift = 0 }) {
   const themeColor = useThemeColor();
   const drawingRef = useRef<DrawingData>(null);
 
@@ -25,22 +25,22 @@ export function FigureExampleQuery({ query = '', tableWidth = 300 }) {
   const w2 = tBounds?.width || 100;
   const delta = 30;
   const width = w1 + w2 + delta;
-  const height = Math.max(eBounds?.height || 100, tBounds?.height || 200);
-  const radius = Math.min(((tBounds?.height || 120) - (eBounds?.height || 0)) / 2, 60);
+  const height = Math.max(eBounds?.height || 100, shift + (tBounds?.height || 200));
+  const radius = Math.min((shift + (tBounds?.height || 120) - (eBounds?.height || 0)) / 2, 60);
 
   return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width} disableSVGPointerEvents>
     <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
-    <Element position={[w1 + delta, 0]} anchor={[-1, -1]} scale={0.8} behind>
+    <Element position={[w1 + delta, shift]} anchor={[-1, -1]} scale={0.8} behind>
       <Box sx={{ width: tableWidth / 0.8 }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>
 
     {eBounds && tBounds ? <>
-      <Curve points={[eBounds.bottomMiddle.add([0, 5]), [eBounds.middle.x, tBounds.middle.y + eBounds.height / 2], tBounds.leftMiddle.add([-4, eBounds.height / 2])]} color={themeColor} curveDistance={radius} endArrow />
+      <Curve points={[eBounds.bottomMiddle.add([0, 5]), [eBounds.middle.x, (tBounds.bottom + eBounds.bottom) / 2], [tBounds.left - 4, (tBounds.bottom + eBounds.bottom) / 2]]} color={themeColor} curveDistance={radius} endArrow />
     </> : null}
   </Drawing>;
 }

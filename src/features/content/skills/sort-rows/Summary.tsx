@@ -58,7 +58,7 @@ function FigureSorting() {
   const b4 = new Vector([b3.x, b3.y + offset]);
 
   // Render the figure.
-  return <Drawing ref={drawingRef} width={800} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={800} disableSVGPointerEvents>
+  return <Drawing ref={drawingRef} width={700} height={editorHeight + 20 + t1Height + 20 + t2Height} maxWidth={700} disableSVGPointerEvents>
     {/* Query. */}
     <Element position={[40, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
@@ -77,8 +77,8 @@ function FigureSorting() {
     {offsetBounds && <Curve points={[offsetBounds.middleRight.add([5, 1]), offsetBounds.middleRight.add([123, 1]), b4.add([-22, 0]), b4.add([-4, 0])]} endArrow={true} color={themeColor} />}
 
     {/* Table 1. */}
-    <Element position={[0, editorHeight + 20]} anchor={[-1, -1]} scale={0.6}>
-      <Box sx={{ width: 800 }}>
+    <Element position={[0, editorHeight + 20]} anchor={[-1, -1]} scale={0.7}>
+      <Box sx={{ width: 460 / 0.75 }}>
         <DataTable ref={t1Ref} data={data1} showPagination={false} compact />
       </Box>
     </Element>
@@ -87,8 +87,8 @@ function FigureSorting() {
     {t1Bounds && t2Bounds ? <Curve points={[[(t1Bounds.left + t2Bounds.left) / 2, t1Bounds.bottom + 10], [(t1Bounds.left + t2Bounds.left) / 2, t2Bounds.middle.y], t2Bounds.leftMiddle.add([-10, 0])]} color={themeColor} endArrow /> : null}
 
     {/* Table 2. */}
-    <Element position={[320, editorHeight + 20 + t1Height + 20]} anchor={[-1, -1]} scale={0.6}>
-      <Box sx={{ width: 800 }}>
+    <Element position={[700, editorHeight + 20 + t1Height + 20]} anchor={[1, -1]} scale={0.7}>
+      <Box sx={{ width: 460 / 0.75 }}>
         <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
       </Box>
     </Element>

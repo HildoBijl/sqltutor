@@ -63,8 +63,8 @@ export function FigureTwoTables() {
   const data1 = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const data2 = useQueryResult(db?.database, 'SELECT * FROM employees;');
   const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
-  const x = 160;
-  const y = 150;
+  const x = 80;
+  const y = 108;
 
   return <Drawing ref={drawingRef} width={800} height={y + (t2Bounds?.height ?? 200)} maxWidth={800}>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of departments</span></Element>

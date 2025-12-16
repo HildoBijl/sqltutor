@@ -12,7 +12,7 @@ export function Summary() {
         column: 'Column/Property/Attribute',
         columnNames: 'Column names',
         row: <p style={{ textAlign: 'right', lineHeight: 1.2, margin: 0 }}>Row/<br />Record</p>,
-        cell: <p style={{ textAlign: 'right', lineHeight: 1.2, margin: 0 }}>Cell/<br/>Field</p>,
+        cell: 'Cell/Field',
       }} />
       <Info>The terminology used varies a bit, depending on what subfield of database studies you're in. Make sure you know your local language.</Info>
     </Section>
