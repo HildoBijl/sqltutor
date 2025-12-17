@@ -82,7 +82,7 @@ export function useTransformedRectangle(rectangle?: DOMRect | null, drawingData?
 	drawingData = useDrawingDataWithFallback(drawingData);
 	const { figure, bounds } = drawingData || {};
 	const innerFigure = figure?.inner;
-	return useMemo(() => transformRectangle(rectangle, innerFigure?.getBoundingClientRect(), bounds), [rectangle, innerFigure, bounds]);
+	return useMemo(() => transformRectangle(rectangle, innerFigure?.getBoundingClientRect(), bounds), [rectangle, innerFigure]);
 }
 
 // Find the bounds of a given element in drawing coordinates.
