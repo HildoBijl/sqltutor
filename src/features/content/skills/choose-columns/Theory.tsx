@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Info, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -28,35 +28,35 @@ export function Theory() {
 
     <Section title="Rename columns">
       <Par>In database tables the columns have names. When retrieving a table, we can optionally adjust the names that the columns have in our output. This <Term>renames</Term> the columns.</Par>
-      <FigureRenameColumns query={`SELECT
+      {/* <FigureRenameColumns query={`SELECT
   first_name,
   last_name AS family_name,
   phone AS number
-FROM employees;`} />
+FROM employees;`} /> */}
       <Info>The addendum <ISQL>AS</ISQL> is optional, and it works just as well without. For readability, it is still recommended to add it.</Info>
     </Section>
 
     <Section title="Deal with multiple tables">
       <Par>So far we have run queries that only request a single table. Later on we will encounter queries involving multiple tables. In that case it may be confusing which column comes from which table, especially if the two tables have columns with the same name. We can indicate what specific table to select a column from through the format <ISQL>table_name.column_name</ISQL>.</Par>
-      <FigureRenameColumns query={`SELECT
+      {/* <FigureRenameColumns query={`SELECT
   employees.first_name,
   employees.last_name AS family_name,
   employees.phone AS number
-FROM employees;`} />
+FROM employees;`} /> */}
       <Par>When the two tables don't have duplicate column names, this table specification is generally not needed, but it is still recommended for clarity. When the two tables do have duplicate column names, this notation is obligatory.</Par>
       <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: temporarily rename them within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
-      <FigureRenameColumns query={`SELECT
+      {/* <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,
   e.phone AS number
-FROM employees AS e;`} />
+FROM employees AS e;`} /> */}
     </Section>
   </Page>;
 }
 
 function FigureSelectColumns() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const c1 = 'first_name', c2 = 'last_name', c3 = 'city';
@@ -67,20 +67,20 @@ FROM employees;`
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const c1QueryBounds = useTextNodeBounds(editor, c1, drawingRef);
-  const c2QueryBounds = useTextNodeBounds(editor, c2, drawingRef);
-  const c3QueryBounds = useTextNodeBounds(editor, c3, drawingRef);
+  const [eRef, editor] = useRefWithElement<HTMLElement>();
+  const c1QueryBounds = useTextNodeBounds(editor, c1, drawingData);
+  const c2QueryBounds = useTextNodeBounds(editor, c2, drawingData);
+  const c3QueryBounds = useTextNodeBounds(editor, c3, drawingData);
 
   // Find the table column name bounds.
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const c1NameBounds = useTextNodeBounds(table, c1, drawingRef);
-  const c2NameBounds = useTextNodeBounds(table, c2, drawingRef);
-  const c3NameBounds = useTextNodeBounds(table, c3, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const c1NameBounds = useTextNodeBounds(table, c1, drawingData);
+  const c2NameBounds = useTextNodeBounds(table, c2, drawingData);
+  const c3NameBounds = useTextNodeBounds(table, c3, drawingData);
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+    <Element ref={eRef} position={[0, 20]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     <Element position={[350, 20]} anchor={[-1, -1]} scale={0.8} behind>
@@ -99,7 +99,7 @@ FROM employees;`
 
 function FigureSelectUnique() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const c = 'city';
@@ -114,10 +114,10 @@ FROM employees;`;
   const data2 = useQueryResult(db?.database, query2);
 
   // Find the table column name bounds.
-  const [e1Ref, e1Bounds] = useRefWithBounds(drawingRef);
-  const [e2Ref, e2Bounds] = useRefWithBounds(drawingRef);
-  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const [e1Ref, e1Bounds] = useRefWithBounds(drawingData);
+  const [e2Ref, e2Bounds] = useRefWithBounds(drawingData);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
 
   // Set up dimensions.
   const w1 = e1Bounds?.width || 100;
@@ -160,15 +160,15 @@ FROM employees;`;
 
 export function FigureRenameColumns({ query = '' }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the element bounds.
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [eRef, eBounds] = useRefWithBounds(drawingData);
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
   const arrowWidth = 80;
   const width = (eBounds?.width || 200) + (tBounds?.width || 200) + arrowWidth;
 

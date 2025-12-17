@@ -111,7 +111,7 @@ export function NodeCard({
 
   return (
     <>
-      {/* Background rectangle to avoid lines in the backround */}
+      {/* Background rectangle to avoid lines in the background */}
       <Rectangle
         dimensions={{ start: rectStart, end: rectEnd }}
         cornerRadius={cornerRadius}

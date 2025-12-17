@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Term } from '@/components';
 import { type DrawingData, Drawing, Element, Line, useRefWithBounds } from '@/components/figures';
@@ -41,10 +41,10 @@ function FigureProjection() {
   const db = useConceptDatabase();
   const dataFull = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const dataProjection = useQueryResult(db?.database, 'SELECT d_name, nr_employees FROM departments;');
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
-  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
   const height = Math.max(t1Bounds?.height || 200, t2Bounds?.height || 200);
   const w1 = 600;
   const w2 = 120;
@@ -75,10 +75,10 @@ function FigureFiltering() {
   const db = useConceptDatabase();
   const dataFull = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const dataFiltering = useQueryResult(db?.database, 'SELECT * FROM departments WHERE nr_employees > 10;');
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
-  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
   const w = 800;
   const arrowHeight = 80;
   const arrowMargin = 10;

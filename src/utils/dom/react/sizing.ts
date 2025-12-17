@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
 import useResizeObserver from '@react-hook/resize-observer';
 
-import { getWindowSize } from '../dom';
+import { getWindowSize, findLayoutRoots } from '../dom';
 
 import { useConsistentValue } from './consistency';
 import { useEventListener } from './events';
@@ -23,51 +23,77 @@ export function useWindowSize(): { width: number; height: number } {
 	return windowSize;
 }
 
+// An extension of getBoundingClientRect to also work for Text nodes.
+export function getNodeClientRect(node?: Element | Text | null): DOMRect | undefined {
+	// On no input, return nothing.
+	if (!node)
+		return undefined;
+
+	// Is it a Text node?
+	if (node instanceof Text) {
+		const range = document.createRange();
+		range.selectNode(node);
+		return range.getBoundingClientRect();
+	}
+
+	// It's a regular element.
+	return node.getBoundingClientRect();
+}
+
 // Track the BoundingClientRect of a list of elements. Update them on changes to the elements, scrolls, etcetera.
 export function useBoundingClientRects(elements: (Element | Text | null | undefined)[]): (DOMRect | undefined)[] {
 	const [rects, setRects] = useState<(DOMRect | undefined)[]>();
 	const stableElements = useConsistentValue(elements);
+	const rafId = useRef<number | null>(null);
 
 	// Compute rects for given elements.
-	const getRects = useCallback(() => {
-		return stableElements.map((element) => {
-			if (!element)
-				return undefined;
-			if (element.nodeType === 3) { // Text node.
-				const range = document.createRange();
-				range.selectNode(element);
-				return range.getBoundingClientRect();
-			}
-			if (element instanceof Element)
-				return element.getBoundingClientRect(); // HTMLElement or SVGElement.
-			return undefined;
+	const getRects = useCallback(() => stableElements.map((element) => getNodeClientRect(element)), [stableElements]);
+
+	// Batch updates (to prevent scroll spam).
+	const scheduleUpdate = useCallback(() => {
+		if (rafId.current != null)
+			return;
+
+		rafId.current = requestAnimationFrame(() => {
+			rafId.current = null;
+			setRects(getRects());
 		});
-	}, [stableElements]);
-
-	// Get a debounced updater.
-	const updateElementPosition = useCallback(() => setRects(getRects()), [setRects, getRects]);
-
-	// Update when elements change.
-	useEffect(() => {
-		updateElementPosition();
-	}, [getRects, updateElementPosition]);
-
-	// Observe resize on the first element (resize observer cannot handle arrays).
-	const firstElement = stableElements.find((element): element is HTMLElement => !!element && element.nodeType === 1);
-	useResizeListener(updateElementPosition, firstElement || null);
-
-	// React to scrolling and swiping.
-	useEventListener("scroll", updateElementPosition);
-	useEventListener("swipe" as any, updateElementPosition);
-	useEventListener("swipeEnd" as any, updateElementPosition);
+	}, [getRects]);
 
 	// Initialize on the first run.
-	if (!rects) {
-		const actualRect = getRects();
-		setRects(actualRect);
-		return actualRect;
-	}
-	return rects;
+	useLayoutEffect(() => {
+		setRects(getRects());
+	}, [getRects]);
+
+	// Use a ResizeObserver to listen for changes.
+	useLayoutEffect(() => {
+		const observer = new ResizeObserver(scheduleUpdate);
+
+		// Observe the given elements.
+		stableElements.forEach(el => {
+			if (el instanceof Element)
+				observer.observe(el);
+		});
+
+		// Observe the layout roots too.
+		const layoutRoots = findLayoutRoots(stableElements);
+		layoutRoots.forEach(root => observer.observe(root));
+
+		return () => observer.disconnect();
+	}, [stableElements, scheduleUpdate]);
+
+	// Handle scroll & viewport movement.
+	useLayoutEffect(() => {
+		window.addEventListener("scroll", scheduleUpdate, { passive: true });
+		window.addEventListener("resize", scheduleUpdate);
+		return () => {
+			window.removeEventListener("scroll", scheduleUpdate);
+			window.removeEventListener("resize", scheduleUpdate);
+		};
+	}, [scheduleUpdate]);
+
+	// Return the result.
+	return rects || getRects();
 }
 
 // Track the BoundingClientRect of an element.

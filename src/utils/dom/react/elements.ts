@@ -10,6 +10,13 @@ export function useRefWithElement<T extends Element | null = Element>(): [(node:
   return [onRefChange, element];
 }
 
+// Get a tuple [ref, value]. Put the ref into a React object, and value will be the corresponding ref's value (which could be an imperative handle or similar).
+export function useRefWithValue<T>(): [(value: T | null) => void, T | null] {
+  const [value, setValue] = useState<T | null>(null);
+  const refCallback = useCallback((value: T | null) => setValue(value), []);
+  return [refCallback, value];
+}
+
 // Ensure that the given parameter is a React-type element.
 export function ensureReactElement(element: ReactNode, allowString = true, allowNumber = true): ReactNode {
   if (

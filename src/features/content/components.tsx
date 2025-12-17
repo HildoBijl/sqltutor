@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
@@ -10,15 +10,15 @@ import { SQLDisplay } from '@/shared/components/SQLEditor';
 
 export function FigureExampleQuery({ query = '', tableWidth = 300 }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the table column name bounds.
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [eRef, eBounds] = useRefWithBounds(drawingData);
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
 
   // Set up dimensions.
   const w1 = eBounds?.width || 100;

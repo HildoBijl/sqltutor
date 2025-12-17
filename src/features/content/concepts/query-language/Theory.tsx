@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Info, Term, Link } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
@@ -54,7 +54,7 @@ WHERE current_salary > 180000
 
 export function FigureQueryExample() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
@@ -62,8 +62,8 @@ export function FigureQueryExample() {
   const data2 = useQueryResult(db?.database, `SELECT first_name, last_name FROM employees WHERE current_salary > 180000;`);
 
   // Find the bounds for "d_name".
-  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
 
   const arrowHeight = 80;
   const arrowMargin = 10;

@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useMemo, useImperativeHandle, useId, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, type CSSProperties } from 'react';
 
 import { type Vector, Rectangle } from '@/utils/geometry';
-import { getEventPosition, useEnsureRef, useForceUpdateEffect, notSelectable } from '@/utils/dom';
+import { getEventPosition, useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@/utils/dom';
 
 import { type FigureData, Figure } from '../Figure';
 
@@ -35,48 +35,47 @@ export function Drawing(props: DrawingProps) {
 	// Set up references.
 	const id = useId();
 	const [mergedRef] = useEnsureRef<DrawingData>(ref);
-	const figureRef = useRef<FigureData>(null);
-	const htmlContentsRef = useRef<HTMLDivElement>(null);
-	const svgRef = useRef<SVGSVGElement>(null);
-	const svgDefsRef = useRef<SVGDefsElement>(null);
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-
-	// Rerender the component once references are established.
-	useForceUpdateEffect();
+	const [figureRef, figure] = useRefWithValue<FigureData>();
+	const [htmlContentsRef, htmlContents] = useRefWithElement<HTMLDivElement>();
+	const [svgRef, svg] = useRefWithElement<SVGSVGElement>();
+	const [svgDefsRef, svgDefs] = useRefWithElement<SVGDefsElement>();
+	const [canvasRef, canvas] = useRefWithElement<HTMLCanvasElement>();
 
 	// Determine figure size parameters to use for rendering.
 	if (width <= 0)
 		throw new Error(`Invalid Drawing width: ${width}`);
 	if (height <= 0)
 		throw new Error(`Invalid Drawing height: ${height}`);
-	const bounds = useMemo(() => new Rectangle([0, 0], [width, height]), [width, height]);
-	const aspectRatio = height / width; // This must be passed on to the Figure object.
+	const roundedWidth = Math.round(width), roundedHeight = Math.round(height); // Round width and height to prevent a potential infinite change loop.
+	const bounds = useMemo(() => new Rectangle([0, 0], [roundedWidth, roundedHeight]), [roundedWidth, roundedHeight]);
+	const aspectRatio = roundedHeight / roundedWidth; // This must be passed on to the Figure object.
 	const figureMaxWidth = maxWidth === 'fill' ? undefined : (typeof maxWidth === 'function' ? maxWidth(bounds) : maxWidth);
 
 	// Determine the initial figure scale, in case autoScale is applied.
 	const [initialFigureScale, setInitialFigureScale] = useState<number | undefined>();
-	const innerFigure = figureRef.current?.inner;
+	const innerFigure = figure?.inner;
 	useEffect(() => {
 		if (innerFigure)
 			setInitialFigureScale(innerFigure.getBoundingClientRect().width / bounds.width);
 	}, [innerFigure, setInitialFigureScale]);
+	const getFigureScale = useCallback(() => autoScale && innerFigure ? innerFigure.getBoundingClientRect().width / bounds.width : initialFigureScale, [autoScale, innerFigure, bounds, initialFigureScale]);
 
 	// Set up refs and make them accessible to any implementing component.
-	const drawingData = {
+	const drawingData = useMemo(() => ({
 		id,
 		bounds,
-		figure: figureRef.current,
-		svg: svgRef.current,
-		svgDefs: svgDefsRef.current,
-		htmlContents: htmlContentsRef.current,
-		canvas: canvasRef.current,
-		getFigureScale: () => autoScale && innerFigure ? innerFigure.getBoundingClientRect().width / bounds.width : initialFigureScale,
-		getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => getCoordinates(cPoint, bounds, figureRef.current, figureRect),
-		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventPosition(event), bounds, figureRef.current),
+		figure,
+		svg,
+		svgDefs,
+		htmlContents,
+		canvas,
+		getFigureScale,
+		getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => getCoordinates(cPoint, figureRect, bounds),
+		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventPosition(event), figure?.inner && figure?.inner.getBoundingClientRect(), bounds),
 		contains: (point: Vector) => bounds.contains(point),
 		applyBounds: (point: Vector) => bounds.applyBounds(point),
-	};
-	useImperativeHandle(mergedRef, () => drawingData, [bounds, figureRef.current, svgRef.current, svgDefsRef.current, htmlContentsRef.current, canvasRef.current]);
+	}), [bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);
+	useImperativeHandle(mergedRef, () => drawingData, [bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);
 
 	// Render figure with SVG and Canvas properly placed.
 	return <DrawingContext.Provider value={drawingData}>

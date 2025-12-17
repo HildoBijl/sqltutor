@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { Vector } from '@/utils/geometry';
+import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -42,7 +42,7 @@ export function Theory() {
 
 function FigureSortOnSingleColumn() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const sortColumn = 'd_name';
@@ -54,16 +54,16 @@ ORDER BY ${sortColumn} DESC;`
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const descBounds = useTextNodeBounds(editor, 'DESC', drawingRef);
+  const [eRef, editor] = useRefWithElement<HTMLElement>();
+  const descBounds = useTextNodeBounds(editor, 'DESC', drawingData);
 
   // Find the bounds for "d_name".
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+    <Element ref={eRef} position={[0, 20]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>
@@ -79,7 +79,7 @@ ORDER BY ${sortColumn} DESC;`
 
 function FigureSortOnMultipleColumns() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const sortColumn1 = 'nr_employees';
@@ -93,20 +93,20 @@ ORDER BY
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const ascBounds = useTextNodeBounds(editor, 'ASC', drawingRef);
-  const descBounds = useTextNodeBounds(editor, 'DESC', drawingRef);
+  const [eRef, editor] = useRefWithElement<HTMLElement>();
+  const ascBounds = useTextNodeBounds(editor, 'ASC', drawingData);
+  const descBounds = useTextNodeBounds(editor, 'DESC', drawingData);
 
   // Find the bounds for "d_name".
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const sortColumn1NameBounds = useTextNodeBounds(table, sortColumn1, drawingRef);
-  const sortColumn2NameBounds = useTextNodeBounds(table, sortColumn2, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const sortColumn1NameBounds = useTextNodeBounds(table, sortColumn1, drawingData);
+  const sortColumn2NameBounds = useTextNodeBounds(table, sortColumn2, drawingData);
 
   const drawingHeight = 20 + (tBounds?.height ?? 200) + 20;
   return <Drawing ref={drawingRef} width={800} height={drawingHeight} maxWidth={800} disableSVGPointerEvents>
     {/* SQL query */}
-    <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+    <Element ref={eRef} position={[0, 20]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     {/* Table */}
@@ -134,7 +134,7 @@ ORDER BY
 
 function FigureLimitRows() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const sortColumn = 'd_name';
@@ -147,21 +147,20 @@ LIMIT 3;`
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const limitBounds = useTextNodeBounds(editor, ';', drawingRef);
+  const [eRef, eBounds, editor] = useRefWithBounds(drawingData);
+  const limitBounds = useTextNodeBounds(editor, ';', drawingData);
 
   // Find the bounds for "d_name".
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const [qRef, qBounds] = useRefWithBounds(drawingRef);
-  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
   const minY = (sortColumnNameBounds?.bottom ?? 60) + 12;
   const maxY = (tBounds?.bottom ?? 200) - 6;
   const avgY = (minY + maxY) / 2;
   const x = (tBounds?.left ?? 320) - 10;
-  return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
+  return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, eBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
+    <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -178,7 +177,7 @@ LIMIT 3;`
 
 function FigureLimitRowsWithOffset() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const sortColumn = 'd_name';
@@ -192,18 +191,17 @@ LIMIT 3 OFFSET ${offset};`
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const offsetBounds = useTextNodeBounds(editor, ';', drawingRef);
+  const [eRef, eBounds, editor] = useRefWithBounds(drawingData);
+  const offsetBounds = useTextNodeBounds(editor, ';', drawingData);
 
   // Find the bounds for "d_name".
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const [qRef, qBounds] = useRefWithBounds(drawingRef);
-  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
   const point = tBounds && sortColumnNameBounds && new Vector(tBounds.left - 4, sortColumnNameBounds.bottom + 10);
-  return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, qBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[0, 0]} anchor={[-1, -1]} behind>
-      <SQLDisplay ref={qRef} onLoad={setEditor}>{query}</SQLDisplay>
+  return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, eBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
+    <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 0]} anchor={[-1, -1]} scale={0.6} behind>
@@ -222,7 +220,7 @@ LIMIT 3 OFFSET ${offset};`
 
 function FigureSortNullValues() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const sortColumn = 'budget';
@@ -234,16 +232,16 @@ ORDER BY ${sortColumn} ASC NULLS LAST;`
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
-  const [editor, setEditor] = useState<HTMLElement | null>(null);
-  const descBounds = useTextNodeBounds(editor, 'DESC', drawingRef);
+  const [eRef, editor] = useRefWithElement<HTMLElement>();
+  const descBounds = useTextNodeBounds(editor, 'DESC', drawingData);
 
   // Find the bounds for "d_name".
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
   return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[0, 20]} anchor={[-1, -1]} behind>
-      <SQLDisplay onLoad={setEditor}>{query}</SQLDisplay>
+    <Element ref={eRef} position={[0, 20]} anchor={[-1, -1]} behind>
+      <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
     <Element position={[320, 20]} anchor={[-1, -1]} scale={0.6} behind>

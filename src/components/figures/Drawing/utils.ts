@@ -1,42 +1,45 @@
-import { type Ref } from 'react';
+import { useMemo } from 'react';
 import { repeat } from '@/utils/javascript';
 import { Vector, type VectorInput, ensureVector, Rectangle, type RectangleInput, ensureRectangle } from '@/utils/geometry';
-import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useBoundingClientRects, useRefWithElement, useTextNode } from '@/utils/dom';
-
-import { type FigureData } from '../Figure';
+import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement, useTextNode } from '@/utils/dom';
 
 import { type DrawingData } from './definitions';
-import { useDrawingData } from './DrawingContext';
+import { useDrawingDataWithFallback } from './DrawingContext';
+
+// Track the rectangle which the figure has in the page.
+export function useFigureRect(drawingData?: DrawingData | null) {
+	drawingData = useDrawingDataWithFallback(drawingData);
+	const figureRect = useBoundingClientRect(drawingData?.figure?.inner);
+	return figureRect;
+}
 
 // Transform client coordinates to drawing coordinates. This function may be provided with a figureRectangle, but if not provided, it is recalculated from the given figure.
 export function getCoordinates(
-	clientCoordinates?: VectorInput,
-	bounds?: RectangleInput,
-	figure?: FigureData | null,
-	figureRect?: DOMRect,
+	clientCoordinates?: VectorInput | null,
+	figureRect?: DOMRect | null,
+	figureBounds?: RectangleInput | null,
 ): Vector | undefined {
-	if (!clientCoordinates || !bounds)
+	// On missing data, do nothing.
+	if (!clientCoordinates || !figureRect || !figureBounds)
 		return undefined;
 
-	// Find the figureRect if not provided.
-	if (!figureRect) {
-		const figureInner = figure?.inner;
-		if (!figureInner)
-			return undefined;
-		figureRect = figureInner.getBoundingClientRect();
-	}
-
+	// Check that the input is in the right dimension and format.
 	const clientCoordinatesVector = ensureVector(clientCoordinates, 2);
-	const boundsRect = ensureRectangle(bounds, 2);
+	const boundsRect = ensureRectangle(figureBounds, 2);
 
+	// Check edge cases.
+	if ((figureRect.width === 0 && boundsRect.width !== 0) || (figureRect.height === 0 && boundsRect.height !== 0))
+		return undefined;
+
+	// Set up the transformed vector.
 	return new Vector([
-		((clientCoordinatesVector.x - figureRect.x) * boundsRect.width) / figureRect.width,
-		((clientCoordinatesVector.y - figureRect.y) * boundsRect.height) / figureRect.height,
+		boundsRect.width === 0 ? 0 : ((clientCoordinatesVector.x - figureRect.x) * boundsRect.width) / figureRect.width,
+		boundsRect.height === 0 ? 0 : ((clientCoordinatesVector.y - figureRect.y) * boundsRect.height) / figureRect.height,
 	]);
 }
 
 // Track the mouse position in both client and drawing coordinates.
-export function useDrawingMouseData(drawingRef?: Ref<DrawingData | null>): {
+export function useDrawingMouseData(drawingData?: DrawingData | null): {
 	clientPosition?: Vector;
 	position?: Vector;
 	keys?: UtilKeys;
@@ -45,107 +48,77 @@ export function useDrawingMouseData(drawingRef?: Ref<DrawingData | null>): {
 	const { position: clientPosition, keys } = useClientMouseData();
 
 	// Acquire data on the drawing.
-	const drawingData = useDrawingData(drawingRef);
-	if (!drawingData)
-		return {};
-
-	// If things are still initializing, don't return anything.
-	const { figure, bounds } = drawingData;
-	const figureRect = useBoundingClientRect(figure?.inner);
-	if (!clientPosition || !figureRect || figureRect.width === 0 || figureRect.height === 0)
-		return {};
+	drawingData = useDrawingDataWithFallback(drawingData);
+	const figureRect = useFigureRect(drawingData);
 
 	// Find the position in drawing coordinates and return everything.
-	const position = getCoordinates(clientPosition, bounds, figure, figureRect);
+	const position = getCoordinates(clientPosition, figureRect, drawingData?.bounds);
 	return { clientPosition, position, keys };
 }
 
 // Track the mouse position in drawing coordinates.
 export function useDrawingMousePosition(): Vector | undefined {
-	return useDrawingMouseData().position
+	return useDrawingMouseData().position;
+}
+
+// Transform a DOMRect (client coordinates) into a Rectangle (drawing coordinates).
+export function transformRectangle(
+	rectangle?: DOMRect | null,
+	figureRect?: DOMRect,
+	figureBounds?: RectangleInput,
+): Rectangle | undefined {
+	// On missing input do nothing.
+	if (!rectangle || !figureRect || !figureBounds)
+		return undefined;
+
+	// Calculate the rectangle.
+	const start = getCoordinates({ x: rectangle.left, y: rectangle.top }, figureRect, figureBounds);
+	const end = getCoordinates({ x: rectangle.right, y: rectangle.bottom }, figureRect, figureBounds);
+	return start && end && new Rectangle(start, end);
+}
+
+// Transform a rectangle through a hook, monitoring updates on drawing resizing/repositioning.
+export function useTransformedRectangle(rectangle?: DOMRect | null, drawingData?: DrawingData | null) {
+	drawingData = useDrawingDataWithFallback(drawingData);
+	const { figure, bounds } = drawingData || {};
+	const innerFigure = figure?.inner;
+	return useMemo(() => transformRectangle(rectangle, innerFigure?.getBoundingClientRect(), bounds), [rectangle, innerFigure, bounds]);
 }
 
 // Find the bounds of a given element in drawing coordinates.
 export function useElementBounds(
 	element?: Element | Text | null,
-	drawingRef?: Ref<DrawingData | null>,
+	drawingData?: DrawingData | null,
 	numUp = 0,
 ): Rectangle | undefined {
+	drawingData = useDrawingDataWithFallback(drawingData);
+
+	// If specified, find the (parents of parents of) parents.
 	repeat(numUp, () => {
 		if (element?.parentElement)
 			element = element?.parentElement;
 	})
-	const clientRect = useBoundingClientRect(element);
-	const drawingData = useDrawingData(drawingRef);
-	return transformRectangle(clientRect, drawingData);
+
+	// Find the bounding rectangles and transform accordingly.
+	const rectangle = useBoundingClientRect(element);
+	return useTransformedRectangle(rectangle, drawingData);
 }
 
 // Finds a text node and returns its bounds in drawing coordinates.
 export function useTextNodeBounds(
 	container: Element | null | undefined,
 	condition: string | ((node: Text) => boolean),
-	drawingRef?: Ref<DrawingData | null>,
+	drawingData?: DrawingData | null,
 	index = 0,
 	numUp = 0,
 ): Rectangle | undefined {
 	const textNode = useTextNode(container, condition, index);
-	return useElementBounds(textNode, drawingRef, numUp);
+	return useElementBounds(textNode, drawingData, numUp);
 }
 
-// Get the bounding rectangle of an element in drawing coordinates.
-export function useBoundingDrawingRect(
-	element?: Element,
-	drawingRef?: Ref<DrawingData | null>
-): DOMRect | undefined {
-	// Find the bounds.
-	const bounds = useElementBounds(element, drawingRef);
-	if (!bounds)
-		return undefined;
-
-	// Set up a DOMRect.
-	return {
-		x: bounds.start.x,
-		y: bounds.start.y,
-		left: bounds.start.x,
-		top: bounds.start.y,
-		right: bounds.end.x,
-		bottom: bounds.end.y,
-		width: bounds.vector.x,
-		height: bounds.vector.y,
-		toJSON: () => ({}), // DOMRect compatibility
-	} as DOMRect;
-}
-
-// Return [ref, bounds, element] for an element within a drawing. Attach the ref to a DOM object to get its bounds and the element.
-export function useRefWithBounds<T extends Element | null = Element>(drawingRef?: Ref<DrawingData | null>): [(node: T | null) => void, Rectangle | undefined, Element | null] {
+// Return [ref, bounds, element] for an element within a drawing. As usage: attach the ref to a DOM object to get its bounds (in drawing coordinates) and optionally the respective element. (If you only want the element, use the React hook useRefWithElement.)
+export function useRefWithBounds<T extends Element | null = Element>(drawingData?: DrawingData | null): [(node: T | null) => void, Rectangle | undefined, Element | null] {
 	const [ref, element] = useRefWithElement<T>();
-	const bounds = useElementBounds(element, drawingRef);
+	const bounds = useElementBounds(element, drawingData);
 	return [ref, bounds, element];
-}
-
-// Get bounds for each child of a given element. It only considers Elements and TextNodes, but not other ChildNodes like annotations/comments.
-export function useIndividualChildrenBounds(
-	element?: Element,
-	drawingRef?: Ref<DrawingData | null>
-): (Rectangle | undefined)[] {
-	const nodes = [...(element?.childNodes || [])].filter(node => node instanceof Element || node instanceof Text);
-	const clientRects = useBoundingClientRects(nodes);
-	const drawingData = useDrawingData(drawingRef);
-	return clientRects.map(clientRect => clientRect && transformRectangle(clientRect, drawingData));
-}
-
-// Transform a DOMRect (client coordinates) into a Rectangle (drawing coordinates).
-export function transformRectangle(
-	rectangle?: DOMRect,
-	drawingData?: DrawingData,
-): Rectangle | undefined {
-	// Check the input.
-	if (!rectangle || !drawingData)
-		return undefined;
-
-	// Calculate the rectangle.
-	const { figure, bounds } = drawingData;
-	const start = getCoordinates({ x: rectangle.left, y: rectangle.top }, bounds, figure);
-	const end = getCoordinates({ x: rectangle.right, y: rectangle.bottom }, bounds, figure);
-	return start && end && new Rectangle(start, end);
 }

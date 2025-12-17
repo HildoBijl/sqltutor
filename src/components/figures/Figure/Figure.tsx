@@ -1,6 +1,6 @@
-import { useRef, useImperativeHandle } from 'react';
+import { useImperativeHandle } from 'react';
 
-import { useEnsureRef } from '@/utils';
+import { useEnsureRef, useRefWithElement } from '@/utils/dom';
 
 import { getDefaultFigure, FigureProps, FigureData } from './definitions';
 
@@ -9,16 +9,16 @@ export function Figure(props: FigureProps) {
 	const { style: innerStyle, ...innerRest } = innerProps!;
 
 	// Define refs and make them accessible to calling elements.
-	const figureInner = useRef<HTMLDivElement>(null);
-	const figureOuter = useRef<HTMLDivElement>(null);
+	const [figureInnerRef, figureInner] = useRefWithElement<HTMLDivElement>();
+	const [figureOuterRef, figureOuter] = useRefWithElement<HTMLDivElement>();
 	const [mergedRef] = useEnsureRef<FigureData>(props.ref);
 	useImperativeHandle(mergedRef, () => ({
-		get inner() { return figureInner.current },
-		get outer() { return figureOuter.current },
-	}));
+		get inner() { return figureInner },
+		get outer() { return figureOuter },
+	}), [figureInner, figureOuter]);
 
 	// Render the figure.
-	return <div ref={figureOuter} style={{
+	return <div ref={figureOuterRef} style={{
 		boxSizing: 'content-box',
 		margin: '0rem auto',
 		padding: '0',
@@ -27,7 +27,7 @@ export function Figure(props: FigureProps) {
 		...(maxWidth === undefined ? {} : { maxWidth: `${maxWidth}px` }),
 		...(style ?? {}),
 	}} {...rest}>
-		<div ref={figureInner} style={{
+		<div ref={figureInnerRef} style={{
 			boxSizing: 'content-box',
 			height: 0,
 			paddingBottom: `${aspectRatio! * 100}%`,

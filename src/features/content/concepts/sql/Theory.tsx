@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components/figures';
 import { useConceptDatabase } from '@/shared/hooks/useDatabase';
@@ -46,8 +46,8 @@ FROM employees;`}</SQLDisplay>
 function FigureEmployeeTable() {
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, 'SELECT * FROM employees;');
-  const drawingRef = useRef<DrawingData>(null);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
 
   return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>The full employees table</span></Element>

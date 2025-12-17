@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Link, Glyph } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
@@ -43,8 +43,8 @@ export function Theory() {
 function FigureOneTable() {
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, 'SELECT * FROM departments;');
-  const drawingRef = useRef<DrawingData>(null);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
 
   return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
     <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of departments</span></Element>
@@ -58,11 +58,11 @@ function FigureOneTable() {
 
 export function FigureTwoTables() {
   const db = useConceptDatabase();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   const data1 = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const data2 = useQueryResult(db?.database, 'SELECT * FROM employees;');
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
   const x = 160;
   const y = 150;
 

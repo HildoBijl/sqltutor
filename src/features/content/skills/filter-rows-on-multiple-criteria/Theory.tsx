@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, List, Section, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -103,7 +103,7 @@ WHERE position = 'logistics specialist'`} operator="EXCEPT" />
 
 function FigureCombinedCondition({ c1 = '', v1 = '', c2 = '', v2 = '', combiner = 'AND', addNot = false }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const query = `
@@ -115,14 +115,14 @@ WHERE ${addNot ? 'NOT (' : ''}${c1} = '${v1}'
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
-  const [eRef, eBounds, editor] = useRefWithBounds(drawingRef);
-  const c1QueryBounds = useTextNodeBounds(editor, v1, drawingRef);
-  const c2QueryBounds = useTextNodeBounds(editor, v2, drawingRef);
+  const [eRef, eBounds, editor] = useRefWithBounds(drawingData);
+  const c1QueryBounds = useTextNodeBounds(editor, v1, drawingData);
+  const c2QueryBounds = useTextNodeBounds(editor, v2, drawingData);
 
   // Find the table column name bounds.
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const c1NameBounds = useTextNodeBounds(table, c1, drawingRef);
-  const c2NameBounds = useTextNodeBounds(table, c2, drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const c1NameBounds = useTextNodeBounds(table, c1, drawingData);
+  const c2NameBounds = useTextNodeBounds(table, c2, drawingData);
 
   const h1 = eBounds?.height || 100;
   const delta = 30;
@@ -149,7 +149,7 @@ WHERE ${addNot ? 'NOT (' : ''}${c1} = '${v1}'
 
 function FigureAndExplanation() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
@@ -161,12 +161,12 @@ WHERE status = 'active'
 LIMIT 1;`);
 
   // Find the editor bounds.
-  const [aRef, aBounds] = useRefWithBounds(drawingRef);
-  const [c1Ref, c1Bounds] = useRefWithBounds(drawingRef);
-  const [c2Ref, c2Bounds] = useRefWithBounds(drawingRef);
-  const [r1Ref, r1Bounds] = useRefWithBounds(drawingRef);
-  const [r2Ref, r2Bounds] = useRefWithBounds(drawingRef);
-  const [rRef, rBounds] = useRefWithBounds(drawingRef);
+  const [aRef, aBounds] = useRefWithBounds(drawingData);
+  const [c1Ref, c1Bounds] = useRefWithBounds(drawingData);
+  const [c2Ref, c2Bounds] = useRefWithBounds(drawingData);
+  const [r1Ref, r1Bounds] = useRefWithBounds(drawingData);
+  const [r2Ref, r2Bounds] = useRefWithBounds(drawingData);
+  const [rRef, rBounds] = useRefWithBounds(drawingData);
 
   // Position data.
   const lineHeight = 50;
@@ -248,17 +248,17 @@ LIMIT 1;`);
 
 function FigureRewrittenQuery({ query = '' }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
+  const [eRef, eBounds] = useRefWithBounds(drawingData);
 
   // Find the table column name bounds.
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
 
   const h1 = eBounds?.height || 100;
   const delta = 10;
@@ -282,7 +282,7 @@ function FigureRewrittenQuery({ query = '' }) {
 
 export function FigureMergingTables({ query1 = '', query2 = '', operator = 'UNION' }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
@@ -293,14 +293,14 @@ ${operator}
 ${query2}`);
 
   // Find the editor bounds.
-  const [e1Ref, e1Bounds] = useRefWithBounds(drawingRef);
-  const [e2Ref, e2Bounds] = useRefWithBounds(drawingRef);
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
+  const [e1Ref, e1Bounds] = useRefWithBounds(drawingData);
+  const [e2Ref, e2Bounds] = useRefWithBounds(drawingData);
+  const [eRef, eBounds] = useRefWithBounds(drawingData);
 
   // Find the table column name bounds.
-  const [t1Ref, t1Bounds] = useRefWithBounds(drawingRef);
-  const [t2Ref, t2Bounds] = useRefWithBounds(drawingRef);
-  const [tRef, tBounds] = useRefWithBounds(drawingRef);
+  const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
+  const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
 
   const h1 = Math.max(e1Bounds?.height || 200, t1Bounds?.height || 200);
   const delta1 = 15;

@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -64,24 +64,24 @@ export function Theory() {
 
 export function FigureDataTypeDemo() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, `SELECT * FROM emp_data;`);
 
   // Find the bounds of the table.
-  const [tableRef, tableBounds, table] = useRefWithBounds(drawingRef);
-  const [labelTextRef, labelTextBounds] = useRefWithBounds(drawingRef);
-  const [labelNumberRef, labelNumberBounds] = useRefWithBounds(drawingRef);
-  const [labelDateRef, labelDateBounds] = useRefWithBounds(drawingRef);
+  const [tableRef, tableBounds, table] = useRefWithBounds(drawingData);
+  const [labelTextRef, labelTextBounds] = useRefWithBounds(drawingData);
+  const [labelNumberRef, labelNumberBounds] = useRefWithBounds(drawingData);
+  const [labelDateRef, labelDateBounds] = useRefWithBounds(drawingData);
 
-  const c1Bounds = useTextNodeBounds(table, data && data.values[0][1] || '', drawingRef);
-  const c2Bounds = useTextNodeBounds(table, data && data.columns[2] || '', drawingRef);
-  const c3Bounds = useTextNodeBounds(table, data && data.values[0][3] || '', drawingRef);
-  const c4Bounds = useTextNodeBounds(table, data && data.values[0][4] || '', drawingRef);
-  const c5Bounds = useTextNodeBounds(table, data && data.columns[5] || '', drawingRef);
-  const c6Bounds = useTextNodeBounds(table, data && data.values[0][6] || '', drawingRef);
+  const c1Bounds = useTextNodeBounds(table, data && data.values[0][1] || '', drawingData);
+  const c2Bounds = useTextNodeBounds(table, data && data.columns[2] || '', drawingData);
+  const c3Bounds = useTextNodeBounds(table, data && data.values[0][3] || '', drawingData);
+  const c4Bounds = useTextNodeBounds(table, data && data.values[0][4] || '', drawingData);
+  const c5Bounds = useTextNodeBounds(table, data && data.columns[5] || '', drawingData);
+  const c6Bounds = useTextNodeBounds(table, data && data.values[0][6] || '', drawingData);
 
   const r = 20;
   const height = tableBounds?.height || 200;

@@ -1,8 +1,6 @@
-import { useRef } from 'react';
-
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, Info, Link } from '@/components';
-import { type DrawingData, Drawing, Element } from '@/components/figures';
+import { Drawing, Element } from '@/components/figures';
 import { ISQL } from '@/shared/components/SQLEditor';
 
 import { FigureExampleQuery } from '../../components';
@@ -27,7 +25,6 @@ ORDER BY taxes ASC;`} tableWidth={350} />
 
 function FigureProcessingCommands() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
 
   // Define styles.
   const titleStyle = { fontWeight: 600, fontSize: '1.2em' };
@@ -49,16 +46,16 @@ function FigureProcessingCommands() {
   const x11 = 4;
   const x12 = 180;
   const x13 = w1 - 60;
-  const x1i = (x12 + x13)/2 + 25;
+  const x1i = (x12 + x13) / 2 + 25;
   const xm1 = x12;
 
   const x21 = w1 + delta;
   const x22 = x21 + 240;
   const x23 = x21 + w2 - 80;
-  const x2i = (x22 + x23)/2 + 36;
+  const x2i = (x22 + x23) / 2 + 36;
   const xm2 = x22;
 
-  return <Drawing ref={drawingRef} width={w} height={height} maxWidth={w} disableSVGPointerEvents>
+  return <Drawing width={w} height={height} maxWidth={w} disableSVGPointerEvents>
     {/* Numbers */}
     <Element position={[xm1, 0]} anchor={[0, -1]} behind>
       <span style={titleStyle}>Numbers</span>

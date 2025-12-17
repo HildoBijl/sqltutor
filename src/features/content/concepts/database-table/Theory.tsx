@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, Rectangle, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -62,13 +62,13 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
   const data = useQueryResult(db?.database, 'SELECT * FROM departments;');
 
   // Set up reference to the table.
-  const drawingRef = useRef<DrawingData>(null);
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
 
   // Find the text nodes.
   const text = data && data.values[2][1] || '';
-  const textNodeBounds = useTextNodeBounds(table, text, drawingRef, 0, 1);
-  const columnNameNodeBounds = useTextNodeBounds(table, 'd_id', drawingRef, 0, 1);
+  const textNodeBounds = useTextNodeBounds(table, text, drawingData, 0, 1);
+  const columnNameNodeBounds = useTextNodeBounds(table, 'd_id', drawingData, 0, 1);
 
   // Define coordinates.
   const x = 150;

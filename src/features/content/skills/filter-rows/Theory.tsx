@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -75,16 +75,16 @@ WHERE perf_score IS NULL;`} columnName="perf_score" />
 
 export function FigureFiltering({ query = '', columnName = '' }) {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useConceptDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the table column name bounds.
-  const [eRef, eBounds] = useRefWithBounds(drawingRef);
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const columnNameBounds = useTextNodeBounds(table, columnName, drawingRef);
+  const [eRef, eBounds] = useRefWithBounds(drawingData);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const columnNameBounds = useTextNodeBounds(table, columnName, drawingData);
 
   // Set up dimensions.
   const width = 800;

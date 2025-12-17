@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Box } from '@mui/material';
 
+import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
@@ -34,7 +34,7 @@ WHERE position = 'logistics specialist'`} operator="UNION" />
 
 function FigureCombinedCondition() {
   const themeColor = useThemeColor();
-  const drawingRef = useRef<DrawingData>(null);
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const query = `
@@ -46,14 +46,14 @@ WHERE NOT (status = 'paid leave' OR status = 'sick leave')
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
-  const [eRef, eBounds, editor] = useRefWithBounds(drawingRef);
-  const c1QueryBounds = useTextNodeBounds(editor, 'sick leave', drawingRef);
-  const c2QueryBounds = useTextNodeBounds(editor, 'start_date', drawingRef);
+  const [eRef, eBounds, editor] = useRefWithBounds(drawingData);
+  const c1QueryBounds = useTextNodeBounds(editor, 'sick leave', drawingData);
+  const c2QueryBounds = useTextNodeBounds(editor, 'start_date', drawingData);
 
   // Find the table column name bounds.
-  const [tRef, tBounds, table] = useRefWithBounds(drawingRef);
-  const c1NameBounds = useTextNodeBounds(table, 'status', drawingRef);
-  const c2NameBounds = useTextNodeBounds(table, 'start_date', drawingRef);
+  const [tRef, tBounds, table] = useRefWithBounds(drawingData);
+  const c1NameBounds = useTextNodeBounds(table, 'status', drawingData);
+  const c2NameBounds = useTextNodeBounds(table, 'start_date', drawingData);
 
   const h1 = eBounds?.height || 100;
   const delta = 30;
