@@ -39,19 +39,19 @@ WHERE status <> 'active';`} columnName="status" />
     </Section>
 
     <Section title="Set up larger/smaller than conditions">
-      <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <ISQL>{`>`}</ISQL> for <Term>larger than</Term> and <ISQL>{`<`}</ISQL> for <Term>smaller than</Term>. We could for instance find all employees who obtained performance score of <Em>more</Em> than <ISQL>70</ISQL>.</Par>
+      <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <ISQL>{`>`}</ISQL> for <Term>larger than</Term> and <ISQL>{`<`}</ISQL> for <Term>smaller than</Term>. We could for instance find all employees who obtained performance score of <Em>more</Em> than <ISQL>90</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
 FROM emp_data
-WHERE perf_score > 70;`} columnName="perf_score" />
+WHERE perf_score > 90;`} columnName="perf_score" />
       <Info>You use <ISQL>{`>=`}</ISQL> for <Term>larger than or equal to</Term> and you use <ISQL>{`<=`}</ISQL> for <Term>smaller than or equal to</Term>. The = symbol that indicates "or equal" should always come <Em>after</Em> the comparison symbol, and never before.</Info>
-      <Par>This works similarly for text. SQL compares text lexicographically: whichever entry comes first in the dictionary is considered smaller. So one way to find all employee positions starting with a letter in the range <ISQL>w-z</ISQL> is the following.</Par>
+      <Par>This works similarly for text. SQL compares text lexicographically: whichever entry comes first in the dictionary is considered smaller. So one way to find all employee positions starting with a letter in the range <ISQL>s-z</ISQL> is the following.</Par>
       <FigureFiltering query={`SELECT *
 FROM emp_data
-WHERE position >= 'w';`} columnName="position" />
+WHERE position >= 's';`} columnName="position" />
       <Par>For dates/times, the comparison is done using earlier/later than. Earlier dates are considered smaller and later dates are considered larger.</Par>
       <FigureFiltering query={`SELECT *
 FROM emp_data
-WHERE start_date >= '2017-01-01';`} columnName="start_date" />
+WHERE start_date >= '2025-01-01';`} columnName="start_date" />
       <Info>Most DBMSs store a date/time value as an object with various functionalities: it is "aware" that it is a date or time. On SQL Valley we use the light-weight SQLite DBMS. This DBMS stores dates/times simply as piece of text, like "{date}" or "{time}". Luckily, if we compare this text lexicographically, we get exactly the same result as when we would compare it time-wise. So usually this SQLite quirk is not a problem.</Info>
     </Section>
 

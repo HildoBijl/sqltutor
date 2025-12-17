@@ -5,6 +5,7 @@ import {
   getTablesForSchema,
   resolveDatasetSize,
   resolveSkillTables,
+  getCompletionSchemaForTables,
   type DatabaseRole,
   type DatasetSize,
   type SchemaKey,
@@ -38,6 +39,7 @@ interface UseDatabaseReturn {
   queryResult: QueryResult[] | null;
   queryError: Error | null;
   tableNames: string[];
+  completionSchema: Record<string, string[]>;
 }
 
 export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
@@ -84,6 +86,11 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   const resolvedSchema = useMemo(() => {
     return buildSchema({ tables: resolvedTables, size: resolvedSize, role });
   }, [resolvedTables, resolvedSize, role]);
+
+  const completionSchema = useMemo(
+    () => getCompletionSchemaForTables(resolvedTables, role),
+    [resolvedTables, role],
+  );
 
   const contextKey = useMemo(() => {
     const base = cacheKey ?? `${role}:${skillId ?? 'global'}`;
@@ -224,6 +231,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     queryResult,
     queryError,
     tableNames,
+    completionSchema,
   };
 }
 

@@ -14,7 +14,7 @@ export function Summary() {
   salary,
   0.3*salary AS taxes
 FROM emp_data
-WHERE 0.3*salary < 25000
+WHERE 0.3*salary < 60000
 ORDER BY taxes ASC;`} tableWidth={350} />
       <Par>The most commonly used processing functions for numbers and text are shown below. There are far more, so whenever you want to process some values, do a quick search on which functions might come in handy.</Par>
       <FigureProcessingCommands />
@@ -39,7 +39,7 @@ function FigureProcessingCommands() {
 
   // Define widths.
   const w1 = 400;
-  const delta = 15; // Margin between two halves.
+  const delta = 25; // Margin between two halves.
   const w2 = 550;
   const w = w1 + delta + w2;
 

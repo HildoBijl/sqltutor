@@ -1,6 +1,6 @@
 import { type Ref, useEffect, useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
-import { sql } from '@codemirror/lang-sql';
+import { sql, type SQLConfig } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView, keymap } from '@codemirror/view';
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
@@ -24,6 +24,8 @@ interface SQLEditorProps {
   showResults?: boolean; // accepted for compatibility, no-op here
   ref?: Ref<HTMLDivElement>;
   onLoad?: (element: HTMLElement | null) => void;
+  completionSchema?: Record<string, string[]>;
+  completionDefaultTable?: string;
 }
 
 export function SQLEditor({
@@ -39,6 +41,8 @@ export function SQLEditor({
   liveExecutionDelay = 150,
   ref,
   onLoad = noop,
+  completionSchema,
+  completionDefaultTable,
 }: SQLEditorProps) {
   const executeRef = useLatest(onExecute);
 
@@ -55,6 +59,20 @@ export function SQLEditor({
   }, [debouncedValue, enableLiveExecution, onLiveExecute]);
 
   const hasExecute = Boolean(onExecute);
+
+  const sqlConfig = useMemo<SQLConfig>(() => {
+    const config: SQLConfig = {};
+    if (completionSchema && Object.keys(completionSchema).length > 0) {
+      config.schema = completionSchema;
+      const firstTable = Object.keys(completionSchema)[0];
+      const inferredDefaultTable =
+        completionDefaultTable ?? (Object.keys(completionSchema).length === 1 ? firstTable : undefined);
+      if (inferredDefaultTable) {
+        config.defaultTable = inferredDefaultTable;
+      }
+    }
+    return config;
+  }, [completionSchema, completionDefaultTable]);
 
   // Memoize editor configuration so it stays stable between renders.
   const extensions = useMemo(() => {
@@ -92,6 +110,8 @@ export function SQLEditor({
       { dark: true }
     );
 
+    const sqlExtension = sqlConfig.schema ? sql(sqlConfig) : sql();
+
     const highlightStyle = HighlightStyle.define([
       {
         tag: tags.keyword,
@@ -105,7 +125,7 @@ export function SQLEditor({
     ]);
 
     const baseExtensions = [
-      sql(),
+      sqlExtension,
       legacyTheme,
       syntaxHighlighting(highlightStyle),
       EditorView.lineWrapping,
@@ -131,7 +151,7 @@ export function SQLEditor({
     }
 
     return baseExtensions;
-  }, [hasExecute]);
+  }, [hasExecute, sqlConfig]);
 
   const basicSetup = useMemo(
     () => ({

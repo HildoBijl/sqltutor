@@ -9,6 +9,7 @@ interface ExerciseEditorProps {
   onExecute: (value?: string) => Promise<void> | void;
   onLiveExecute: (value: string) => Promise<void> | void;
   readOnly?: boolean;
+  completionSchema?: Record<string, string[]>;
   sx?: SxProps<Theme>;
 }
 
@@ -18,6 +19,7 @@ export function ExerciseEditor({
   onExecute,
   onLiveExecute,
   readOnly = false,
+  completionSchema,
   sx,
 }: ExerciseEditorProps) {
   return (
@@ -32,6 +34,7 @@ export function ExerciseEditor({
         liveExecutionDelay={150}
         showResults={false}
         readOnly={readOnly}
+        completionSchema={completionSchema}
       />
     </Box>
   );

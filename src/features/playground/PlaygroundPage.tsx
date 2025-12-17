@@ -46,6 +46,7 @@ export default function PlaygroundPage() {
     queryError,
     isExecuting,
     tableNames,
+    completionSchema,
     resetDatabase,
     clearQueryState,
     isReady
@@ -288,6 +289,7 @@ export default function PlaygroundPage() {
           enableLiveExecution={true}
           liveExecutionDelay={150}
           showResults={false}
+          completionSchema={completionSchema}
         />
       </Paper>
 

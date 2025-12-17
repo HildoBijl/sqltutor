@@ -62,7 +62,7 @@ function FigureSorting() {
   const b4 = new Vector([b3.x, b3.y + offset]);
 
   // Render the figure.
-  return <Drawing ref={drawingRef} width={800} height={height} maxWidth={800} disableSVGPointerEvents>
+  return <Drawing ref={drawingRef} width={700} height={height} maxWidth={700} disableSVGPointerEvents>
     {/* Query */}
     <Element ref={eRef} position={[40, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay>{query}</SQLDisplay>
@@ -83,16 +83,16 @@ function FigureSorting() {
       {offsetBounds && <Curve points={[offsetBounds.middleRight.add([5, 1]), offsetBounds.middleRight.add([123, 1]), b4.add([-22, 0]), b4.add([-4, 0])]} endArrow={true} color={themeColor} />}
 
       {/* Table 1 */}
-      <Element position={[0, editorHeight + 20]} anchor={[-1, -1]} scale={0.6}>
-        <Box sx={{ width: 800 }}>
+      <Element position={[0, editorHeight + 20]} anchor={[-1, -1]} scale={0.7}>
+        <Box sx={{ width: 460 / 0.75 }}>
           <DataTable ref={t1Ref} data={data1} showPagination={false} compact />
         </Box>
       </Element>
 
       {t1Bounds ? <>
-        {/* Table 2 */}
-        <Element position={[320, editorHeight + 20 + t1Height + 20]} anchor={[-1, -1]} scale={0.6}>
-          <Box sx={{ width: 800 }}>
+        {/* Table 2. */}
+        <Element position={[700, editorHeight + 20 + t1Height + 20]} anchor={[1, -1]} scale={0.7}>
+          <Box sx={{ width: 460 / 0.75 }}>
             <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
           </Box>
         </Element>
@@ -103,5 +103,5 @@ function FigureSorting() {
         </> : null}
       </> : null}
     </> : null}
-  </Drawing>;
+  </Drawing >;
 }
