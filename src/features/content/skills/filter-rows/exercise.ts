@@ -2,30 +2,39 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 
 const EXERCISES: StaticExercise[] = [
   {
-    id: 'filter-rows-gt-amount',
-    prompt: 'Retrieve all transactions with an amount greater than 10,000.',
+    id: 'filter-rows-lt-amount',
+    prompt: 'Retrieve all employee data records with performance score under 80.',
     solution: `
 SELECT *
-FROM transactions
-WHERE amount > 10000;
+FROM emp_data
+WHERE perf_score < 80;
     `,
   },
   {
-    id: 'filter-rows-same-buyer-vendor',
-    prompt: 'Retrieve all transactions where the buyer and the vendor is the same account.',
+    id: 'filter-rows-equal-date',
+    prompt: 'Retrieve all employee data records where the start date and end date are the same.',
     solution: `
 SELECT *
-FROM transactions
-WHERE buyer_id = vendor_id;
+FROM emp_data
+WHERE start_date = end_date;
     `,
   },
   {
-    id: 'filter-rows-specific-date',
-    prompt: 'Retrieve all transactions that occurred on the 11th of February 2025.',
+    id: 'filter-rows-string-like',
+    prompt: 'Retrieve all employee data records that have the word "sick" anywhere in the status.',
     solution: `
 SELECT *
-FROM transactions
-WHERE date_time LIKE '2025-02-11%';
+FROM emp_data
+WHERE status LIKE '%sick%';
+    `,
+  },
+  {
+    id: 'filter-rows-gt-date',
+    prompt: 'Find all employee data records for employees that started after 2023.',
+    solution: `
+SELECT *
+FROM emp_data
+WHERE start_date > '2023-12-31';
     `,
   },
 ];

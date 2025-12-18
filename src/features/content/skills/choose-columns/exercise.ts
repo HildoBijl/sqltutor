@@ -3,18 +3,25 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'choose-columns-contacts',
-    prompt: 'List the first name, last name, email, and phone number of all employees.',
+    prompt: 'List the first name, last name, email, and phone number of all employees. Ensure that the phone number is called "number" as column name.',
     solution: `
-SELECT first_name, last_name, email, phone
+SELECT
+  first_name,
+  last_name,
+  email,
+  phone AS number
 FROM employees;
     `,
   },
   {
-    id: 'choose-columns-emp-rating',
-    prompt: 'Retrieve the employee ID, position, salary, and performance score (as rating) of all employees.',
+    id: 'choose-columns-department-budgets',
+    prompt: 'Retrieve the department ID, department name and budget of all departments. Ensure that the budget is called "available_money" as column name.',
     solution: `
-SELECT e_id, position, salary, perf_score AS rating
-FROM emp_data;
+SELECT
+  d_id,
+  d_name,
+  budget AS available_money
+FROM departments;
     `,
     comparisonOptions: {
       requireEqualColumnNames: true,
