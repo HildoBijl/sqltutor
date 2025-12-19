@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/shared/components/DataTable';
-import { useDatabase } from '@/shared/hooks/useDatabase';
+import { useDatabase } from '@/hooks/useDatabase';
 import { buildSchema, resolveDatasetSize, resolveSkillTables } from '@/features/database/schemas';
 
 interface DataExplorerTabProps {

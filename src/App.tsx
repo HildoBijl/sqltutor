@@ -4,8 +4,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { router } from './router';
 import { getTheme, ColorModeContext } from './theme';
-import { SQLJSProvider } from './shared/providers/SQLJSProvider';
-import { DatabaseProvider } from './shared/providers/DatabaseProvider';
+import { SQLJSProvider } from './providers/SQLJSProvider';
+import { DatabaseProvider } from './providers/DatabaseProvider';
 import { ErrorBoundary } from './shared/components/ErrorBoundary';
 import { useAppStore, useIsStoreReady } from './store';
 

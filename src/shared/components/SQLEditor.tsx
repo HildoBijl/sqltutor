@@ -8,7 +8,7 @@ import { tags } from '@lezer/highlight';
 import { Box, Paper } from '@mui/material';
 import { useLatest } from '@/utils/dom';
 import { noop } from '@/utils/javascript';
-import { useDebounce } from '@/shared/hooks';
+import { useDebounce } from '@/hooks';
 
 interface SQLEditorProps {
   value: string;

@@ -5,8 +5,8 @@ import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
-import { useConceptDatabase } from '@/shared/hooks/useDatabase';
-import { useQueryResult } from '@/shared/hooks/useQuery';
+import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
 import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
 

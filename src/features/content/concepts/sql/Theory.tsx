@@ -3,8 +3,8 @@ import { Box } from '@mui/material';
 import { useRefWithValue } from '@/utils/dom';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components/figures';
-import { useConceptDatabase } from '@/shared/hooks/useDatabase';
-import { useQueryResult } from '@/shared/hooks/useQuery';
+import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
 import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
 

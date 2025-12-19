@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
-import { usePlaygroundDatabase } from '@/shared/hooks/useDatabase';
+import { usePlaygroundDatabase } from '@/hooks/useDatabase';
 import { schemas, getSchemaDescription, type SchemaKey } from '@/features/database/schemas';
 import {
   useComponentState,

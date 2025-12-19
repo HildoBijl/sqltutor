@@ -4,8 +4,8 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Link, Glyph } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
-import { useConceptDatabase } from '@/shared/hooks/useDatabase';
-import { useQueryResult } from '@/shared/hooks/useQuery';
+import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/shared/components/DataTable';
 
 export function Theory() {
