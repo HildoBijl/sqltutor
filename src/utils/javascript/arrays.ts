@@ -71,3 +71,13 @@ export function findOptimum<T>(
 	const index = findOptimumIndex(array, isBetter);
 	return index === -1 ? undefined : array[index];
 }
+
+// Shuffle an array randomly (Fisher-Yates algorithm). Returns a new array.
+export function shuffleArray<T>(array: readonly T[]): T[] {
+	const shuffled = [...array];
+	for (let i = shuffled.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+	}
+	return shuffled;
+}

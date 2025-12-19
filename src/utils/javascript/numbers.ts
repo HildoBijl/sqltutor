@@ -36,3 +36,13 @@ export function mod(a: number, n: number): number {
 export function boundTo(val: number, min = 0, max = 1): number {
 	return Math.max(Math.min(val, max), min);
 }
+
+// Alias for boundTo with required min/max. Clamps a value to a range.
+export function clamp(value: number, min: number, max: number): number {
+	return Math.max(min, Math.min(max, value));
+}
+
+// Generate a random integer between min and max (inclusive).
+export function randomInt(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
