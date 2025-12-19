@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store";
-import { contentItems } from "@/features/content";
+import { contentItems } from "@/curriculum";
 
 /**
  * Marks all prerequisites of a given item as complete. 

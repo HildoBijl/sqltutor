@@ -1,7 +1,7 @@
 ﻿import { useMemo } from 'react';
 import type { LazyExoticComponent, ComponentType } from 'react';
 
-import { contentComponents } from '@/features/content';
+import { contentComponents } from '@/curriculum';
 
 export type ContentComponent = LazyExoticComponent<ComponentType<any>>;
 

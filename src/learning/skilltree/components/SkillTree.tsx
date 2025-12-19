@@ -6,7 +6,7 @@ import {
   Curve,
   useDrawingMousePosition,
 } from "@/components";
-import { ContentMeta } from "@/features/content";
+import { ContentMeta } from "@/curriculum";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";

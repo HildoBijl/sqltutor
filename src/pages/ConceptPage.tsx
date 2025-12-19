@@ -4,7 +4,7 @@ import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
 
 import { useAppStore, type ConceptComponentState } from '@/store';
-import { contentIndex, type ContentMeta } from '@/features/content';
+import { contentIndex, type ContentMeta } from '@/curriculum';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
 import { ContentHeader } from '@/learning/components/ContentHeader';

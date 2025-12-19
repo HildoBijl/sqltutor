@@ -1,4 +1,4 @@
-import type { QueryResult } from '@/features/content/types';
+import type { QueryResult } from '@/curriculum/types';
 
 export interface ComparisonResult {
   match: boolean;

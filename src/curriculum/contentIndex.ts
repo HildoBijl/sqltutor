@@ -1,5 +1,5 @@
-﻿import type { ContentMeta } from '@/features/content';
-import { contentIndex } from '@/features/content';
+﻿import type { ContentMeta } from '@/curriculum';
+import { contentIndex } from '@/curriculum';
 
 export type ContentType = ContentMeta['type'];
 export type ContentEntryMeta = ContentMeta;

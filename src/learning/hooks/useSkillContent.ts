@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/features/content';
+import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/curriculum';
 
 import { normalizeSkillExerciseModule } from '../utils/normalizeSkillModule';
 import type { SkillExerciseModuleLike } from '../useSkillExerciseState';

@@ -2,7 +2,7 @@ import { RefObject, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
-import { ContentMeta } from "@/features/content";
+import { ContentMeta } from "@/curriculum";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";

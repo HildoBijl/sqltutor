@@ -1,6 +1,6 @@
 import { Vector } from "@/utils/geometry";
 import { Rectangle, Element } from "@/components";
-import { ContentMeta } from "@/features/content";
+import { ContentMeta } from "@/curriculum";
 import { cardWidth, cardHeight } from "../utils/settings";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { ExecutionResult as SqlExecutionResult } from '@/features/content/types';
+import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/types';
 import type { SkillComponentState } from '@/store';
 import { useDatabase } from '@/hooks/useDatabase';
 import {

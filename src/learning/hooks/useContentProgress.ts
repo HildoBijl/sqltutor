@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ContentMeta } from "@/features/content";
+import { ContentMeta } from "@/curriculum";
 
 
 /*

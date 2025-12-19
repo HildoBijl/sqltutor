@@ -1,4 +1,4 @@
-import { contentItems } from "@/features/content";
+import { contentItems } from "@/curriculum";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
 import { cardWidth, cardHeight } from "./settings";

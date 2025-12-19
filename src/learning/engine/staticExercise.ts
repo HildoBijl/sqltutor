@@ -5,7 +5,7 @@ import type {
   Utils,
   ValidationResult,
   VerificationResult,
-} from '@/features/content/types';
+} from '@/curriculum/types';
 
 export interface StaticExercise {
   id: string;
