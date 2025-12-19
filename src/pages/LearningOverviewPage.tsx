@@ -2,10 +2,10 @@ import { useState, useRef } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/store";
 import { contentIndex, contentItems } from "@/features/content";
-import { SkillTreeCanvas } from "@/features/skilltree/components/SkillTreeCanvas";
+import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useContentProgress } from "@/learning/hooks/useContentProgress";
-import { useTreeBounds } from "@/features/skilltree/hooks/useTreeBounds";
-import { contentPositions, connectors } from "@/features/skilltree/utils/treeDefinition";
+import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
+import { contentPositions, connectors } from "@/learning/skilltree/utils/treeDefinition";
 
 /*
  * LearningOverviewPage component that displays the skill tree overview page.
