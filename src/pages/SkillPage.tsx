@@ -5,18 +5,18 @@ import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit} from '@mui/icons-ma
 
 import { useAppStore, type SkillComponentState } from '@/store';
 
-import { useContentTabs } from './hooks/useContentTabs';
-import { useSkillContent } from './hooks/useSkillContent';
-import { useSkillExerciseController } from './hooks/useSkillExerciseController';
-import { useAdminMode } from './hooks/useAdminMode';
+import { useContentTabs } from '@/features/learning/hooks/useContentTabs';
+import { useSkillContent } from '@/features/learning/hooks/useSkillContent';
+import { useSkillExerciseController } from '@/features/learning/hooks/useSkillExerciseController';
+import { useAdminMode } from '@/features/learning/hooks/useAdminMode';
 
-import { ContentHeader } from './components/ContentHeader';
-import { ContentTabs } from './components/ContentTabs';
-import { StoryTab, TheoryTab, VideoTab, SummaryTab } from './components/TabContent/ContentTab';
-import { CompletionDialog, SkillPracticeTab } from './components/SkillPractice';
-import { DataExplorerTab } from './components/DataExplorerTab';
+import { ContentHeader } from '@/features/learning/components/ContentHeader';
+import { ContentTabs } from '@/features/learning/components/ContentTabs';
+import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/features/learning/components/TabContent/ContentTab';
+import { CompletionDialog, SkillPracticeTab } from '@/features/learning/components/SkillPractice';
+import { DataExplorerTab } from '@/features/learning/components/DataExplorerTab';
 
-import type { TabConfig } from './types';
+import type { TabConfig } from '@/features/learning/types';
 
 const REQUIRED_EXERCISE_COUNT = 3;
 
