@@ -3,12 +3,12 @@ import { Box } from '@mui/material';
 import { Vector } from '@/utils/geometry';
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
 import { Page, Section, Par } from '@/components';
-import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { SQLDisplay } from '@/components';
 import { useConceptDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
-import { DataTable } from '@/shared/components/DataTable';
+import { DataTable } from '@/components';
 
 export function Summary() {
   return <Page>

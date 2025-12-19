@@ -1,5 +1,5 @@
 import { Page, Section, Par, List, Warning, Info, Term, Em, Link } from '@/components';
-import { ISQL } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/components';
 
 import { FigureExampleQuery } from '../../components';
 

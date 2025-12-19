@@ -1,7 +1,7 @@
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, Info, Link } from '@/components';
-import { Drawing, Element } from '@/components/figures';
-import { ISQL } from '@/shared/components/SQLEditor';
+import { Drawing, Element } from '@/components';
+import { ISQL } from '@/components';
 
 import { FigureExampleQuery } from '../../components';
 

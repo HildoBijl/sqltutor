@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 
-import { SQLEditor } from '@/shared/components/SQLEditor';
+import { SQLEditor } from '@/components';
 
 interface ExerciseEditorProps {
   query: string;

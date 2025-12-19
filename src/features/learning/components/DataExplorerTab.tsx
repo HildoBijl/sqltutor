@@ -15,7 +15,7 @@ import {
   DialogActions,
 } from '@mui/material';
 import { AccountTree } from '@mui/icons-material';
-import { DataTable } from '@/shared/components/DataTable';
+import { DataTable } from '@/components';
 import { useDatabase } from '@/hooks/useDatabase';
 import { buildSchema, resolveDatasetSize, resolveSkillTables } from '@/data/schemas';
 

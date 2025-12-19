@@ -4,11 +4,10 @@ import { Vector } from '@/utils/geometry';
 import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning, Term, Em } from '@/components';
-import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
 import { useConceptDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
-import { DataTable } from '@/shared/components/DataTable';
-import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
+import { DataTable, ISQL, SQLDisplay } from '@/components';
 
 export function Theory() {
   return <Page>

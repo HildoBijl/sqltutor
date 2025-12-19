@@ -5,7 +5,7 @@ import {
   Element,
   Curve,
   useDrawingMousePosition,
-} from "@/components/figures";
+} from "@/components";
 import { ContentMeta } from "@/features/content";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";

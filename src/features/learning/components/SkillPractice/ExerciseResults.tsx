@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Box, Button, Collapse, Divider, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
-import { DataTable } from '@/shared/components/DataTable';
+import { DataTable } from '@/components';
 import type { QueryResultSet } from '../../types';
 import { ExerciseSection } from './ExerciseSection';
 

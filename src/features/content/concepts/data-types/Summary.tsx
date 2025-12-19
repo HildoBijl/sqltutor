@@ -1,5 +1,5 @@
 import { Page, Section, Par, Info, Term, Em } from '@/components';
-import { ISQL } from '@/shared/components/SQLEditor';
+import { ISQL } from '@/components';
 
 import { FigureDataTypeDemo } from './Theory';
 

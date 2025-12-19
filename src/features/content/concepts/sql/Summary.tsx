@@ -1,5 +1,5 @@
 import { Page, Section, Par, Warning, Term } from '@/components';
-import { ISQL, SQLDisplay } from '@/shared/components/SQLEditor';
+import { ISQL, SQLDisplay } from '@/components';
 
 export function Summary() {
   return <Page>

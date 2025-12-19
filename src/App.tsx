@@ -6,7 +6,7 @@ import { router } from './router';
 import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider } from './providers/SQLJSProvider';
 import { DatabaseProvider } from './providers/DatabaseProvider';
-import { ErrorBoundary } from './shared/components/ErrorBoundary';
+import { ErrorBoundary } from './components';
 import { useAppStore, useIsStoreReady } from './store';
 
 export function App() {

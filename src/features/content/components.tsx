@@ -2,11 +2,10 @@ import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components/figures';
+import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
 import { useConceptDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
-import { DataTable } from '@/shared/components/DataTable';
-import { SQLDisplay } from '@/shared/components/SQLEditor';
+import { DataTable, SQLDisplay } from '@/components';
 
 export function FigureExampleQuery({ query = '', tableWidth = 300, shift = 0 }) {
   const themeColor = useThemeColor();

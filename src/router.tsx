@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Suspense } from "react";
-import { LoadingScreen } from "@/shared/components/LoadingScreen";
-import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
+import { LoadingScreen, ErrorBoundary } from "@/components";
 
 // Import components
 import HomePage from "@/features/home/HomePage";

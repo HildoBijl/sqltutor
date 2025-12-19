@@ -1,5 +1,5 @@
 import { Vector } from "@/utils/geometry";
-import { Rectangle, Element } from "@/components/figures";
+import { Rectangle, Element } from "@/components";
 import { ContentMeta } from "@/features/content";
 import { cardWidth, cardHeight } from "../utils/settings";
 import { ContentPositionMeta } from "../utils/treeDefinition";
