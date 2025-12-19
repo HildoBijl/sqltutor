@@ -13,7 +13,7 @@ import {
   type ValidationResult,
   type VerificationResult,
   type ValidateInputArgs,
-} from './exerciseEngine';
+} from './engine';
 import {
   useComponentState,
   type ExerciseInstanceId,

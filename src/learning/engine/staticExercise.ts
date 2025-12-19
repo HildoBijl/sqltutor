@@ -1,11 +1,11 @@
-import { compareQueryResults, type CompareOptions } from '@/features/learning/exerciseEngine/resultComparison';
+import { compareQueryResults, type CompareOptions } from './resultComparison';
 import type {
   ExecutionResult,
   QueryResult,
   Utils,
   ValidationResult,
   VerificationResult,
-} from '../../types';
+} from '@/features/content/types';
 
 export interface StaticExercise {
   id: string;

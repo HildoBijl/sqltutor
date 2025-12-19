@@ -5,14 +5,14 @@ import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-mater
 
 import { useAppStore, type ConceptComponentState } from '@/store';
 import { contentIndex, type ContentMeta } from '@/features/content';
-import { useContentTabs } from '@/features/learning/hooks/useContentTabs';
-import { useAdminMode } from '@/features/learning/hooks/useAdminMode';
-import { ContentHeader } from '@/features/learning/components/ContentHeader';
-import { ContentTabs } from '@/features/learning/components/ContentTabs';
-import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/features/learning/components/TabContent/ContentTab';
-import type { TabConfig } from '@/features/learning/types';
-import { markPrerequisitesComplete } from '@/features/learning/utils/markPrerequisitesComplete';
-import { ConceptCompletionDialog } from '@/features/learning/components/ConceptCompletionDialog';
+import { useContentTabs } from '@/learning/hooks/useContentTabs';
+import { useAdminMode } from '@/learning/hooks/useAdminMode';
+import { ContentHeader } from '@/learning/components/ContentHeader';
+import { ContentTabs } from '@/learning/components/ContentTabs';
+import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/learning/components/TabContent/ContentTab';
+import type { TabConfig } from '@/learning/types';
+import { markPrerequisitesComplete } from '@/learning/utils/markPrerequisitesComplete';
+import { ConceptCompletionDialog } from '@/learning/components/ConceptCompletionDialog';
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();

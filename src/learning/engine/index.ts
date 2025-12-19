@@ -1,6 +1,10 @@
 import type { StoredAttempt, StoredExerciseState } from '@/store/types';
 import type { PracticeSolution, PracticeSolutionLike } from '../types';
 
+export * from './resultComparison';
+export * from './schemaHelpers';
+export * from './staticExercise';
+
 export type ExerciseStatus =
   | 'idle'
   | 'ready'

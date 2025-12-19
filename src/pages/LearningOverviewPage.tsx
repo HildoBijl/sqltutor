@@ -3,7 +3,7 @@ import { Container } from "@mui/material";
 import { useAppStore } from "@/store";
 import { contentIndex, contentItems } from "@/features/content";
 import { SkillTreeCanvas } from "@/features/skilltree/components/SkillTreeCanvas";
-import { useContentProgress } from "@/features/learning/hooks/useContentProgress";
+import { useContentProgress } from "@/learning/hooks/useContentProgress";
 import { useTreeBounds } from "@/features/skilltree/hooks/useTreeBounds";
 import { contentPositions, connectors } from "@/features/skilltree/utils/treeDefinition";
 

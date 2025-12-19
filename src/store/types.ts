@@ -1,4 +1,4 @@
-import type { ExerciseAction, ExerciseStatus } from '@/features/learning/exerciseEngine';
+import type { ExerciseAction, ExerciseStatus } from '@/learning/engine';
 
 export type ExerciseInstanceId = string;
 

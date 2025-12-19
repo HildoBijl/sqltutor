@@ -1,4 +1,4 @@
-import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '../shared/simpleExercise';
+import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, type StaticExercise } from '@/learning/engine/staticExercise';
 
 const EXERCISES: StaticExercise[] = [
   {
