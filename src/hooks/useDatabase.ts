@@ -10,7 +10,7 @@ import {
   type DatasetSize,
   type SchemaKey,
   type TableKey,
-} from '@/features/database/schemas';
+} from '@/data/schemas';
 
 export interface QueryResult {
   columns: string[];

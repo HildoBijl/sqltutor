@@ -17,7 +17,7 @@ import {
 import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/shared/components/DataTable';
 import { useDatabase } from '@/hooks/useDatabase';
-import { buildSchema, resolveDatasetSize, resolveSkillTables } from '@/features/database/schemas';
+import { buildSchema, resolveDatasetSize, resolveSkillTables } from '@/data/schemas';
 
 interface DataExplorerTabProps {
   skillId: string;

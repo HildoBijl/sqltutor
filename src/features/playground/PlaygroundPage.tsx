@@ -25,7 +25,7 @@ import {
 import { SQLEditor } from '@/shared/components/SQLEditor';
 import { DataTable } from '@/shared/components/DataTable';
 import { usePlaygroundDatabase } from '@/hooks/useDatabase';
-import { schemas, getSchemaDescription, type SchemaKey } from '@/features/database/schemas';
+import { schemas, getSchemaDescription, type SchemaKey } from '@/data/schemas';
 import {
   useComponentState,
   type PlaygroundComponentState,

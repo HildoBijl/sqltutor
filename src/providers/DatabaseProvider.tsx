@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 
 import { useSQLJS } from './SQLJSProvider';
-import type { DatabaseRole, DatasetSize } from '@/features/database/schemas';
+import type { DatabaseRole, DatasetSize } from '@/data/schemas';
 
 interface ManagedDatabase {
   instance: any | null;

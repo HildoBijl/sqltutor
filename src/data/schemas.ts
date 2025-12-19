@@ -1,20 +1,20 @@
-import accountsCsv from '../../../data/csv/accounts.csv?raw';
-import departmentsCsv from '../../../data/csv/departments.csv?raw';
-import empDataCsv from '../../../data/csv/emp_data.csv?raw';
-import empDeptCsv from '../../../data/csv/emp_dept.csv?raw';
-import employeesCsv from '../../../data/csv/employees.csv?raw';
-import productsCsv from '../../../data/csv/products.csv?raw';
-import transactionsCsv from '../../../data/csv/transactions.csv?raw';
+import accountsCsv from '../../data/csv/accounts.csv?raw';
+import departmentsCsv from '../../data/csv/departments.csv?raw';
+import empDataCsv from '../../data/csv/emp_data.csv?raw';
+import empDeptCsv from '../../data/csv/emp_dept.csv?raw';
+import employeesCsv from '../../data/csv/employees.csv?raw';
+import productsCsv from '../../data/csv/products.csv?raw';
+import transactionsCsv from '../../data/csv/transactions.csv?raw';
 
-import theoryAccountsCsv from '../../../data/theory-sample/accounts.csv?raw';
-import theoryDepartmentsCsv from '../../../data/theory-sample/departments.csv?raw';
-import theoryEmpDataCsv from '../../../data/theory-sample/emp_data.csv?raw';
-import theoryEmpDeptCsv from '../../../data/theory-sample/emp_dept.csv?raw';
-import theoryEmployeesCsv from '../../../data/theory-sample/employees.csv?raw';
-import theoryProductsCsv from '../../../data/theory-sample/products.csv?raw';
-import theoryTransactionsCsv from '../../../data/theory-sample/transactions.csv?raw';
-import theoryExpensesCsv from '../../../data/theory-sample/expenses.csv?raw';
-import theoryQuarterlyPerformanceCsv from '../../../data/theory-sample/quarterly_performance.csv?raw';
+import theoryAccountsCsv from '../../data/theory-sample/accounts.csv?raw';
+import theoryDepartmentsCsv from '../../data/theory-sample/departments.csv?raw';
+import theoryEmpDataCsv from '../../data/theory-sample/emp_data.csv?raw';
+import theoryEmpDeptCsv from '../../data/theory-sample/emp_dept.csv?raw';
+import theoryEmployeesCsv from '../../data/theory-sample/employees.csv?raw';
+import theoryProductsCsv from '../../data/theory-sample/products.csv?raw';
+import theoryTransactionsCsv from '../../data/theory-sample/transactions.csv?raw';
+import theoryExpensesCsv from '../../data/theory-sample/expenses.csv?raw';
+import theoryQuarterlyPerformanceCsv from '../../data/theory-sample/quarterly_performance.csv?raw';
 
 import type { DatasetSize, DatabaseRole, TableKey } from './types';
 import { resolveContentTables, resolveContentSize } from './contentAccess';
