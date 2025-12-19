@@ -8,7 +8,7 @@ import LearningOverviewPage from "@/features/skilltree/LearningOverviewPage";
 import ConceptPage from "@/features/learning/ConceptPage";
 import SkillPage from "@/features/learning/SkillPage";
 import PlaygroundPage from "@/features/playground/PlaygroundPage";
-import { Layout } from "@/features/layout/Layout";
+import { Layout } from "@/layout/Layout";
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
