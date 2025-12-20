@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, List, Section, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
@@ -110,7 +110,7 @@ SELECT *
 FROM emp_data
 WHERE ${addNot ? 'NOT (' : ''}${c1} = '${v1}'
   ${combiner} ${c2} = '${v2}'${addNot ? ')' : ''};`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
@@ -151,7 +151,7 @@ function FigureAndExplanation() {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const status = 'active';
   const position = 'director of pr';
   const data = useQueryResult(db?.database, `
@@ -252,7 +252,7 @@ function FigureRewrittenQuery({ query = '' }) {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
@@ -286,7 +286,7 @@ export function FigureMergingTables({ query1 = '', query2 = '', operator = 'UNIO
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data1 = useQueryResult(db?.database, query1);
   const data2 = useQueryResult(db?.database, query2);
   const data = useQueryResult(db?.database, `${query1}

@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL } from '@/components';
 
@@ -66,7 +66,7 @@ export function FigureDataTypeDemo() {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, `SELECT * FROM emp_data;`);
 
   // Find the bounds of the table.

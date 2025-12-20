@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, SQLDisplay } from '@/components';
 
@@ -12,7 +12,7 @@ export function FigureExampleQuery({ query = '', tableWidth = 300, shift = 0 }) 
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the table column name bounds.

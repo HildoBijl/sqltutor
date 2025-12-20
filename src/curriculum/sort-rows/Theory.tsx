@@ -5,7 +5,7 @@ import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
@@ -49,7 +49,7 @@ function FigureSortOnSingleColumn() {
 SELECT *
 FROM departments
 ORDER BY ${sortColumn} DESC;`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
@@ -88,7 +88,7 @@ FROM departments
 ORDER BY
   ${sortColumn1} ASC,
   ${sortColumn2} DESC;`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
@@ -142,7 +142,7 @@ SELECT *
 FROM departments
 ORDER BY ${sortColumn} DESC
 LIMIT 3;`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
@@ -186,7 +186,7 @@ SELECT *
 FROM departments
 ORDER BY ${sortColumn} DESC
 LIMIT 3 OFFSET ${offset};`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".
@@ -227,7 +227,7 @@ function FigureSortNullValues() {
 SELECT *
 FROM departments
 ORDER BY ${sortColumn} ASC NULLS LAST;`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the bounds for "DESC".

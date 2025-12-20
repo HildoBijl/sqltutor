@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, Rectangle, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
@@ -58,7 +58,7 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
   const themeColor = useThemeColor();
 
   // Get data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, 'SELECT * FROM departments;');
 
   // Set up reference to the table.

@@ -4,7 +4,7 @@ import { useRefWithValue, useRefWithElement } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Par, Section, Info, Warning, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
@@ -62,7 +62,7 @@ function FigureSelectColumns() {
   const query = `
 SELECT ${c1}, ${c2}, ${c3}
 FROM employees;`
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.
@@ -108,7 +108,7 @@ FROM employees;`;
   const query2 = `
 SELECT DISTINCT ${c}
 FROM employees;`;
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data1 = useQueryResult(db?.database, query1);
   const data2 = useQueryResult(db?.database, query2);
 
@@ -162,7 +162,7 @@ export function FigureRenameColumns({ query = '' }) {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the element bounds.

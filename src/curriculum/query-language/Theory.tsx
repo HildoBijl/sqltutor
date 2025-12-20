@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Info, Term, Link } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
@@ -57,7 +57,7 @@ export function FigureQueryExample() {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data1 = useQueryResult(db?.database, `SELECT * FROM employees;`);
   const data2 = useQueryResult(db?.database, `SELECT first_name, last_name FROM employees WHERE current_salary > 200000;`);
 

@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Term } from '@/components';
 import { type DrawingData, Drawing, Element, Line, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
@@ -38,7 +38,7 @@ export function Theory() {
 
 function FigureProjection() {
   const themeColor = useThemeColor();
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const dataFull = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const dataProjection = useQueryResult(db?.database, 'SELECT d_name, nr_employees FROM departments;');
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
@@ -72,7 +72,7 @@ function FigureProjection() {
 
 function FigureFiltering() {
   const themeColor = useThemeColor();
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const dataFull = useQueryResult(db?.database, 'SELECT * FROM departments;');
   const dataFiltering = useQueryResult(db?.database, 'SELECT * FROM departments WHERE nr_employees > 10;');
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();

@@ -1,18 +1,58 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+
+import { useRefWithValue } from '@/utils/dom';
+import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
+import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
+import { useQueryResult } from '@/hooks/useQuery';
+import { DataTable, ISQL } from '@/components';
 
 export function Theory() {
-  return (
-    <Box display="flex" flexDirection="column" gap={2}>
-      {/* <Alert severity="warning">
-        This theory page is still under development. The contents below only offer a meta-description of what will
-        be taught in this component.
-      </Alert> */}
-      <Typography variant="body1">
-        Theory for this concept will come soon.
-        {/* In a database table, we need to find a way to uniquely identify rows. These are the so-called keys. There are super keys, candidate keys and primary keys. Super keys uniquely identify the row (assuming there are no duplicates), candidate keys do so as well but are minimal, and the primary key is the candidate key that we choose to use in practice. */}
-      </Typography>
-    </Box>
-  );
+  return <Page>
+    <Section>
+      <Par>We know that, in a database table, the columns have names but the rows do not. How can we then point to a specific row? The key (pun intended) lies in <Term>keys</Term>.</Par>
+    </Section>
+
+    <Section title="Superkey: a set of attributes uniquely identifying a row">
+      <Par>Let's consider the table of all employees of a company.</Par>
+      <FigureOneTable />
+      <Par>If you want to point me to a specific row, you could try the following.</Par>
+        <List items={[
+          <>"Take the fourth row." This may fail, since the ordering is arbitrary. Maybe someone orders the rows differently, and I end up at a different row.</>,
+          <>"Take the row where the city is Palo Alto." This also fails, since there are multiple people living there.</>,
+          <>"Take the row of Paris Casteel." Now we're getting somewhere! After all, the combination of <ISQL>first_name</ISQL> and <ISQL>last_name</ISQL> seems to be unique.</>
+        ]} />
+      <Par>Let's assume our table does not have duplicate rows. A <Term>superkey</Term> is a set of attributes (for instance <ISQL>{`{first_name, last_name}`}</ISQL>) whose values are unique for all rows. These attributes can be used to uniquely identify the row.</Par>
+      <Par>But what if the table may have duplicate rows? In this case, there is <Em>no</Em> way of distinguishing between identical rows. But we <Em>can</Em> distinguish between non-identical rows. In this case, a <Term>superkey</Term> is a set of attributes such that, whenever two rows have the same value for <Em>these</Em> attributes, then they always have the same value for <Em>all other</Em> attributes (and are hence duplicate rows). Note that this definition extends our earlier definition, to also work for tables with duplicate rows.</Par>
+    </Section>
+
+    <Section title="Candidate key: a minimal superkey">
+      <Par>If I tell you to find the row of "Paris Casteel from Palo Alto" then you can uniquely do so. The set <ISQL>{`{first_name, last_name, city}`}</ISQL> is a superkey. However, we don't need the city. The set <ISQL>{`{first_name, last_name}`}</ISQL> is also a superkey! So the first set had superfluous attributes. This leads to the following definition.</Par>
+      <Par>A <Term>candidate key</Term> is a set of attributes that is a superkey, but if we remove any single attribute, the set is not a superkey anymore, irrespective of which attribute we remove. So in a way, a candidate key is a <Em>minimal</Em> superkey. Note that <ISQL>{`{first_name, last_name, city}`}</ISQL> is not a candidate key (only a superkey) but the set <ISQL>{`{first_name, last_name}`}</ISQL> is a candidate key.</Par>
+      <Warning>Note that a candidate key is not necessarily minimal in the <Em>number</Em> of attributes. Whereas the set containing only the employee ID <ISQL>{`{e_id}`}</ISQL> is a candidate key with one attribute, the set <ISQL>{`{first_name, last_name}`}</ISQL> is a candidate key with two attributes. They're both valid candidate keys! The fact that one candidate key has more attributes than the other is irrelevant. The candidate key definition only requires us to not be able to <Em>remove</Em> any attributes without losing superkey status.</Warning>
+      <Info>When finding candidate keys, it is helpful to not only look at your data now, but also what <Em>future</Em> data you may obtain. In the small example above all the names are unique, but maybe in the future this will not be the case anymore! Duplicate names do occur in practice, just like people sharing the same address or even the same phone number. When determining the candidate keys for a table, we usually consider potential future data too.</Info>
+    </Section>
+
+    <Section title="Primary key: a chosen candidate key">
+      <Par>Once we have determined various candidate keys for a table, we choose one as the so-called <Term>primary key</Term>. This primary key is effectively an "agreement": whenever we refer to a specific row within a table, we agree to refer to it through <Em>those</Em> attributes.</Par>
+      <Par>The choice of primary key is not a mathematical one, but one of convenience. What do we consider to be a good way of referring to a specific row? One might argue that <ISQL>email</ISQL> is a good way, as it's recognizable. However, it is very important that the primary key never changes. (Or, whenever it changes, we have to change it <Em>everywhere</Em>.) Since an email address might potentially change, and even a name could be altered, using the Employee ID <ISQL>e_id</ISQL> seems to be the best choice here.</Par>
+      <Info>Note that the definitions of superkey and candidate key are mathematical: it is always clear which sets of attributes are superkeys and candidate keys. However, the primary key is a human choice: there could always be arguments to use one over the other.</Info>
+    </Section>
+  </Page>;
 }
 
-export default Theory;
+export function FigureOneTable() {
+  const db = useTheorySampleDatabase();
+  const data = useQueryResult(db?.database, 'SELECT * FROM employees;');
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
+
+  return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800}>
+    <Element position={[10, -5]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of employees</span></Element>
+    <Element position={[0, 20]} anchor={[-1, -1]} scale={0.65}>
+      <Box sx={{ width: 800 / 0.65 }}>
+        <DataTable ref={tRef} data={data} showPagination={false} compact />
+      </Box>
+    </Element>
+  </Drawing>;
+}

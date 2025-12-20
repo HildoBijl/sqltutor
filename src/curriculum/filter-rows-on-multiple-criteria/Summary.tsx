@@ -4,7 +4,7 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
@@ -41,7 +41,7 @@ SELECT *
 FROM emp_data
 WHERE NOT (status = 'paid leave' OR status = 'sick leave')
   AND start_date < '2018-01-01';`;
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
   // Find the editor bounds.

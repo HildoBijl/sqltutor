@@ -6,7 +6,7 @@ import { useThemeColor } from '@/theme';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
 import { Page, Section, Par } from '@/components';
 import { SQLDisplay } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
@@ -33,7 +33,7 @@ function FigureSorting() {
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up data for the two tables.
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data1 = useQueryResult(db?.database, 'SELECT * FROM departments');
   const data2 = useQueryResult(db?.database, query);
 

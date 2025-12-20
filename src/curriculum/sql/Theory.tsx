@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { useRefWithValue } from '@/utils/dom';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components';
-import { useConceptDatabase } from '@/hooks/useDatabase';
+import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
@@ -43,7 +43,7 @@ FROM employees;`}</SQLDisplay>
 }
 
 function FigureEmployeeTable() {
-  const db = useConceptDatabase();
+  const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, 'SELECT * FROM employees;');
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
   const [tRef, tBounds] = useRefWithBounds(drawingData);
