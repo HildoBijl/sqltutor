@@ -1,4 +1,5 @@
-import type { DatabaseRole, DatasetSize, TableKey } from './types';
+import type { DatabaseRole, DatasetSize } from './types';
+import type { TableKey } from './tableDefinitions';
 
 type RoleSpecificTables = Partial<Record<DatabaseRole, TableKey[]>>;
 type ContentTableConfig = TableKey[] | RoleSpecificTables;

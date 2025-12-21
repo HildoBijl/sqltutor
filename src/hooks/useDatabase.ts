@@ -10,7 +10,7 @@ import {
   type DatasetSize,
   type SchemaKey,
   type TableKey,
-} from '@/data/schemas';
+} from '@/mockData';
 
 export interface QueryResult {
   columns: string[];
