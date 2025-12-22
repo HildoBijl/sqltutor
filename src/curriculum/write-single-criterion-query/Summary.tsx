@@ -6,7 +6,7 @@ import { FigureExampleQuery } from '../components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>We can combine <Term>projection</Term> (choosing columns) and <Term>filtering</Term> in a single query. The strategy for writing queries is usually the following.</Par>
+      <Par>We can combine <Term>projection</Term> (choosing columns) and <Term>filtering</Term> (selecting rows) in a single query. The strategy for writing queries is usually the following.</Par>
       <List items={[
         <>Find which <Term>table</Term> we need data from: start with <ISQL>FROM</ISQL>.</>,
         <>Set up the required <Term>filter</Term>: add in <ISQL>WHERE</ISQL>.</>,
