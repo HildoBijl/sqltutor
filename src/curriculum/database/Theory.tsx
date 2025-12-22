@@ -8,11 +8,13 @@ import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
+import { FigureSingleTable } from '../components';
+
 export function Theory() {
   return <Page>
     <Section>
       <Par>Suppose that we are working for a company that's looking to keep track of their internal departments. How would we store this data? Could we just put it in something like an Excel file?</Par>
-      <FigureOneTable />
+      <FigureSingleTable query={`SELECT * FROM departments;`} title="List of departments" tableWidth={600} />
     </Section>
 
     <Section title="Why databases: a list of requirements">
@@ -38,22 +40,6 @@ export function Theory() {
       <Warning>Because a database and its DBMS are so linked, people often use the word "database" when they actually mean DBMS. "Hey, which database are you using at SQL Valley? Oh, we're using SQLite!"</Warning>
     </Section>
   </Page>;
-}
-
-function FigureOneTable() {
-  const db = useTheorySampleDatabase();
-  const data = useQueryResult(db?.database, 'SELECT * FROM departments;');
-  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
-  const [tRef, tBounds] = useRefWithBounds(drawingData);
-
-  return <Drawing ref={drawingRef} width={800} height={25 + (tBounds?.height || 200)} maxWidth={800}>
-    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of departments</span></Element>
-    <Element position={[0, 25]} anchor={[-1, -1]}>
-      <Box sx={{ width: 800 }}>
-        <DataTable ref={tRef} data={data} showPagination={false} compact />
-      </Box>
-    </Element>
-  </Drawing>;
 }
 
 export function FigureTwoTables() {

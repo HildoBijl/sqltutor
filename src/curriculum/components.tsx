@@ -2,10 +2,9 @@ import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
+import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable, SQLDisplay } from '@/components';
 import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
-import { DataTable, SQLDisplay } from '@/components';
 
 export function FigureExampleQuery({ query = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60 }) {
   const themeColor = useThemeColor();
@@ -57,3 +56,27 @@ export function FigureExampleQuery({ query = '', below = false, tableWidth = 300
     </> : null}
   </Drawing>;
 }
+
+export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }) {
+  // Get the data.
+  const db = useTheorySampleDatabase();
+  const data = useQueryResult(db?.database, query);
+
+  // Check out the table bounds.
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
+  const ty = (title ? 20 : 0);
+  const height = ty + (tBounds?.height || 200);
+
+  // Render the drawing.
+  return <Drawing ref={drawingRef} width={tableWidth} height={height} maxWidth={tableWidth}>
+    {title ? <Element position={[10, -5]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>{title}</span></Element> : null}
+
+    <Element position={[0, ty]} anchor={[-1, -1]} scale={tableScale}>
+      <Box sx={{ width: tableWidth / tableScale }}>
+        <DataTable ref={tRef} data={data} showPagination={false} compact />
+      </Box>
+    </Element>
+  </Drawing>;
+}
+

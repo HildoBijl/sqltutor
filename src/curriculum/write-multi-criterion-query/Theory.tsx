@@ -57,7 +57,7 @@ WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={240} tableScale={0.7} />
       <Par>Finally, we should check if we need to remove duplicates. For the example, this is not the case, and so we keep the query as is. And with this we are done setting up the query.</Par>
-      <Info>If you're struggling to set up the query, it helps to simply follow these five steps. They usually help you to get there. And if not, then you can ask for help related to a specific step, which is far more powerful than just telling someone "I don't know how to do it."</Info>
+      <Info>If you're struggling to set up a complicated query, it helps to simply follow these five steps. They usually help you to get there. And if not, then you can ask for help related to a specific step, which is far more powerful than just telling someone "I don't know how to do it."</Info>
     </Section>
   </Page>;
 }

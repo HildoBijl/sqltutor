@@ -1,11 +1,6 @@
-import { Box } from '@mui/material';
+import { Page, Section, Par, List, Warning, Info, Term, Em, ISQL } from '@/components';
 
-import { useRefWithValue } from '@/utils/dom';
-import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
-import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
-import { DataTable, ISQL } from '@/components';
+import { FigureSingleTable } from '../components';
 
 export function Theory() {
   return <Page>
@@ -15,14 +10,15 @@ export function Theory() {
 
     <Section title="Superkey: a set of attributes uniquely identifying a row">
       <Par>Let's consider the table of all employees of a company.</Par>
-      <FigureOneTable />
+      <FigureSingleTable query={`SELECT * FROM employees;`} title="List of employees" tableWidth={800} tableScale={0.65} />
       <Par>If you want to point me to a specific row, you could try the following.</Par>
-        <List items={[
-          <>"Take the fourth row." This may fail, since the ordering is arbitrary. Maybe someone orders the rows differently, and I end up at a different row.</>,
-          <>"Take the row where the city is Palo Alto." This also fails, since there are multiple people living there.</>,
-          <>"Take the row of Paris Casteel." Now we're getting somewhere! After all, the combination of <ISQL>first_name</ISQL> and <ISQL>last_name</ISQL> seems to be unique.</>
-        ]} />
+      <List items={[
+        <>"Take the fourth row." This may fail, since the ordering is arbitrary. Maybe someone orders the rows differently, and I end up at a different row.</>,
+        <>"Take the row where the city is Palo Alto." This also fails, since there are multiple people living there.</>,
+        <>"Take the row of Paris Casteel." Now we're getting somewhere! After all, the combination of <ISQL>first_name</ISQL> and <ISQL>last_name</ISQL> seems to be unique.</>
+      ]} />
       <Par>Let's assume our table does not have duplicate rows. A <Term>superkey</Term> is a set of attributes (for instance <ISQL>{`{first_name, last_name}`}</ISQL>) whose values are unique for all rows. These attributes can be used to uniquely identify the row.</Par>
+      <Info>Just to be clear: we don't mean that <Em>every</Em> value of a superkey is unique. Not everyone has to have a different first name! We mean that the <Em>combined</Em> values are unique. We have <ISQL>{`{first_name, last_name}`}</ISQL> as a superkey if if everyone has a different combination of first and last name.</Info>
       <Par>But what if the table may have duplicate rows? In this case, there is <Em>no</Em> way of distinguishing between identical rows. But we <Em>can</Em> distinguish between non-identical rows. In this case, a <Term>superkey</Term> is a set of attributes such that, whenever two rows have the same value for <Em>these</Em> attributes, then they always have the same value for <Em>all other</Em> attributes (and are hence duplicate rows). Note that this definition extends our earlier definition, to also work for tables with duplicate rows.</Par>
     </Section>
 
@@ -39,20 +35,4 @@ export function Theory() {
       <Info>Note that the definitions of superkey and candidate key are mathematical: it is always clear which sets of attributes are superkeys and candidate keys. However, the primary key is a human choice: there could always be arguments to use one over the other.</Info>
     </Section>
   </Page>;
-}
-
-export function FigureOneTable() {
-  const db = useTheorySampleDatabase();
-  const data = useQueryResult(db?.database, 'SELECT * FROM employees;');
-  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
-  const [tRef, tBounds] = useRefWithBounds(drawingData);
-
-  return <Drawing ref={drawingRef} width={800} height={20 + (tBounds?.height || 200)} maxWidth={800}>
-    <Element position={[10, -5]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>List of employees</span></Element>
-    <Element position={[0, 20]} anchor={[-1, -1]} scale={0.65}>
-      <Box sx={{ width: 800 / 0.65 }}>
-        <DataTable ref={tRef} data={data} showPagination={false} compact />
-      </Box>
-    </Element>
-  </Drawing>;
 }
