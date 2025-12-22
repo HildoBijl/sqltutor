@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/theme';
-import { Page, Section, Par, Info, Link } from '@/components';
+import { Page, Section, Par, Info } from '@/components';
 import { Drawing, Element } from '@/components';
 import { ISQL } from '@/components';
 
@@ -8,14 +8,12 @@ import { FigureExampleQuery } from '../components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>In SQL there is a wide variety of functions that can be used to process the values in a column. This is mainly used to create new columns, but it can potentially also be used when <Link to="/skill/filter-rows" target="_self">filtering</Link> or <Link to="/skill/sort-rows">sorting</Link>.</Par>
+      <Par>In SQL there is a wide variety of functions that can be used to process the values in a column, for instance to create new columns.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,
   0.3*salary AS taxes
-FROM emp_data
-WHERE 0.3*salary < 60000
-ORDER BY taxes ASC;`} tableWidth={350} />
+FROM emp_data;`} tableWidth={350} />
       <Par>The most commonly used processing functions for numbers and text are shown below. There are far more, so whenever you want to process some values, do a quick search on which functions might come in handy.</Par>
       <FigureProcessingCommands />
       <Info>Processing functions for <ISQL>DATE</ISQL> values are also available, but they strongly differ per DBMS. Look up the specifications for your own DBMS whenever you need them.</Info>

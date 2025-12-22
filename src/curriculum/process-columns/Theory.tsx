@@ -17,19 +17,18 @@ export function Theory() {
       <Par>We know how to <Term>rename</Term> columns using the (optional) <ISQL>AS</ISQL> command, but we can take this one step further. We can <Term>process columns</Term>: manipulate and/or combine various columns to create new ones. We'll first study the general application of this idea, and then dive into the numerous ways of <Em>how</Em> to process column values.</Par>
     </Section>
 
-    <Section title="Set up and apply processed columns">
+    <Section title="Create new (processed) columns">
       <Par>Suppose that we have a list of employee data with corresponding salaries. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,
   0.3*salary AS taxes
 FROM emp_data;`} tableWidth={350} />
-      <Par>If you already know how to apply <Link to="/skill/filter-rows" target="_self">filtering</Link>: you can use calculations and such in the filter too. So you can add <ISQL>{`WHERE 0.3*salary < 20000`}</ISQL> to your query. Identically, if you already know how to apply <Link to="/skill/sort-rows">sorting</Link>: you can sort based on these calculated quantities as well. Just add <ISQL>{`ORDER BY 0.3*salary DESC`}</ISQL>. (Admittedly this is not the best example for sorting: you might as well sort by the salary then.)</Par>
-      <Info>You usually <Em>cannot</Em> use names of newly created column like <ISQL>taxes</ISQL> in your filter, because the <ISQL>WHERE</ISQL> command is executed <Em>before</Em> the <ISQL>SELECT</ISQL> command. So using <ISQL>{`WHERE taxes < 20000`}</ISQL> will likely fail. (Some DBMSs have work-arounds and do allow this.) You <Em>can</Em> use these new columns in your sorting though, like through <ISQL>ORDER BY taxes DESC</ISQL>, because the <ISQL>ORDER BY</ISQL> command is executed <Em>after</Em> the <ISQL>SELECT</ISQL> command.</Info>
+      <Par>Behind the scenes, the DBMS walks through all the rows. For each row, it performs the given calculation <ISQL>0.3*salary</ISQL>, where it uses the salary for that row. The result is then put this in the new <ISQL>taxes</ISQL> column. In this way, a new column is created within the query output.</Par>
     </Section>
 
     <Section title="Process numerical values">
-      <Par>When processing numeric columns, we mainly use arithmetic. The most common operations are the following.</Par>
+      <Par>Let's take a look at the variety of methods to process column values. When processing numeric columns, we mainly use arithmetic. The most common operations are the following.</Par>
       <List items={[
         <><Term>Addition</Term>: <ISQL>5 + 2</ISQL> becomes <ISQL>7</ISQL>.</>,
         <><Term>Subtraction</Term>: <ISQL>5 - 2</ISQL> becomes <ISQL>3</ISQL>.</>,

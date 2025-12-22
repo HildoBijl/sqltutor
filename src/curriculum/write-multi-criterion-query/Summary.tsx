@@ -6,7 +6,7 @@ import { FigureExampleQuery } from '../components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>To set up a complex multi-criterion query for a single table, there are five steps to follow. At first these steps add data, and then they start removing it, to end up with the data we need.</Par>
+      <Par>To set up a complex multi-criterion query for a single table, there are five steps to follow. At first these steps add data, and then they start removing it, to end up with the data that we need.</Par>
       <List useNumbers items={[
         <>Select all columns and where needed <Term>create extra columns</Term>.</>,
         <>Set up the <Term>filter</Term> to only get the entries required.</>,
@@ -14,7 +14,7 @@ export function Summary() {
         <><Term>Cut columns</Term> to only get the required output.</>,
         <><Term>Remove duplicates</Term> if required.</>
       ]} />
-      <Par>It is also possible to use processed column values in the <ISQL>WHERE</ISQL> and <ISQL>ORDER BY</ISQL> clauses.</Par>
+      <Par>It is also possible to use processed column values in the <ISQL>WHERE</ISQL> and <ISQL>ORDER BY</ISQL> clauses, as well as use new column names within the <ISQL>ORDER BY</ISQL> clause.</Par>
       <Quote>Find the income taxes paid per position, but only for contracts that lasted exactly one year, and only for the top 5 performance scores.</Quote>
       <FigureExampleQuery query={`SELECT
   position,

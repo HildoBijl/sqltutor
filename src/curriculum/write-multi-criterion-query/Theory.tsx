@@ -1,4 +1,4 @@
-import { Page, Section, Par, Quote, List, Warning, Info, Term } from '@/components';
+import { Page, Section, Par, Quote, List, Warning, Info, Term, Em } from '@/components';
 import { ISQL } from '@/components';
 
 import { FigureExampleQuery } from '../components';
@@ -24,15 +24,15 @@ export function Theory() {
     </Section>
 
     <Section title="Practical application of the five steps">
-      <Par>To start, we need to calculate the taxes and the contract duration. The taxes can be found through <ISQL>0.3*salary AS taxes</ISQL>. The contract duration is harder. How to do find it depends on our DBMS, so we look this up. Google or LLMs are your friend here.</Par>
-      <Par>For SQLite, there apparently is the <ISQL>JULIANDAY(date)</ISQL> function that calculates the number of days since Nov 24, 4714 BC. We can use this to find the number of days of the contract, simply by finding the difference in days. So we use <ISQL>JULIANDAY(end_date) - JULIANDAY(start_date) AS duration</ISQL>. This leads to the following query.</Par>
+      <Par>To start, we need to calculate the taxes and the contract duration. The taxes can be found through <ISQL>0.3*salary AS taxes</ISQL>. The contract duration is harder. How to do find it depends on our DBMS, so we look this up. Google and Large Language Models are your friends here.</Par>
+      <Par>For SQLite, there apparently is the <ISQL>JULIANDAY(date)</ISQL> function that calculates the number of days since Nov 24, 4714 BC. We can use this to find the number of days of the contract, simply by finding the difference in number of days. So we use <ISQL>JULIANDAY(end_date) - JULIANDAY(start_date) AS duration</ISQL>. This leads to the following query.</Par>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
   JULIANDAY(end_date) - JULIANDAY(start_date) AS duration
 FROM emp_data;`} tableWidth={800} tableScale={0.7} below />
       <Par>As second step, we want to apply the filter. We can add a <ISQL>WHERE</ISQL> clause with this newly found <ISQL>duration</ISQL>. There is one caveat though.</Par>
-      <Warning>When the DBMS evaluates the query, it starts with <ISQL>FROM</ISQL>, then applies the <ISQL>WHERE</ISQL>, then the <ISQL>SELECT</ISQL> and it ends with the <ISQL>ORDER BY</ISQL>. Newly created columns get created at the <ISQL>SELECT</ISQL> step. You therefore generally cannot use newly defined column names within the <ISQL>WHERE</ISQL> clause! So using <ISQL>duration BETWEEN 365 AND 366</ISQL> would fail. Some DBMSs do allow this through a work-around, but it's better not to count on this, and simply copy the full calculation into the <ISQL>WHERE</ISQL> clause.</Warning>
+      <Warning>When the DBMS evaluates the query, it starts with <ISQL>FROM</ISQL>, then applies the <ISQL>WHERE</ISQL>, then the <ISQL>SELECT</ISQL> and it ends with the <ISQL>ORDER BY</ISQL>. Newly created columns get created at the <ISQL>SELECT</ISQL> step. You therefore generally <Em>cannot</Em> use newly defined column names within the <ISQL>WHERE</ISQL> clause! So using <ISQL>duration BETWEEN 365 AND 366</ISQL> would fail. Some DBMSs do allow this through a work-around, but it's better not to count on this, and simply copy the full calculation into the <ISQL>WHERE</ISQL> clause.</Warning>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
