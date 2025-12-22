@@ -8,7 +8,7 @@ import { FigureExampleQuery } from '../components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>In SQL there is a wide variety of functions that can be used to process the values in a column. This is often used to create new columns, but can also be used when <Link to="/skill/filter-rows" target="_self">filtering</Link> or <Link to="/skill/sort-rows">sorting</Link>.</Par>
+      <Par>In SQL there is a wide variety of functions that can be used to process the values in a column. This is mainly used to create new columns, but it can potentially also be used when <Link to="/skill/filter-rows" target="_self">filtering</Link> or <Link to="/skill/sort-rows">sorting</Link>.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,

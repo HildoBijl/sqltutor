@@ -83,7 +83,7 @@ FROM employees;`} tableWidth={350} />
     WHEN nr_employees > 10 THEN 'medium'
     ELSE 'small'
   END AS dep_size
-FROM departments;`} shift={40} tableWidth={350} />
+FROM departments;`} tableWidth={350} />
       <Info>When using <ISQL>CASE</ISQL>, add as many <ISQL>WHEN ... THEN ...</ISQL> conditions as needed. SQL looks for the <Em>first</Em> condition that matches. If no condition matches, then the <ISQL>ELSE</ISQL> outcome is used. (Or when <ISQL>ELSE</ISQL> is omitted, then <ISQL>NULL</ISQL> is returned.)</Info>
       <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value that is not <ISQL>NULL</ISQL>. An example (albeit a not very sensible one) is the following.</Par>
       <FigureExampleQuery query={`SELECT

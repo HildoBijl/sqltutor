@@ -7,7 +7,7 @@ import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable, SQLDisplay } from '@/components';
 
-export function FigureExampleQuery({ query = '', tableWidth = 300, shift = 0 }) {
+export function FigureExampleQuery({ query = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60 }) {
   const themeColor = useThemeColor();
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
@@ -15,31 +15,45 @@ export function FigureExampleQuery({ query = '', tableWidth = 300, shift = 0 }) 
   const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 
-  // Find the table column name bounds.
+  // Find the bounds of the respective elements.
   const [eRef, eBounds] = useRefWithBounds(drawingData);
   const [tRef, tBounds] = useRefWithBounds(drawingData);
+  const we = eBounds?.width || 100;
+  const wt = tBounds?.width || 100;
+  const he = eBounds?.height || 100;
+  const ht = tBounds?.height || 100;
 
-  // Set up dimensions.
-  const w1 = eBounds?.width || 100;
-  const w2 = tBounds?.width || 100;
-  const delta = 30;
-  const width = w1 + w2 + delta;
-  const height = Math.max(eBounds?.height || 100, shift + (tBounds?.height || 200));
-  const radius = Math.min((shift + (tBounds?.height || 120) - (eBounds?.height || 0)) / 2, 60);
+  // Determine the table position.
+  const arrowBetween = below ? we + arrowRadius * 1.5 > wt : he + arrowRadius * 1.5 > ht;
+  const tx = below ? 0 : (we + (arrowBetween ? arrowLength : delta));
+  const ty = below ? (he + (arrowBetween ? arrowLength : delta)) : 0;
+
+  // Determine the arrow coordinates.
+  const arrowPoints = eBounds && tBounds && (arrowBetween ? (
+    below ? [eBounds.bottomMiddle.add([0, 4]), [eBounds.middle.x, ty + 4]]
+      : [eBounds.rightMiddle.add([4, 0]), [tx - 4, eBounds.middle.y]]
+  ) : (
+    below ? [eBounds.rightMiddle.add([4, 0]), [eBounds.right + arrowRadius, eBounds.middle.y], [eBounds.right + arrowRadius, ty - 4]]
+      : [eBounds.bottomMiddle.add([0, 4]), [eBounds.middle.x, eBounds.bottom + arrowRadius], [tx - 4, eBounds.bottom + arrowRadius]]
+  ))
+
+  // Determine the drawing size.
+  const width = below ? Math.max(we, wt) : (we + (arrowBetween ? arrowLength : delta) + wt);
+  const height = below ? he + (arrowBetween ? arrowLength : delta) + ht : Math.max(he, ht);
 
   return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width} disableSVGPointerEvents>
     <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay>{query}</SQLDisplay>
     </Element>
 
-    <Element position={[w1 + delta, shift]} anchor={[-1, -1]} scale={0.8} behind>
-      <Box sx={{ width: tableWidth / 0.8 }}>
+    <Element position={[tx, ty]} anchor={[-1, -1]} scale={tableScale} behind>
+      <Box sx={{ width: tableWidth / tableScale }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>
 
-    {eBounds && tBounds ? <>
-      <Curve points={[eBounds.bottomMiddle.add([0, 5]), [eBounds.middle.x, (tBounds.bottom + eBounds.bottom) / 2], [tBounds.left - 4, (tBounds.bottom + eBounds.bottom) / 2]]} color={themeColor} curveDistance={radius} endArrow />
+    {arrowPoints ? <>
+      <Curve points={arrowPoints} color={themeColor} curveDistance={arrowRadius} endArrow />
     </> : null}
   </Drawing>;
 }

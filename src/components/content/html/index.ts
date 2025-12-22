@@ -8,3 +8,4 @@ export * from './Link';
 export * from './List';
 export * from './Info';
 export * from './Warning';
+export * from './Quote';
