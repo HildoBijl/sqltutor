@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Warning, Info, Term, Em, Link } from '@/components';
+import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { ISQL } from '@/components';
 
 import { FigureExampleQuery } from '../queryFigures';
