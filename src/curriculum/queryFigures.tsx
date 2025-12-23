@@ -29,13 +29,13 @@ export function FigureSingleTable({ query = '', title = '', tableWidth = 800, ta
   </Drawing>;
 }
 
-export function FigureExampleQuery({ query = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60 }) {
+export function FigureExampleQuery({ query = '', actualQuery = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60 }) {
   const themeColor = useThemeColor();
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
   // Set up query data.
   const db = useTheorySampleDatabase();
-  const data = useQueryResult(db?.database, query);
+  const data = useQueryResult(db?.database, actualQuery || query);
 
   // Find the bounds of the respective elements.
   const [eRef, eBounds] = useRefWithBounds(drawingData);

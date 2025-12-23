@@ -11,9 +11,9 @@ import { DataTable } from '@/components';
 import { FigureSingleTable } from '../queryFigures';
 import { FigureTwoTables } from '../database/Theory';
 
-const adjustedManagerId = '11111111';
-const addedManagerId = '41655533';
-const adjustedDepartments = `SELECT
+export const adjustedManagerId = '11111111';
+export const addedManagerId = '41655533';
+export const adjustedDepartments = `SELECT
   d_id, d_name,
   CASE
       WHEN d_id = 2000 THEN ${adjustedManagerId}
@@ -160,7 +160,7 @@ function FigureNaturalJoin() {
   </Drawing>;
 }
 
-function FigureTwoTablesAdjusted() {
+export function FigureTwoTablesAdjusted() {
   const themeColor = useThemeColor();
 
   // Get the data.
