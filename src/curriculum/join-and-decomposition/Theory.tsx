@@ -8,7 +8,7 @@ import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 import { DataTable } from '@/components';
 
-import { FigureSingleTable } from '../components';
+import { FigureSingleTable } from '../queryFigures';
 import { FigureTwoTables } from '../database/Theory';
 
 const adjustedManagerId = '11111111';

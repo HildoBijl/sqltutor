@@ -6,6 +6,29 @@ import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable,
 import { useTheorySampleDatabase } from '@/hooks/useDatabase';
 import { useQueryResult } from '@/hooks/useQuery';
 
+export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }) {
+  // Get the data.
+  const db = useTheorySampleDatabase();
+  const data = useQueryResult(db?.database, query);
+
+  // Check out the table bounds.
+  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
+  const [tRef, tBounds] = useRefWithBounds(drawingData);
+  const ty = (title ? 20 : 0);
+  const height = ty + (tBounds?.height || 200);
+
+  // Render the drawing.
+  return <Drawing ref={drawingRef} width={tableWidth} height={height} maxWidth={tableWidth}>
+    {title ? <Element position={[10, -5]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>{title}</span></Element> : null}
+
+    <Element position={[0, ty]} anchor={[-1, -1]} scale={tableScale}>
+      <Box sx={{ width: tableWidth / tableScale }}>
+        <DataTable ref={tRef} data={data} showPagination={false} compact />
+      </Box>
+    </Element>
+  </Drawing>;
+}
+
 export function FigureExampleQuery({ query = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60 }) {
   const themeColor = useThemeColor();
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
@@ -29,8 +52,8 @@ export function FigureExampleQuery({ query = '', below = false, tableWidth = 300
 
   // Determine the arrow coordinates.
   const arrowPoints = eBounds && tBounds && (arrowBetween ? (
-    below ? [eBounds.bottomMiddle.add([0, 4]), [eBounds.middle.x, ty + 4]]
-      : [eBounds.rightMiddle.add([4, 0]), [tx - 4, eBounds.middle.y]]
+    below ? [[Math.min(eBounds.middle.x, tBounds.middle.x), eBounds.bottom + 4], [Math.min(eBounds.middle.x, tBounds.middle.x), ty - 4]]
+      : [[eBounds.right + 4, Math.min(eBounds.middle.y, tBounds.middle.y)], [tx - 4, Math.min(eBounds.middle.y, tBounds.middle.y)]]
   ) : (
     below ? [eBounds.rightMiddle.add([4, 0]), [eBounds.right + arrowRadius, eBounds.middle.y], [eBounds.right + arrowRadius, ty - 4]]
       : [eBounds.bottomMiddle.add([0, 4]), [eBounds.middle.x, eBounds.bottom + arrowRadius], [tx - 4, eBounds.bottom + arrowRadius]]
@@ -56,27 +79,3 @@ export function FigureExampleQuery({ query = '', below = false, tableWidth = 300
     </> : null}
   </Drawing>;
 }
-
-export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }) {
-  // Get the data.
-  const db = useTheorySampleDatabase();
-  const data = useQueryResult(db?.database, query);
-
-  // Check out the table bounds.
-  const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
-  const [tRef, tBounds] = useRefWithBounds(drawingData);
-  const ty = (title ? 20 : 0);
-  const height = ty + (tBounds?.height || 200);
-
-  // Render the drawing.
-  return <Drawing ref={drawingRef} width={tableWidth} height={height} maxWidth={tableWidth}>
-    {title ? <Element position={[10, -5]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>{title}</span></Element> : null}
-
-    <Element position={[0, ty]} anchor={[-1, -1]} scale={tableScale}>
-      <Box sx={{ width: tableWidth / tableScale }}>
-        <DataTable ref={tRef} data={data} showPagination={false} compact />
-      </Box>
-    </Element>
-  </Drawing>;
-}
-

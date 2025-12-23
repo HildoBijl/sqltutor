@@ -1,7 +1,7 @@
 import { Page, Section, Par, List, Term } from '@/components';
 import { ISQL } from '@/components';
 
-import { FigureSingleTable } from '../components';
+import { FigureSingleTable } from '../queryFigures';
 
 export function Summary() {
   return <Page>

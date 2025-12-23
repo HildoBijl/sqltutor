@@ -1,6 +1,6 @@
 import { Page, Section, Par, List, Warning, Info, Term, Em, ISQL } from '@/components';
 
-import { FigureSingleTable } from '../components';
+import { FigureSingleTable } from '../queryFigures';
 
 export function Theory() {
   return <Page>
