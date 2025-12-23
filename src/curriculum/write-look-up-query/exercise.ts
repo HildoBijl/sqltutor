@@ -2,31 +2,70 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 
 const EXERCISES: StaticExercise[] = [
   {
-    id: 'lookup-validator-names',
-    prompt: 'Retrieve the names of employees who appear as validators in transactions where the customer ID is the same as the vendor ID.',
+    id: 'lookup-manager-city',
+    prompt: 'Find the names of the departments whose manager lives in Palo Alto.',
     solution: `
-SELECT first_name, last_name
-FROM employees
-WHERE e_id IN (
-  SELECT validated_by
-  FROM transactions
-  WHERE buyer_id = vendor_id
+SELECT d_name
+FROM departments
+WHERE manager_id IN (
+    SELECT e_id
+    FROM employees
+    WHERE city = 'Palo Alto'
 );
     `,
   },
   {
-    id: 'lookup-before-vendor-created',
-    prompt: 'Retrieve all transactions that occurred before the corresponding vendor’s registration date.',
+    id: 'lookup-employee-position',
+    prompt: 'Find the first and last name of all employees that have ever worked as a warehouse associate.',
     solution: `
-SELECT *
-FROM transactions t
-WHERE t.date_time < (
-    SELECT a.created_at
-    FROM accounts a
-    WHERE a.acct_id = t.vendor_id
+SELECT first_name, last_name
+FROM employees
+WHERE e_id IN (
+    SELECT e_id
+    FROM emp_data
+    WHERE position = 'warehouse associate'
 );
     `,
   },
+  {
+    id: 'lookup-manager-sick',
+    prompt: 'Find the names of the departments whose manager has at some point been on sick leave.',
+    solution: `
+SELECT d_name
+FROM departments
+WHERE manager_id IN (
+    SELECT e_id
+    FROM emp_data
+    WHERE status = 'sick leave'
+);
+    `,
+  },
+  //   {
+  //     id: 'lookup-validator-names',
+  //     prompt: 'Retrieve the names of employees who appear as validators in transactions where the customer ID is the same as the vendor ID.',
+  //     solution: `
+  // SELECT first_name, last_name
+  // FROM employees
+  // WHERE e_id IN (
+  //   SELECT validated_by
+  //   FROM transactions
+  //   WHERE buyer_id = vendor_id
+  // );
+  //     `,
+  //   },
+  //   {
+  //     id: 'lookup-before-vendor-created',
+  //     prompt: 'Retrieve all transactions that occurred before the corresponding vendor’s registration date.',
+  //     solution: `
+  // SELECT *
+  // FROM transactions t
+  // WHERE t.date_time < (
+  //     SELECT a.created_at
+  //     FROM accounts a
+  //     WHERE a.acct_id = t.vendor_id
+  // );
+  //     `,
+  //   },
 ];
 
 export type ExerciseState = StaticExerciseState;

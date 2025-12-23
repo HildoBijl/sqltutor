@@ -12,6 +12,10 @@ SELECT
   phone AS number
 FROM employees;
     `,
+    comparisonOptions: {
+      requireEqualColumnNames: true,
+      requireEqualColumnOrder: false,
+    },
   },
   {
     id: 'choose-columns-department-budgets',
