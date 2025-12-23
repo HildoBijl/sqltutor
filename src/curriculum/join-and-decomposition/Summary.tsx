@@ -11,10 +11,11 @@ import { DataTable } from '@/components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>When two tables are linked through a foreign key, we can <Term>join</Term> them together into one larger table. We take the left table (which has the foreign key) and, for every foreign key, look up the reference in the right table (which the foreign key refers to). The respective columns are added to the left table to form one larger joined table.</Par>
+      <Par>When two tables are linked through a foreign key, we can <Term>join</Term> them together into one larger table. We take the left table (which has the foreign key) and, for every foreign key, we look up the reference in the right table (which the foreign key refers to). The respective columns are added to the left table to form one larger joined table.</Par>
       <FigureJoinAndDecomposition />
+      <Par>Formally a join is a <Term>Cartesian product</Term> (all possible combinations of one row from one table and another row from the other table) followed by a <Term>filter</Term> that requires the foreign keys to be equal.</Par>
       <Par>The opposite of a join is a <Term>decomposition</Term>: it splits the table back up into two separate tables. This is useful in case the larger table has duplicate data: by storing the decomposed tables, we can prevent storing duplicate data.</Par>
-      <Par>There are different types of joins. In most joins we have to manually specify through which foreign key we want to join the tables. In the <Term>natural join</Term> we do not: we implicitly state that the foreign key used to join the tables consists of all <Em>equally-named</Em> attributes. This can be a useful (though sometimes risky) short-cut.</Par>
+      <Par>Normally, when performing a join, we have to specify through which foreign key we join the tables. In the <Term>natural join</Term> we do not: we implicitly state that the foreign key used to join the tables consists of all <Em>equally-named</Em> attributes. This can be a useful (though sometimes risky) short-cut.</Par>
       <Par>When we encounter missing references in a join, there are four ways to deal with this. <List items={[
         <>In the <Term>inner join</Term> (the default method) we ignore (remove) any rows from either table that does not have a matching row from the other table.</>,
         <>In the <Term>left (outer) join</Term> we <Em>always</Em> keep the rows from the left table.</>,
@@ -68,7 +69,7 @@ function FigureJoinAndDecomposition() {
       {t2Bounds ? <>
         <Curve points={[[width / 2 - delta / 2, y2 + 4], [width / 2 - delta / 2, y3 - 4]]} color={themeColor} endArrow />
         <Element position={[width / 2 - delta / 2 - 6, (y2 + y3) / 2 - 4]} anchor={[1, 0]}><span style={{ fontWeight: 500, fontSize: '0.8em', color: themeColor }}>Join</span></Element>
-        
+
         <Curve points={[[width / 2 + delta / 2, y3 - 4], [width / 2 + delta / 2, y2 + 4]]} color={themeColor} endArrow />
         <Element position={[width / 2 + delta / 2 + 6, (y2 + y3) / 2 + 4]} anchor={[-1, 0]}><span style={{ fontWeight: 500, fontSize: '0.8em', color: themeColor }}>Decomposition</span></Element>
 
