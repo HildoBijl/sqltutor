@@ -22,7 +22,7 @@ export function Theory() {
 
     <Section title="Examples of query languages">
       <Par>So what does a query look like? This depends on the query language. There is a large variety of query languages: every DBMS pretty much has its own query language. But to get a feeling of what queries may look like, we study a few examples.</Par>
-      <Par>Suppose that we want to get a list of companies with more than 200.000 employees. In the <Term>SQL</Term> query language (the query language used by the most common/popular databases) that would be done through</Par>
+      <Par>Suppose that we want to find all employees earning more than 200.000 annually. In the <Term>SQL</Term> query language (the query language used by the most common/popular databases) that would be done through</Par>
       <Par><pre><code>{`SELECT first_name, last_name
 FROM employees
 WHERE current_salary > 200000
