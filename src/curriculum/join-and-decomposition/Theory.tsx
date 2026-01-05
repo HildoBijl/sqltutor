@@ -41,10 +41,10 @@ export function Theory() {
       <Par>When decomposing a table, we basically take three steps.</Par>
       <List useNumbers items={[
         <>Make a list of all the attributes that might potentially be repeated, and should be grouped into a separate table. For the example above, that's all employee properties, being <ISQL>{`{e_id, first_name, last_name, phone, email, address, city, hire_date, current_salary}`}</ISQL>.</>,
-        <>Set up this new separate table. When doing so, ensure there are no duplicate rows, and define the table's primary key.</>,
-        <>Remove all respective columns from the large table <Em>except</Em> the ones we put in the primary key. These are kept, to be used as foreign key. (If the primary key is present twice, obviously only include it once, with a sensible name.)</>,
+        <>Set up this new separate table. When doing so, ensure there are no duplicate rows, and define the table's primary key. For the example, we use <ISQL>e_id</ISQL> as primary key.</>,
+        <>Remove all respective columns from the large table <Em>except</Em> the ones we put in the primary key. These are kept, to be used as foreign key. In the example, we use <ISQL>e_id</ISQL> as primary key and, for clarity, rename it as <ISQL>manager_id</ISQL>.</>,
       ]} />
-      <Par>If we take these steps for the above example, we wind up with the tables we started with.</Par>
+      <Par>If we take these steps for the above example, we wind up with the two tables we started with. We effectively pulled out the right table, and the remains became the left table.</Par>
       <FigureTwoTables />
     </Section>
 
@@ -60,15 +60,15 @@ export function Theory() {
           <FigureSingleTable query={`SELECT * FROM departments, employees WHERE manager_id=e_id;`} tableScale={0.45} />
         </>,
       ]} />
-      <Info>The above definition of a join, through a Cartesian product, is a <Em>generalization</Em> of the idea we saw earlier. The look-up idea we saw earlier only works when the foreign key is unique in the second (for us <ISQL>employees</ISQL>) table. If this is not the case, for instance because multiple employees have the same employee ID, then the look-up fails. This method with the Cartesian product always works.</Info>
+      <Info>The above definition of a join, through a Cartesian product, is a <Em>generalization</Em> of the idea we saw earlier. The look-up idea we saw earlier only works when the foreign key is unique in the second (for us <ISQL>employees</ISQL>) table. If this is not the case, for instance because multiple employees have the same employee ID, then the look-up fails. This generalized method with the Cartesian product always works.</Info>
     </Section>
 
     <Section title="The natural join: require equal-named columns to be equal">
       <Par>Whenever we do a join, we have to specify how this join is performed: which foreign key is used? In other words, which attributes are required to be equal?</Par>
-      <Par>In practice, it often happens that the join is performed on attributes with the <Em>same name</Em>. When this is the case, we can apply a short-cut: the so-called natural join. A <Term>natural join</Term> is a join where we use all <Em>equally-named attributes</Em> as foreign key, linking the two tables. These equally-named attributes are then required to be equal. This saves us from having to specify on which attributes to join the tables.</Par>
+      <Par>In practice, it often happens that the join is performed on attributes with the <Em>same name</Em>. When this is the case, we can apply a short-cut: the so-called natural join. A <Term>natural join</Term> is a join where we require all <Em>equally-named attributes</Em> to be equal. Effectively, we use the equally-named attributes as foreign key. This is a trick that at times can save us from having to specify on which attributes to join the tables.</Par>
       <Par>Let's show how this works with the example from before. Currently, when we join the tables, we have to specify that <ISQL>manager_id</ISQL> from one table has to equal <ISQL>e_id</ISQL> from the other table. But what if, within the <ISQL>departments</ISQL> table, the attribute was already called <ISQL>e_id</ISQL>? In that case, we could instantly perform a natural join. We wouldn't have to specify anymore how to perform the join, as it's implicit!</Par>
       <FigureNaturalJoin />
-      <Warning>Using natural joins in practice is somewhat risky. If both tables wind up getting some other column with equal name (columns named "name", "date" or "quantity" are very common after all) then this attribute is automatically used in the join as well. The natural join requires this attribute to be equal too then! Because of this easy oversight, natural joins are in practice discouraged.</Warning>
+      <Warning>Using natural joins in practice is somewhat risky. If both tables wind up getting some other column with equal name (columns named "name", "date" or "quantity" are very common after all) then this attribute is automatically used in the join as well. The natural join requires this attribute to be equal too! Because of this easy oversight, natural joins are in practice discouraged.</Warning>
     </Section>
 
     <Section title="Outer joins: keep rows with missing references">
