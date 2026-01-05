@@ -209,6 +209,7 @@ interface SQLDisplayProps {
   onLoad?: (element: HTMLElement | null) => void;
 }
 
+// A component for pure display (no editor) of existing SQL.
 export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplayProps) {
   if (inline) {
     return (
@@ -245,6 +246,7 @@ export function SQLDisplay({ children, inline = false, ref, onLoad }: SQLDisplay
   );
 }
 
+// A short-cut component for inline SQL.
 export function ISQL(props: SQLDisplayProps) {
   return <SQLDisplay {...props} inline />
 }
