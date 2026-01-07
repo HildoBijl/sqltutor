@@ -40,14 +40,15 @@ WHERE current_salary > 200000
       <Par>You see that there is a large variety of query languages.</Par>
     </Section>
 
-    <Section title="Two branches of query languages">
-      <Par>Query languages usually consist of two parts (sublanguages) that work mostly independently from one another.</Par>
+    <Section title="Three branches of query languages">
+      <Par>Query languages usually consist of three parts (sublanguages) that work mostly independently from one another.</Par>
       <List items={[
-        <>The so-called <Term>Data Definition Language</Term> (DDL) revolves around defining the structure of data: creating tables, adjusting tables, etcetera.</>,
-        <>The <Term>Data Manipulation Language</Term> (DML) focuses on working with data: adding/updating records, retrieving the right data, and so forth.</>,
+        <>The <Term>Data Definition Language</Term> (DDL) revolves around defining the structure of data: creating tables, adjusting tables, etcetera.</>,
+        <>The <Term>Data Manipulation Language</Term> (DML) focuses on adjusting data: adding/updating/deleting records.</>,
+        <>The <Term>Data Query Language</Term> (DQL) focuses on working with existing data without modifying it: find the right data in tables, and possibly combine data from multiple tables to gain new insights.</>,
       ]} />
-      <Par>When learning a query language, you usually start with the DML, and then you continue with the DDL. But in theory you could also learn the DDL without knowing the DML.</Par>
-      <Info>Here at SQL Valley we obviously focus on the SQL query language. On top of this, we mainly focus on the DML side.</Info>
+      <Par>When learning a query language, you usually start with the DQL, move on to the DML and end with the DDL. But in theory, you can start with any part of the query language.</Par>
+      <Info>Here at SQL Valley we obviously focus on the SQL query language. On top of this, we mainly focus on the DQL side.</Info>
     </Section>
   </Page>;
 }
