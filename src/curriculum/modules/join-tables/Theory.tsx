@@ -8,7 +8,7 @@ import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable, ISQL } from '@/components';
 
-import { FigureExampleQuery } from '../queryFigures';
+import { FigureExampleQuery } from '@/curriculum/utils/queryFigures';
 import { adjustedManagerId, addedManagerId, adjustedDepartments, FigureTwoTablesAdjusted } from '../join-and-decomposition/Theory';
 
 const departmentsReplacement = `SELECT d_id, d_name, manager_id e_id, budget, nr_employees FROM departments`;

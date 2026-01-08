@@ -8,7 +8,7 @@ import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable } from '@/components';
 
-import { FigureSingleTable } from '../queryFigures';
+import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
 import { FigureTwoTables } from '../database/Theory';
 
 export const adjustedManagerId = '11111111';

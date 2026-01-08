@@ -1,7 +1,7 @@
 import { Page, Section, Par, List, Term, PrimaryKey } from '@/components';
 import { ISQL } from '@/components';
 
-import { FigureSingleTable } from '../queryFigures';
+import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
 
 export function Summary() {
   return <Page>

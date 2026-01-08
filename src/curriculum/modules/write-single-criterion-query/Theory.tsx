@@ -1,7 +1,7 @@
 import { Page, Par, List, Section, Info, Term } from '@/components';
 import { ISQL } from '@/components';
 
-import { FigureExampleQuery } from '../queryFigures';
+import { FigureExampleQuery } from '@/curriculum/utils/queryFigures';
 
 export function Theory() {
   return <Page>

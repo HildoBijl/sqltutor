@@ -8,7 +8,7 @@ import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable } from '@/components';
 
-import { FigureSingleTable } from '../queryFigures';
+import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
 
 export function Theory() {
   return <Page>

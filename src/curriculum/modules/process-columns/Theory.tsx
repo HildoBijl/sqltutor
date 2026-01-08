@@ -1,7 +1,7 @@
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { ISQL } from '@/components';
 
-import { FigureExampleQuery } from '../queryFigures';
+import { FigureExampleQuery } from '@/curriculum/utils/queryFigures';
 
 export function Theory() {
   const now = new Date();
