@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/store";
-import { raContentIndex, raContentItems } from "@/curriculum/ra/ra-index";
+import { contentIndex, contentItems } from "@/curriculum/index";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useContentProgress } from "@/learning/hooks/useContentProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
@@ -19,7 +19,7 @@ export default function RALearningOverviewPage() {
   const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
   const { isCompleted, getProgress } = useContentProgress(
-    raContentIndex,
+    contentIndex,
     components
   );
 
@@ -28,7 +28,7 @@ export default function RALearningOverviewPage() {
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
-        contentItems={raContentItems}
+        contentItems={contentItems}
         contentPositions={raContentPositions}
         treeBounds={treeBounds}
         visiblePaths={raConnectors}

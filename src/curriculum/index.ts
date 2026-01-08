@@ -84,6 +84,15 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['data-types', 'projection-and-filtering'],
   },
 
+  // Relational Algebra fundamentals.
+  {
+    id: 'relational-algebra',
+    name: 'Relational Algebra',
+    type: 'concept',
+    description: '',
+    prerequisites: ['query-language'],
+  },
+
   // SQL fundamentals.
   {
     id: 'sql',
@@ -211,6 +220,64 @@ const contentIndexRaw: ContentMetaRaw[] = [
     type: 'skill',
     description: 'How do we use SQL to shape aggregated data into a pivot table?',
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
+  },
+
+  // RA-specific skills.
+  {
+    id: 'ra-choose-columns',
+    name: 'Choose Columns',
+    type: 'skill',
+    description: '',
+    prerequisites: ['relational-algebra', 'projection-and-filtering'],
+  },
+  {
+    id: 'ra-filter-rows',
+    name: 'Filter Rows',
+    type: 'skill',
+    description: '',
+    prerequisites: ['relational-algebra', 'projection-and-filtering'],
+  },
+  {
+    id: 'ra-set-up-single-relation-query',
+    name: 'Set Up Single Relation Query',
+    type: 'skill',
+    description: '',
+    prerequisites: ['ra-choose-columns', 'ra-filter-rows'],
+  },
+  {
+    id: 'ra-join-relations',
+    name: 'Join Relations',
+    type: 'skill',
+    description: '',
+    prerequisites: ['join-and-decomposition', 'ra-filter-rows'],
+  },
+  {
+    id: 'ra-set-up-multi-condition-query',
+    name: 'Set Up Multi-Condition Query',
+    type: 'skill',
+    description: '',
+    prerequisites: ['ra-set-up-single-relation-query'],
+  },
+  {
+    id: 'ra-set-up-multi-relation-query',
+    name: 'Set Up Multi-Relation Query',
+    type: 'skill',
+    description: '',
+    prerequisites: ['ra-set-up-single-relation-query', 'ra-join-relations'],
+  },
+  {
+    id: 'ra-set-up-universal-condition-queries',
+    name: 'Set Up Universal Condition Queries',
+    type: 'skill',
+    description: '',
+    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query'],
+  },
+  {
+    id: 'ra-set-up-multi-step-queries',
+    name: 'Set Up Multi-Step Queries',
+    type: 'skill',
+    description: '',
+    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-universal-condition-queries'],
   },
 ];
 

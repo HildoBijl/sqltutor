@@ -1,4 +1,4 @@
-import { raContentItems } from "@/curriculum/ra/ra-index";
+import { contentItems } from "@/curriculum";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
 import { cardWidth, cardHeight } from "../utils/settings";
@@ -32,21 +32,20 @@ const x6 = x5 + dx;
 export const treeWidth = x6 + cardWidth / 2 + margin;
 
 // Placeholder positions for RA skill tree
-// TODO: Update these positions based on the actual tree structure from the picture
 const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
-	// Fundamental database concepts (shared with SQL tree, but with ra- prefix).
-	'ra-database': { position: { x: (x2+x3)/2, y: y1 } },
-	'ra-query-language': { position: { x: x2, y: y2 } },
-	'ra-database-table': { position: { x: x3, y: y2 } },
-	'ra-database-keys': { position: { x: x4, y: y3 } },
+	// Fundamental database concepts (shared with SQL tree)
+	'database': { position: { x: (x2+x3)/2, y: y1 } },
+	'query-language': { position: { x: x2, y: y2 } },
+	'database-table': { position: { x: x3, y: y2 } },
+	'database-keys': { position: { x: x4, y: y3 } },
 
 	// Database table manipulation concepts.
-	'ra-projection-and-filtering': { position: { x: x3, y: y3 } },
-	'ra-foreign-key': { position: { x: x4, y: y4 } },
-	'ra-join-and-decomposition': { position: { x: x4, y: y5 } },
+	'projection-and-filtering': { position: { x: x3, y: y3 } },
+	'foreign-key': { position: { x: x4, y: y4 } },
+	'join-and-decomposition': { position: { x: x4, y: y5 } },
 
 	// RA fundamentals.
-	'ra-relational-algebra': { position: { x: x2, y: y3 } },
+	'relational-algebra': { position: { x: x2, y: y3 } },
 
 	// RA-specific skills 
 	'ra-choose-columns': { position: { x: x2, y: y4 } },
@@ -69,7 +68,7 @@ export interface ContentPositionMeta extends Omit<ContentPositionMetaRaw, 'posit
 // Prepare the contentWithPosition mapping object with empty lists.
 export const raContentPositions: Record<string, ContentPositionMeta> = applyMapping(contentPositionsRaw, (positionDataRaw: ContentPositionMetaRaw, id: string) => {
 	// Verify that all skills for which positions are defined exist.
-	if (!raContentItems[id])
+	if (!contentItems[id])
 		throw new Error(`Invalid content item ID "${id}" encountered when defining content positions for the RA Skill Tree.`);
 
 	// Set up the empty shell for the skill.
@@ -88,7 +87,7 @@ Object.values(raContentPositions).forEach(positionData => {
 
 	// Determine an order for the prerequisites.
 	const prerequisiteRefPoint = position.add([0, -cardHeight / 2]);
-	positionData.prerequisitesPathOrder = raContentItems[positionData.id].prerequisites
+	positionData.prerequisitesPathOrder = contentItems[positionData.id].prerequisites
 		.filter(id => !!contentPositionsRaw[id]) // The prerequisite is in the tree.
 		.map(id => {
 			const { position } = raContentPositions[id]
@@ -102,7 +101,7 @@ Object.values(raContentPositions).forEach(positionData => {
 
 	// Determine an order for the follow-ups.
 	const followUpRefPoint = position.add([0, cardHeight / 2]);
-	positionData.followUpsPathOrder = raContentItems[positionData.id].followUps
+	positionData.followUpsPathOrder = contentItems[positionData.id].followUps
 		.filter(id => !!contentPositionsRaw[id]) // The follow-up is in the tree.
 		.map(id => {
 			const { position } = raContentPositions[id]
