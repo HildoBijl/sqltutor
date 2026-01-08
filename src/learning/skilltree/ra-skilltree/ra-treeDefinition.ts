@@ -19,6 +19,8 @@ const y5 = y4 + dy;
 const y6 = y5 + dy;
 const y7 = y6 + dy;
 const y8 = y7 + dy;
+const y9 = y8 + dy;
+const y5_5 = (y3 + y6) / 2;
 export const treeHeight = y8 + cardHeight / 2 + margin;
 
 const dx = cardWidth * 1.5;
@@ -48,14 +50,14 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	'relational-algebra': { position: { x: x2, y: y3 } },
 
 	// RA-specific skills 
-	'ra-choose-columns': { position: { x: x2, y: y4 } },
-	'ra-filter-rows': { position: { x: x3, y: y4 } },
-	'ra-set-up-single-relation-query': { position: { x: x2, y: y5 } },
-	'ra-join-relations': { position: { x: x3, y: y5 } },
-	'ra-set-up-multi-condition-query': { position: { x: x2, y: y6 } },
-	'ra-set-up-multi-relation-query': { position: { x: x3, y: y6 } },
-	'ra-set-up-universal-condition-queries': { position: { x: (x2+x3)/2, y: y7 } },
-	'ra-set-up-multi-step-queries': { position: { x: (x2+x3)/2, y: y8 } },
+	'ra-choose-columns': { position: { x: x2, y: y5_5 } },
+	'ra-filter-rows': { position: { x: x3, y: y5_5 } },
+	'ra-set-up-single-relation-query': { position: { x: x2, y: y6 } },
+	'ra-join-relations': { position: { x: x3, y: y6 } },
+	'ra-set-up-multi-condition-query': { position: { x: x2, y: y7 } },
+	'ra-set-up-multi-relation-query': { position: { x: x3, y: y7 } },
+	'ra-set-up-universal-condition-query': { position: { x: (x2+x3)/2, y: y9 } },
+	'ra-set-up-multi-step-query': { position: { x: (x2+x3)/2, y: y8 } },
 }
 
 export interface ContentPositionMeta extends Omit<ContentPositionMetaRaw, 'position'> {

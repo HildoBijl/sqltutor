@@ -266,18 +266,18 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['ra-set-up-single-relation-query', 'ra-join-relations'],
   },
   {
-    id: 'ra-set-up-universal-condition-queries',
-    name: 'Set Up Universal Condition Queries',
+    id: 'ra-set-up-universal-condition-query',
+    name: 'Set Up Universal Condition Query',
     type: 'skill',
     description: '',
     prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query'],
   },
   {
-    id: 'ra-set-up-multi-step-queries',
-    name: 'Set Up Multi-Step Queries',
+    id: 'ra-set-up-multi-step-query',
+    name: 'Set Up Multi-Step Query',
     type: 'skill',
     description: '',
-    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-universal-condition-queries'],
+    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query'],
   },
 ];
 
