@@ -256,7 +256,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     name: 'Set Up Multi-Condition Query',
     type: 'skill',
     description: '',
-    prerequisites: ['ra-set-up-single-relation-query'],
+    prerequisites: ['ra-set-up-single-relation-query', 'foreign-key'],
   },
   {
     id: 'ra-set-up-multi-relation-query',
@@ -270,7 +270,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     name: 'Set Up Universal Condition Query',
     type: 'skill',
     description: '',
-    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query'],
+    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-multi-step-query'],
   },
   {
     id: 'ra-set-up-multi-step-query',

@@ -20,7 +20,7 @@ const y6 = y5 + dy;
 const y7 = y6 + dy;
 const y8 = y7 + dy;
 const y9 = y8 + dy;
-const y5_5 = (y3 + y6) / 2;
+const y5_5 = y4 + dy / 2;
 export const treeHeight = y8 + cardHeight / 2 + margin;
 
 const dx = cardWidth * 1.5;
