@@ -1,13 +1,12 @@
-// Core hooks for the application
-export { useDatabase } from './useDatabase';
+/**
+ * General-purpose hooks (not database-specific).
+ */
 
-// Import React hooks for local use within this module,
-// then re-export them for convenience from this index.
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 export { useState, useEffect, useCallback, useMemo, useRef };
 
 /**
- * useDebounce - Debounce a value
+ * Debounce a value by the specified delay.
  */
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);

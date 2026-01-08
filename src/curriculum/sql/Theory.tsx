@@ -3,8 +3,8 @@ import { Box } from '@mui/material';
 import { useRefWithValue } from '@/utils/dom';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, useRefWithBounds } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
+import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable, ISQL, SQLDisplay } from '@/components';
 
 export function Theory() {

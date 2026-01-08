@@ -3,8 +3,8 @@ import { Box } from '@mui/material';
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable, SQLDisplay } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
+import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@/components/sql/sqljs';
 
 export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }) {
   // Get the data.

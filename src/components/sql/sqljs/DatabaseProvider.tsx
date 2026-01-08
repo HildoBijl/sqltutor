@@ -1,29 +1,24 @@
+/**
+ * Database instance manager provider.
+ * Creates and manages SQL.js database instances with caching and lifecycle management.
+ */
+
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
-
 import { useSQLJS } from './SQLJSProvider';
-import type { DatasetSize } from '@/mockData';
-
-interface ManagedDatabase {
-  instance: any | null;
-  persistent: boolean;
-  createdAt: number | null;
-  contentId?: string;
-  size?: DatasetSize;
-}
+import type { ManagedDatabase, GetDatabaseOptions } from './types';
 
 type DatabaseState = Record<string, ManagedDatabase | null>;
 
-interface GetDatabaseOptions {
-  persistent?: boolean;
-  contentId?: string;
-  size?: DatasetSize;
-}
-
 interface DatabaseContextValue {
+  /** Current database instances */
   databases: DatabaseState;
+  /** Get or create a database with the given key and schema */
   getDatabase: (key: string, schema: string, options?: GetDatabaseOptions) => any | null;
+  /** Reset (close and remove) a specific database */
   resetDatabase: (key: string) => void;
+  /** Reset all databases */
   resetAllDatabases: () => void;
+  /** Whether SQL.js is ready */
   isReady: boolean;
 }
 
@@ -45,7 +40,6 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   const SQLJS = useSQLJS();
   const [databases, setDatabases] = useState<DatabaseState>({});
   const databasesRef = useRef<DatabaseState>({});
-
   const [isReady, setIsReady] = useState(false);
 
   // Initialize readiness when SQLJS is available
@@ -53,7 +47,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     setIsReady(!!SQLJS);
   }, [SQLJS]);
 
-  // Create a database with the given schema and context-specific setup
+  // Create a database with the given schema
   const createDatabase = useCallback((schema: string) => {
     if (!SQLJS) return null;
 
@@ -75,7 +69,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     });
   }, []);
 
-  // Get or create a database for the given context key and schema
+  // Get or create a database for the given key and schema
   const getDatabase = useCallback((key: string, schema: string, options?: GetDatabaseOptions) => {
     const existing = databasesRef.current[key];
     if (existing?.instance) {
@@ -87,8 +81,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       ? {
           instance: newInstance,
           persistent: options?.persistent ?? false,
-          contentId: options?.contentId,
-          size: options?.size,
+          metadata: options?.metadata,
           createdAt: Date.now(),
         }
       : null;
@@ -101,7 +94,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     return newInstance;
   }, [createDatabase, updateDatabases]);
 
-  // Reset a specific database context
+  // Reset a specific database
   const resetDatabase = useCallback((key: string) => {
     const entry = databasesRef.current[key];
     if (entry?.instance && typeof entry.instance.close === 'function') {
@@ -165,15 +158,14 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Keep persistent databases alive; cleanup transient DBs only
       resetTransientDatabases();
     };
   }, [resetTransientDatabases]);
 
   // Auto-cleanup: drop transient databases older than 30 minutes
   useEffect(() => {
-    const CHECK_INTERVAL_MS = 60_000; // 1 minute
-    const MAX_AGE_MS = 30 * 60_000; // 30 minutes
+    const CHECK_INTERVAL_MS = 60_000;
+    const MAX_AGE_MS = 30 * 60_000;
 
     const interval = setInterval(() => {
       const now = Date.now();
@@ -194,9 +186,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
         keysToRemove.push(key);
       });
 
-      if (keysToRemove.length === 0) {
-        return;
-      }
+      if (keysToRemove.length === 0) return;
 
       updateDatabases((prev) => {
         const next = { ...prev };
@@ -210,7 +200,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     return () => clearInterval(interval);
   }, [updateDatabases]);
 
-  // Cleanup on tab visibility change (keep playground persistent)
+  // Cleanup on tab visibility change
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.hidden) {

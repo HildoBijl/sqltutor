@@ -4,8 +4,8 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Em, ISQL } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, Rectangle, useRefWithBounds, useTextNodeBounds } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
+import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable } from '@/components';
 
 import { FigureSingleTable } from '../queryFigures';

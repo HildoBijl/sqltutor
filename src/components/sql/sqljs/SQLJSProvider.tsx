@@ -1,3 +1,8 @@
+/**
+ * SQL.js WASM loader provider.
+ * Initializes SQL.js and provides the instance to child components.
+ */
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import initSqlJs from 'sql.js';
 import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';

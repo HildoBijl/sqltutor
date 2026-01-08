@@ -4,8 +4,8 @@ import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Warning, Info, Term, Em } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
+import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable, ISQL } from '@/components';
 
 export function Theory() {

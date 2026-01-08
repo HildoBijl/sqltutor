@@ -6,8 +6,8 @@ import { useThemeColor } from '@/theme';
 import { type DrawingData, Drawing, Element, Curve, useTextNodeBounds, useRefWithBounds } from '@/components';
 import { Page, Section, Par } from '@/components';
 import { SQLDisplay } from '@/components';
-import { useTheorySampleDatabase } from '@/hooks/useDatabase';
-import { useQueryResult } from '@/hooks/useQuery';
+import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@/components/sql/sqljs';
 import { DataTable } from '@/components';
 
 export function Summary() {

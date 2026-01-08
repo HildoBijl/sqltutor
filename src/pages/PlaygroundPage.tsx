@@ -19,7 +19,7 @@ import {
   Refresh,
 } from '@mui/icons-material';
 import { SQLEditor, DataTable } from '@/components';
-import { usePlaygroundDatabase } from '@/hooks/useDatabase';
+import { usePlaygroundDatabase } from '@/learning/databases';
 import {
   useComponentState,
   type PlaygroundComponentState,

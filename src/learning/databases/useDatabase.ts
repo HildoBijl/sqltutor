@@ -1,12 +1,12 @@
+/**
+ * SQL-Valley specific database hook.
+ * Knows about content, tables, and sizes - wraps the generic SQL.js functionality.
+ */
+
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { useDatabaseContext } from '@/providers/DatabaseProvider';
+import { useDatabaseContext, type QueryResult } from '@/components/sql/sqljs';
 import { buildSchema, getCompletionSchemaForTables, type DatasetSize, type TableKey } from '@/mockData';
 import { getContentTables, getContentSize } from '@/curriculum/utils/contentAccess';
-
-export interface QueryResult {
-  columns: string[];
-  values: any[][];
-}
 
 interface DatabaseOptions {
   /** Content ID (skill or concept) to determine tables and size */
@@ -106,7 +106,6 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     const shouldResetForSchema = resetOnSchemaChange && schemaChanged;
 
     if (shouldResetForSchema && providerDb) {
-      // Only reset early if there is an existing provider DB to close
       resetContextDatabase(contextKey);
       setDatabase(null);
       return;
@@ -116,8 +115,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     if (!providerDb) {
       const db = getDatabase(contextKey, resolvedSchema, {
         persistent,
-        contentId,
-        size: resolvedSize,
+        metadata: { contentId, size: resolvedSize },
       });
       setDatabase(db);
       setCurrentSchema(resolvedSchema);
@@ -192,7 +190,6 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
         if (err instanceof Error) return err.message;
         if (typeof err === 'string') return err;
         try {
-          // sql.js sometimes throws objects; best-effort stringify
           return (err as any)?.message ?? JSON.stringify(err);
         } catch {
           return 'Query execution failed';
@@ -210,7 +207,6 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
   // Reset current database
   const resetDatabase = useCallback(() => {
     resetContextDatabase(contextKey);
-    // Clear local ref so effect reinitializes a new DB instance
     setDatabase(null);
     clearQueryState();
     setError(null);
@@ -231,7 +227,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
   };
 }
 
-// Convenience hook for playground
+/** Playground database - full dataset, persistent */
 export function usePlaygroundDatabase() {
   return useDatabase({
     contentId: 'playground',
@@ -241,7 +237,7 @@ export function usePlaygroundDatabase() {
   });
 }
 
-// Convenience hook for concept pages (uses small dataset)
+/** Concept pages - small dataset */
 export function useConceptDatabase() {
   return useDatabase({
     size: 'small',
@@ -249,7 +245,7 @@ export function useConceptDatabase() {
   });
 }
 
-// Convenience hook for skill practice
+/** Skill practice - content-specific tables */
 export function useSkillDatabase(skillId: string) {
   return useDatabase({
     contentId: skillId,
@@ -257,11 +253,11 @@ export function useSkillDatabase(skillId: string) {
   });
 }
 
-// Small, sample-friendly database for theory examples across all tables.
+/** Theory examples - all tables with small dataset */
 export function useTheorySampleDatabase() {
   return useDatabase({
-    contentId: 'playground', // Use all tables
-    size: 'small',           // But with small dataset
+    contentId: 'playground',
+    size: 'small',
     resetOnSchemaChange: true,
   });
 }
