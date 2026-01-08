@@ -25,7 +25,7 @@ import {
   type PlaygroundComponentState,
   type QueryHistory,
   type SavedQuery,
-} from '@/store';
+} from '@/learning/store';
 
 export default function PlaygroundPage() {
   const [query, setQuery] = useState('SELECT * FROM employees LIMIT 10;');

@@ -1,4 +1,4 @@
-import type { StoredAttempt, StoredExerciseState } from '@/store/types';
+import type { StoredAttempt, StoredExerciseState } from '@/learning/store/types';
 import type { PracticeSolution, PracticeSolutionLike } from '../types';
 
 export * from './resultComparison';

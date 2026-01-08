@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/types';
-import type { SkillComponentState } from '@/store';
+import type { SkillComponentState } from '@/learning/store';
 import { useDatabase } from '@/learning/databases';
 import {
   useSkillExerciseState,

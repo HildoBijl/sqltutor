@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button } from '@mui/material';
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit} from '@mui/icons-material';
 
-import { useAppStore, type SkillComponentState } from '@/store';
+import { useAppStore, type SkillComponentState } from '@/learning/store';
 
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useSkillContent } from '@/learning/hooks/useSkillContent';

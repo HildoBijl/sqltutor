@@ -1,5 +1,5 @@
 import type { ContentMeta } from '@/curriculum';
-import type { ComponentState } from '@/store';
+import type { ComponentState } from '@/learning/store';
 import { EXERCISES_TO_COMPLETE } from '@/constants';
 
 interface ProcessedProgress {

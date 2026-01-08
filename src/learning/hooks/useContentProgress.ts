@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import type { ContentMeta } from "@/curriculum";
-import type { ComponentState } from "@/store";
+import type { ComponentState } from "@/learning/store";
 import { processProgress } from "@/learning/utils/processProgress";
 
 
