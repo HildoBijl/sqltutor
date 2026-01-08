@@ -1,22 +1,24 @@
-import type { DatabaseRole, DatasetSize } from './types';
-import type { TableKey } from './tableDefinitions';
+/**
+ * Content access configuration - maps content IDs to their required tables and dataset sizes.
+ */
 
-type RoleSpecificTables = Partial<Record<DatabaseRole, TableKey[]>>;
-type ContentTableConfig = TableKey[] | RoleSpecificTables;
+import type { TableKey } from '@/mockData/tables';
+import type { DatasetSize } from '@/mockData/types';
 
-const DEFAULT_ROLE_TABLES: Record<DatabaseRole, TableKey[]> = {
-  display: ['employees'],
-  grading: ['employees'],
-  theory: ['employees'],
-};
+/**
+ * Default tables when no content-specific config exists.
+ */
+const DEFAULT_TABLES: TableKey[] = ['employees'];
 
-const DEFAULT_ROLE_SIZES: Record<DatabaseRole, DatasetSize> = {
-  display: 'medium',
-  grading: 'large',
-  theory: 'small',
-};
+/**
+ * Default dataset size for content.
+ */
+const DEFAULT_SIZE: DatasetSize = 'small';
 
-const contentTableAccess: Record<string, ContentTableConfig> = {
+/**
+ * Tables required for each content ID (skill or concept).
+ */
+const contentTableAccess: Record<string, TableKey[]> = {
   default: ['employees'],
   playground: ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
   // Skills
@@ -37,32 +39,28 @@ const contentTableAccess: Record<string, ContentTableConfig> = {
   'write-multi-layered-query': ['departments', 'employees', 'emp_data', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
 };
 
-const contentSizeOverrides: Record<string, Partial<Record<DatabaseRole, DatasetSize>>> = {
-  playground: {
-    display: 'medium',
-    grading: 'large',
-  },
+/**
+ * Size overrides for specific content.
+ */
+const contentSizeOverrides: Record<string, DatasetSize> = {
+  playground: 'full',
 };
 
-function getTablesConfig(role: DatabaseRole, contentId?: string): TableKey[] | undefined {
-  if (!contentId) return undefined;
-  const config = contentTableAccess[contentId];
-  if (!config) return undefined;
-  if (Array.isArray(config)) {
-    return config;
-  }
-  return config[role];
+/**
+ * Get the tables required for a given content ID.
+ */
+export function getContentTables(contentId?: string): TableKey[] {
+  if (!contentId) return DEFAULT_TABLES;
+  return contentTableAccess[contentId] ?? DEFAULT_TABLES;
 }
 
-export function resolveContentTables(role: DatabaseRole, contentId?: string): TableKey[] {
-  return getTablesConfig(role, contentId) ?? DEFAULT_ROLE_TABLES[role];
-}
-
-export function resolveContentSize(role: DatabaseRole, contentId?: string, override?: DatasetSize): DatasetSize {
+/**
+ * Get the dataset size for a given content ID.
+ */
+export function getContentSize(contentId?: string, override?: DatasetSize): DatasetSize {
   if (override) return override;
-  if (contentId) {
-    const size = contentSizeOverrides[contentId]?.[role];
-    if (size) return size;
+  if (contentId && contentSizeOverrides[contentId]) {
+    return contentSizeOverrides[contentId];
   }
-  return DEFAULT_ROLE_SIZES[role];
+  return DEFAULT_SIZE;
 }

@@ -1,3 +1,7 @@
+/**
+ * Central registry of all table definitions.
+ */
+
 import { accountsTable } from './accounts';
 import { departmentsTable } from './departments';
 import { empDataTable } from './emp_data';
@@ -7,7 +11,7 @@ import { expensesTable } from './expenses';
 import { productsTable } from './products';
 import { quarterlyPerformanceTable } from './quarterly_performance';
 import { transactionsTable } from './transactions';
-import type { TableDefinition } from './types';
+import type { TableDefinition } from '../types';
 
 export const tableDefinitions = {
   employees: employeesTable,

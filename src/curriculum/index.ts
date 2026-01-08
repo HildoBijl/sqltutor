@@ -1,6 +1,5 @@
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
-import type { SchemaKey } from '@/mockData';
 // @ts-ignore - util is a JavaScript module without type definitions
 import { keysToObject } from '@/utils';
 
@@ -12,7 +11,6 @@ export interface ContentMetaRaw {
   type: ContentType;
   description: string;
   prerequisites: string[];
-  database?: SchemaKey;
 }
 
 // The contentIndexRaw contains all definitions of content items, before being processed into more derived objects.
@@ -307,3 +305,6 @@ export const skillExerciseLoaders = Object.fromEntries(
     return entries;
   }, []),
 ) as Record<string, SkillExerciseLoader>;
+
+// Re-export utilities
+export { getContentTables, getContentSize } from './utils/contentAccess';

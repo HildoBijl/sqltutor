@@ -85,6 +85,7 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
+  // Display database (small dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,
     queryResult,
@@ -96,19 +97,21 @@ export function useSkillExerciseController({
     resetDatabase: resetDisplayDatabase,
     clearQueryState,
   } = useDatabase({
-    role: 'display',
-    skillId,
+    contentId: skillId,
+    size: 'small',
     resetOnSchemaChange: true,
   });
 
+  // Grading database (full dataset for verification)
   const {
     database: gradingDatabase,
     executeQuery: executeGradingQuery,
     isReady: gradingDbReady,
     resetDatabase: resetGradingDatabase,
   } = useDatabase({
-    role: 'grading',
-    skillId,
+    contentId: skillId,
+    size: 'full',
+    cacheKey: `${skillId}:grading`,
     resetOnSchemaChange: true,
   });
 

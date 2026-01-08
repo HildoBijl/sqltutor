@@ -1,6 +1,11 @@
-import { DEFAULT_ROW_LIMITS } from './constants';
-import type { DatasetSize, DatabaseRole, SqlCell, TableDefinition } from './types';
+/**
+ * CSV parsing utilities and value converters.
+ */
 
+/**
+ * Parse a raw CSV string into an array of records.
+ * Each record is an object mapping column headers to string values.
+ */
 export function parseCsv(raw: string): Record<string, string>[] {
   if (!raw) return [];
   const source = raw.replace(/^\uFEFF/, '');
@@ -65,6 +70,9 @@ export function parseCsv(raw: string): Record<string, string>[] {
     .filter((entry) => headers.some((header) => (entry[header] ?? '').trim().length > 0));
 }
 
+/**
+ * Convert a string value to a number, or null if invalid/empty.
+ */
 export function numberOrNull(value: string | undefined): number | null {
   if (!value) return null;
   const normalized = value.replace(/[^0-9.-]/g, '');
@@ -73,6 +81,9 @@ export function numberOrNull(value: string | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+/**
+ * Convert a string value to a boolean, or null if invalid/empty.
+ */
 export function booleanOrNull(value: string | undefined): boolean | null {
   if (!value) return null;
   const normalized = value.trim().toLowerCase();
@@ -81,59 +92,20 @@ export function booleanOrNull(value: string | undefined): boolean | null {
   return null;
 }
 
+/**
+ * Trim a string value, returning null if empty.
+ */
 export function stringOrNull(value: string | undefined): string | null {
   const trimmed = (value ?? '').trim();
   return trimmed.length === 0 ? null : trimmed;
 }
 
+/**
+ * Convert a string value to a numeric ID or keep as string ID, or null if empty.
+ */
 export function idOrNull(value: string | undefined): number | string | null {
   const trimmed = (value ?? '').trim();
   if (!trimmed) return null;
   const numeric = Number(trimmed);
   return Number.isFinite(numeric) ? numeric : trimmed;
-}
-
-export function formatSqlValue(value: SqlCell): string {
-  if (value === null || (typeof value === 'number' && !Number.isFinite(value))) {
-    return 'NULL';
-  }
-  if (typeof value === 'number') {
-    return String(value);
-  }
-  if (typeof value === 'boolean') {
-    return value ? '1' : '0';
-  }
-  return `'${String(value).replace(/'/g, "''")}'`;
-}
-
-export function buildInsertStatement(table: string, rows: SqlCell[][]): string {
-  if (rows.length === 0) return '';
-  const values = rows
-    .map((row) => `(${row.map(formatSqlValue).join(', ')})`)
-    .join(',\n    ');
-
-  return `INSERT INTO ${table} VALUES\n    ${values};`;
-}
-
-export function resolveDefinitionForRole(definition: TableDefinition, role?: DatabaseRole): TableDefinition {
-  if (!role || !definition.roleOverrides?.[role]) {
-    return definition;
-  }
-  const override = definition.roleOverrides[role]!;
-  return {
-    name: definition.name,
-    createStatement: override.createStatement ?? definition.createStatement,
-    rows: override.rows ?? definition.rows,
-    rowLimits: override.rowLimits ?? definition.rowLimits,
-  };
-}
-
-export function getRowsForSize(definition: TableDefinition, size?: DatasetSize): SqlCell[][] {
-  const rows = Array.isArray(definition.rows) ? definition.rows : Array.from(definition.rows);
-  if (!size) return rows.map((row) => [...row]);
-  const limit = definition.rowLimits?.[size] ?? DEFAULT_ROW_LIMITS[size];
-  if (!Number.isFinite(limit)) {
-    return rows.map((row) => [...row]);
-  }
-  return rows.slice(0, limit).map((row) => [...row]);
 }
