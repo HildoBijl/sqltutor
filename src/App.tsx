@@ -2,7 +2,7 @@ import { StrictMode, useEffect, useMemo } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { router } from './router';
+import { router } from './navigation';
 import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider, DatabaseProvider } from './components/sql/sqljs';
 import { ErrorBoundary } from './components';

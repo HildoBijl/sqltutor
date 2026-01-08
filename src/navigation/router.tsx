@@ -2,13 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import { Suspense } from "react";
 import { LoadingScreen, ErrorBoundary } from "@/components";
 
-// Import components
-import HomePage from "@/pages/HomePage";
-import LearningOverviewPage from "@/pages/LearningOverviewPage";
-import ConceptPage from "@/pages/ConceptPage";
-import SkillPage from "@/pages/SkillPage";
-import PlaygroundPage from "@/pages/PlaygroundPage";
-import { Layout } from "@/layout/Layout";
+import HomePage from "./pages/HomePage";
+import LearningOverviewPage from "./pages/LearningOverviewPage";
+import ConceptPage from "./pages/ConceptPage";
+import SkillPage from "./pages/SkillPage";
+import PlaygroundPage from "./pages/PlaygroundPage";
+import { Layout } from "./layout/Layout";
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
