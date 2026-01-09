@@ -4,6 +4,7 @@ import { LoadingScreen, ErrorBoundary } from "@/components";
 
 import HomePage from "./pages/HomePage";
 import LearningOverviewPage from "./pages/LearningOverviewPage";
+import RALearningOverviewPage from "./pages/ra-LearningOverviewPage";
 import ConceptPage from "./pages/ConceptPage";
 import SkillPage from "./pages/SkillPage";
 import PlaygroundPage from "./pages/PlaygroundPage";
@@ -43,6 +44,14 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrapper>
             <LearningOverviewPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "learn-ra",
+        element: (
+          <SuspenseWrapper>
+            <RALearningOverviewPage />
           </SuspenseWrapper>
         ),
       },
