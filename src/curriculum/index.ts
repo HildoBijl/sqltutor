@@ -82,15 +82,6 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['data-types', 'projection-and-filtering'],
   },
 
-  // Relational Algebra fundamentals.
-  {
-    id: 'relational-algebra',
-    name: 'Relational Algebra',
-    type: 'concept',
-    description: '',
-    prerequisites: ['query-language'],
-  },
-
   // SQL fundamentals.
   {
     id: 'sql',
@@ -220,62 +211,73 @@ const contentIndexRaw: ContentMetaRaw[] = [
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
   },
 
-  // RA-specific skills.
+  // Relational Algebra fundamentals.
+  {
+    id: 'relational-algebra',
+    name: 'Relational Algebra',
+    type: 'concept',
+    description: 'What is the relational algebra query language, and what should I know about it?',
+    prerequisites: ['query-language'],
+  },
   {
     id: 'ra-choose-columns',
     name: 'Choose Columns',
     type: 'skill',
-    description: '',
+    description: 'How do we use relational algebra to select attributes from a relation?',
     prerequisites: ['relational-algebra', 'projection-and-filtering'],
   },
   {
     id: 'ra-filter-rows',
     name: 'Filter Rows',
     type: 'skill',
-    description: '',
+    description: 'How do we use relational algebra to filter the tuples in a relation based on some condition?',
     prerequisites: ['relational-algebra', 'projection-and-filtering'],
   },
   {
     id: 'ra-set-up-single-relation-query',
-    name: 'Set Up Single Relation Query',
+    name: 'Set Up Single-Relation Query',
     type: 'skill',
-    description: '',
+    description: 'How do we write basic relational algebra queries for a single relation?',
     prerequisites: ['ra-choose-columns', 'ra-filter-rows'],
+  },
+
+  // Relational algebra multi-relation queries.
+  {
+    id: 'ra-set-up-multi-condition-query',
+    name: 'Set Up Multi-Condition Query',
+    type: 'skill',
+    description: 'How do we combine multiple conditions, possibly on different relations, in one query?',
+    prerequisites: ['ra-set-up-single-relation-query', 'foreign-key'],
   },
   {
     id: 'ra-join-relations',
     name: 'Join Relations',
     type: 'skill',
-    description: '',
+    description: 'How do use relational algebra to join two tables together?',
     prerequisites: ['join-and-decomposition', 'ra-filter-rows'],
-  },
-  {
-    id: 'ra-set-up-multi-condition-query',
-    name: 'Set Up Multi-Condition Query',
-    type: 'skill',
-    description: '',
-    prerequisites: ['ra-set-up-single-relation-query', 'foreign-key'],
   },
   {
     id: 'ra-set-up-multi-relation-query',
     name: 'Set Up Multi-Relation Query',
     type: 'skill',
-    description: '',
+    description: 'How do we write relational algebra queries on a combination of different relations?',
     prerequisites: ['ra-set-up-single-relation-query', 'ra-join-relations'],
+  },
+
+  // Advanced relational algebra queries.
+  {
+    id: 'ra-set-up-multi-step-query',
+    name: 'Set Up Multi-Step Query',
+    type: 'skill',
+    description: 'How do we set up complex relational algebra queries involving multiple steps?',
+    prerequisites: ['ra-set-up-multi-condition-query', 'ra-set-up-multi-relation-query'],
   },
   {
     id: 'ra-set-up-universal-condition-query',
     name: 'Set Up Universal Condition Query',
     type: 'skill',
-    description: '',
+    description: 'How do we set up relational algebra queries involving "for all" quantifiers and similar?',
     prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-multi-step-query'],
-  },
-  {
-    id: 'ra-set-up-multi-step-query',
-    name: 'Set Up Multi-Step Query',
-    type: 'skill',
-    description: '',
-    prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query'],
   },
 ];
 
