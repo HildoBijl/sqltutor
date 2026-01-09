@@ -1,4 +1,4 @@
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/learning/store";
 import { contentItems } from "@/curriculum";
 
 /**

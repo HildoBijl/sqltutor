@@ -21,7 +21,7 @@ import {
   type StoredExerciseEvent,
   type StoredExerciseInstance,
   type StoredExerciseState,
-} from '@/store';
+} from '@/learning/store';
 import type { PracticeSolutionLike, PracticeSolution } from './types';
 import { normalizePracticeSolution } from './utils/normalizePracticeSolution';
 

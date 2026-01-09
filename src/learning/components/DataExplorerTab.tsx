@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/components';
-import { useDatabase } from '@/hooks/useDatabase';
+import { useDatabase } from '@/learning/databases';
 import { buildSchema } from '@/mockData';
 import { getContentTables, getContentSize } from '@/curriculum/utils/contentAccess';
 

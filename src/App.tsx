@@ -2,12 +2,11 @@ import { StrictMode, useEffect, useMemo } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { router } from './router';
+import { router } from './navigation';
 import { getTheme, ColorModeContext } from './theme';
-import { SQLJSProvider } from './providers/SQLJSProvider';
-import { DatabaseProvider } from './providers/DatabaseProvider';
+import { SQLJSProvider, DatabaseProvider } from './components/sql/sqljs';
 import { ErrorBoundary } from './components';
-import { useAppStore, useIsStoreReady } from './store';
+import { useAppStore, useIsStoreReady } from './learning/store';
 
 export function App() {
   const mode = useAppStore((s) => s.currentTheme);
