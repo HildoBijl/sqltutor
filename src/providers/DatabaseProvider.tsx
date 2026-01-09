@@ -1,14 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 
 import { useSQLJS } from './SQLJSProvider';
-import type { DatabaseRole, DatasetSize } from '@/mockData';
+import type { DatasetSize } from '@/mockData';
 
 interface ManagedDatabase {
   instance: any | null;
   persistent: boolean;
   createdAt: number | null;
-  role?: DatabaseRole;
-  skillId?: string;
+  contentId?: string;
   size?: DatasetSize;
 }
 
@@ -16,8 +15,7 @@ type DatabaseState = Record<string, ManagedDatabase | null>;
 
 interface GetDatabaseOptions {
   persistent?: boolean;
-  role?: DatabaseRole;
-  skillId?: string;
+  contentId?: string;
   size?: DatasetSize;
 }
 
@@ -89,8 +87,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
       ? {
           instance: newInstance,
           persistent: options?.persistent ?? false,
-          role: options?.role,
-          skillId: options?.skillId,
+          contentId: options?.contentId,
           size: options?.size,
           createdAt: Date.now(),
         }

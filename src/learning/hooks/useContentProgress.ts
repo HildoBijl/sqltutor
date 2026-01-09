@@ -1,5 +1,7 @@
-import { useMemo } from "react";
-import { ContentMeta } from "@/curriculum";
+import { useCallback, useMemo } from "react";
+import type { ContentMeta } from "@/curriculum";
+import type { ComponentState } from "@/store";
+import { processProgress } from "@/learning/utils/processProgress";
 
 
 /*
@@ -9,7 +11,10 @@ import { ContentMeta } from "@/curriculum";
 * @param components - Object mapping content item IDs to their progress data.
 * @returns An object with concepts, skills, isCompleted, getProgress, completedConcepts, and completedSkills.
 */
-export function useContentProgress(contentItems: ContentMeta[], components: any) {
+export function useContentProgress(
+  contentItems: ContentMeta[],
+  components: Record<string, ComponentState>,
+) {
   const concepts = useMemo(
     () => contentItems.filter((item) => item.type === "concept"),
     [contentItems]
@@ -20,33 +25,44 @@ export function useContentProgress(contentItems: ContentMeta[], components: any)
     [contentItems]
   );
 
-  const isCompleted = (id: string) => {
-    const component = components[id];
-    if (!component) return false;
+  const processed = useMemo(
+    () => processProgress(contentItems, components),
+    [contentItems, components],
+  );
 
-    // For concepts, check if understood
-    if (concepts.find((c) => c.id === id)) {
-      return component.understood === true;
+  const isCompleted = useCallback(
+    (id: string) => processed.completed.has(id),
+    [processed],
+  );
+
+  const getProgress = useCallback(
+    (id: string) => {
+      const progress = processed.skillProgress[id];
+      if (progress === undefined) return null;
+      return `${progress}/${processed.requiredCount}`;
+    },
+    [processed],
+  );
+
+  const completedConcepts = useMemo(() => {
+    let count = 0;
+    for (const concept of concepts) {
+      if (processed.completed.has(concept.id)) {
+        count += 1;
+      }
     }
+    return count;
+  }, [concepts, processed]);
 
-    // For skills, check if completed (3+ exercises)
-    return (component.numSolved || 0) >= 3;
-  };
-
-  const getProgress = (id: string) => {
-    const component = components[id];
-    if (!component) return null;
-
-    // For skills, return exercise progress
-    if (skills.find((s) => s.id === id) && component.numSolved) {
-      return `${component.numSolved}/3`;
+  const completedSkills = useMemo(() => {
+    let count = 0;
+    for (const skill of skills) {
+      if (processed.completed.has(skill.id)) {
+        count += 1;
+      }
     }
-
-    return null;
-  };
-
-  const completedConcepts = concepts.filter((c) => isCompleted(c.id)).length;
-  const completedSkills = skills.filter((s) => isCompleted(s.id)).length;
+    return count;
+  }, [processed, skills]);
 
   return {
     concepts,

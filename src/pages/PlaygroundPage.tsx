@@ -8,10 +8,6 @@ import {
   Alert,
   Tabs,
   Tab,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Container,
 } from '@mui/material';
 import {
@@ -24,7 +20,6 @@ import {
 } from '@mui/icons-material';
 import { SQLEditor, DataTable } from '@/components';
 import { usePlaygroundDatabase } from '@/hooks/useDatabase';
-import { schemas, getSchemaDescription, type SchemaKey } from '@/mockData';
 import {
   useComponentState,
   type PlaygroundComponentState,
@@ -33,12 +28,11 @@ import {
 } from '@/store';
 
 export default function PlaygroundPage() {
-  const [selectedSchema, setSelectedSchema] = useState<SchemaKey>('full');
   const [query, setQuery] = useState('SELECT * FROM employees LIMIT 10;');
   const [currentTab, setCurrentTab] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Use the new playground database hook
+  // Use the playground database hook
   const {
     executeQuery,
     queryResult,
@@ -49,7 +43,7 @@ export default function PlaygroundPage() {
     resetDatabase,
     clearQueryState,
     isReady
-  } = usePlaygroundDatabase(selectedSchema);
+  } = usePlaygroundDatabase();
 
   const [playgroundState, setPlaygroundState] = useComponentState<PlaygroundComponentState>('playground', 'playground');
   const savedQueries = (playgroundState.savedQueries as SavedQuery[] | undefined) ?? [];
@@ -163,25 +157,10 @@ export default function PlaygroundPage() {
     }
   };
 
-  const handleSchemaChange = (newSchema: SchemaKey) => {
-    setSelectedSchema(newSchema);
-    // Update the default query based on the new schema
-    const firstTable = getFirstTableFromSchema(newSchema);
-    setQuery(`SELECT * FROM ${firstTable} LIMIT 10;`);
-    clearQueryState();
-  };
-
   const handleDeleteSavedQuery = (index: number) => {
     const newSavedQueries = savedQueries.filter((_, i) => i !== index);
     setPlaygroundState({ savedQueries: newSavedQueries });
     setMessage('Query deleted');
-  };
-
-  // Helper to get first table name from schema
-  const getFirstTableFromSchema = (schemaKey: SchemaKey): string => {
-    const schema = schemas[schemaKey];
-    const match = schema.match(/CREATE TABLE (\w+)/);
-    return match ? match[1] : 'employees';
   };
 
   return (
@@ -196,30 +175,8 @@ export default function PlaygroundPage() {
         </Typography>
       </Box>
 
-      {/* Database Selector */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-        <FormControl sx={{ minWidth: 250 }}>
-          <InputLabel>Database Schema</InputLabel>
-          <Select
-            value={selectedSchema}
-            onChange={(e) => handleSchemaChange(e.target.value as SchemaKey)}
-            label="Database Schema"
-          >
-            {Object.keys(schemas).map(schema => (
-              <MenuItem key={schema} value={schema}>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                    {schema.charAt(0).toUpperCase() + schema.slice(1)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {getSchemaDescription(schema as SchemaKey)}
-                  </Typography>
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
+      {/* Database Controls */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Button
           variant="outlined"
           startIcon={<Refresh />}

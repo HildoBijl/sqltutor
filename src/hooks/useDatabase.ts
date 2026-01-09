@@ -1,16 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDatabaseContext } from '@/providers/DatabaseProvider';
-import {
-  buildSchema,
-  getTablesForSchema,
-  resolveDatasetSize,
-  resolveSkillTables,
-  getCompletionSchemaForTables,
-  type DatabaseRole,
-  type DatasetSize,
-  type SchemaKey,
-  type TableKey,
-} from '@/mockData';
+import { buildSchema, getCompletionSchemaForTables, type DatasetSize, type TableKey } from '@/mockData';
+import { getContentTables, getContentSize } from '@/curriculum/utils/contentAccess';
 
 export interface QueryResult {
   columns: string[];
@@ -18,13 +9,17 @@ export interface QueryResult {
 }
 
 interface DatabaseOptions {
-  role: DatabaseRole;
-  skillId?: string;
-  schema?: SchemaKey;
+  /** Content ID (skill or concept) to determine tables and size */
+  contentId?: string;
+  /** Override tables (ignores contentId for table resolution) */
   tables?: TableKey[];
+  /** Override dataset size */
   size?: DatasetSize;
+  /** Custom cache key for the database instance */
   cacheKey?: string;
+  /** Whether to reset the database when schema changes */
   resetOnSchemaChange?: boolean;
+  /** Whether to persist the database across page navigations */
   persistent?: boolean;
 }
 
@@ -42,11 +37,9 @@ interface UseDatabaseReturn {
   completionSchema: Record<string, string[]>;
 }
 
-export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
+export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
   const {
-    role,
-    skillId,
-    schema,
+    contentId,
     tables,
     size,
     cacheKey,
@@ -69,34 +62,39 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     setQueryError(null);
   }, []);
 
-  const resolvedSize = useMemo(() => resolveDatasetSize(role, skillId, size), [role, skillId, size]);
-
-  const resolvedTables = useMemo(() => {
-    const sourceTables: TableKey[] | undefined = tables?.length
-      ? tables
-      : schema
-        ? getTablesForSchema(schema)
-        : resolveSkillTables(role, skillId);
-
-    const baseTables = (sourceTables && sourceTables.length > 0 ? sourceTables : ['employees']) as TableKey[];
-    const deduped = Array.from(new Set(baseTables));
-    return deduped as TableKey[];
-  }, [tables, schema, role, skillId]);
-
-  const resolvedSchema = useMemo(() => {
-    return buildSchema({ tables: resolvedTables, size: resolvedSize, role });
-  }, [resolvedTables, resolvedSize, role]);
-
-  const completionSchema = useMemo(
-    () => getCompletionSchemaForTables(resolvedTables, role),
-    [resolvedTables, role],
+  // Resolve the dataset size
+  const resolvedSize = useMemo(
+    () => size ?? getContentSize(contentId),
+    [size, contentId],
   );
 
+  // Resolve the tables to include
+  const resolvedTables = useMemo(() => {
+    if (tables?.length) {
+      return Array.from(new Set(tables)) as TableKey[];
+    }
+    const contentTables = getContentTables(contentId);
+    return Array.from(new Set(contentTables)) as TableKey[];
+  }, [tables, contentId]);
+
+  // Build the schema SQL
+  const resolvedSchema = useMemo(
+    () => buildSchema({ tables: resolvedTables, size: resolvedSize }),
+    [resolvedTables, resolvedSize],
+  );
+
+  // Build completion schema for SQL editor
+  const completionSchema = useMemo(
+    () => getCompletionSchemaForTables(resolvedTables),
+    [resolvedTables],
+  );
+
+  // Generate a unique key for this database instance
   const contextKey = useMemo(() => {
-    const base = cacheKey ?? `${role}:${skillId ?? 'global'}`;
+    if (cacheKey) return cacheKey;
     const tablesSignature = resolvedTables.join('|');
-    return `${base}:size=${resolvedSize}:tables=${tablesSignature}`;
-  }, [cacheKey, role, skillId, resolvedTables, resolvedSize]);
+    return `${contentId ?? 'default'}:size=${resolvedSize}:tables=${tablesSignature}`;
+  }, [cacheKey, contentId, resolvedTables, resolvedSize]);
 
   // Update database when schema changes, provider DB instance changes, or context is ready
   useEffect(() => {
@@ -118,8 +116,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     if (!providerDb) {
       const db = getDatabase(contextKey, resolvedSchema, {
         persistent,
-        role,
-        skillId,
+        contentId,
         size: resolvedSize,
       });
       setDatabase(db);
@@ -168,8 +165,7 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
     currentSchema,
     contextKey,
     persistent,
-    role,
-    skillId,
+    contentId,
     resolvedSize,
     resetOnSchemaChange,
     getDatabase,
@@ -235,30 +231,37 @@ export function useDatabase(options: DatabaseOptions): UseDatabaseReturn {
   };
 }
 
-// Convenience hooks for specific contexts
-export function usePlaygroundDatabase(schema: SchemaKey = 'full') {
+// Convenience hook for playground
+export function usePlaygroundDatabase() {
   return useDatabase({
-    role: 'display',
-    skillId: 'playground',
-    schema,
+    contentId: 'playground',
+    size: 'full',
     persistent: true,
     resetOnSchemaChange: true,
   });
 }
 
-export function useConceptDatabase(schema: SchemaKey = 'core') {
+// Convenience hook for concept pages (uses small dataset)
+export function useConceptDatabase() {
   return useDatabase({
-    role: 'theory',
-    schema,
+    size: 'small',
+    resetOnSchemaChange: true,
+  });
+}
+
+// Convenience hook for skill practice
+export function useSkillDatabase(skillId: string) {
+  return useDatabase({
+    contentId: skillId,
     resetOnSchemaChange: true,
   });
 }
 
 // Small, sample-friendly database for theory examples across all tables.
-export function useTheorySampleDatabase(schema: SchemaKey = 'full') {
+export function useTheorySampleDatabase() {
   return useDatabase({
-    role: 'theory',
-    schema,
+    contentId: 'playground', // Use all tables
+    size: 'small',           // But with small dataset
     resetOnSchemaChange: true,
   });
 }

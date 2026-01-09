@@ -11,7 +11,6 @@ import {
 import type { PracticeFeedback } from '../components/SkillPractice';
 import type { SkillExercise, QueryResultSet, PracticeSolution, PracticeSolutionLike } from '../types';
 import { normalizePracticeSolution } from '../utils/normalizePracticeSolution';
-import { markPrerequisitesComplete } from '../utils/markPrerequisitesComplete';
 
 const normalizeForHistory = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
@@ -86,6 +85,7 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
+  // Display database (small dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,
     queryResult,
@@ -97,19 +97,21 @@ export function useSkillExerciseController({
     resetDatabase: resetDisplayDatabase,
     clearQueryState,
   } = useDatabase({
-    role: 'display',
-    skillId,
+    contentId: skillId,
+    size: 'small',
     resetOnSchemaChange: true,
   });
 
+  // Grading database (full dataset for verification)
   const {
     database: gradingDatabase,
     executeQuery: executeGradingQuery,
     isReady: gradingDbReady,
     resetDatabase: resetGradingDatabase,
   } = useDatabase({
-    role: 'grading',
-    skillId,
+    contentId: skillId,
+    size: 'full',
+    cacheKey: `${skillId}:grading`,
     resetOnSchemaChange: true,
   });
 
@@ -349,8 +351,6 @@ export function useSkillExerciseController({
             !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
 
           if (reachedMasteryNow) {
-            // Mark all prerequisites as complete when reaching mastery
-            markPrerequisitesComplete(skillId, requiredCount);
             setShowCompletionDialog(true);
           } else {
             const progressDisplay = Math.min(updatedSolvedCount, requiredCount);

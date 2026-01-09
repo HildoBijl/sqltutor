@@ -11,7 +11,6 @@ import { ContentHeader } from '@/learning/components/ContentHeader';
 import { ContentTabs } from '@/learning/components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/learning/components/TabContent/ContentTab';
 import type { TabConfig } from '@/learning/types';
-import { markPrerequisitesComplete } from '@/learning/utils/markPrerequisitesComplete';
 import { ConceptCompletionDialog } from '@/learning/components/ConceptCompletionDialog';
 
 export default function ConceptPage() {
@@ -77,9 +76,6 @@ export default function ConceptPage() {
 
   const handleComplete = () => {
     setComponentState({ understood: true });
-
-    // Mark all prerequisites as complete
-    markPrerequisitesComplete(conceptMeta.id);
 
     setShowCompletionDialog(true);
   };
