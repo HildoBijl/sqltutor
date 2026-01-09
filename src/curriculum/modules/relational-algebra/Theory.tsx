@@ -36,7 +36,7 @@ export function Theory() {
           <Info>Example: We can define the attribute <ISQL>d_id</ISQL>.</Info>
         </>,
         <>
-          <Par sx={{ mb: 1 }}>A <Term>domain</Term> is a set of possible values an attribute may have. Common domains are "all possible numbers" or "all possible text strings".</Par>
+          <Par sx={{ mb: 1 }}>A <Term>domain</Term> is a set of possible values an attribute may take values from. Common domains are "all possible numbers" or "all possible text strings".</Par>
           <Info>Example: The domain of <ISQL>d_id</ISQL> is the set of all possible four-digit numbers.</Info>
         </>,
       ]} />
