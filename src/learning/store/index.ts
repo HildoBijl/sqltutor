@@ -248,16 +248,22 @@ export const useAppStore = create<AppState>()(
         currentTheme: state.currentTheme,
         hideStories: state.hideStories,
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('Failed to rehydrate store:', error);
+        }
         if (state) {
+          // Normalize any persisted component states
           state.components = Object.fromEntries(
             Object.entries(state.components ?? {}).map(([id, value]) => [
               id,
               normalizeComponentState(id, value),
             ]),
           );
-          state.setHasHydrated(true);
         }
+        // Always mark as hydrated, even if storage was empty or there was an error
+        // This ensures the app can proceed after a data reset
+        useAppStore.getState().setHasHydrated(true);
       },
     },
   ),
