@@ -11,3 +11,4 @@ export * from './Warning';
 export * from './Quote';
 export * from './PrimaryKey';
 export * from './ForeignKey';
+export * from './maths';
