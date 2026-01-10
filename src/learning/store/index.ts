@@ -248,22 +248,16 @@ export const useAppStore = create<AppState>()(
         currentTheme: state.currentTheme,
         hideStories: state.hideStories,
       }),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error('Failed to rehydrate store:', error);
-        }
+      onRehydrateStorage: () => (state) => {
         if (state) {
-          // Normalize any persisted component states
           state.components = Object.fromEntries(
             Object.entries(state.components ?? {}).map(([id, value]) => [
               id,
               normalizeComponentState(id, value),
             ]),
           );
+          state.setHasHydrated(true);
         }
-        // Always mark as hydrated, even if storage was empty or there was an error
-        // This ensures the app can proceed after a data reset
-        useAppStore.getState().setHasHydrated(true);
       },
     },
   ),
@@ -285,6 +279,24 @@ export function useComponentState<State extends ComponentState = ComponentState>
 
   const setComponentState = useCallback(
     (updater: Partial<State> | State | ((prev: State) => Partial<State> | State)) => {
+      const attachType = (value: Partial<State> | State) => {
+        if (!typeHint) {
+          return value as Partial<ComponentState>;
+        }
+        const existing = useAppStore.getState().components[componentId];
+        if (existing && existing.type !== typeHint) {
+          return {
+            ...existing,
+            ...value,
+            type: typeHint,
+          } as Partial<ComponentState>;
+        }
+        return {
+          ...value,
+          type: typeHint,
+        } as Partial<ComponentState>;
+      };
+
       if (typeof updater === 'function') {
         const currentState =
           (useAppStore.getState().components[componentId] as State | undefined) ??
@@ -293,9 +305,9 @@ export function useComponentState<State extends ComponentState = ComponentState>
             (typeHint ?? DEFAULT_COMPONENT_TYPE) as ComponentType,
           ) as State);
         const result = updater(currentState);
-        updateComponent(componentId, result as Partial<ComponentState>);
+        updateComponent(componentId, attachType(result));
       } else {
-        updateComponent(componentId, updater as Partial<ComponentState>);
+        updateComponent(componentId, attachType(updater));
       }
     },
     [componentId, typeHint, updateComponent],
