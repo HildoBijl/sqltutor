@@ -85,7 +85,7 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
-  // Display database (small dataset for showing results to user)
+  // Display database (full dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,
     queryResult,
@@ -98,7 +98,7 @@ export function useSkillExerciseController({
     clearQueryState,
   } = useDatabase({
     contentId: skillId,
-    size: 'small',
+    size: 'full',
     resetOnSchemaChange: true,
   });
 

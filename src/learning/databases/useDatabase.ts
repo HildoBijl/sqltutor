@@ -245,10 +245,11 @@ export function useConceptDatabase() {
   });
 }
 
-/** Skill practice - content-specific tables */
+/** Skill practice - content-specific tables (full dataset) */
 export function useSkillDatabase(skillId: string) {
   return useDatabase({
     contentId: skillId,
+    size: 'full',
     resetOnSchemaChange: true,
   });
 }
