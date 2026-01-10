@@ -17,11 +17,13 @@ const DEFAULT_SIZE: DatasetSize = 'small';
 
 /**
  * Tables required for each content ID (skill or concept).
+ * Use `undefined` for skills that don't use tables (e.g., RA skills).
  */
-const contentTableAccess: Record<string, TableKey[]> = {
+const contentTableAccess: Record<string, TableKey[] | undefined> = {
   default: ['employees'],
   playground: ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
-  // Skills
+
+  // SQL Skills
   'choose-columns': ['departments', 'employees'],
   'filter-rows': ['departments', 'employees', 'emp_data'],
   'filter-rows-on-multiple-criteria': ['departments', 'employees', 'emp_data'],
@@ -37,6 +39,16 @@ const contentTableAccess: Record<string, TableKey[]> = {
   'create-pivot-table': ['departments', 'employees', 'emp_data', 'quarterly_performance', 'expenses', 'transactions'],
   'write-multi-table-query': ['departments', 'employees', 'emp_data', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
   'write-multi-layered-query': ['departments', 'employees', 'emp_data', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
+
+  // RA Skills (no database tables)
+  'ra-choose-columns': undefined,
+  'ra-filter-rows': undefined,
+  'ra-set-up-single-relation-query': undefined,
+  'ra-set-up-multi-condition-query': undefined,
+  'ra-join-relations': undefined,
+  'ra-set-up-multi-relation-query': undefined,
+  'ra-set-up-multi-step-query': undefined,
+  'ra-set-up-universal-condition-query': undefined,
 };
 
 /**
@@ -48,10 +60,15 @@ const contentSizeOverrides: Record<string, DatasetSize> = {
 
 /**
  * Get the tables required for a given content ID.
+ * Returns `undefined` for skills that don't use tables.
  */
-export function getContentTables(contentId?: string): TableKey[] {
+export function getContentTables(contentId?: string): TableKey[] | undefined {
   if (!contentId) return DEFAULT_TABLES;
-  return contentTableAccess[contentId] ?? DEFAULT_TABLES;
+  // Check if contentId is explicitly defined (including undefined values)
+  if (contentId in contentTableAccess) {
+    return contentTableAccess[contentId];
+  }
+  return DEFAULT_TABLES;
 }
 
 /**

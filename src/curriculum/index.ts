@@ -316,7 +316,7 @@ contentIndexRaw.forEach(itemRaw => {
 
 export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
 
-const ALLOWED_CONTENT_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video']);
+const ALLOWED_CONTENT_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video', 'Practice']);
 
 type ComponentModule = {
   default?: ComponentType<any>;

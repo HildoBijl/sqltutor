@@ -49,8 +49,8 @@ export function DataExplorerTab({ skillId }: DataExplorerTabProps) {
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [isErDiagramOpen, setIsErDiagramOpen] = useState(false);
 
-  const resolvedTables = useMemo(() => getContentTables(skillId), [skillId]);
-  const resolvedSize = useMemo(() => getContentSize(skillId), [skillId]);
+  const resolvedTables = useMemo(() => getContentTables(skillId) ?? [], [skillId]);
+  const resolvedSize = useMemo(() => getContentSize(skillId, 'full'), [skillId]);
   const schemaSource = useMemo(
     () => buildSchema({ tables: resolvedTables, size: resolvedSize }),
     [resolvedTables, resolvedSize],
@@ -58,6 +58,7 @@ export function DataExplorerTab({ skillId }: DataExplorerTabProps) {
   
   const { tableNames, executeQuery, queryResult } = useDatabase({
     contentId: skillId,
+    size: 'full',
     resetOnSchemaChange: false,
   });
 
