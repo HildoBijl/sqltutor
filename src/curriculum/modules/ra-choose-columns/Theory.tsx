@@ -4,13 +4,13 @@ import { FigureExampleRAQuery } from '../../utils';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know that <Term>projection</Term> comes down to selecting various columns from a relation. How do we do so using Relational Algebra?</Par>
+      <Par>We know that <Term>projection</Term> comes down to selecting various columns from a relation. How do we do so using relational algebra?</Par>
     </Section>
 
-    <Section title="Select columns (projection)">
+    <Section title="Use the projection operator">
       <Par>Suppose that we have a list of departments of a company, but we only want an overview of the number of employees for each department. To generate this overview, we apply projection. In relational algebra we can do so through</Par>
       <FigureExampleRAQuery query={<>∏<sub>d_name, nr_employees</sub>(departments)</>} actualQuery="SELECT d_name, nr_employees FROM departments" />
-      <Par>Note that the projection operator <M>\Pi</M> (the Greek capital letter Pi) expects some relation within its brackets. As subscript, it expects the names of the attributes that should appear within the projection. As output, the operator returns the given relation, but only with the specified attributes.</Par>
+      <Par>Note that the <Term>projection operator</Term> <M>\Pi</M> (the Greek capital letter Pi) expects some relation within its brackets. As subscript, it expects the names of the attributes that should appear within the projection. As output, the operator returns the given relation, but only with the specified attributes.</Par>
     </Section>
 
     <Section title="The definition of the projection operator">
