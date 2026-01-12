@@ -1,0 +1,4 @@
+/* Override the margins of block-math components. */
+.katex-display {
+  margin: 0;
+}

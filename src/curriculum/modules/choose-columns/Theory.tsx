@@ -21,34 +21,34 @@ export function Theory() {
     </Section>
 
     <Section title="Select unique values">
-      <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is possible, but it is not a good habit. When you select columns, it often does occur that you get duplicate rows. To filter those out, add the keyword <ISQL>DISTINCT</ISQL> right after <ISQL>SELECT</ISQL>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
+      <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is theoretically possible in SQL, but it is not a good habit. When you select columns, it often <Em>does</Em> occur that you get duplicate rows. To filter those out, add the keyword <ISQL>DISTINCT</ISQL> right after <ISQL>SELECT</ISQL>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
       <FigureSelectUnique />
     </Section>
 
     <Section title="Rename columns">
       <Par>In database tables the columns have names. When retrieving a table, we can optionally adjust the names that the columns have in our output. This <Term>renames</Term> the columns.</Par>
-      {/* <FigureRenameColumns query={`SELECT
+      <FigureRenameColumns query={`SELECT
   first_name,
   last_name AS family_name,
   phone AS number
-FROM employees;`} /> */}
+FROM employees;`} />
       <Info>The addendum <ISQL>AS</ISQL> is optional, and it works just as well without. For readability, it is still recommended to add it.</Info>
     </Section>
 
     <Section title="Deal with multiple tables">
       <Par>So far we have run queries that only request a single table. Later on we will encounter queries involving multiple tables. In that case it may be confusing which column comes from which table, especially if the two tables have columns with the same name. We can indicate what specific table to select a column from through the format <ISQL>table_name.column_name</ISQL>.</Par>
-      {/* <FigureRenameColumns query={`SELECT
+      <FigureRenameColumns query={`SELECT
   employees.first_name,
   employees.last_name AS family_name,
   employees.phone AS number
-FROM employees;`} /> */}
+FROM employees;`} />
       <Par>When the two tables don't have duplicate column names, this table specification is generally not needed, but it is still recommended for clarity. When the two tables do have duplicate column names, this notation is obligatory.</Par>
       <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: temporarily rename them within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
-      {/* <FigureRenameColumns query={`SELECT
+      <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,
   e.phone AS number
-FROM employees AS e;`} /> */}
+FROM employees AS e;`} />
     </Section>
   </Page>;
 }
