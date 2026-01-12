@@ -25,4 +25,3 @@ export function ExerciseDescription({ title, description, tableNames }: Exercise
     </Paper>
   );
 }
-

@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Warning, Term, Em, PrimaryKey, ForeignKey, ISQL } from '@/components';
+import { Page, Section, Par, List, Warning, Term, Em, RelationName, PrimaryKey, ForeignKey, ISQL } from '@/components';
 
 import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
 
@@ -29,8 +29,8 @@ export function Theory() {
       <Par>The solution to our problem lies in making references. We know that the <ISQL>employees</ISQL> table has all employees, including contact information and such. So within the <ISQL>departments</ISQL> we only have to <Em>refer</Em> to the right row. And referring to a row in a table is generally done through its key! Every employee has a unique employee ID <ISQL>e_id</ISQL>. So we can add this to the <ISQL>departments</ISQL> table as <ISQL>manager_id</ISQL>.</Par>
       <FigureSingleTable query={`SELECT * FROM departments;`} title="List of departments with the ID of the manager" tableWidth={700} tableScale={0.65} />
       <Par>When the key of one table appears as reference in another table, then we say that this second table has a <Term>foreign key</Term> pointing to the first table. A common way to indicate a foreign key in the table's schema is by making the foreign key italic. It shows this is a reference to a primary key of some other table. <List items={[
-        <><Term>departments</Term> (<PrimaryKey>d_id</PrimaryKey>, d_name, <ForeignKey>manager_id</ForeignKey>, budget, nr_employees)</>,
-        <><Term>employees</Term> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
+        <><RelationName>departments</RelationName> (<PrimaryKey>d_id</PrimaryKey>, d_name, <ForeignKey>manager_id</ForeignKey>, budget, nr_employees)</>,
+        <><RelationName>employees</RelationName> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
       ]} /></Par>
       <Par>So how do we apply a foreign key? Well, by looking things up in steps! If we want the phone number of the manager of "Human Resources", we first look through the departments to find the manager ID. This is <ISQL>42223311</ISQL>. We then jump to the list of employees, find the row (the employee) corresponding to this ID (Marcelle Johnson) and extract the respective phone number: 408-555-0674. Looking things up like this is simple enough, and these references keep our database clean.</Par>
     </Section>

@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
-import { Page, Section, Par, List, Info, Term, Em } from '@/components';
+import { Page, Section, Par, List, Info, Term, Em, RelationName } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, Rectangle, useTextNodeBounds, useRefWithBounds } from '@/components';
 import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
@@ -25,7 +25,7 @@ export function Theory() {
         cell: 'Cell',
       }} />
       <Info>In database tables columns have names, but rows do not. They don't even have an index or ID. Of course you <Em>can</Em> set up a column named "ID" or similar. This is actually common practice.</Info>
-      <Par>The set-up/design of the table is called the <Term>schema</Term>. It consists of the table name and the names of its columns. A common way of writing the schema is by putting the table name in bold, and the attributes behind it within brackets. (Though variations to this convention occur.) For the above example table we have the schema: <List items={[<><Term>departments</Term> (d_id, d_name, manager_id, budget, nr_employees)</>]} /></Par>
+      <Par>The set-up/design of the table is called the <Term>schema</Term>. It consists of the table name and the names of its columns. A common way of writing the schema is by putting the table name in bold, and the attributes behind it within brackets. (Though variations to this convention occur.) For the above example table we have the schema: <List items={[<><RelationName>departments</RelationName> (d_id, d_name, manager_id, budget, nr_employees)</>]} /></Par>
     </Section>
 
     <Section title="Rows as objects">

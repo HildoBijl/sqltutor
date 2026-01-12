@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Term, Em, PrimaryKey, ForeignKey, ISQL } from '@/components';
+import { Page, Section, Par, List, Term, Em, RelationName, PrimaryKey, ForeignKey, ISQL } from '@/components';
 
 import { FigureTwoTables } from '../database/Theory';
 
@@ -10,8 +10,8 @@ export function Summary() {
       <Par>As example, within a company, every department has a manager. This manager is an employee. The list of departments can therefore use <ISQL>manager_id</ISQL> as foreign key to the <ISQL>employees</ISQL> table, which has <ISQL>e_id</ISQL> as primary key. If we know the manager ID, we can then easily look up all other attributes of said manager through this respective key.</Par>
       <FigureTwoTables />
       <Par>Within the schema, a foreign key is often marked italic. <List items={[
-        <><Term>departments</Term> (<PrimaryKey>d_id</PrimaryKey>, d_name, <ForeignKey>manager_id</ForeignKey>, budget, nr_employees)</>,
-        <><Term>employees</Term> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
+        <><RelationName>departments</RelationName> (<PrimaryKey>d_id</PrimaryKey>, d_name, <ForeignKey>manager_id</ForeignKey>, budget, nr_employees)</>,
+        <><RelationName>employees</RelationName> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
       ]} /></Par>
     </Section>
   </Page>;

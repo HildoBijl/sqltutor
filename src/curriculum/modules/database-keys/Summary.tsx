@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Term, PrimaryKey } from '@/components';
+import { Page, Section, Par, List, Term, RelationName, PrimaryKey } from '@/components';
 import { ISQL } from '@/components';
 
 import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
@@ -13,7 +13,7 @@ export function Summary() {
         <>A <Term>primary key</Term> is a candidate key that we choose to use when referring to specific table rows. The primary key is ideally one whose value never changes. Using the employee ID <ISQL>{`{e_id}`}</ISQL> is a wise choice here.</>
       ]} />
       <FigureSingleTable query={`SELECT * FROM employees;`} title="List of employees" tableWidth={800} tableScale={0.65} />
-      <Par>Within the schema, the primary key is indicated through an underline. <List items={[<><Term>employees</Term> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>]} /></Par>
+      <Par>Within the schema, the primary key is indicated through an underline. <List items={[<><RelationName>employees</RelationName> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>]} /></Par>
     </Section>
   </Page>;
 }

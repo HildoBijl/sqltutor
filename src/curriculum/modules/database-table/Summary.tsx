@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Info, Term } from '@/components';
+import { Page, Section, Par, List, Info, Term, RelationName } from '@/components';
 
 import { FigureTerminology } from './Theory';
 
@@ -15,7 +15,7 @@ export function Summary() {
         cell: 'Cell/Field',
       }} />
       <Info>The terminology used varies a bit, depending on what subfield of database studies you're in. Make sure you know your local language.</Info>
-      <Par>A table's design is called the <Term>schema</Term> and is written using the table name and the column names. <List items={[<><Term>departments</Term> (d_id, d_name, manager_id, budget, nr_employees)</>]} /></Par>
+      <Par>A table's design is called the <Term>schema</Term> and is written using the table name and the column names. <List items={[<><RelationName>departments</RelationName> (d_id, d_name, manager_id, budget, nr_employees)</>]} /></Par>
     </Section>
   </Page>;
 }

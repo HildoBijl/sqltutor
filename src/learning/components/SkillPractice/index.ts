@@ -9,4 +9,5 @@ export * from './ExerciseResults';
 export * from './ExerciseSolution';
 export * from './GiveUpDialog';
 export * from './SkillPracticeTab';
+export * from './ManualExerciseSet';
 export * from './types';
