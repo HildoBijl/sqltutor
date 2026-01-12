@@ -49,7 +49,7 @@ export function Theory() {
         <>On the right, we have the actual definition of the filter. In words, you can read it as "The set of all tuples <M>t</M>, where <M>t</M> comes from the given relation <M>r</M>, and where the predicate <M>p(t)</M>, when evaluated for the tuple <M>t</M>, results in something that holds true."</>,
         <>The notation <M>p(t)</M> is a shorthand for the predicate evaluated given the tuple <M>t</M>. It is something that evaluates as true or false.</>,
       ]} />
-      <Par>So altogether the above definition says: "The filtering of the relation <M>r</M> subject to the predicate/condition <M>p</M> is defined as the set of all tuples <M>t</M> from <M>r</M> for which the predicate evaluates as true."</Par>
+      <Par>So altogether the above definition says: "The filtering of the relation <M>r</M> subject to the predicate/condition <M>p</M> is defined as the set of all tuples <M>t</M> from <M>r</M> for which the predicate <M>p</M> evaluates as true."</Par>
     </Section>
   </Page>;
 }
