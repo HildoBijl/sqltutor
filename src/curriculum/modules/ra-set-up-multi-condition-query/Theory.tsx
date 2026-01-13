@@ -4,7 +4,7 @@ import { FigureExampleRAQuery } from '../../utils';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know that relations are often linked through foreign keys. Running a filter on one relation is easy enough, but how do we filter based on conditions from multiple tables? One option here is to use <Term>set operators</Term>.</Par>
+      <Par>We know that relations are often linked through foreign keys. Running a filter on one relation is easy enough, but how do we filter based on conditions from multiple tables? One option here is to use <Term>set operators</Term> on the respective keys. Let's study this idea using an example.</Par>
     </Section>
 
     <Section title="The issue of combining multiple results">
