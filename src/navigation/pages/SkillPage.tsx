@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mui/material';
-import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit } from '@mui/icons-material';
+import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/learning/store';
 import { contentComponents } from '@/curriculum';
@@ -61,7 +61,9 @@ export default function SkillPage() {
     defaultTab: 'practice',
   });
 
-  const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId);
+  const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId, {
+    loadExercises: !hasStaticPractice,
+  });
 
   // Determine practice availability
   const hasInteractivePractice = Boolean(skillModule);
@@ -187,6 +189,21 @@ export default function SkillPage() {
               </Typography>
             ))}
         </ContentTabs>
+      )}
+
+      {currentTab === 'practice' && hasStaticPractice && !isSkillMastered && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+          <span />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleStaticComplete}
+              startIcon={<CheckCircle />}
+            >
+              I have mastered these exercises
+            </Button>
+          </Box>
+        </Box>
       )}
 
       {/* Completion dialog for interactive practice */}
