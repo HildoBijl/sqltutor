@@ -15,6 +15,10 @@ interface SkillContentState {
   error: string | null;
 }
 
+interface UseSkillContentOptions {
+  loadExercises?: boolean;
+}
+
 const initialState: SkillContentState = {
   isLoading: true,
   skillMeta: null,
@@ -22,7 +26,11 @@ const initialState: SkillContentState = {
   error: null,
 };
 
-export function useSkillContent(skillId?: string): SkillContentState {
+export function useSkillContent(
+  skillId?: string,
+  options?: UseSkillContentOptions,
+): SkillContentState {
+  const loadExercises = options?.loadExercises ?? true;
   const [state, setState] = useState<SkillContentState>(initialState);
 
   useEffect(() => {
@@ -49,6 +57,17 @@ export function useSkillContent(skillId?: string): SkillContentState {
         skillModule: null,
         isLoading: false,
         error: 'Skill metadata could not be found.',
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (!loadExercises) {
+      updateState({
+        skillModule: null,
+        isLoading: false,
+        error: null,
       });
       return () => {
         cancelled = true;
@@ -91,7 +110,7 @@ export function useSkillContent(skillId?: string): SkillContentState {
     return () => {
       cancelled = true;
     };
-  }, [skillId]);
+  }, [skillId, loadExercises]);
 
   return state;
 }
