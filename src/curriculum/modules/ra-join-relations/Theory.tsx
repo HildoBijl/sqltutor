@@ -6,7 +6,7 @@ import { FigureTwoTables } from '../database/Theory';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know what it means to join tables, and how to visualize it through a Cartesian product. But how do we set up a join in relational algebra? There are two possible methods: through the Cartesian product or through the natural join. Let's study both methods.</Par>
+      <Par>We know what it means to join tables, and how to visualize the process as a Cartesian product followed by a filter. But how do we set up a join in relational algebra? There are two possible methods: through the Cartesian product or through the natural join. Let's study both methods.</Par>
     </Section>
 
     <Section title="Join relations through the Cartesian product">

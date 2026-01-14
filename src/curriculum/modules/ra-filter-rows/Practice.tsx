@@ -1,4 +1,4 @@
-import { Page, Section, Par, Em, RA, RelationName } from '@/components';
+import { Page, Section, Par, Em, Term, RA, RelationName } from '@/components';
 import { ManualExerciseSet } from '@/learning/components/SkillPractice';
 
 import { CompaniesSchema } from '../../utils';
@@ -6,7 +6,7 @@ import { CompaniesSchema } from '../../utils';
 export function Practice() {
 	return <Page>
 		<Section>
-			<Par>The following exercises use the "Companies" database. It is defined by the following schema.</Par>
+			<Par>The following exercises use the <Term>Companies</Term> database. It is defined by the following schema.</Par>
 			<CompaniesSchema />
 			<Par>When an exercise says "Find ... " then it means "Write a relational algebra query that gives ... ".</Par>
 			<ManualExerciseSet exercises={exercises} />

@@ -32,7 +32,7 @@ function ManualExercise({ exercise, number }: ManualExerciseProps) {
 			<Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
 				Exercise {number}
 			</Typography>
-			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 				{exercise.problem}
 			</Box>
 		</Paper>
