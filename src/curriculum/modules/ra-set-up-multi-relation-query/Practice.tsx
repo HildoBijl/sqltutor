@@ -10,7 +10,7 @@ export function Practice() {
 			<CompaniesSchema />
 			<Par>When an exercise says "Find ... " then it means "Write a relational algebra query that gives ... ".</Par>
 			<ManualExerciseSet exercises={companiesExercises} />
-			<Par>The following exercises use the "Shopping" database. It is defined by the following schema.</Par>
+			<Par>The following exercises use the <Term>Shopping</Term> database. It is defined by the following schema.</Par>
 			<ShoppingSchema />
 			<ManualExerciseSet exercises={shoppingExercises} startingNumber={companiesExercises.length + 1} />
 		</Section>
