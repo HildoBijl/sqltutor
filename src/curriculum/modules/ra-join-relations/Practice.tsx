@@ -23,10 +23,10 @@ const exercises = [
 			<Par>Alternatively, because the foreign key has the same name "person_name" in both relations, we could also use the natural join as short-cut.</Par>
 			<RA>employee ⋈ works</RA>
 			<Par>Both these commands do the same thing: they join the two relations. Once we have the join, we need to add a filter on the city. The following three commands are all valid options to do so.</Par>
-			<RA>σ<sub>city = "Amsterdam"</sub>(σ<sub>employee.person_name = works.person_name</sub>(employee⨯works))</RA>
+			<RA>σ<sub>employee.city = "Amsterdam"</sub>(σ<sub>employee.person_name = works.person_name</sub>(employee⨯works))</RA>
 			<RA>σ<sub>employee.person_name = works.person_name ∧ city = "Amsterdam"</sub>(employee⨯works)</RA>
 			<RA>σ<sub>city = "Amsterdam"</sub>(employee ⋈ works)</RA>
-			<Par>Note that, for the city, we could also use "employee.city" rather than just "city", but since there are no duplicate names, this is optional.</Par>
+			<Par>Note that, in the first solution, we could also just use "city" rather than "employee.city", since there is no "city" attribute anywhere else. But just in case there would be, this dot-notation is recommended after a Cartesian product.</Par>
 		</>,
 	},
 	{
@@ -37,7 +37,6 @@ const exercises = [
 			<RA>works ⋈ company</RA>
 			<Par>Then the salary requirement should still be added. This can for instance be done through</Par>
 			<RA>σ<sub>salary &lt; 20000</sub>(works ⋈ company)</RA>
-			<Par>Note that there cannot be confusion about attribute names, since there is only one attribute called "salary".</Par>
 		</>,
 	},
 	{
