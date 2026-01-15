@@ -1,14 +1,15 @@
 import { type ReactNode } from 'react';
-import { List as MuiList, ListItem, type ListProps as MuiListProps } from '@mui/material';
+import { List as MuiList, ListItem, type ListProps as MuiListProps, Stack } from '@mui/material';
 
 export type ListProps = {
   items: ReactNode[];
   useNumbers?: boolean;
   sx?: MuiListProps['sx'];
   itemSx?: MuiListProps['sx'];
+  contentSpacing?: number;
 };
 
-export function List({ items, useNumbers = false, sx, itemSx }: ListProps) {
+export function List({ items, useNumbers = false, sx, itemSx, contentSpacing }: ListProps) {
   if (!items || !Array.isArray(items))
     throw new Error(`Invalid list items: expected an array "items" property, but received something of type ${typeof items}.`);
 
@@ -32,7 +33,7 @@ export function List({ items, useNumbers = false, sx, itemSx }: ListProps) {
           ...itemSx,
         }}
       >
-        {item}
+        {contentSpacing === undefined ? item : <Stack spacing={contentSpacing}>{item}</Stack>}
       </ListItem>
     ))}
   </MuiList>;
