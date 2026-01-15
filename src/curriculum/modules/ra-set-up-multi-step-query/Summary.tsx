@@ -14,9 +14,9 @@ export function Summary() {
       <Par>The relational algebra query has turned into a <Term>relational algebra script</Term>, where the last line (without assignment) gives the output of the script.</Par>
       <Par>When tackling tough data requests, there are a few tips and tricks that can help.</Par>
       <List useNumbers items={[
-        <Par>First <Term>execute the request manually</Term> (for a few tuples) to gain some intuition of the data.</Par>,
+        <Par>First <Term>execute the request manually</Term> (for a few tuples) to gain some intuition of the data and the steps need to tackle the request.</Par>,
         <Par>Set up the script, keeping assigned relations <Term>intuitive</Term> and <Term>based on keys</Term>.</Par>,
-        <Par>When the request has the words "never" or "always", first <Term>do the opposite</Term> and then flip the result around.</Par>,
+        <Par>When the request has the words "never" or "every", first <Term>do the opposite</Term> and then flip the result around.</Par>,
       ]} />
     </Section>
   </Page>;

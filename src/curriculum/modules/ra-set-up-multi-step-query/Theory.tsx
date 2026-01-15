@@ -45,7 +45,7 @@ export function Theory() {
           <Par>Set up assigned relations that are <Term>intuitive</Term>. Every relation you assign should mean something, and you should be able to explain to a colleague, ideally in a single sentence, what the relation stands for. Or even better: make the relation name you assigned self-explanatory! By making your relations intuitive, you support your own intuition too.</Par>
         </>,
         <>
-          <Par>When you find the word "never" or "always" in a request, first <Term>do the opposite</Term>. Relational algebra is very good in existence checks: we just check if a tuple exists in a relation. But a "never" or "always" check is not something relational algebra can directly do.</Par>
+          <Par>When you find the word "never" or "every" in a request, first <Term>do the opposite</Term>. Relational algebra is very good in existence checks: we just check if a tuple exists in a relation. But a "never" or "every" check is not something relational algebra can directly do.</Par>
           <Par>To show how this "do the opposite" idea works, we use an example. Suppose we want to find all the employees who have <Em>never</Em> been on sick leave. This sounds hard, but we could first do the opposite: we find the employees that <Em>have</Em> been on sick leave.</Par>
           <RA>had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))</RA>
           <Par>The people who have <Em>never</Em> been on sick leave are all employees <Em>except</Em> the employees who had sick leave.</Par>
