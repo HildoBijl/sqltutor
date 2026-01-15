@@ -252,7 +252,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     id: 'ra-join-relations',
     name: 'Join Relations',
     type: 'skill',
-    description: 'How do use relational algebra to join two tables together?',
+    description: 'How do use relational algebra to join two relations together?',
     prerequisites: ['join-and-decomposition', 'ra-filter-rows'],
   },
   {
