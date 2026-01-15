@@ -28,7 +28,8 @@ export function Layout() {
   const location = useLocation();
 
   const navItems = [
-    { path: '/learn', label: 'Learn', icon: LearnIcon },
+    { path: '/learn-ra', label: 'Learn RA', icon: LearnIcon },
+    { path: '/learn', label: 'Learn SQL', icon: LearnIcon },
     // { path: '/playground', label: 'Playground', icon: PlaygroundIcon },
   ];
 
