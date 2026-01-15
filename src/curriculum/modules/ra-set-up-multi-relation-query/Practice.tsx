@@ -63,7 +63,7 @@ const companiesExercises = [
 	},
 	{
 		problem: <>
-			<Par>Consider the case where people can work for multiple companies: the primary key for the works relation is not <PrimaryKey>person_name</PrimaryKey> but (<PrimaryKey>person_name</PrimaryKey>, <PrimaryKey>company_name</PrimaryKey>).</Par>
+			<Par>Consider the case where people can work for multiple companies: the primary key for the <RelationName>works</RelationName> relation is not <PrimaryKey>person_name</PrimaryKey> but (<PrimaryKey>person_name</PrimaryKey>, <PrimaryKey>company_name</PrimaryKey>).</Par>
 			<Par>Find the names of all employees who work for at least two (different) companies.</Par>
 		</>,
 		solution: <>
