@@ -4,17 +4,19 @@ import { List as MuiList, ListItem, type ListProps as MuiListProps, Stack } from
 export type ListProps = {
   items: ReactNode[];
   useNumbers?: boolean;
+  startNumber?: number;
   sx?: MuiListProps['sx'];
   itemSx?: MuiListProps['sx'];
   contentSpacing?: number;
 };
 
-export function List({ items, useNumbers = false, sx, itemSx, contentSpacing }: ListProps) {
+export function List({ items, useNumbers = false, startNumber, sx, itemSx, contentSpacing }: ListProps) {
   if (!items || !Array.isArray(items))
     throw new Error(`Invalid list items: expected an array "items" property, but received something of type ${typeof items}.`);
 
   return <MuiList
     component={useNumbers ? 'ol' : 'ul'}
+    start={useNumbers ? startNumber : undefined}
     sx={{
       textAlign: 'justify',
       listStyleType: useNumbers ? 'decimal' : 'disc',

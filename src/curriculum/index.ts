@@ -275,7 +275,7 @@ const contentIndexRaw: ContentMetaRaw[] = [
     id: 'ra-set-up-universal-condition-query',
     name: 'Set Up Universal Condition Query',
     type: 'skill',
-    description: 'How do we set up relational algebra queries involving "for all" quantifiers and similar?',
+    description: 'How do we set up relational algebra queries involving "for every" quantifiers and similar?',
     prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-multi-step-query'],
   },
 ];
