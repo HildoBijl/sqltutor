@@ -4,13 +4,16 @@ import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mu
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/learning/store';
-import { contentComponents } from '@/curriculum';
+import { contentComponents, contentIndex } from '@/curriculum';
 import { getContentTables } from '@/curriculum/utils/contentAccess';
 
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useSkillContent } from '@/learning/hooks/useSkillContent';
 import { useSkillExerciseController } from '@/learning/hooks/useSkillExerciseController';
+import { useContentProgress } from '@/learning/hooks/useContentProgress';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
+import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
+import { getBackToLearningPathFromHistory } from '@/learning/utils/skillTreeTracking';
 
 import { ContentHeader } from '@/learning/components/ContentHeader';
 import { ContentTabs } from '@/learning/components/ContentTabs';
@@ -27,8 +30,14 @@ export default function SkillPage() {
   const navigate = useNavigate();
 
   const hideStories = useAppStore((state) => state.hideStories);
+  const components = useAppStore((state) => state.components);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const skillTreeHistory = useSkillTreeHistory();
+  const backToLearningPath = useMemo(
+    () => getBackToLearningPathFromHistory(skillTreeHistory, skillId),
+    [skillTreeHistory, skillId],
+  );
 
   // Check what practice mode this skill uses
   const hasStaticPractice = Boolean(skillId && contentComponents[skillId]?.Practice);
@@ -78,7 +87,8 @@ export default function SkillPage() {
     setComponentState,
   });
 
-  const isSkillMastered = (componentState.numSolved || 0) >= REQUIRED_EXERCISE_COUNT;
+  const { isCompleted } = useContentProgress(contentIndex, components);
+  const isSkillMastered = skillId ? isCompleted(skillId) : false;
   const summaryUnlocked = isSkillMastered || isAdmin;
 
   // Filter out practice tab if no practice available
@@ -121,7 +131,8 @@ export default function SkillPage() {
     return (
       <Container maxWidth="lg" sx={{ py: 3 }}>
         <Alert severity="error">
-          Skill not found. <Button onClick={() => navigate('/learn')}>Return to learning</Button>
+          Skill not found.{' '}
+          <Button onClick={() => navigate(backToLearningPath)}>Return to learning</Button>
         </Alert>
       </Container>
     );
@@ -144,7 +155,7 @@ export default function SkillPage() {
       <ContentHeader
         title={skillMeta.name}
         description={skillMeta.description}
-        onBack={() => navigate('/learn')}
+        onBack={() => navigate(backToLearningPath)}
         icon={<EditNote color="primary" sx={{ fontSize: 32 }} />}
         isCompleted={isSkillMastered}
         progress={progressInfo}
@@ -223,7 +234,7 @@ export default function SkillPage() {
           controller.dialogs.completion.close();
           selectTab('summary');
         }}
-        onContinueLearning={() => navigate('/learn')}
+        onContinueLearning={() => navigate(backToLearningPath)}
         showStoryButton={showStoryButton}
       />
 
@@ -244,7 +255,7 @@ export default function SkillPage() {
           setShowCompletionDialog(false);
           selectTab('summary');
         }}
-        onContinueLearning={() => navigate('/learn')}
+        onContinueLearning={() => navigate(backToLearningPath)}
         showStoryButton={showStoryButton}
       />
     </Container>

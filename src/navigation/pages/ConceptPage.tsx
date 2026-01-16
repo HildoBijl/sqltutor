@@ -7,11 +7,13 @@ import { useAppStore, type ConceptComponentState } from '@/learning/store';
 import { contentIndex, type ContentMeta } from '@/curriculum';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
+import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { ContentHeader } from '@/learning/components/ContentHeader';
 import { ContentTabs } from '@/learning/components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/learning/components/TabContent/ContentTab';
 import type { TabConfig } from '@/learning/types';
 import { ConceptCompletionDialog } from '@/learning/components/ConceptCompletionDialog';
+import { getBackToLearningPathFromHistory } from '@/learning/utils/skillTreeTracking';
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
@@ -19,6 +21,11 @@ export default function ConceptPage() {
   const hideStories = useAppStore((state) => state.hideStories);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const skillTreeHistory = useSkillTreeHistory();
+  const backToLearningPath = useMemo(
+    () => getBackToLearningPathFromHistory(skillTreeHistory, conceptId),
+    [skillTreeHistory, conceptId],
+  );
 
   const conceptMeta = useMemo<ContentMeta | undefined>(() => {
     if (!conceptId) return undefined;
@@ -68,7 +75,7 @@ export default function ConceptPage() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error">
           Concept not found
-          <Button onClick={() => navigate('/learn')}>Return to learning</Button>
+          <Button onClick={() => navigate(backToLearningPath)}>Return to learning</Button>
         </Alert>
       </Container>
     );
@@ -85,7 +92,7 @@ export default function ConceptPage() {
       <ContentHeader
         title={conceptMeta.name}
         description={conceptMeta.description}
-        onBack={() => navigate('/learn')}
+        onBack={() => navigate(backToLearningPath)}
         icon={<School color="primary" sx={{ fontSize: 32 }} />}
         isCompleted={isCompleted}
       />
@@ -123,7 +130,7 @@ export default function ConceptPage() {
           setShowCompletionDialog(false);
           selectTab('summary');
         }}
-        onReturnToOverview={() => navigate('/learn')}
+        onReturnToOverview={() => navigate(backToLearningPath)}
       />
     </Container>
   );

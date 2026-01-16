@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/learning/store";
 import { contentIndex, contentItems } from "@/curriculum/index";
@@ -6,6 +6,7 @@ import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas
 import { useContentProgress } from "@/learning/hooks/useContentProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
 import { raContentPositions, raConnectors } from "@/learning/skilltree/ra-skilltree/ra-treeDefinition";
+import { markSkillTreeVisited } from "@/learning/utils/skillTreeTracking";
 
 /*
  * RALearningOverviewPage component that displays the Relational Algebra skill tree overview page.
@@ -17,6 +18,10 @@ export default function RALearningOverviewPage() {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+
+  useEffect(() => {
+    markSkillTreeVisited("ra");
+  }, []);
 
   const { isCompleted, getProgress } = useContentProgress(
     contentIndex,
