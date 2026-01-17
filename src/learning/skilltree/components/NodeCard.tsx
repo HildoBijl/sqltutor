@@ -21,6 +21,7 @@ interface NodeCardProps {
   isPrerequisite?: boolean;
   isSomethingHovered?: boolean;
   onClick?: () => void;
+  planningMode?: boolean;
 }
 
 export function NodeCard({
@@ -32,6 +33,7 @@ export function NodeCard({
   isPrerequisite = false,
   isSomethingHovered = false,
   onClick,
+  planningMode,
 }: NodeCardProps) {
   const theme = useTheme();
   const type = item.type;
@@ -50,11 +52,11 @@ export function NodeCard({
   // Calculate rectangle bounds from position (top-left corner)
   const rectStart = new Vector(
     positionData.position.x - cardWidth / 2,
-    positionData.position.y - cardHeight / 2
+    positionData.position.y - cardHeight / 2,
   );
   const rectEnd = new Vector(
     positionData.position.x + cardWidth / 2,
-    positionData.position.y + cardHeight / 2
+    positionData.position.y + cardHeight / 2,
   );
 
   // Calculate position for the icon
@@ -69,44 +71,52 @@ export function NodeCard({
   let strokeWidth: number;
   // let borderOpacity: number;
 
-  if (isHovered || isPrerequisite) {
-    if (completed) {
-      nodeOpacity = 1.0;
-      borderColor = "rgba(76, 175, 80, 1.0)";
-      strokeWidth = 2;
+  if (planningMode) {
+    nodeOpacity = 1.0;
+    borderColor = isHovered
+      ? theme.palette.primary.main
+      : theme.palette.divider;
+    strokeWidth = isHovered ? 2 : 1;
+  } else {
+    if (isHovered || isPrerequisite) {
+      if (completed) {
+        nodeOpacity = 1.0;
+        borderColor = "rgba(76, 175, 80, 1.0)";
+        strokeWidth = 2;
+      } else if (readyToLearn) {
+        nodeOpacity = 1.0;
+        borderColor = "#FFD700";
+        strokeWidth = 2;
+      } else {
+        nodeOpacity = 1.0;
+        borderColor = "#E84421";
+        strokeWidth = 2;
+      }
+    } else if (completed) {
+      if (isSomethingHovered && !isPrerequisite) {
+        nodeOpacity = 0.4;
+        borderColor = "rgba(76, 175, 80, 0.4)";
+        strokeWidth = 1;
+      } else {
+        nodeOpacity = 1.0;
+        borderColor = "#4CAF50";
+        strokeWidth = 1;
+      }
     } else if (readyToLearn) {
-      nodeOpacity = 1.0;
-      borderColor = "#FFD700"
-      strokeWidth = 2;
+      if (isSomethingHovered && !isPrerequisite) {
+        nodeOpacity = 0.15;
+        borderColor = "#e0e0e0";
+        strokeWidth = 1;
+      } else {
+        nodeOpacity = 1.0;
+        borderColor = "#FFD700";
+        strokeWidth = 1;
+      }
     } else {
-      nodeOpacity = 1.0;
-      borderColor = "#E84421";
-      strokeWidth = 2;
-    }
-  } else if (completed) {
-    if (isSomethingHovered && !isPrerequisite) {
-      nodeOpacity = 0.4;
-      borderColor = "rgba(76, 175, 80, 0.4)";
-      strokeWidth = 1;
-    } else {
-      nodeOpacity = 1.0;
-      borderColor = "#4CAF50";
-      strokeWidth = 1;
-    }
-  } else if (readyToLearn) {
-    if (isSomethingHovered && !isPrerequisite) {
       nodeOpacity = 0.15;
       borderColor = "#e0e0e0";
       strokeWidth = 1;
-    } else {
-      nodeOpacity = 1.0;
-      borderColor = "#FFD700";
-      strokeWidth = 1;
     }
-  } else {
-    nodeOpacity = 0.15;
-    borderColor = "#e0e0e0";
-    strokeWidth = 1;
   }
 
   return (

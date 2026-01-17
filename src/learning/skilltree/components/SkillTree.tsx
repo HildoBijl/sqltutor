@@ -1,17 +1,13 @@
 import { type RefObject, type ReactNode, useState, useEffect } from "react";
 import type { Vector } from "@/utils/geometry";
-import {
-  Drawing,
-  Element,
-  Curve,
-  useDrawingMousePosition,
-} from "@/components";
+import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
 import { ContentMeta } from "@/curriculum";
 import { NodeCard } from "./NodeCard";
 import { ContentPositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
 import { useTransformContext } from "react-zoom-pan-pinch";
 import { useDebouncedFunction } from "@/utils";
+import { Opacity } from "@mui/icons-material";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -56,8 +52,8 @@ export function SkillTree({
   isCompleted,
   setHoveredId,
   containerRef,
-}: 
-SkillTreeProps) {
+  planningMode,
+}: SkillTreeProps) {
   const theme = useTheme();
 
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
@@ -69,8 +65,14 @@ SkillTreeProps) {
 
   // On changes in the zoom-pan-pinch transform state, dispatch a scroll event to update rects.
   const { transformState } = useTransformContext();
-  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
-  useEffect(dispatchScrollEvent, [transformState.scale, transformState.positionX, transformState.positionY]);
+  const dispatchScrollEvent = useDebouncedFunction(() =>
+    window.dispatchEvent(new Event("scroll")),
+  );
+  useEffect(dispatchScrollEvent, [
+    transformState.scale,
+    transformState.positionX,
+    transformState.positionY,
+  ]);
 
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
@@ -145,6 +147,10 @@ SkillTreeProps) {
 
   // Determine the style for connectors based on different cases
   const getConnectorStyle = (connector: { from: string; to: string }) => {
+    // TO DO
+    if (planningMode) {
+      return { opacity: 1 };
+    }
     // Full opacity for connectors in the hovered path
     if (isConnectorInHoveredPath(connector)) {
       return { opacity: 0.7 };
@@ -176,6 +182,10 @@ SkillTreeProps) {
     const isNextToLearn =
       isReadyToLearn(contentItems[connector.to]) && fromCompleted;
 
+    if (planningMode) {
+      // TO DO
+      return "#1976d2";
+    }
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
       if (bothCompleted) {
@@ -249,6 +259,7 @@ SkillTreeProps) {
                 isPrerequisite={prerequisites.has(item.id)}
                 isSomethingHovered={localHoveredId !== null}
                 onClick={() => handleNodeClick(item)}
+                planningMode={planningMode}
               />
             </g>
           );
