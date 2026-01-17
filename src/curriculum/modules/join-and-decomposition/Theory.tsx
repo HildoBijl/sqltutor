@@ -98,7 +98,7 @@ export function Theory() {
           <Par sx={{ my: 1 }}><FigureSingleTable query={`SELECT * FROM (${adjustedDepartments}) d FULL JOIN employees e ON d.manager_id=e.e_id;`} tableScale={0.6} tableWidth={1100} /></Par>
         </>,
       ]} />
-      <Info>Note that the distinction between natural/non-natural join is completely different from the distinction between inner/outer join. The first issue is about "Do we manually specify on which attributes to perform the join, or do we just pick equally named attributes?" The second issue is about "How do we handle entries without a matching reference?" When we talk about a "join" we usually refer to the the non-natural inner join, but you could very well apply a natural full outer join too.</Info>
+      <Info>Note that the distinction of natural/non-natural join is completely separate from the distinction of inner/outer join. The first issue is about "Do we manually specify on which attributes to perform the join, or do we just pick equally named attributes?" The second issue is about "How do we handle entries without a matching reference?" When we talk about a "join" we usually refer to the the non-natural inner join, but you could very well apply a natural full outer join too.</Info>
     </Section>
   </Page>;
 }

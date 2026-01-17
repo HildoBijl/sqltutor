@@ -17,7 +17,7 @@ export function Theory() {
       <Par>A very basic SQL query is the following.</Par>
       <SQLDisplay>{`SELECT *
 FROM employees;`}</SQLDisplay>
-      <Par>This query instructs the DBMS to take all columns (the star means "all") from the table named <ISQL>employees</ISQL> and return them. So effectively, this query loads in the full table. The result would be the following.</Par>
+      <Par>This query instructs the DBMS to take all columns (the asterisk "*" means "all") from the table named <ISQL>employees</ISQL> and return them. So effectively, this query loads in the full table. The result would be the following.</Par>
       <FigureEmployeeTable />
       <Par>The above query (with whatever table name applies) is used very often. It's a quick way to check out the data in a table. Use it at the start of every exercise you make here at SQL Valley, just to get started.</Par>
       <Info>One of the reasons why SQL is popular is its readability. Even without ever having seen SQL, you probably had an idea what the above query was for.</Info>
