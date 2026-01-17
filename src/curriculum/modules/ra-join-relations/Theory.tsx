@@ -35,7 +35,8 @@ export function Theory() {
       ]} />
       <Par>An example way to use it would be the following.</Par>
       <FigureExampleRAQuery query={<>departments ⋈ ρ<sub>e_id→manager_id</sub>(employees)</>} actualQuery="SELECT * FROM departments NATURAL JOIN (SELECT e_id AS manager_id, first_name, last_name, phone, email, address, city, hire_date, current_salary FROM employees)" tableWidth={900} tableScale={0.5} below />
-      <Par>Internally, relational algebra sets up the Cartesian product, finds all attributes from the two relations with equal name (here "manager_id") and applies filtering to keep only the rows with equal "manager_id". It also merges the two attributes "departments.manager_id" and "employees.manager_id" into one attribute, since the values are equal anyway. This completes the join, but then with far less notation than before.</Par>
+      <Info>A third thing that the natural join does, is merge the equally-named attributes (here "departments.manager_id" and "employees.manager_id") into one attribute (here "manager_id"). After all, they are required to have equal value anyway.</Info>
+      <Par>The natural join is a useful short-cut, assuming the attribute names line up well, and there are no extra attributes that accidentally also have the same name.</Par>
     </Section>
 
     <Section title="Apply a filter after the join">
