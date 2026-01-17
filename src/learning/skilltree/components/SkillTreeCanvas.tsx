@@ -58,6 +58,8 @@ export function SkillTreeCanvas({
   const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
   const [isPanning, setIsPanning] = useState(false);
 
+  // Added for planning mode
+  const [planningMode, setPlanningMode] = useState(false);
   const theme = useTheme();
 
   return (
@@ -97,6 +99,10 @@ export function SkillTreeCanvas({
               onZoomOut={zoomOut}
               onReset={resetTransform}
               onCenter={centerView}
+              onTogglePlanningMode={() => setPlanningMode(!planningMode)}
+              planningMode={planningMode}
+            />
+            <TreeLegend 
             />
             <TreeLegend />
             <TransformComponent
@@ -125,6 +131,7 @@ export function SkillTreeCanvas({
                 setHoveredId={setHoveredId}
                 containerRef={containerRef}
                 nodeRefs={nodeRefs}
+                planningMode={planningMode}
               />
             </TransformComponent>
           </div>

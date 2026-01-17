@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { EditNote, School } from "@mui/icons-material";
 
-
 /*
 * TreeLegend component that displays a legend for the skill tree nodes.
 */

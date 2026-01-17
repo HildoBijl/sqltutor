@@ -45,6 +45,7 @@ interface SkillTreeProps {
   setHoveredId: (id: string | null) => void;
   containerRef: RefObject<HTMLDivElement | null>;
   nodeRefs: RefObject<Map<string, HTMLDivElement | null>>;
+  planningMode: boolean;
 }
 
 export function SkillTree({
@@ -53,10 +54,9 @@ export function SkillTree({
   treeBounds,
   visiblePaths,
   isCompleted,
-  // getProgress,
   setHoveredId,
   containerRef,
-}: // nodeRefs,
+}: 
 SkillTreeProps) {
   const theme = useTheme();
 

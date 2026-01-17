@@ -1,5 +1,5 @@
 import { Box, Button, Tooltip } from "@mui/material";
-import { Add, Remove, Refresh } from "@mui/icons-material";
+import { Add, Remove, Refresh, OutlinedFlag } from "@mui/icons-material";
 
 /*
 * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
@@ -9,6 +9,8 @@ interface ZoomControlsProps {
   onZoomOut: (step?: number, animationTime?: number) => void;
   onReset: (animationTime?: number) => void;
   onCenter: (scale?: number, animationTime?: number) => void;
+  planningMode?: boolean;
+  onTogglePlanningMode?: () => void;
   zoomStep?: number;
 }
 
@@ -24,6 +26,8 @@ export function ZoomControls({
   onZoomIn,
   onZoomOut,
   onReset,
+  onTogglePlanningMode,
+  planningMode,
   // onCenter,
   zoomStep = 0.15,
 }: ZoomControlsProps) {
@@ -71,6 +75,16 @@ export function ZoomControls({
           sx={{ minWidth: "40px", fontSize: '15px' }}
         >
           <Refresh fontSize="small" color="primary" />
+        </Button>
+      </Tooltip>
+      <Tooltip title="Planning Mode" placement="left">
+        <Button
+          variant={planningMode ? "contained" : "outlined"}
+          size="small"
+          onClick={onTogglePlanningMode}
+          sx={{ minWidth: "40px", fontSize: '15px'}}
+        >
+          <OutlinedFlag fontSize="small" sx={{ color: planningMode ? "white" : "primary" }} />
         </Button>
       </Tooltip>
     </Box>
