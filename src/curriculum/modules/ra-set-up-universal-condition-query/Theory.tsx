@@ -15,7 +15,7 @@ export function Theory() {
       <Par>By now we know how to set up relatively complex relational algebra queries and scripts. We have not yet tackled the hardest ones though: requests with <Term>universal conditions</Term> such as "for every [...]". Let's study how to tackle those.</Par>
     </Section>
 
-    <Section title="Flip the request: use a double negative">
+    <Section title="Reformulate the request: use a double negative">
       <Par>Let's consider an example: we study the employee contracts from the <Term>emp_data</Term> relation. These contracts can have a variety of statuses.</Par>
       <FigureExampleRAQuery query={<>∏<sub>status</sub>(emp_data)</>} actualQuery="SELECT DISTINCT status FROM emp_data" tableWidth={150} />
       <Par>How can we find the employees who have had <Em>all</Em> these statuses at some point during their career?</Par>
@@ -67,7 +67,7 @@ export function Theory() {
       <Info>The original request had a double negative: two not-statements. Each not-statement results in a flip (a set difference) in our final relational algebra script. It's a nice way to check if we haven't forgotten something: "Did we get the same number of flips as we have the word <Em>not</Em> in our request?"</Info>
     </Section>
 
-    <Section title="Use the shortcut: the division operator">
+    <Section title="Use a shortcut: the division operator">
       <Par>The above procedure is a lengthy one. It has resulted in the following six-step script.</Par>
       <RA>
         all_employees ← ∏<sub>e_id</sub>(emp_data)<br />

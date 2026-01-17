@@ -104,7 +104,7 @@ const shoppingExercises = [
 				products_bought ← ∏<sub>cID,pID,date</sub>(purchase)<br />
 				products_on_list ← ∏<sub>cID,pID,date</sub>(shoppinglist)
 			</RA>
-			<Par>It helps to visualize these two relations as checklist tables, with the customers representing rows, and the combinations (pID, date) representing columns. The checklist table contains a checkmark if the customer had the specific product on the specific date in their purchase list and/or shoppinglist.</Par>
+			<Par>It helps to visualize these two relations as checklist tables, with the customers representing rows, and the combinations (pID, date) representing columns. The checklist table contains a checkmark if the customer had the specific product on the specific date on their purchase list and/or shoppinglist.</Par>
 			<Par>We now want to know which products were bought <Em>and</Em> were on the shopping list. To implement these conditions, we take an intersection. We get</Par>
 			<RA>products_bought_from_list ← products_bought ∩ products_on_list</RA>
 			<Par>We are looking for the people for which there <Em>exists</Em> some moment where they bought a product from their list. There is no "not" here, so we don't flip the checklist table: we directly squash it. This gives us all the people who <Em>at some point</Em> bought something from their shopping list.</Par>
