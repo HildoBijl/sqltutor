@@ -7,6 +7,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
+import { fill } from "lodash";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -69,15 +70,21 @@ export function NodeCard({
   let nodeOpacity: number;
   let borderColor: string;
   let strokeWidth: number;
+  let fillColor: string;
   // let borderOpacity: number;
 
   if (planningMode) {
     nodeOpacity = 1.0;
-    borderColor = isHovered
-      ? theme.palette.primary.main
-      : theme.palette.divider;
     strokeWidth = isHovered ? 2 : 1;
+    if (completed) {
+      fillColor = "#4CAF50";
+      borderColor = "$4CAF50";
+    } else {
+      fillColor = theme.palette.background.paper;
+      borderColor = isHovered ? theme.palette.primary.main : theme.palette.divider;
+    }
   } else {
+    fillColor = theme.palette.background.paper;
     if (isHovered || isPrerequisite) {
       if (completed) {
         nodeOpacity = 1.0;
@@ -136,9 +143,7 @@ export function NodeCard({
         dimensions={{ start: rectStart, end: rectEnd }}
         cornerRadius={cornerRadius}
         style={{
-          fill: isHovered
-            ? theme.palette.action.hover
-            : theme.palette.background.paper,
+          fill: fillColor,
           stroke: borderColor,
           strokeWidth: strokeWidth,
           strokeOpacity: nodeOpacity,
@@ -245,7 +250,8 @@ export function NodeCard({
                 width: cardWidth - 20,
                 textAlign: "center",
                 fontWeight: 500,
-                fontSize: "15px",
+                fontSize: "17px",
+                color: planningMode && completed ? "#ffffff" : "#000000",
               }}
             >
               {item.name}

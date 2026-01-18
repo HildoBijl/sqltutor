@@ -184,7 +184,10 @@ export function SkillTree({
 
     if (planningMode) {
       // TO DO
-      return "#1976d2";
+      if (bothCompleted) {
+        return "#4CAF50";
+      }
+      return "#9aa0a6";
     }
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
