@@ -60,6 +60,7 @@ export function SkillTreeCanvas({
 
   // Added for planning mode
   const [planningMode, setPlanningMode] = useState(false);
+  const [goalNodeId, setGoalNodeId] = useState<string | null>(null);
   const theme = useTheme();
 
   return (
@@ -132,6 +133,8 @@ export function SkillTreeCanvas({
                 containerRef={containerRef}
                 nodeRefs={nodeRefs}
                 planningMode={planningMode}
+                goalNodeId={goalNodeId}
+                setGoalNodeId={setGoalNodeId}
               />
             </TransformComponent>
           </div>

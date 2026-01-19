@@ -7,7 +7,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
+import PushPinIcon from "@mui/icons-material/PushPin";
 import { fill } from "lodash";
+import { check } from "zod";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -23,6 +25,8 @@ interface NodeCardProps {
   isSomethingHovered?: boolean;
   onClick?: () => void;
   planningMode?: boolean;
+  isGoalNode?: boolean;
+  onSetGoal?: () => void;
 }
 
 export function NodeCard({
@@ -35,6 +39,8 @@ export function NodeCard({
   isSomethingHovered = false,
   onClick,
   planningMode,
+  isGoalNode = false,
+  onSetGoal,
 }: NodeCardProps) {
   const theme = useTheme();
   const type = item.type;
@@ -81,7 +87,9 @@ export function NodeCard({
       borderColor = "$4CAF50";
     } else {
       fillColor = theme.palette.background.paper;
-      borderColor = isHovered ? theme.palette.primary.main : theme.palette.divider;
+      borderColor = isHovered
+        ? theme.palette.primary.main
+        : theme.palette.divider;
     }
   } else {
     fillColor = theme.palette.background.paper;
@@ -224,7 +232,7 @@ export function NodeCard({
               )}
             </div>
 
-            {completed && (
+            {completed && !isGoalNode && (
               <div
                 style={{
                   position: "absolute",
@@ -244,6 +252,68 @@ export function NodeCard({
                 />
               </div>
             )}
+
+            {/* Show pin icon when hovering over an item in planning mode, if the item is not set as a goal */}
+            {planningMode && isHovered && !isGoalNode && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevents trigger the card click
+                  if (onSetGoal) {
+                    onSetGoal();
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  top: -5,
+                  right: -5,
+                  width: 2 * checkmarkSize,
+                  height: 2 * checkmarkSize,
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: "1px solid #616161",
+                  pointerEvents: "auto",
+                }}
+              >
+                <PushPinIcon
+                  style={{ fontSize: checkmarkSize - 4, color: "#9aa0a6" }}
+                />
+              </div>
+            )}
+
+            {/* Show filled pin icon if the item is set as a goal */}
+            {planningMode && isGoalNode && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSetGoal) {
+                    onSetGoal();
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  top: -5,
+                  right: -5,
+                  width: 2 * checkmarkSize,
+                  height: 2 * checkmarkSize,
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  pointerEvents: "auto",
+                  border: "1px solid purple",
+                }}
+              >
+                <PushPinIcon
+                  style={{ fontSize: checkmarkSize - 4, color: "purple" }}
+                />
+              </div>
+            )} 
 
             <div
               style={{

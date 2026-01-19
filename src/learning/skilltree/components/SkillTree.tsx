@@ -42,6 +42,8 @@ interface SkillTreeProps {
   containerRef: RefObject<HTMLDivElement | null>;
   nodeRefs: RefObject<Map<string, HTMLDivElement | null>>;
   planningMode: boolean;
+  goalNodeId?: string | null;
+  setGoalNodeId?: (id: string | null) => void;
 }
 
 export function SkillTree({
@@ -53,6 +55,8 @@ export function SkillTree({
   setHoveredId,
   containerRef,
   planningMode,
+  goalNodeId,
+  setGoalNodeId,
 }: SkillTreeProps) {
   const theme = useTheme();
 
@@ -263,6 +267,12 @@ export function SkillTree({
                 isSomethingHovered={localHoveredId !== null}
                 onClick={() => handleNodeClick(item)}
                 planningMode={planningMode}
+                isGoalNode={planningMode && goalNodeId === item.id}
+                onSetGoal={() => {
+                  if (planningMode) {
+                    setGoalNodeId(goalNodeId === item.id ? null : item.id);
+                  }
+                }}
               />
             </g>
           );
