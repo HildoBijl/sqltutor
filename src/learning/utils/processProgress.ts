@@ -62,15 +62,5 @@ export function processProgress(
     addPrerequisites(id);
   }
 
-  for (const item of contentItems) {
-    if (item.type !== 'skill') continue;
-    if (completed.has(item.id)) {
-      const solved = skillProgress[item.id] ?? 0;
-      if (solved < requiredCount) {
-        skillProgress[item.id] = requiredCount;
-      }
-    }
-  }
-
   return { completed, skillProgress, requiredCount };
 }
