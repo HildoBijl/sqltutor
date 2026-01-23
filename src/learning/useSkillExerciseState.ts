@@ -40,6 +40,11 @@ function generateInstanceId(): ExerciseInstanceId {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+export interface SkillExerciseOption {
+  id: string;
+  label: string;
+}
+
 export interface SkillExerciseModuleLike {
   generate?: (helpers: ExerciseHelpers) => any;
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
@@ -50,6 +55,8 @@ export interface SkillExerciseModuleLike {
   getDescription?: (exercise: any) => string | null | undefined;
   runDemo?: (args: { exercise: any; helpers: ExerciseHelpers }) => unknown;
   isExerciseValid?: (exercise: any) => boolean;
+  listExercises?: () => ReadonlyArray<SkillExerciseOption>;
+  getExerciseById?: (id: string) => any | null;
   solutionTemplate?: string;
   messages?: {
     correct?: string;

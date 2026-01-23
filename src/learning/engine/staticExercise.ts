@@ -59,8 +59,7 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
   };
   const exerciseIndex = new Map(exercises.map((exercise) => [exercise.id, exercise]));
 
-  function generate(utils: Utils): ExerciseState {
-    const exercise = utils.selectRandomly(exercises as readonly StaticExercise[]);
+  const toExerciseState = (exercise: StaticExercise): ExerciseState => {
     const description = (exercise.description ?? exercise.prompt).trim();
     return {
       id: exercise.id,
@@ -70,6 +69,11 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
       solution: exercise.solution.trim(),
       comparisonOptions: exercise.comparisonOptions,
     };
+  };
+
+  function generate(utils: Utils): ExerciseState {
+    const exercise = utils.selectRandomly(exercises as readonly StaticExercise[]);
+    return toExerciseState(exercise);
   }
 
   function getDescription(exercise: ExerciseState): string {
@@ -146,6 +150,19 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     return exercise.solution;
   }
 
+  function listExercises() {
+    return exercises.map((exercise) => ({
+      id: exercise.id,
+      label: (exercise.description ?? exercise.prompt).trim(),
+    }));
+  }
+
+  function getExerciseById(id: string): ExerciseState | null {
+    const exercise = exerciseIndex.get(id);
+    if (!exercise) return null;
+    return toExerciseState(exercise);
+  }
+
   function isExerciseValid(exercise: unknown): boolean {
     if (!exercise || typeof exercise !== 'object') return false;
     const exerciseId = (exercise as ExerciseState).id;
@@ -163,6 +180,8 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     validateOutput,
     verifyOutput,
     getSolution,
+    listExercises,
+    getExerciseById,
     isExerciseValid,
   };
 }

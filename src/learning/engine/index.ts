@@ -62,7 +62,7 @@ export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unkn
 }
 
 export type ExerciseAction<Input = unknown, Result = unknown> =
-  | { type: 'generate'; seed?: number }
+  | { type: 'generate'; seed?: number; exercise?: unknown }
   | { type: 'reset'; keepExercise?: boolean }
   | {
       type: 'input';
@@ -175,7 +175,10 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
 
     switch (action.type) {
       case 'generate': {
-        const exercise = config.generateExercise(helpers);
+        const exercise =
+          action.exercise !== undefined && action.exercise !== null
+            ? (action.exercise as Exercise)
+            : config.generateExercise(helpers);
         const demo = config.runDemo ? config.runDemo({ exercise, helpers }) : undefined;
         const status: ExerciseStatus = demo ? 'demo-ready' : 'ready';
         const entry: ExerciseHistoryEntry<Input, Result> = {

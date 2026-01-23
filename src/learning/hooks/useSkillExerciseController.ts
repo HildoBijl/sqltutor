@@ -6,6 +6,7 @@ import { useDatabase } from '@/learning/databases';
 import type { DatasetSize } from '@/mockData';
 import {
   useSkillExerciseState,
+  type SkillExerciseOption,
   type SkillExerciseModuleLike,
   type SkillExerciseProgress,
 } from '../useSkillExerciseState';
@@ -15,6 +16,8 @@ import { normalizePracticeSolution } from '../utils/normalizePracticeSolution';
 
 const normalizeForHistory = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+
+const normalizeExerciseLabel = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const SMALL_DATASET_WARNING =
   'Warning: you are using the small data set. Not all exercises are suitable for this data set. Consider using the full data set instead.';
@@ -57,6 +60,8 @@ interface SkillExerciseControllerState {
     hasExecutedQuery: boolean;
     datasetSize: DatasetSize;
     datasetWarning: string | null;
+    exerciseOptions: SkillExerciseOption[];
+    selectedExerciseId: string | null;
   };
   status: {
     dbReady: boolean;
@@ -87,6 +92,7 @@ interface SkillExerciseControllerState {
     nextExercise: () => void;
     dismissFeedback: () => void;
     setDatasetSize: (size: DatasetSize) => void;
+    selectExercise: (exerciseId: string) => void;
   };
 }
 
@@ -629,6 +635,52 @@ export function useSkillExerciseController({
     ? (currentExercise as SkillExercise)
     : null;
 
+  const exerciseOptions = useMemo<SkillExerciseOption[]>(() => {
+    if (!skillModule?.listExercises || !skillModule?.getExerciseById) return [];
+    const options = skillModule.listExercises() ?? [];
+    return options.map((option, index) => {
+      const baseLabel = normalizeExerciseLabel(option.label || option.id);
+      const label = baseLabel ? `${index + 1}. ${baseLabel}` : `Exercise ${index + 1}`;
+      return { id: option.id, label };
+    });
+  }, [skillModule]);
+
+  const selectedExerciseId = useMemo(() => {
+    if (!normalizedExercise) return null;
+    const id = (normalizedExercise as Record<string, unknown>).id;
+    return typeof id === 'string' ? id : null;
+  }, [normalizedExercise]);
+
+  const handleSelectExercise = useCallback(
+    (exerciseId: string) => {
+      if (!skillModule?.getExerciseById) return;
+      if (!exerciseId || exerciseId === selectedExerciseId) return;
+      const selectedExercise = skillModule.getExerciseById(exerciseId);
+      if (!selectedExercise) {
+        updateFeedback({ message: 'Selected exercise is not available.', type: 'warning' });
+        return;
+      }
+      exerciseDispatch({ type: 'generate', exercise: selectedExercise });
+      setQuery('');
+      updateFeedback(null);
+      setHasGivenUp(false);
+      setHasExecutedQuery(false);
+      setHasSubmittedAttempt(false);
+      setRevealedSolution(null);
+    },
+    [
+      exerciseDispatch,
+      selectedExerciseId,
+      setHasExecutedQuery,
+      setHasGivenUp,
+      setHasSubmittedAttempt,
+      setQuery,
+      setRevealedSolution,
+      skillModule,
+      updateFeedback,
+    ],
+  );
+
   const exerciseDescription = useMemo(() => {
     if (!normalizedExercise) {
       return '';
@@ -689,6 +741,8 @@ export function useSkillExerciseController({
       hasExecutedQuery,
       datasetSize: selectedDatasetSize,
       datasetWarning: datasetWarning?.message ?? null,
+      exerciseOptions,
+      selectedExerciseId,
     },
     status: {
       dbReady,
@@ -719,6 +773,7 @@ export function useSkillExerciseController({
       nextExercise: handleNewExercise,
       dismissFeedback: () => updateFeedback(null),
       setDatasetSize: handleDatasetSizeChange,
+      selectExercise: handleSelectExercise,
     },
   };
 }

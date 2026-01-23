@@ -53,4 +53,6 @@ export const {
   validateOutput,
   verifyOutput,
   getSolution,
+  listExercises,
+  getExerciseById,
 } = buildStaticExerciseModule(EXERCISES);
