@@ -6,6 +6,7 @@ import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-mater
 import { useAppStore, type ConceptComponentState } from '@/learning/store';
 import { contentIndex, type ContentMeta } from '@/curriculum';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
+import { useContentProgress } from '@/learning/hooks/useContentProgress';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
 import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { ContentHeader } from '@/learning/components/ContentHeader';
@@ -19,6 +20,7 @@ export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
   const hideStories = useAppStore((state) => state.hideStories);
+  const components = useAppStore((state) => state.components);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();
@@ -52,7 +54,8 @@ export default function ConceptPage() {
     defaultTab: 'theory',
   });
 
-  const isCompleted = componentState.understood ?? false;
+  const { isCompleted: isContentCompleted } = useContentProgress(contentIndex, components);
+  const isCompleted = conceptId ? isContentCompleted(conceptId) : componentState.understood ?? false;
   const summaryUnlocked = isCompleted || isAdmin;
 
   const visibleTabs = useMemo(
