@@ -9,6 +9,7 @@ import type {
 
 export interface StaticExercise {
   id: string;
+  version?: number;
   prompt: string;
   solution: string;
   description?: string;
@@ -17,6 +18,7 @@ export interface StaticExercise {
 
 export interface ExerciseState {
   id: string;
+  version: number;
   prompt: string;
   solution: string;
   description: string;
@@ -35,11 +37,17 @@ const MESSAGES = {
   },
 } as const;
 
+const DEFAULT_VERSION = 1;
+
 function formatMessage(template: string, context: Record<string, unknown>): string {
   return template.replace(/\{(\w+)\}/g, (_m, key) => {
     const value = context[key];
     return value === undefined || value === null ? '' : String(value);
   });
+}
+
+function normalizeVersion(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : DEFAULT_VERSION;
 }
 
 export function buildStaticExerciseModule(exercises: StaticExercise[]) {
@@ -49,12 +57,14 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     requireEqualColumnNames: false,
     caseSensitive: false,
   };
+  const exerciseIndex = new Map(exercises.map((exercise) => [exercise.id, exercise]));
 
   function generate(utils: Utils): ExerciseState {
     const exercise = utils.selectRandomly(exercises as readonly StaticExercise[]);
     const description = (exercise.description ?? exercise.prompt).trim();
     return {
       id: exercise.id,
+      version: normalizeVersion(exercise.version),
       prompt: exercise.prompt,
       description,
       solution: exercise.solution.trim(),
@@ -136,11 +146,23 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     return exercise.solution;
   }
 
+  function isExerciseValid(exercise: unknown): boolean {
+    if (!exercise || typeof exercise !== 'object') return false;
+    const exerciseId = (exercise as ExerciseState).id;
+    if (typeof exerciseId !== 'string') return false;
+    const entry = exerciseIndex.get(exerciseId);
+    if (!entry) return false;
+    const expectedVersion = normalizeVersion(entry.version);
+    const currentVersion = normalizeVersion((exercise as ExerciseState).version);
+    return expectedVersion === currentVersion;
+  }
+
   return {
     generate,
     getDescription,
     validateOutput,
     verifyOutput,
     getSolution,
+    isExerciseValid,
   };
 }

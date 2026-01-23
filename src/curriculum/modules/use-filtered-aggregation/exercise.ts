@@ -3,6 +3,7 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'filtered-aggregation-micro',
+    version: 1,
     prompt: 'Retrieve the buyer ID and the number of transactions they appear in, where the amount of the transaction is less than 5, but that buyer\'s total amount spent is more than 20000.',
     solution: `
 SELECT 
@@ -16,6 +17,7 @@ HAVING SUM(amount) > 20000;
   },
   {
     id: 'filtered-aggregation-teambuilding',
+    version: 1,
     prompt: 'Retrieve the department ID, average, and total expenses for teambuilding activities for departments where the average teambuilding expense exceeds 10,000.',
     solution: `
 SELECT 
@@ -30,6 +32,7 @@ HAVING AVG(amount) > 10000;
   },
   {
     id: 'filtered-aggregation-perf-range',
+    version: 1,
     prompt: 'Retrieve the employee ID, minimum, and maximum performance scores for employees whose performance score range exceeds 40.',
     solution: `
 SELECT 
@@ -43,6 +46,7 @@ HAVING max_score - min_score > 40;
   },
   {
     id: 'filtered-aggregation-rejected-tx',
+    version: 1,
     prompt: 'Retrieve the vendor ID, total number of transactions, and number of rejected transactions for vendors with more than 50 rejected transactions.',
     solution: `
 SELECT 
@@ -56,6 +60,7 @@ HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 50;
   },
   {
     id: 'filtered-aggregation-product-revenue',
+    version: 1,
     prompt: 'Retrieve the product ID, total revenue, and number of transactions for products with an average transaction amount below 10 but total revenue above 20,000.',
     solution: `
 SELECT 

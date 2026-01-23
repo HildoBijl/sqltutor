@@ -21,6 +21,7 @@ const EXERCISES: StaticExercise[] = [
   //   },
   {
     id: 'unknown-budget',
+    version: 1,
     prompt: 'Find the ID and name of all the departments whose budget is not known.',
     solution: `
 SELECT d_id, d_name
@@ -30,6 +31,7 @@ WHERE budget IS NULL;
   },
   {
     id: 'large-earners',
+    version: 1,
     prompt: 'Find the first and last names of all the employees who currently earn more than 150,000. Ensure there are no duplicates.',
     solution: `
 SELECT DISTINCT first_name, last_name
@@ -39,6 +41,7 @@ WHERE current_salary > 150000;
   },
   {
     id: 'tough-positions',
+    version: 1,
     prompt: 'Find all the job positions where at some point someone performed less than a performance score of 60. Ensure there are no duplicates.',
     solution: `
 SELECT DISTINCT position

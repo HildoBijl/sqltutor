@@ -3,6 +3,7 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'lookup-manager-city',
+    version: 1,
     prompt: 'Find the names of the departments whose manager lives in Palo Alto.',
     solution: `
 SELECT d_name
@@ -16,6 +17,7 @@ WHERE manager_id IN (
   },
   {
     id: 'lookup-employee-position',
+    version: 1,
     prompt: 'Find the first and last name of all employees that have ever worked as a warehouse associate.',
     solution: `
 SELECT first_name, last_name
@@ -29,6 +31,7 @@ WHERE e_id IN (
   },
   {
     id: 'lookup-manager-sick',
+    version: 1,
     prompt: 'Find the names of the departments whose manager has at some point been on sick leave.',
     solution: `
 SELECT d_name

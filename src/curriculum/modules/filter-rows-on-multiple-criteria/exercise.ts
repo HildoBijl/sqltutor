@@ -3,6 +3,7 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'multi-filter-employees-between',
+    version: 1,
     prompt: 'Retrieve all departments where the number of employees is not between 10 and 20, and whose budget is known.',
     solution: `
 SELECT *
@@ -13,6 +14,7 @@ WHERE nr_employees NOT BETWEEN 10 AND 20
   },
   {
     id: 'multi-filter-on-leave',
+    version: 1,
     prompt: 'Retrieve all employee data records where the employee is either on sick leave or paid leave, and the end date is after 2024.',
     solution: `
 SELECT *
@@ -23,6 +25,7 @@ WHERE (status = 'paid leave' OR status = 'sick leave')
   },
   {
     id: 'multi-filter-phone-area',
+    version: 1,
     prompt: 'Retrieve all employees whose phone number starts with 408 and who live in either Mountain View or Menlo Park.',
     solution: `
 SELECT *

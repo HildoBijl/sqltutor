@@ -3,6 +3,7 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'join-managers-hire-date',
+    version: 1,
     prompt: 'Retrieve the department names and manager names (first and last) of all departments whose manager was hired before 2018.',
     solution: `
 SELECT d_name, first_name, last_name
@@ -14,6 +15,7 @@ WHERE e.hire_date < '2018-01-01';
   },
   {
     id: 'join-employee-positions',
+    version: 1,
     prompt: 'For all employees, make a list of the positions they have had. Give the first name, the last name and the position. A person may have multiple entries in case of multiple positions, but there should be no duplicates. Also include employees who never had a position.',
     solution: `
 SELECT DISTINCT first_name, last_name, position
@@ -23,6 +25,7 @@ NATURAL LEFT JOIN emp_data;
   },
   {
     id: 'join-employee-leave',
+    version: 1,
     prompt: 'Create an overview of all sick leaves. More specific: find the names (first and last) of all employees who have been on sick leave. Also include the starting date and ending date of the respective contract in which they had sick leave. (In case of multiple contracts with sick leave, include multiple rows.)',
     solution: `
 SELECT first_name, last_name, position, start_date, end_date
