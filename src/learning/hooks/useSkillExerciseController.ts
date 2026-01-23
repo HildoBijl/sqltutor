@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/utils/types';
 import type { SkillComponentState } from '@/learning/store';
 import { useDatabase } from '@/learning/databases';
+import type { DatasetSize } from '@/mockData';
 import {
   useSkillExerciseState,
   type SkillExerciseModuleLike,
@@ -14,6 +15,14 @@ import { normalizePracticeSolution } from '../utils/normalizePracticeSolution';
 
 const normalizeForHistory = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
+
+const SMALL_DATASET_WARNING =
+  'Warning: you are using the small data set. Not all exercises are suitable for this data set. Consider using the full data set instead.';
+
+const hasResultRows = (results?: ReadonlyArray<QueryResultSet> | null) =>
+  Boolean(results?.some((result) => (result?.values?.length ?? 0) > 0));
+
+const isResultEmpty = (results?: ReadonlyArray<QueryResultSet> | null) => !hasResultRows(results);
 
 interface UseSkillExerciseControllerParams {
   skillId: string;
@@ -46,6 +55,8 @@ interface SkillExerciseControllerState {
     canSubmit: boolean;
     canGiveUp: boolean;
     hasExecutedQuery: boolean;
+    datasetSize: DatasetSize;
+    datasetWarning: string | null;
   };
   status: {
     dbReady: boolean;
@@ -75,6 +86,7 @@ interface SkillExerciseControllerState {
     autoComplete: (options?: { insertIntoEditor?: boolean }) => Promise<void> | void;
     nextExercise: () => void;
     dismissFeedback: () => void;
+    setDatasetSize: (size: DatasetSize) => void;
   };
 }
 
@@ -85,7 +97,8 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
-  // Display database (full dataset for showing results to user)
+  const selectedDatasetSize: DatasetSize = componentState.practiceDatasetSize ?? 'full';
+  // Display database (user-selected dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,
     queryResult,
@@ -98,7 +111,7 @@ export function useSkillExerciseController({
     clearQueryState,
   } = useDatabase({
     contentId: skillId,
-    size: 'full',
+    size: selectedDatasetSize,
     resetOnSchemaChange: true,
   });
 
@@ -135,6 +148,9 @@ export function useSkillExerciseController({
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
+  const [datasetWarning, setDatasetWarning] = useState<{ message: string; queryKey: string } | null>(null);
+  const latestQueryKeyRef = useRef('');
+  const datasetSizeRef = useRef<DatasetSize>(selectedDatasetSize);
   const [revealedSolution, setRevealedSolution] = useState<PracticeSolution | null>(null);
 
   const updateFeedback = useCallback(
@@ -164,11 +180,28 @@ export function useSkillExerciseController({
   const exerciseCompleted = exerciseStatus === 'correct';
 
   useEffect(() => {
+    const normalizedQuery = normalizeForHistory(query);
+    latestQueryKeyRef.current = normalizedQuery;
+
+    if (datasetWarning && datasetWarning.queryKey !== normalizedQuery) {
+      setDatasetWarning(null);
+    }
+  }, [datasetWarning, query]);
+
+  useEffect(() => {
+    datasetSizeRef.current = selectedDatasetSize;
+    setDatasetWarning(null);
+    setHasExecutedQuery(false);
+    clearQueryState();
+  }, [selectedDatasetSize, clearQueryState]);
+
+  useEffect(() => {
     setHasGivenUp(false);
     setRevealedSolution(null);
     updateFeedback(null);
     setHasExecutedQuery(false);
     setHasSubmittedAttempt(false);
+    setDatasetWarning(null);
   }, [currentExercise, setHasExecutedQuery, setHasSubmittedAttempt, setRevealedSolution, updateFeedback]);
 
   useEffect(() => {
@@ -185,6 +218,68 @@ export function useSkillExerciseController({
     }
   }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
 
+  const handleDatasetSizeChange = useCallback(
+    (size: DatasetSize) => {
+      if (size === selectedDatasetSize) return;
+      setComponentState({ practiceDatasetSize: size });
+    },
+    [selectedDatasetSize, setComponentState],
+  );
+
+  const evaluateSmallDatasetWarning = useCallback(
+    async (
+      executedQuery: string,
+      displayOutput: ReadonlyArray<QueryResultSet> | null | undefined,
+      fullOutput?: ReadonlyArray<QueryResultSet> | null,
+    ) => {
+      const normalizedQuery = normalizeForHistory(executedQuery);
+      if (!normalizedQuery) {
+        setDatasetWarning(null);
+        return;
+      }
+
+      if (selectedDatasetSize !== 'small') {
+        setDatasetWarning(null);
+        return;
+      }
+
+      if (!isResultEmpty(displayOutput)) {
+        setDatasetWarning(null);
+        return;
+      }
+
+      let resolvedFullOutput = fullOutput;
+      if (!resolvedFullOutput) {
+        if (!gradingDatabase) {
+          setDatasetWarning(null);
+          return;
+        }
+        try {
+          resolvedFullOutput = await executeGradingQuery(executedQuery);
+        } catch (error) {
+          setDatasetWarning(null);
+          return;
+        }
+      }
+
+      if (latestQueryKeyRef.current !== normalizedQuery) {
+        return;
+      }
+
+      if (datasetSizeRef.current !== 'small') {
+        return;
+      }
+
+      if (isResultEmpty(resolvedFullOutput)) {
+        setDatasetWarning(null);
+        return;
+      }
+
+      setDatasetWarning({ message: SMALL_DATASET_WARNING, queryKey: normalizedQuery });
+    },
+    [executeGradingQuery, gradingDatabase, selectedDatasetSize],
+  );
+
   const handleLiveExecute = useCallback(
     async (liveQuery: string) => {
       if (!dbReady || exerciseCompleted || !currentExercise) return;
@@ -193,17 +288,28 @@ export function useSkillExerciseController({
         updateFeedback(null);
         setHasExecutedQuery(false);
         clearQueryState();
+        setDatasetWarning(null);
         return;
       }
 
       try {
-        await executeDisplayQuery(liveQuery);
+        const output = await executeDisplayQuery(liveQuery);
         setHasExecutedQuery(true);
+        void evaluateSmallDatasetWarning(liveQuery, output);
       } catch (error) {
         console.debug('Live query execution failed:', error);
+        setDatasetWarning(null);
       }
     },
-    [clearQueryState, dbReady, exerciseCompleted, currentExercise, executeDisplayQuery, updateFeedback],
+    [
+      clearQueryState,
+      dbReady,
+      exerciseCompleted,
+      currentExercise,
+      executeDisplayQuery,
+      updateFeedback,
+      evaluateSmallDatasetWarning,
+    ],
   );
 
   const handleExecute = useCallback(
@@ -278,6 +384,7 @@ export function useSkillExerciseController({
           execution = { success: false, error: err };
         }
 
+        const displayOutput = execution.success ? (execution.output ?? null) : null;
         const validation = skillModule!.validateOutput!(currentExercise, execution);
 
         if (!validation.ok) {
@@ -289,6 +396,11 @@ export function useSkillExerciseController({
             },
             { normalizedQuery: normalized },
           );
+          if (execution.success) {
+            void evaluateSmallDatasetWarning(effectiveQuery, displayOutput);
+          } else {
+            setDatasetWarning(null);
+          }
           return;
         }
 
@@ -300,6 +412,11 @@ export function useSkillExerciseController({
             },
             { normalizedQuery: normalized },
           );
+          if (execution.success) {
+            void evaluateSmallDatasetWarning(effectiveQuery, displayOutput);
+          } else {
+            setDatasetWarning(null);
+          }
           return;
         }
 
@@ -322,8 +439,11 @@ export function useSkillExerciseController({
             },
             { normalizedQuery: normalized },
           );
+          setDatasetWarning(null);
           return;
         }
+
+        void evaluateSmallDatasetWarning(effectiveQuery, displayOutput, gradingExecution.output ?? null);
 
         const verification = skillModule!.verifyOutput!(
           currentExercise,
@@ -378,6 +498,7 @@ export function useSkillExerciseController({
           },
           { normalizedQuery: normalized },
         );
+        setDatasetWarning(null);
       }
     },
     [
@@ -396,6 +517,7 @@ export function useSkillExerciseController({
       queueComponentStateUpdate,
       hasGivenUp,
       updateFeedback,
+      evaluateSmallDatasetWarning,
       executeGradingQuery,
       gradingDatabase,
     ],
@@ -565,6 +687,8 @@ export function useSkillExerciseController({
       canSubmit,
       canGiveUp,
       hasExecutedQuery,
+      datasetSize: selectedDatasetSize,
+      datasetWarning: datasetWarning?.message ?? null,
     },
     status: {
       dbReady,
@@ -594,6 +718,7 @@ export function useSkillExerciseController({
       autoComplete: handleAutoComplete,
       nextExercise: handleNewExercise,
       dismissFeedback: () => updateFeedback(null),
+      setDatasetSize: handleDatasetSizeChange,
     },
   };
 }

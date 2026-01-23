@@ -1,4 +1,5 @@
 import type { ExerciseAction, ExerciseStatus } from '@/learning/engine';
+import type { DatasetSize } from '@/mockData/types';
 
 export type ExerciseInstanceId = string;
 
@@ -58,6 +59,7 @@ export interface ConceptComponentState extends BaseComponentState {
 export interface SkillComponentState extends BaseComponentState {
   type: 'skill';
   numSolved: number;
+  practiceDatasetSize?: DatasetSize;
   instances: Record<ExerciseInstanceId, StoredExerciseInstance>;
   currentInstanceId?: ExerciseInstanceId;
 }
