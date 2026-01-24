@@ -28,7 +28,7 @@ export interface ExerciseState {
 const MESSAGES = {
   validation: {
     syntaxError: 'SQL error: {error}',
-    noResultSet: 'Query returned no data.',
+    noResultSet: 'Requirement failed: query must return a result set. No result set was returned.',
   },
   verification: {
     correct: 'Correct!',
@@ -48,6 +48,65 @@ function formatMessage(template: string, context: Record<string, unknown>): stri
 
 function normalizeVersion(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : DEFAULT_VERSION;
+}
+
+const SQL_ERROR_PATTERNS: Array<{
+  pattern: RegExp;
+  format: (match: RegExpMatchArray) => string;
+}> = [
+  {
+    pattern: /no such column:\s*("?)([^"\s]+)\1/i,
+    format: (match) => `Did not recognize column "${match[2]}". Check spelling or table schema.`,
+  },
+  {
+    pattern: /no such table:\s*("?)([^"\s]+)\1/i,
+    format: (match) => `Did not recognize table "${match[2]}".`,
+  },
+  {
+    pattern: /no such function:\s*("?)([^"\s]+)\1/i,
+    format: (match) => `Did not recognize function "${match[2]}".`,
+  },
+  {
+    pattern: /ambiguous column name:\s*("?)([^"\s]+)\1/i,
+    format: (match) =>
+      `Column name "${match[2]}" is ambiguous (appears in more than one table).`,
+  },
+  {
+    pattern: /table\s+("?)([^"\s]+)\1\s+has no column named\s+("?)([^"\s]+)\3/i,
+    format: (match) => `Table "${match[2]}" has no column named "${match[4]}".`,
+  },
+  {
+    pattern: /misuse of aggregate(?: function)?:\s*([A-Za-z0-9_]+)\s*\(?/i,
+    format: (match) => `Misuse of aggregate function "${match[1]}".`,
+  },
+  {
+    pattern: /near\s+"([^"]+)":\s*syntax error/i,
+    format: (match) => `Syntax error near "${match[1]}".`,
+  },
+  {
+    pattern: /incomplete input/i,
+    format: () => 'Syntax error: incomplete input.',
+  },
+];
+
+function formatSqlErrorMessage(rawMessage: string): string {
+  const message = rawMessage.replace(/\s+/g, ' ').trim();
+  if (!message) {
+    return formatMessage(MESSAGES.validation.syntaxError, { error: 'Unknown error' });
+  }
+
+  for (const { pattern, format } of SQL_ERROR_PATTERNS) {
+    const match = message.match(pattern);
+    if (match) {
+      return format(match);
+    }
+  }
+
+  if (/syntax error/i.test(message)) {
+    return 'Syntax error.';
+  }
+
+  return formatMessage(MESSAGES.validation.syntaxError, { error: message });
 }
 
 export function buildStaticExerciseModule(exercises: StaticExercise[]) {
@@ -85,11 +144,10 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     result: ExecutionResult<QueryResult[]>,
   ): ValidationResult {
     if (!result.success) {
+      const errorMessage = result.error?.message || 'Unknown error';
       return {
         ok: false,
-        message: formatMessage(MESSAGES.validation.syntaxError, {
-          error: result.error?.message || 'Unknown error',
-        }),
+        message: formatSqlErrorMessage(errorMessage),
       };
     }
 
