@@ -15,40 +15,44 @@ export function Theory() {
       <Par>By now we know how to set up relatively complex relational algebra queries and scripts. We have not yet tackled the hardest ones though: requests with <Term>universal conditions</Term> such as "for every [...]". Let's study how to tackle those.</Par>
     </Section>
 
-    <Section title="Reformulate the request: use a double negative">
-      <Par>Let's consider an example: we study the employee contracts from the <Term>emp_data</Term> relation. These contracts can have a variety of statuses.</Par>
+    <Section title="Gain intuition of the data and the steps">
+      <Par>As example, let's study the employee contracts from the <Term>emp_data</Term> relation. These contracts can have a variety of statuses.</Par>
       <FigureExampleRAQuery query={<>∏<sub>status</sub>(emp_data)</>} actualQuery="SELECT DISTINCT status FROM emp_data" tableWidth={150} />
       <Par>How can we find the employees who have had <Em>all</Em> these statuses at some point during their career?</Par>
       <Par>To start, we apply the usual tricks in setting up complex queries.</Par>
       <List items={[
-        <>We <Term>manually execute the request</Term>. To find the requested employees, we must run a checklist for each employee. "Have they been on sick leave? Have they been on paid leave?" And so forth. We must run this checklist for <Em>every</Em> employee. At the end, we should check if the checklist is fully ticked off. If so, the employee has had all statuses. Whatever relational algebra query we end up writing will have to do something similar. We need a checklist!</>,
-        <>We <Term>reformulate the request</Term>, replacing any difficult universal condition like "for every" by existence checks. Our example request can be reformulated as "Find all employees for which there exists no status which they have not had." Note that the "for every" request has turned into a double negative.</>,
+        <>We <Term>manually execute the request</Term>. When doing so, we will have to run a <Term>checklist</Term> for every employee. We have to verify: "Have they been on sick leave? Have they been on paid leave?" And so forth. At the end, for every employee, we should check if the checklist is fully ticked off. If so, the employee has had all statuses. This means that, whatever relational algebra query we end up writing, it must do something similar!</>,
+        <>We <Term>reformulate the request</Term>, replacing any difficult universal condition like "for every" by existence checks. Our example request can be reformulated as "Find all employees for which there exists no status which they have not had." Note that the "for every" request has turned into a double negative. Double negatives are very common for universal conditions.</>,
       ]} />
-      <Par>The above steps are meant to improve our intuition of the data and what steps need to be taken to set up the query. Once we have an intuitive feel, we can start writing the relational algebra script.</Par>
+      <Par>The above steps have given us a more intuitive feel of what the script we write must entail. Let's start setting up the script.</Par>
     </Section>
 
-    <Section title="Gather data: set up the checklist table">
-      <Par>When starting the script, it helps to set up two supporting lists.</Par>
+    <Section title="Define entities and checks">
+      <Par>We know that we must run a checklist multiple times. When this is the case, there are two very helpful supporting lists.</Par>
       <List sx={{ my: -1 }} itemSx={{ my: 1 }} contentSpacing={1} items={[
         <>
-          <Par>The <Term>entity list</Term> contains (references to) all the entities that we want to run a checklist for. We want to run checks for each employee, so our entity list will be all the employee keys: their IDs.</Par>
+          <Par>The <Term>entity list</Term> contains (references to) all the entities that we want to run a checklist for. In our case, we want to run checks for each employee, so our entity list will be all the employee keys: their IDs.</Par>
           <Box><FigureExampleRAQuery query={<>all_employees ← ∏<sub>e_id</sub>(emp_data)</>} actualQuery="SELECT DISTINCT e_id FROM emp_data" tableWidth={100} /></Box>
         </>,
         <>
-          <Par>The <Term>checklist</Term> contains (references to) all the checks that we need to run for said entities. We want to verify every status for every employee, so for us this is a list of all possible contract statuses.</Par>
+          <Par>The <Term>checklist</Term> contains (references to) all the checks that we need to run for said entities. In our case, we want to verify every status for every employee, so for us this is a list of all possible contract statuses.</Par>
           <Box><FigureExampleRAQuery query={<>all_statuses ← ∏<sub>status</sub>(emp_data)</>} actualQuery="SELECT DISTINCT status FROM emp_data" tableWidth={100} /></Box>
         </>,
       ]} />
-      <Par>Once we know the checklist and who/what to run it for, we set up the <Term>checklist table</Term>. This is the relation that has all combinations (entity, check) that hold <Em>according to the given data</Em>. For us, that is the list of statuses that the employees have held.</Par>
-      <FigureExampleRAQuery query={<>statuses_held ← ∏<sub>e_id,status</sub>(emp_data)</>} actualQuery="SELECT DISTINCT e_id, status FROM emp_data" tableWidth={200} />
-      <Par>The checklist table is a relation with two columns. However, it is very helpful to imagine it differently: as a 2-dimensional table, with the entities listed vertically and the checks listed horizontally. Each field contains a checkmark if the given combination is present in our data.</Par>
-      <ChecklistTable />
-      <Par>Having this table in mind makes all the subsequent steps a lot easier.</Par>
+      <Par>Now that we have defined this, we can run the checklist for each entity.</Par>
     </Section>
 
-    <Section title="Apply the conditions: combine/flip and squash the checklist table">
-      <Par>Once we have the checklist table, we apply the given conditions to it. In our example case, we want to find if an employee has had <Em>all</Em> statuses. This is difficult, but we could also do the opposite: see if there is a status that each employee has <Em>not</Em> had. To do so, we flip the checklist table. This is done in two steps.</Par>
-      <List sx={{ my: -1 }} itemSx={{ my: 1 }} contentSpacing={1} items={[
+    <Section title="Set up the checklist table">
+      <Par>To run the checklist for each entity, we set up a <Term>checklist table</Term>. This is the relation that has all combinations (entity, check) that hold <Em>according to the given data</Em>. For us, that is the list of statuses that the employees have held.</Par>
+      <FigureExampleRAQuery query={<>statuses_held ← ∏<sub>e_id,status</sub>(emp_data)</>} actualQuery="SELECT DISTINCT e_id, status FROM emp_data" tableWidth={200} />
+      <Par>The checklist table here is a relation with two attributes. However, it is very helpful to imagine it differently: as a 2-dimensional table, with the entities forming rows and the checks forming columns. Each field contains a checkmark if the given combination is present in our data.</Par>
+      <ChecklistTable />
+      <Par>Visualizating the checklist table in this way makes the subsequent steps a lot more intuitive.</Par>
+    </Section>
+
+    <Section title="Apply the conditions: combine/flip the checklist table">
+      <Par>Now that we have a checklist table, we apply the given conditions to it. In our example, we want to find if an employee has had <Em>all</Em> statuses. This is difficult, but we could also do the opposite: see if there is a status that each employee has <Em>not</Em> had. To do so, we <Term>flip</Term> the checklist table. This is done in two steps.</Par>
+      <List useNumbers sx={{ my: -1 }} itemSx={{ my: 1 }} contentSpacing={1} items={[
         <>
           <Par>Set up the <Term>Cartesian product</Term> of the entity list and the checklist. This denotes the table with <Em>all</Em> fields checked.</Par>
           <Box><ChecklistTable all={true} /></Box>
@@ -60,7 +64,11 @@ export function Theory() {
       ]} />
       <Par>This is summarized through the following relational algebra assignment.</Par>
       <FigureExampleRAQuery query={<>statuses_not_held ← all_employees x all_statuses - statuses_held</>} actualQuery="SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data" tableWidth={200} />
-      <Par>Once we have applied the conditions, we <Term>squash</Term> the entity-requirement table into a list: we take the projection with respect to the entities. This gives us the employees for which there is a status they have <Em>not</Em> had.</Par>
+      <Par>The result is a new checklist table, but then one that is closer to the result we are searching for.</Par>
+    </Section>
+
+    <Section title="Evaluate entities: squash the checklist table">
+      <Par>Once we have applied the conditions, we need to check which entities (which employees) satisfy the conditions. To do so, we <Term>squash</Term> the entity-requirement table into a list: we take the projection with respect to the entities. This gives us the employees for which there is a status they have <Em>not</Em> had.</Par>
       <FigureExampleRAQuery query={<>employees_with_missing_status ← ∏<sub>e_id</sub>(statuses_not_held)</>} actualQuery="SELECT DISTINCT e_id FROM (SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data)" tableWidth={100} />
       <Par>The above result is not yet what we want. We want to find the opposite: all employees for which there is <Em>not</Em> a status they have not had. To find these employees, we once more flip the result.</Par>
       <FigureExampleRAQuery query={<>all_employees - employees_with_missing_status</>} actualQuery="SELECT DISTINCT e_id FROM emp_data EXCEPT SELECT DISTINCT e_id FROM (SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data)" tableWidth={100} />
@@ -69,33 +77,36 @@ export function Theory() {
 
     <Section title="Use a shortcut: the division operator">
       <Par>The above procedure is a lengthy one. It has resulted in the following six-step script.</Par>
-      <RA>
-        all_employees ← ∏<sub>e_id</sub>(emp_data)<br />
+      <FigureExampleRAQuery query={<>all_employees ← ∏<sub>e_id</sub>(emp_data)<br />
         all_statuses ← ∏<sub>status</sub>(emp_data)<br />
         statuses_held ← ∏<sub>e_id,status</sub>(emp_data)<br />
         statuses_not_held ← all_employees x all_statuses - statuses_held<br />
         employees_with_missing_status ← ∏<sub>e_id</sub>(statuses_not_held)<br />
-        all_employees - employees_with_missing_status
-      </RA>
+        all_employees - employees_with_missing_status</>} actualQuery="SELECT DISTINCT e_id FROM emp_data EXCEPT SELECT DISTINCT e_id FROM (SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data)" tableWidth={100} />
       <Par>The request of "finding all entities for which a certain fixed list of checks holds" is a common use case though. Because of that, an operator has been defined to make this procedure easier: the <Term>division operator</Term> <M>\div</M>.</Par>
-      <Par>The division operator is a bit tricky to grasp, so first let's demonstrate it with an example. Consider the query <IRA>statuses_held ÷ all_statuses</IRA>. We can visualize this with actual data.</Par>
-      <FigureDivisionTable />
-      <Par>The result of this division will be all employee IDs for which <Em>every</Em> status is present in the left relation. Or to be put it in other terms: it will be all entities from the checklist table for which all checkmarks are present.</Par>
-      <Par>More generally, consider two relation schemas <M>A</M> and <M>B</M> with corresponding relation instances <M>a</M> and <M>b</M>, respectively. We may only use the division operator if the attributes of <M>B</M> are a <Em>subset</Em> of the attributes of <M>A</M>. That is, whenever <M>B</M> has attributes <M>{`\\{B_1, \\ldots, B_m\\}`}</M>, then <M>A</M> must have attributes <M>{`\\{C_1, \\ldots, C_n, B_1, \\ldots, B_m\\}`}</M>. (The order does not matter: it's a set.) When this is the case, we can write</Par>
-      <BM>a \div b.</BM>
-      <Par>The result of this division operator is a new relation instance <M>c</M> having attributes <M>{`\\{C_1, \\ldots, C_n\\}`}</M>. This <Term>division</Term> <M>c</M> is defined such that it consists of <Em>all</Em> the possible tuples for which <M>b \times c \subseteq a</M>. In other words, <M>c</M> is the set of all tuples <M>(c_1, \ldots, c_n)</M> such that <M>(c_1, \ldots, c_n, b_1, \ldots, b_m) \in a</M> for <Em>every</Em> tuple <M>(b_1, \ldots, b_m) \in b</M>.</Par>
-      <Par>To find the division <M>a \div b</M>, we can use a the <Term>division formula</Term></Par>
-      <BM>{`a \\div b = \\Pi_{A-B}\\left(a\\right) - \\Pi_{A-B}\\left(\\left(\\Pi_{A-B}\\left(a\\right) \\times b\\right) - a\\right).`}</BM>
-      <Par>Note that the above formula is exactly the procedure that we have followed in the script above: <M>b</M> represents all statuses, <M>{`\\Pi_{A-B}\\left(a\\right)`}</M> represents all employee IDs, and <M>a</M> represents the checklist table.</Par>
-      <Par>Using this division operator, we can simplify our earlier relational algebra script. The division operator effectively replaces the last three steps.</Par>
+      <Par>In short, the division operator takes a <Em>checklist table</Em> and a <Em>checklist</Em>, and it returns all the entities having <Em>all</Em> checks from the checklist marked. Generally put, we may write</Par>
+      <RA>entities_satisfying_all_checks ← checklist_table ÷ checklist</RA>
+      <Par>If we apply this division operator to our example, we could have significantly shortened the above script. The last three lines are replaced by a single division!</Par>
       <FigureExampleRAQuery query={<>all_statuses ← ∏<sub>status</sub>(emp_data)<br />
         statuses_held ← ∏<sub>e_id,status</sub>(emp_data)<br />
         statuses_held ÷ all_statuses</>} actualQuery="SELECT DISTINCT e_id FROM emp_data EXCEPT SELECT DISTINCT e_id FROM (SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data)" tableWidth={100} />
-      <Par>We could have even solved the whole problem in the very short single-line query <IRA>∏<sub>e_id,status</sub>(emp_data) ÷ ∏<sub>status</sub>(emp_data)</IRA>. This is both a lot shorter and a lot clearer than what we had before! The division operator can hence be a <Em>very</Em> powerful short-cut in universal condition queries.</Par>
+      <Par>To see what is happening in the above script, we can display the data in the last step.</Par>
+      <FigureDivisionTable />
+      <Par>The division operator gives all entities that have <Em>all</Em> entries from the given checklist present in the checklist table. All other entities are discared.</Par>
+      <Info>We could have even solved the whole problem in the very short single-line query <IRA>∏<sub>e_id,status</sub>(emp_data) ÷ ∏<sub>status</sub>(emp_data)</IRA>. The division operator can be a <Em>very</Em> powerful short-cut in universal condition queries.</Info>
       <Warning>
         <Par sx={{ mb: 1 }}>We can only apply the division operator when the list of checks is a <Term>fixed set</Term>: it does not depend on the entity that is being examined. For our example that is the case: we are checking the same statuses for every employee.</Par>
-        <Par>But now let's adjust our problem. What if we want to find all employees who have had all the statuses that <Em>their direct supervisor</Em> has had? In this case, the checklist (which statuses they should have had) varies per employee! Since the checklist is not a fixed set, the division operator will not work here. In such a case we follow the steps described above: set up the checklist table, apply the given conditions to it, squash it, and in the end process the results.</Par>
+        <Par>But what if we want to find all employees who have had all the statuses that <Em>their direct supervisor</Em> has had? In this case, the checklist (which statuses they should have had) varies per employee! Since the checklist is not a fixed set, but various per entity, the division operator will not work. In such a case we follow the steps described above: set up the checklist table, apply the given conditions to it, squash it, and in the end process the results.</Par>
       </Warning>
+    </Section>
+
+    <Section title="The definition of the division operator">
+      <Par>The above example introduced the division operator intuitively. It also has a formal definition.</Par>
+      <Par>Consider two relation schemas <M>A</M> and <M>B</M> with corresponding relations <M>a</M> and <M>b</M>, respectively. The division operator can only be used as <M>a \div b</M> when the attributes of <M>B</M> are a <Em>subset</Em> of the attributes of <M>A</M>. That is, if <M>B</M> has attributes <M>{`\\{B_1, \\ldots, B_m\\}`}</M>, then <M>A</M> must have attributes <M>{`\\{C_1, \\ldots, C_n, B_1, \\ldots, B_m\\}`}</M> for the division <M>a \div b</M> to be used. (The order does not matter: it's a set.) The result of this division operator is a new relation <M>c</M> having attributes <M>{`\\{C_1, \\ldots, C_n\\}`}</M>.</Par>
+      <Par>The <Term>division</Term> <M>c = a \div b</M> is defined as the relation containing <Em>all</Em> possible tuples for which <M>b \times c \subseteq a</M> still holds. In other words, <M>c</M> is the set of all tuples <M>(c_1, \ldots, c_n)</M> such that, for <Em>all</Em> tuples <M>(b_1, \ldots, b_m) \in b</M>, we have <M>(c_1, \ldots, c_n, b_1, \ldots, b_m) \in a</M>.</Par>
+      <Par>To find the division <M>a \div b</M>, we can use the <Term>division formula</Term></Par>
+      <BM>{`a \\div b = \\Pi_{A-B}\\left(a\\right) - \\Pi_{A-B}\\left(\\left(\\Pi_{A-B}\\left(a\\right) \\times b\\right) - a\\right).`}</BM>
+      <Info>The above division formula is exactly the procedure that we have followed in the large example script from before. <M>a</M> represents the checklist table (statuses held), <M>b</M> represents the checklist (all statuses), and <M>{`\\Pi_{A-B}\\left(a\\right)`}</M> represents the entity list (all employee IDs).</Info>
     </Section>
   </Page>;
 }

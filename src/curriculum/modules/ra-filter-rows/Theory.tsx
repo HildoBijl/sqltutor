@@ -17,10 +17,10 @@ export function Theory() {
       <Par>In relational algebra, predicates/conditions are set up using propositional logic. In this logic, conditions are always some kind of comparison. They come in the form</Par>
       <RA>[value] [comparator] [value]</RA>
       <Par>Here, the value may be predefined (like a given number or piece of text) or they may come from the given tuple.</Par>
-      <Par>For <Term>text</Term>, comparing is always done using either <M>=</M> (equals) or <M>\neq</M> (unequals). You could for instance find all departments whose name does not equal "Operations" using</Par>
+      <Par>For <Term>text</Term>, comparing is usually done using either <M>=</M> (equals) or <M>\neq</M> (unequals). You could for instance find all departments whose name does not equal "Operations" using</Par>
       <FigureExampleRAQuery query={<>σ<sub>d_name ≠ "Operations"</sub>(departments)</>} actualQuery="SELECT * FROM departments WHERE d_name <> 'Operations'" tableWidth={500} />
       <Warning>When you are predefining a piece of text in a condition, always use quotation marks to show that you are using text, rather than using an attribute name.</Warning>
-      <Par>For <Term>numbers</Term> there are more comparators that we can use. Next to <M>=</M> and <M>\neq</M> there are also <M>&gt;</M> (greater than), <M>&lt;</M> (lower than), <M>\geq</M> (greater or equal) and <M>\leq</M> (lower or equal). So to find all departments having ten or less employees, we can use</Par>
+      <Par>For <Term>numbers</Term> there are more comparators that are commonly applied. Next to <M>=</M> and <M>\neq</M> there are also <M>&gt;</M> (greater than), <M>&lt;</M> (lower than), <M>\geq</M> (greater or equal) and <M>\leq</M> (lower or equal). So to find all departments having ten or less employees, we can use</Par>
       <FigureExampleRAQuery query={<>σ<sub>nr_employees ≤ 10</sub>(departments)</>} actualQuery="SELECT * FROM departments WHERE nr_employees <= 10" tableWidth={500} />
       <Info>Later on we are going to use multiple relations within the same query. In that case, we use the dot-notation to indicate which relation an attribute is from, like in <IRA>σ<sub>employees.nr_employees ≤ 10</sub>(departments)</IRA>. This notation is crucial when there are multiple attributes from different relations with the same name. In our current case we only have one relation, so then using <IRA>σ<sub>nr_employees ≤ 10</sub>(departments)</IRA> suffices.
       </Info>
