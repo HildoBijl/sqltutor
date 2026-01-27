@@ -1,4 +1,4 @@
-import { Alert, Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 
 import { ExerciseControls } from './ExerciseControls';
 import { ExerciseDescription } from './ExerciseDescription';
@@ -9,7 +9,6 @@ import { ExerciseSolution } from './ExerciseSolution';
 import { GiveUpDialog } from './GiveUpDialog';
 import { ExerciseAdminTools } from './ExerciseAdminTools';
 import type { SkillExerciseControllerState } from '../../hooks/useSkillExerciseController';
-import type { DatasetSize } from '@/mockData';
 
 interface SkillPracticeTabProps {
   practice: SkillExerciseControllerState['practice'];
@@ -48,46 +47,6 @@ export function SkillPracticeTab({
           Generating your next exercise...
         </Typography>
       )}
-
-      <Box
-        sx={{
-          mb: 1.5,
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 1,
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          flexWrap: 'wrap',
-        }}
-      >
-        <Typography variant="caption" color="text.secondary" sx={{ minWidth: { sm: 160 } }}>
-          Data set for trial queries
-        </Typography>
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={practice.datasetSize}
-          onChange={(_event, nextValue) => {
-            if (!nextValue) return;
-            actions.setDatasetSize(nextValue as DatasetSize);
-          }}
-          sx={{
-            flexWrap: 'wrap',
-            '& .MuiToggleButton-root': {
-              px: 1,
-              py: 0.25,
-              textTransform: 'none',
-            },
-          }}
-        >
-          <ToggleButton value="small">Use small data set</ToggleButton>
-          <ToggleButton value="full">Use full data set</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-      {practice.datasetWarning ? (
-        <Alert severity="warning" variant="outlined" sx={{ mb: 1.5, py: 0.25, px: 1.5 }}>
-          {practice.datasetWarning}
-        </Alert>
-      ) : null}
 
       <Box sx={{ mb: 3 }}>
         <ExerciseEditor
@@ -146,6 +105,9 @@ export function SkillPracticeTab({
         queryError={practice.queryError}
         hasExecuted={practice.hasExecutedQuery}
         isComplete={isSolvedOrGivenUp}
+        datasetSize={practice.datasetSize}
+        onDatasetSizeChange={actions.setDatasetSize}
+        datasetWarning={practice.datasetWarning}
       />
 
       <GiveUpDialog

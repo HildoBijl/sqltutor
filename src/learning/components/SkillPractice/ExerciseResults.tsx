@@ -1,20 +1,24 @@
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { Box, Button, Collapse, Divider, Typography } from '@mui/material';
+import { Box, Button, Collapse, Divider, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
-import { DataTable } from '@/components';
+import { DataTable, Warning } from '@/components';
 import type { QueryResultSet } from '../../types';
 import { ExerciseSection } from './ExerciseSection';
+import type { DatasetSize } from '@/mockData';
 
 interface ExerciseResultsProps {
   queryResult: ReadonlyArray<QueryResultSet> | null;
   queryError: Error | null;
   hasExecuted: boolean;
   isComplete: boolean;
+  datasetSize: DatasetSize;
+  onDatasetSizeChange: (size: DatasetSize) => void;
+  datasetWarning?: string | null;
 }
 
-function ResultsPlaceholder({ message }: { message: string }) {
+function ResultsPlaceholder({ message, children }: { message: string; children?: ReactNode }) {
   return (
     <Box
       sx={{
@@ -26,14 +30,27 @@ function ResultsPlaceholder({ message }: { message: string }) {
       }}
     >
       <Typography color="text.secondary">{message}</Typography>
+      {children ? <Box sx={{ mt: 2, textAlign: 'left' }}>{children}</Box> : null}
     </Box>
   );
 }
 
-export function ExerciseResults({ queryResult, queryError, hasExecuted, isComplete }: ExerciseResultsProps) {
+export function ExerciseResults({
+  queryResult,
+  queryError,
+  hasExecuted,
+  isComplete,
+  datasetSize,
+  onDatasetSizeChange,
+  datasetWarning,
+}: ExerciseResultsProps) {
   const [expanded, setExpanded] = useState(() => !isComplete);
   let content: ReactNode = null;
   const emptyMessage = 'Query executed successfully but returned no rows.';
+  const hasResultSet = Boolean(queryResult && queryResult.length > 0);
+  const hasRows = Boolean(hasResultSet && queryResult?.[0]?.values && queryResult[0].values.length > 0);
+  const isEmptyResult = hasExecuted && !queryError && (!hasResultSet || !hasRows);
+  const showWarning = Boolean(datasetWarning && isEmptyResult);
 
   useEffect(() => {
     setExpanded(!isComplete);
@@ -41,20 +58,21 @@ export function ExerciseResults({ queryResult, queryError, hasExecuted, isComple
 
   if (queryError) {
     content = <ResultsPlaceholder message="No results due to query error" />;
-  } else if (queryResult && queryResult.length > 0) {
-    const [firstResult] = queryResult;
-    const hasRows = Boolean(firstResult?.values && firstResult.values.length > 0);
+  } else if (hasResultSet) {
+    const [firstResult] = queryResult ?? [];
 
     content = hasRows ? (
       <DataTable data={firstResult} />
     ) : (
-      <ResultsPlaceholder message={emptyMessage} />
+      <ResultsPlaceholder message={emptyMessage}>
+        {showWarning ? <Warning>{datasetWarning}</Warning> : null}
+      </ResultsPlaceholder>
     );
   } else {
     content = (
-      <ResultsPlaceholder
-        message={hasExecuted ? emptyMessage : 'Execute your query to preview results.'}
-      />
+      <ResultsPlaceholder message={hasExecuted ? emptyMessage : 'Execute your query to preview results.'}>
+        {showWarning ? <Warning>{datasetWarning}</Warning> : null}
+      </ResultsPlaceholder>
     );
   }
 
@@ -64,16 +82,38 @@ export function ExerciseResults({ queryResult, queryError, hasExecuted, isComple
       showDivider={false}
       contentSx={{ p: 0 }}
       actions={
-        <Button
-          size="small"
-          color="primary"
-          variant="text"
-          onClick={() => setExpanded((prev) => !prev)}
-          endIcon={expanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
-          sx={{ textTransform: 'none', fontWeight: 500, px: 1 }}
-        >
-          {expanded ? 'Hide' : 'Show'}
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={datasetSize}
+            onChange={(_event, nextValue) => {
+              if (!nextValue) return;
+              onDatasetSizeChange(nextValue as DatasetSize);
+            }}
+            sx={{
+              flexWrap: 'wrap',
+              '& .MuiToggleButton-root': {
+                px: 1,
+                py: 0.25,
+                textTransform: 'none',
+              },
+            }}
+          >
+            <ToggleButton value="small">Use small data set</ToggleButton>
+            <ToggleButton value="full">Use full data set</ToggleButton>
+          </ToggleButtonGroup>
+          <Button
+            size="small"
+            color="primary"
+            variant="text"
+            onClick={() => setExpanded((prev) => !prev)}
+            endIcon={expanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+            sx={{ textTransform: 'none', fontWeight: 500, px: 1 }}
+          >
+            {expanded ? 'Hide' : 'Show'}
+          </Button>
+        </Box>
       }
     >
       <Collapse in={expanded} unmountOnExit>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/utils/types';
-import type { SkillComponentState } from '@/learning/store';
+import { useAppStore, type SkillComponentState } from '@/learning/store';
 import { useDatabase } from '@/learning/databases';
 import type { DatasetSize } from '@/mockData';
 import {
@@ -20,7 +20,7 @@ const normalizeForHistory = (value: string) =>
 const normalizeExerciseLabel = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const SMALL_DATASET_WARNING =
-  'Warning: you are using the small data set. Not all exercises are suitable for this data set. Consider using the full data set instead.';
+  'You are using the small data set. This data set is meant to get a quick intuition of the data, but it does not support all exercises. Consider using the full data set to get the full real-life experience.';
 
 const hasResultRows = (results?: ReadonlyArray<QueryResultSet> | null) =>
   Boolean(results?.some((result) => (result?.values?.length ?? 0) > 0));
@@ -103,7 +103,8 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
-  const selectedDatasetSize: DatasetSize = componentState.practiceDatasetSize ?? 'full';
+  const selectedDatasetSize = useAppStore((state) => state.practiceDatasetSize);
+  const setPracticeDatasetSize = useAppStore((state) => state.setPracticeDatasetSize);
   // Display database (user-selected dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,
@@ -227,10 +228,10 @@ export function useSkillExerciseController({
   const handleDatasetSizeChange = useCallback(
     (size: DatasetSize) => {
       if (size === selectedDatasetSize) return;
-      setComponentState({ practiceDatasetSize: size });
+      setPracticeDatasetSize(size);
     },
-    [selectedDatasetSize, setComponentState],
-  );
+    [selectedDatasetSize, setPracticeDatasetSize],
+   );
 
   const evaluateSmallDatasetWarning = useCallback(
     async (
@@ -391,7 +392,48 @@ export function useSkillExerciseController({
         }
 
         const displayOutput = execution.success ? (execution.output ?? null) : null;
-        const validation = skillModule!.validateOutput!(currentExercise, execution);
+        let validation = skillModule!.validateOutput!(currentExercise, execution);
+        let gradingExecution: SqlExecutionResult | null = null;
+        const shouldTryFullValidation =
+          selectedDatasetSize === 'small' && execution.success && isResultEmpty(displayOutput);
+
+        if (!validation.ok && shouldTryFullValidation) {
+          if (!gradingDatabase) {
+            updateFeedback(
+              {
+                message: 'Database is not ready for verification. Please try again in a moment.',
+                type: 'warning',
+              },
+              { normalizedQuery: normalized },
+            );
+            void evaluateSmallDatasetWarning(effectiveQuery, displayOutput);
+            return;
+          }
+
+          try {
+            const gradingOutput = await executeGradingQuery(effectiveQuery);
+            gradingExecution = { success: true, output: gradingOutput };
+          } catch (error: any) {
+            const err = error instanceof Error ? error : new Error(String(error));
+            gradingExecution = { success: false, error: err };
+          }
+
+          if (!gradingExecution.success || !gradingExecution.output) {
+            updateFeedback(
+              {
+                message:
+                  gradingExecution.error?.message ??
+                  'Unable to verify results because the grading database query failed.',
+                type: 'error',
+              },
+              { normalizedQuery: normalized },
+            );
+            setDatasetWarning(null);
+            return;
+          }
+
+          validation = skillModule!.validateOutput!(currentExercise, gradingExecution);
+        }
 
         if (!validation.ok) {
           recordAttempt({ input: effectiveQuery, result: execution.output ?? null, validation });
@@ -403,7 +445,11 @@ export function useSkillExerciseController({
             { normalizedQuery: normalized },
           );
           if (execution.success) {
-            void evaluateSmallDatasetWarning(effectiveQuery, displayOutput);
+            void evaluateSmallDatasetWarning(
+              effectiveQuery,
+              displayOutput,
+              gradingExecution?.output ?? null,
+            );
           } else {
             setDatasetWarning(null);
           }
@@ -419,20 +465,25 @@ export function useSkillExerciseController({
             { normalizedQuery: normalized },
           );
           if (execution.success) {
-            void evaluateSmallDatasetWarning(effectiveQuery, displayOutput);
+            void evaluateSmallDatasetWarning(
+              effectiveQuery,
+              displayOutput,
+              gradingExecution?.output ?? null,
+            );
           } else {
             setDatasetWarning(null);
           }
           return;
         }
 
-        let gradingExecution: SqlExecutionResult;
-        try {
-          const gradingOutput = await executeGradingQuery(effectiveQuery);
-          gradingExecution = { success: true, output: gradingOutput };
-        } catch (error: any) {
-          const err = error instanceof Error ? error : new Error(String(error));
-          gradingExecution = { success: false, error: err };
+        if (!gradingExecution) {
+          try {
+            const gradingOutput = await executeGradingQuery(effectiveQuery);
+            gradingExecution = { success: true, output: gradingOutput };
+          } catch (error: any) {
+            const err = error instanceof Error ? error : new Error(String(error));
+            gradingExecution = { success: false, error: err };
+          }
         }
 
         if (!gradingExecution.success || !gradingExecution.output) {
@@ -524,6 +575,7 @@ export function useSkillExerciseController({
       hasGivenUp,
       updateFeedback,
       evaluateSmallDatasetWarning,
+      selectedDatasetSize,
       executeGradingQuery,
       gradingDatabase,
     ],
