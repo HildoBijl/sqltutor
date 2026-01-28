@@ -16,7 +16,7 @@ export function Theory() {
     <Section title="Set up a single condition">
       <Par>In relational algebra, predicates/conditions are set up using propositional logic. In this logic, conditions are always some kind of comparison. They come in the form</Par>
       <RA>[value] [comparator] [value]</RA>
-      <Par>Here, the value may be predefined (like a given number or piece of text) or they may come from the given tuple.</Par>
+      <Par>Here, the value may be predefined (like a given number or piece of text, such as "10") or they may come from the given tuple (like for instance "nr_employees").</Par>
       <Par>For <Term>text</Term>, comparing is usually done using either <M>=</M> (equals) or <M>\neq</M> (unequals). You could for instance find all departments whose name does not equal "Operations" using</Par>
       <FigureExampleRAQuery query={<>σ<sub>d_name ≠ "Operations"</sub>(departments)</>} actualQuery="SELECT * FROM departments WHERE d_name <> 'Operations'" tableWidth={500} />
       <Warning>When you are predefining a piece of text in a condition, always use quotation marks to show that you are using text, rather than using an attribute name.</Warning>

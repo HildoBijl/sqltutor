@@ -83,7 +83,7 @@ export function Theory() {
         statuses_not_held ← all_employees x all_statuses - statuses_held<br />
         employees_with_missing_status ← ∏<sub>e_id</sub>(statuses_not_held)<br />
         all_employees - employees_with_missing_status</>} actualQuery="SELECT DISTINCT e_id FROM emp_data EXCEPT SELECT DISTINCT e_id FROM (SELECT DISTINCT e1.e_id, e2.status FROM emp_data e1 JOIN emp_data e2 EXCEPT SELECT DISTINCT e_id, status FROM emp_data)" tableWidth={100} />
-      <Par>The request of "finding all entities for which a certain fixed list of checks holds" is a common use case though. Because of that, an operator has been defined to make this procedure easier: the <Term>division operator</Term> <M>\div</M>.</Par>
+      <Par>The request of "finding all entities for which a certain fixed checklist holds" is a common use case though. Because of that, an operator has been defined to make this procedure easier: the <Term>division operator</Term> <M>\div</M>.</Par>
       <Par>In short, the division operator takes a <Em>checklist table</Em> and a <Em>checklist</Em>, and it returns all the entities having <Em>all</Em> checks from the checklist marked. Generally put, we may write</Par>
       <RA>entities_satisfying_all_checks ← checklist_table ÷ checklist</RA>
       <Par>If we apply this division operator to our example, we could have significantly shortened the above script. The last three lines are replaced by a single division!</Par>
@@ -95,8 +95,8 @@ export function Theory() {
       <Par>The division operator gives all entities that have <Em>all</Em> entries from the given checklist present in the checklist table. All other entities are discared.</Par>
       <Info>We could have even solved the whole problem in the very short single-line query <IRA>∏<sub>e_id,status</sub>(emp_data) ÷ ∏<sub>status</sub>(emp_data)</IRA>. The division operator can be a <Em>very</Em> powerful short-cut in universal condition queries.</Info>
       <Warning>
-        <Par sx={{ mb: 1 }}>We can only apply the division operator when the list of checks is a <Term>fixed set</Term>: it does not depend on the entity that is being examined. For our example that is the case: we are checking the same statuses for every employee.</Par>
-        <Par>But what if we want to find all employees who have had all the statuses that <Em>their direct supervisor</Em> has had? In this case, the checklist (which statuses they should have had) varies per employee! Since the checklist is not a fixed set, but various per entity, the division operator will not work. In such a case we follow the steps described above: set up the checklist table, apply the given conditions to it, squash it, and in the end process the results.</Par>
+        <Par sx={{ mb: 1 }}>We can only apply the division operator when the checklist is a <Term>fixed set</Term>: it does not depend on the entity that is being examined. For our example that is the case: we are checking the <Em>same</Em> statuses for every employee.</Par>
+        <Par>But what if we want to find all employees who have had all the statuses that <Em>their direct supervisor</Em> has had? In this case, the exact checklist (which statuses they should have had) varies per employee! Since the checklist is not a fixed set, but varies per entity, the division operator will not work. In such a case we follow the steps described above: set up the checklist table, apply the given conditions to it, squash it, and in the end process the results.</Par>
       </Warning>
     </Section>
 
