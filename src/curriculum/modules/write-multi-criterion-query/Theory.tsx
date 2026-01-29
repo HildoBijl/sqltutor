@@ -24,7 +24,7 @@ export function Theory() {
     </Section>
 
     <Section title="Practical application of the five steps">
-      <Par>To start, we need to calculate the taxes and the contract duration. The taxes can be found through <ISQL>0.3*salary AS taxes</ISQL>. The contract duration is harder. How to do find it depends on our DBMS, so we look this up. Google and Large Language Models are your friends here.</Par>
+      <Par>To start, we need to calculate the taxes and the contract duration. The taxes can be found through <ISQL>0.3*salary AS taxes</ISQL>. The contract duration is harder. How to find it depends on our DBMS, so we look this up. Google and Artificial Intelligence are your friends here.</Par>
       <Par>For SQLite, there apparently is the <ISQL>JULIANDAY(date)</ISQL> function that calculates the number of days since Nov 24, 4714 BC. We can use this to find the number of days of the contract, simply by finding the difference in number of days. So we use <ISQL>JULIANDAY(end_date) - JULIANDAY(start_date) AS duration</ISQL>. This leads to the following query.</Par>
       <FigureExampleQuery query={`SELECT
   *,
