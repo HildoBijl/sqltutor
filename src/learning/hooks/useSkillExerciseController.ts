@@ -156,8 +156,10 @@ export function useSkillExerciseController({
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
   const [datasetWarning, setDatasetWarning] = useState<{ message: string; queryKey: string } | null>(null);
+  const [pendingDatasetRefresh, setPendingDatasetRefresh] = useState(false);
   const latestQueryKeyRef = useRef('');
   const datasetSizeRef = useRef<DatasetSize>(selectedDatasetSize);
+  const lastExecutedQueryRef = useRef('');
   const [revealedSolution, setRevealedSolution] = useState<PracticeSolution | null>(null);
 
   const updateFeedback = useCallback(
@@ -200,6 +202,7 @@ export function useSkillExerciseController({
     setDatasetWarning(null);
     setHasExecutedQuery(false);
     clearQueryState();
+    setPendingDatasetRefresh(true);
   }, [selectedDatasetSize, clearQueryState]);
 
   useEffect(() => {
@@ -209,6 +212,8 @@ export function useSkillExerciseController({
     setHasExecutedQuery(false);
     setHasSubmittedAttempt(false);
     setDatasetWarning(null);
+    setPendingDatasetRefresh(false);
+    lastExecutedQueryRef.current = '';
   }, [currentExercise, setHasExecutedQuery, setHasSubmittedAttempt, setRevealedSolution, updateFeedback]);
 
   useEffect(() => {
@@ -287,6 +292,37 @@ export function useSkillExerciseController({
     [executeGradingQuery, gradingDatabase, selectedDatasetSize],
   );
 
+  useEffect(() => {
+    if (!pendingDatasetRefresh || !displayDbReady) return;
+    const queryToRun = lastExecutedQueryRef.current.trim();
+    if (!queryToRun) {
+      setPendingDatasetRefresh(false);
+      return;
+    }
+
+    let isActive = true;
+
+    executeDisplayQuery(queryToRun)
+      .then((output) => {
+        if (!isActive) return;
+        setHasExecutedQuery(true);
+        void evaluateSmallDatasetWarning(queryToRun, output);
+      })
+      .catch(() => {
+        if (!isActive) return;
+        setHasExecutedQuery(false);
+        setDatasetWarning(null);
+      })
+      .finally(() => {
+        if (!isActive) return;
+        setPendingDatasetRefresh(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [displayDbReady, executeDisplayQuery, evaluateSmallDatasetWarning, pendingDatasetRefresh]);
+
   const handleLiveExecute = useCallback(
     async (liveQuery: string) => {
       if (!dbReady || exerciseCompleted || !currentExercise) return;
@@ -296,10 +332,12 @@ export function useSkillExerciseController({
         setHasExecutedQuery(false);
         clearQueryState();
         setDatasetWarning(null);
+        lastExecutedQueryRef.current = '';
         return;
       }
 
       try {
+        lastExecutedQueryRef.current = liveQuery;
         const output = await executeDisplayQuery(liveQuery);
         setHasExecutedQuery(true);
         void evaluateSmallDatasetWarning(liveQuery, output);
@@ -324,6 +362,7 @@ export function useSkillExerciseController({
       const rawQuery = override ?? query;
       const effectiveQuery = rawQuery.trim();
       if (!currentExercise || !effectiveQuery) return;
+      lastExecutedQueryRef.current = effectiveQuery;
       setHasSubmittedAttempt(true);
       setHasExecutedQuery(true);
 
