@@ -40,7 +40,7 @@ export function Theory() {
           <Info>Example: The domain of <ISQL>d_id</ISQL> is the set of all possible four-digit numbers.</Info>
         </>,
       ]} />
-      <Warning>Formally, an <Term>attribute</Term> is a <Em>combination</Em> of a name and a domain. When referring to an attribute, we write down its name. To refer to its domain, we use <M>{`{\\rm dom}(A)`}</M>.</Warning>
+      <Warning>Formally, an <Term>attribute</Term> is a <Em>combination</Em> of a name and a domain. When referring to an attribute, we write down its name, like <M>A</M>. To refer to its domain, we use <M>{`{\\rm dom}(A)`}</M>.</Warning>
       <List items={[
         <>
           <Par sx={{ mb: 1 }}>A <Term>relation schema</Term> is a set of attributes. You could see this as the table's design. We may write <M>{`R = \\{A_1, A_2, A_3, \\ldots\\}`}</M>. Note that, because this is a set, there is no particular order to the attributes.</Par>
