@@ -16,11 +16,11 @@ export function Theory() {
 
   return <Page>
     <Section>
-      <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by adding the query with the keyword <ISQL>WHERE</ISQL> to the query, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
+      <Par>When dealing with data in databases, it is very common to look for certain rows in a table: <Term>filtering</Term>. In <Term>SQL</Term> we can do so by adding the keyword <ISQL>WHERE</ISQL> to the query, followed by the condition we want to filter on. This condition can be set up in a myriad of ways, so let's browse through the possibilities.</Par>
     </Section>
 
     <Section title="Set up equality-based conditions">
-      <Par>The most common filter is on equality: we want some row property to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <ISQL>column_name = some_value</ISQL>. We can for instance find all the positions held by the employee with employee ID <ISQL>{e_id}</ISQL>.</Par>
+      <Par>The most common filter is on equality: we want some row attribute to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <ISQL>column_name = some_value</ISQL>. We can for instance find all the positions held by the employee with employee ID <ISQL>{e_id}</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
 FROM emp_data
 WHERE e_id = ${e_id};`} columnName="e_id" />
@@ -30,7 +30,7 @@ WHERE e_id = ${e_id};`} columnName="e_id" />
       <FigureFiltering query={`SELECT *
 FROM emp_data
 WHERE status = 'active';`} columnName="status" />
-      <Warning>When entering text in SQL, always use <Em>single</Em> quotation marks. This is how SQL recognizes that it is a piece of text, and not a column name or similar. (Both "no quotation marks" and "double quotation marks" indicate column/table names in SQL.)</Warning>
+      <Warning>When entering text in SQL, always use <Em>single</Em> quotation marks. This is how SQL recognizes that it is a piece of text, and not a column name or similar. (Both <Em>no quotation marks</Em> and <Em>double quotation marks</Em> will be interpreted as column/table names by SQL.)</Warning>
       <Par>We could also do the opposite, and find all contracts that are <Em>not</Em> active. In this case, we use the <Term>unequals sign</Term>, which in SQL is <ISQL>{`<>`}</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
 FROM emp_data
@@ -51,7 +51,10 @@ WHERE position >= 's';`} columnName="position" />
       <FigureFiltering query={`SELECT *
 FROM emp_data
 WHERE start_date >= '2025-01-01';`} columnName="start_date" />
-      <Info>Most DBMSs store a date/time value as an object with various functionalities: it is "aware" that it is a date or time. On SQL Valley we use the light-weight SQLite DBMS. This DBMS stores dates/times simply as piece of text, like "{date}" or "{time}". Luckily, if we compare this text lexicographically, we get exactly the same result as when we would compare it time-wise. So usually this SQLite quirk is not a problem.</Info>
+      <Info>
+        <Par sx={{ mb: 0.5 }}>Most DBMSs store a date/time value as an object, having various functionalities. You could say the column value is "aware" that it is a date or time. This for instance allows us to compare dates.</Par>
+        <Par>On SQL Valley we use the light-weight SQLite DBMS. This DBMS stores dates/times simply as piece of text, like "{date}" or "{time}". Luckily, if we compare this "date text" lexicographically, we get exactly the same result as when we would compare the date time-wise. So usually this SQLite quirk is not a problem.</Par>
+      </Info>
     </Section>
 
     <Section title="Compare text">
@@ -67,7 +70,7 @@ WHERE status LIKE '%leave';`} columnName="status" />
       <FigureFiltering query={`SELECT *
 FROM emp_data
 WHERE perf_score IS NULL;`} columnName="perf_score" />
-      <Info>Because <ISQL>NULL</ISQL> means "unknown", any comparison involving <ISQL>NULL</ISQL>, like for instance <ISQL>{`NULL < 10`}</ISQL>, always resolves to <ISQL>NULL</ISQL> as well, and never to <ISQL>TRUE</ISQL> or <ISQL>FALSE</ISQL>. After all, it is also unknown whether "some unknown value" is smaller than <ISQL>10</ISQL>. Even the comparison <ISQL>NULL = NULL</ISQL> resolves to <ISQL>NULL</ISQL>, since two unknown values are not necessarily equal. Only <ISQL>NULL IS NULL</ISQL> resolves to <ISQL>TRUE</ISQL>.</Info>
+      <Info>Because <ISQL>NULL</ISQL> means "unknown", any comparison involving <ISQL>NULL</ISQL>, like for instance <ISQL>{`NULL < 10`}</ISQL>, always resolves to <ISQL>NULL</ISQL>, and never to <ISQL>TRUE</ISQL> or <ISQL>FALSE</ISQL>. After all, it is also unknown whether "some unknown value" is smaller than <ISQL>10</ISQL>. Even the comparison <ISQL>NULL = NULL</ISQL> resolves to <ISQL>NULL</ISQL>, since two unknown values are not necessarily equal. Only <ISQL>NULL IS NULL</ISQL> resolves to <ISQL>TRUE</ISQL>.</Info>
     </Section>
   </Page>;
 }

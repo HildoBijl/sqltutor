@@ -16,7 +16,7 @@ const departmentsReplacement = `SELECT d_id, d_name, manager_id e_id, budget, nr
 export function Theory() {
   return <Page>
     <Section>
-      <Par>SQL has a variety of ways in which tables can be joined. We can join tables with the <ISQL>FROM/WHERE</ISQL> command or with the <ISQL>JOIN</ISQL> command. For the latter, there are various short-cuts and other options. Let's take a look at how it all works.</Par>
+      <Par>We know in theory what <Term>joining tables</Term> comes down to. SQL has a variety of ways in which tables can be joined: we can do so with the <ISQL>FROM/WHERE</ISQL> command or with the <ISQL>JOIN</ISQL> command. For the latter, there are various short-cuts and other options. Let's take a look at how all these possibilities work.</Par>
     </Section>
 
     <Section title={<>Join tables using <ISQL>FROM/WHERE</ISQL></>}>
@@ -32,14 +32,15 @@ FROM departments, employees;`} tableScale={0.45} tableWidth={800} below />
 FROM departments, employees
 WHERE departments.manager_id = employees.e_id;`} tableScale={0.45} tableWidth={800} below />
       <Par>This has completed the join! The above query hence joins the two tables together.</Par>
-      <Par>To solve the given assignment, we can add extra filtering conditions, select the right columns for the output, and use aliasing to shorten the notation. That gives the full query.</Par>
-      <FigureExampleQuery query={`SELECT d_name, budget, first_name, last_name
+      <Info>In the above query, we didn't need to use <ISQL>departments.manager_id</ISQL> since there is only one column named <ISQL>manager_id</ISQL>. Just using <ISQL>manager_id</ISQL> would suffice. It's nevertheless still good practice to use table specifiers, to improve legibility. Someone else reading the query doesn't have to wonder "Which tables does that column come from?"</Info>
+      <Par>To solve the given assignment, we can add extra filtering conditions, select the appropriate columns for the output, and use aliasing to shorten the notation. That gives the full query.</Par>
+      <FigureExampleQuery query={`SELECT d.d_name, d.budget, e.first_name, e.last_name
 FROM departments AS d, employees AS e
 WHERE d.manager_id = e.e_id AND d.nr_employees > 5;`} tableScale={0.6} tableWidth={300} />
     </Section>
 
     <Section title={<>Join tables using <ISQL>JOIN</ISQL></>}>
-      <Par>Let's take a look at the <ISQL>WHERE</ISQL> clause of the above query. The first condition in this clause is a <Term>join condition</Term>: it is the requirement, when joining the tables, that the foreign keys are equal. The second condition is an <Term>external condition</Term>: for whatever reason, we are only interested in departments with more than five people. At the moment, the join conditions and external conditions are both mixed up in the same clause. That's confusing!</Par>
+      <Par>Let's take a look at the <ISQL>WHERE</ISQL> clause of the above query. The first condition in this clause is a <Term>join condition</Term>: it is the requirement, when joining the tables, that the foreign keys are equal. The second condition is an <Term>external condition</Term>: for unrelated reasons, we are only interested in departments with more than five people. At the moment, the join conditions and external conditions are both mixed up in the same clause. That's confusing!</Par>
       <Par>To make queries easier to understand, it is helpful to keep join conditions and external conditions separate. That's exactly where the <ISQL>JOIN</ISQL> command comes in. Using <ISQL>JOIN</ISQL> goes in three steps. <List items={[
         <>Put one table in the <ISQL>FROM</ISQL> clause.</>,
         <>Use a <ISQL>JOIN</ISQL> clause to specify the second table to be joined in.</>,
@@ -50,12 +51,12 @@ FROM departments
 JOIN employees
 ON departments.manager_id = employees.e_id;`} tableScale={0.45} tableWidth={800} below />
       <Par>The above query is a join in its simplest form. We can of course once more add in extra conditions with a <ISQL>WHERE</ISQL> clause, select columns at <ISQL>SELECT</ISQL>, and apply aliasing where appropriate.</Par>
-      <FigureExampleQuery query={`SELECT d_name, budget, first_name, last_name
+      <FigureExampleQuery query={`SELECT d.d_name, d.budget, e.first_name, e.last_name
 FROM departments AS d
 JOIN employees AS e
 ON d.manager_id = e.e_id
 WHERE d.nr_employees > 5;`} tableScale={0.6} tableWidth={300} />
-      <Par>The above query does <Em>exactly</Em> the same as the join from before, but now we have smoothly separated join conditions from external conditions. It's easier to read!</Par>
+      <Par>The above query does <Em>exactly</Em> the same as the join from before, but now we have smoothly separated our join conditions from our external conditions. It's easier to read!</Par>
     </Section>
 
     <Section title={<>Use the natural join short-cut</>}>
@@ -67,8 +68,8 @@ FROM departments
 NATURAL JOIN employees;`} actualQuery={`SELECT *
 FROM (${departmentsReplacement}) AS departments
 NATURAL JOIN employees;`} tableScale={0.45} tableWidth={800} below />
-      <Par>This works well! But what happens when the two tables have another column name in common? What would we for instance do if both the column for department name  <ISQL>name</ISQL> and the column for employee last name are called <ISQL>name</ISQL>? In that case, the natural join would require these columns to be equal too! That's not what we want.</Par>
-      <Par>For this use case, there is an in-between solution: we can manually specify which columns have to be equal. This is done through <ISQL>JOIN table_name USING (column_name1, column_name2, ...)</ISQL>. Note that the brackets indicate a <Em>list</Em> of column names.</Par>
+      <Par>This works well! But what happens when the two tables have another column name in common? What would we for instance do if both the column for department name  <ISQL>d_name</ISQL> and the column for employee last name <ISQL>last_name</ISQL> would be called <ISQL>name</ISQL>? In that case, the natural join would require these columns to be equal too! That's not what we want.</Par>
+      <Par>For this use case, there is an in-between solution: we can manually specify which columns have to be equal in the natural join. This is done through <ISQL>JOIN table_name USING (column_name1, column_name2, ...)</ISQL>. Note that the brackets indicate a <Em>list</Em> of column names.</Par>
       <FigureExampleQuery query={`SELECT *
 FROM departments
 JOIN employees
@@ -76,8 +77,8 @@ USING (e_id);`} actualQuery={`SELECT *
 FROM (${departmentsReplacement}) AS departments
 JOIN employees
 USING (e_id);`} tableScale={0.45} tableWidth={800} below />
-      <Par>With this solution, we can manually specify which column names to use for the natural join.</Par>
-      <Info>The commands <ISQL>NATURAL JOIN</ISQL> and <ISQL>JOIN ... USING</ISQL> are mostly short-cuts for <ISQL>JOIN ... ON</ISQL> for specific situations, but they do have an added benefit. They automatically remove duplicate columns. When using <ISQL>JOIN ... ON</ISQL>, there wil be two columns <ISQL>e_id</ISQL>. These short-cuts neatly drop one of them, since it is clear that these columns have equal values.</Info>
+      <Par>In this case, even if there are other columns with equal names, we only require the <ISQL>e_id</ISQL> values to be equal.</Par>
+      <Info>The commands <ISQL>NATURAL JOIN</ISQL> and <ISQL>JOIN ... USING</ISQL> are short-cuts for <ISQL>JOIN ... ON</ISQL>: they do the exact same thing with less code. Well ... <Em>almost</Em> the same thing. They have one added benefit: they automatically remove duplicate columns. When using <ISQL>JOIN ... ON</ISQL>, there may be two columns <ISQL>e_id</ISQL> present after the join whose contents are exactly the same. When using these short-cuts, SQL neatly drops one of these columns, since the short-cuts inherently require these columns to have equal contents.</Info>
     </Section>
 
     <Section title={<>Use inner and outer joins</>}>
@@ -95,6 +96,7 @@ USING (e_id);`} tableScale={0.45} tableWidth={800} below />
 FROM departments AS d
 INNER JOIN employees AS e
 ON d.manager_id = e.e_id`} actualQuery={`SELECT * FROM (${adjustedDepartments}) d INNER JOIN employees e ON d.manager_id=e.e_id;`} tableScale={0.6} tableWidth={1100} below /></Par>
+          <Info>The default join is the inner join. The commands <ISQL>JOIN</ISQL> and <ISQL>INNER JOIN</ISQL> do the exact same thing.</Info>
         </>,
         <>
           <Par>In the <Term>left (outer) join</Term> the rows from the left table are always kept.</Par>
@@ -118,7 +120,6 @@ FULL JOIN employees AS e
 ON d.manager_id = e.e_id`} actualQuery={`SELECT * FROM (${adjustedDepartments}) d FULL JOIN employees e ON d.manager_id=e.e_id;`} tableScale={0.6} tableWidth={1100} below /></Par>
         </>,
       ]} />
-      <Info>The default join is the inner join. The commands <ISQL>JOIN</ISQL> and <ISQL>INNER JOIN</ISQL> do the exact same thing.</Info>
     </Section>
   </Page>;
 }

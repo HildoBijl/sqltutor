@@ -11,25 +11,25 @@ import { DataTable, ISQL, SQLDisplay } from '@/components';
 
 export function Theory() {
   return <Page>
-    <Par>We know how to use SQL to retrieve an entire table. The rows then usually appear in the order in which they have originally been added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
+    <Par>We know how to use SQL to retrieve an entire table. The rows usually appear in the order in which they have originally been added. If we want a different order, we can <Term>sort</Term> the table. Let's check out how this works.</Par>
 
     <Section title="Sort on a single column">
-      <Par>To sort your results, add an <ISQL>ORDER BY</ISQL> clause to the end of the query and specify the column to sort by. Optionally, add <ISQL>ASC</ISQL> (ascending, default) or <ISQL>DESC</ISQL> (descending) to choose the sorting direction.</Par>
+      <Par>To sort the output, we add an <ISQL>ORDER BY</ISQL> clause to the end of the query and specify the column to sort by. Optionally, we can add <ISQL>ASC</ISQL> (ascending, default) or <ISQL>DESC</ISQL> (descending) to choose the sorting direction.</Par>
       <FigureSortOnSingleColumn />
-      <Par>The exact sorting method depends on the <Term>data type</Term>. For numbers, we sort by magnitude. For text, we sort alphabetically. For dates/times, we sort by which date/time is earlier or later.</Par>
+      <Par>The exact sorting method depends on the <Term>data type</Term>. For numbers, we sort by magnitude. For text, we sort lexicographically (in dictionary order). For dates/times, we sort by which date/time is earlier or later.</Par>
     </Section>
 
     <Section title="Sort based on multiple columns">
-      <Par>When the first column contains sorting ties, then you can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
+      <Par>When the first column contains sorting ties, then we can add additional sorting attributes separated by commas. Only when the first attribute is equal, will SQL compare the second attribute to determine the order. And then a third attribute, if given, and so forth.</Par>
       <FigureSortOnMultipleColumns />
     </Section>
 
     <Section title="Limit the number of rows">
-      <Par>To limit the number of rows that are returned, add a <ISQL>LIMIT</ISQL> clause, followed by how many rows you want to be returned. Only the <Em>first</Em> couple of rows will then be returned.</Par>
+      <Par>To limit the number of rows that are returned, we add a <ISQL>LIMIT</ISQL> clause, followed by how many rows we want to be returned. Only the <Em>first</Em> couple of rows will be returned.</Par>
       <FigureLimitRows />
-      <Par>Combine <ISQL>LIMIT</ISQL> with <ISQL>OFFSET</ISQL> to skip a number of rows before returning results.</Par>
+      <Par>We can combine <ISQL>LIMIT</ISQL> with <ISQL>OFFSET</ISQL> to skip a number of rows before returning results.</Par>
       <FigureLimitRowsWithOffset />
-      <Warning>Most database management systems support <ISQL>LIMIT</ISQL> and <ISQL>OFFSET</ISQL>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the preferred syntax.</Warning>
+      <Warning>Most database management systems support <ISQL>LIMIT</ISQL> and <ISQL>OFFSET</ISQL>, but a few use alternative keywords. If these clauses do not work in your DBMS, check its documentation for the required syntax.</Warning>
     </Section>
 
     <Section title="Deal with NULL values">

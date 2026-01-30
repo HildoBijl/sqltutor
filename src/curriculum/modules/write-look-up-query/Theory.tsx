@@ -27,8 +27,8 @@ WHERE e_id IN (
   FROM departments
   WHERE nr_employees > 10
 );`} tableWidth={260} />
-      <Par>Note that this query consists of an <Term>outer query</Term> and an <Term>inner query</Term>. To run the query, the DBMS first runs the inner query to find the list of manager IDs. It then runs the outer query, and for every row it checks if the employee ID is in the given list.</Par>
-      <Warning>It is crucial to select the right (number of) columns in the inner query. If the attribute in front of <ISQL>IN</ISQL> is only one attribute, as in the example, then the inner query should export one column. Or similarly if there are two attributes in front of <ISQL>IN</ISQL> (like for instance in <ISQL>WHERE (first_name, last_name) IN (...)</ISQL>) then the inner query should select two columns. (The column names don't matter. Only their order.)</Warning>
+      <Par>Note that this query consists of an <Term>inner query</Term> and an <Term>outer query</Term>. To run the query, the DBMS first runs the inner query to find the list of manager IDs. It then runs the outer query, and for every row it checks if the employee ID is in the given list.</Par>
+      <Warning>It is crucial to select the right (number of) columns in the inner query. If the attribute in front of <ISQL>IN</ISQL> is only one attribute, as in the example, then the inner query should export one column. Or similarly if there are two attributes in front of <ISQL>IN</ISQL> (like for instance in <ISQL>WHERE (first_name, last_name) IN (...)</ISQL>) then the inner query should select two columns. (The column names don't matter here. Only their order.)</Warning>
       <Info>Instead of using <ISQL>IN</ISQL> we can use <ISQL>NOT IN</ISQL> to find the names of all the managers whose ID is <Em>not</Em> in the given list.</Info>
     </Section>
 
@@ -52,7 +52,7 @@ WHERE EXISTS (
       <Warning>Keep in mind that correlated queries run the inner query multiple times. Non-correlated queries run the inner query only once. For larger tables, correlated queries can be slow. In many use cases, using some clever insights, you can rewrite a correlated query as a non-correlated query, improving performance. But in other use cases this may not be possible, and a correlated query is the only option.</Warning>
     </Section>
 
-    <Section title={<>Comparing looked-up values</>}>
+    <Section title={<>Compare rows with looked-up values</>}>
       <Par>We can also use looked-up <Em>values</Em> for comparisons. Consider the following request.</Par>
       <Quote>Find employee IDs and positions of all the people who at some point earned more than the current salary of Elvis Vallelonga (ID <ISQL>41651199</ISQL>).</Quote>
       <Par>To do this, we first have to find the respective salary from the <ISQL>employees</ISQL> table.</Par>

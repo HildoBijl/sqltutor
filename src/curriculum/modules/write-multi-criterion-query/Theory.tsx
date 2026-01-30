@@ -25,14 +25,14 @@ export function Theory() {
 
     <Section title="Practical application of the five steps">
       <Par>To start, we need to calculate the taxes and the contract duration. The taxes can be found through <ISQL>0.3*salary AS taxes</ISQL>. The contract duration is harder. How to find it depends on our DBMS, so we look this up. Google and Artificial Intelligence are your friends here.</Par>
-      <Par>For SQLite, there apparently is the <ISQL>JULIANDAY(date)</ISQL> function that calculates the number of days since Nov 24, 4714 BC. We can use this to find the number of days of the contract, simply by finding the difference in number of days. So we use <ISQL>JULIANDAY(end_date) - JULIANDAY(start_date) AS duration</ISQL>. This leads to the following query.</Par>
+      <Par>For SQLite, there apparently is the <ISQL>JULIANDAY(date)</ISQL> function that calculates the number of days since Nov 24, 4714 BC. We can use this to find the number of days of the contract, simply by finding the <Em>difference</Em> in number of days. So we use <ISQL>JULIANDAY(end_date) - JULIANDAY(start_date) AS duration</ISQL>. This leads to the following query.</Par>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
   JULIANDAY(end_date) - JULIANDAY(start_date) AS duration
 FROM emp_data;`} tableWidth={800} tableScale={0.7} below />
       <Par>As second step, we want to apply the filter. We can add a <ISQL>WHERE</ISQL> clause with this newly found <ISQL>duration</ISQL>. There is one caveat though.</Par>
-      <Warning>When the DBMS evaluates the query, it starts with <ISQL>FROM</ISQL>, then applies the <ISQL>WHERE</ISQL>, then the <ISQL>SELECT</ISQL> and it ends with the <ISQL>ORDER BY</ISQL>. Newly created columns get created at the <ISQL>SELECT</ISQL> step. You therefore generally <Em>cannot</Em> use newly defined column names within the <ISQL>WHERE</ISQL> clause! So using <ISQL>duration BETWEEN 365 AND 366</ISQL> would fail. Some DBMSs do allow this through a work-around, but it's better not to count on this, and simply copy the full calculation into the <ISQL>WHERE</ISQL> clause.</Warning>
+      <Warning>When the DBMS evaluates the query, it starts with <ISQL>FROM</ISQL>, then applies <ISQL>WHERE</ISQL>, then <ISQL>SELECT</ISQL> and it ends with <ISQL>ORDER BY</ISQL>. Newly created columns get created at the <ISQL>SELECT</ISQL> step. We therefore usually <Em>cannot</Em> use newly defined column names within the <ISQL>WHERE</ISQL> clause! So using <ISQL>duration BETWEEN 365 AND 366</ISQL> would fail. Some DBMSs do allow this through a work-around, but it's better not to count on this, and simply copy the full calculation into the <ISQL>WHERE</ISQL> clause.</Warning>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
@@ -48,7 +48,7 @@ FROM emp_data
 WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={800} tableScale={0.7} below />
-      <Par>As fourth step we limit the columns we get. We were only instructed to find the taxes per position, so we select those two columns, cutting out the rest.</Par>
+      <Par>As fourth step, we limit the columns we get. We were only instructed to find the taxes per position, so we select those two columns, cutting out the rest.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   0.3*salary AS taxes
@@ -57,7 +57,7 @@ WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={240} tableScale={0.7} />
       <Par>Finally, we should check if we need to remove duplicates. For the example, this is not the case, and so we keep the query as is. And with this we are done setting up the query.</Par>
-      <Info>If you're struggling to set up a complicated query, it helps to simply follow these five steps. They usually help you to get there. And if not, then you can ask for help related to a specific step, which is far more powerful than just telling someone "I don't know how to do it."</Info>
+      <Info>If you're struggling to set up a complicated query, it helps to simply follow these five steps. They usually get you to the desired query. And if not, then you can ask for help related to a specific step, which is far more powerful than just telling someone "I don't know how to do it."</Info>
     </Section>
   </Page>;
 }

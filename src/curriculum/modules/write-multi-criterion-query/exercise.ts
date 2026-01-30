@@ -4,7 +4,7 @@ const EXERCISES: StaticExercise[] = [
   {
     id: 'multi-criterion-start-date-range',
     version: 1,
-    prompt: 'Retrieve the first 10 employees whose start date falls between January 1 and September 30 of 2025, sorted by start date.',
+    prompt: 'Retrieve the first 10 employees whose start date falls between January 1 and September 30 of 2025 (inclusive), sorted by start date.',
     solution: `
 SELECT e_id, start_date, position, perf_score
 FROM emp_data

@@ -21,18 +21,19 @@ export function Theory() {
     </Section>
 
     <Section title="Select unique values">
-      <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (rows in which every property has the same value) is theoretically possible in SQL, but it is not a good habit. When you select columns, it often <Em>does</Em> occur that you get duplicate rows. To filter those out, add the keyword <ISQL>DISTINCT</ISQL> right after <ISQL>SELECT</ISQL>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
+      <Par>Ideally, in a "clean" database, every table row is unique. Having <Term>duplicate rows</Term> (two rows in which every individual attribute has the same value) is theoretically possible in SQL, but it is not a good habit.</Par>
+      <Par>When we select columns, it often <Em>does</Em> occur that we get duplicate rows. To filter those out, we can add the keyword <ISQL>DISTINCT</ISQL> right after <ISQL>SELECT</ISQL>. This instructs the DBMS to squash sets of duplicates into single rows before returning the result.</Par>
       <FigureSelectUnique />
     </Section>
 
     <Section title="Rename columns">
-      <Par>In database tables the columns have names. When retrieving a table, we can optionally adjust the names that the columns have in our output. This <Term>renames</Term> the columns.</Par>
+      <Par>In database tables the columns have names. When retrieving a table, we can optionally adjust the names that the columns have in our output. To <Term>rename</Term> a column, we add the keyword <ISQL>AS</ISQL> followed by the new name of the column.</Par>
       <FigureRenameColumns query={`SELECT
   first_name,
   last_name AS family_name,
   phone AS number
 FROM employees;`} />
-      <Info>The addendum <ISQL>AS</ISQL> is optional, and it works just as well without. For readability, it is still recommended to add it.</Info>
+      <Info>The keyword <ISQL>AS</ISQL> is optional, and it works just as well without. For readability, it is still recommended to add it.</Info>
     </Section>
 
     <Section title="Deal with multiple tables">
@@ -43,7 +44,7 @@ FROM employees;`} />
   employees.phone AS number
 FROM employees;`} />
       <Par>When the two tables don't have duplicate column names, this table specification is generally not needed, but it is still recommended for clarity. When the two tables do have duplicate column names, this notation is obligatory.</Par>
-      <Par>In case your table names are rather long, you can also <Term>alias</Term> your tables: temporarily rename them within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
+      <Par>In case the table names are long, we can also <Term>alias</Term> our tables: temporarily rename them within this specific query. This creates a shorter query, which may improve readability. Just as with columns, we may remove <ISQL>AS</ISQL>, but its usage is recommended for readability.</Par>
       <FigureRenameColumns query={`SELECT
   e.first_name,
   e.last_name AS family_name,

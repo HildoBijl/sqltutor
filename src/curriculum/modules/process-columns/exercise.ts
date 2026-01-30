@@ -23,7 +23,7 @@ FROM departments;
   {
     id: 'process-date-flag',
     version: 1,
-    prompt: 'Retrieve the employee ID and a flag indicating if the start date is after the end date for each employee. (The flag is TRUE or 1 when the start date is after the end date, and FALSE or 0 when this is not the case.)',
+    prompt: 'Retrieve the employee ID and a flag indicating if the start date is after the end date for each employee. (The flag is TRUE or 1 when the start date is after the end date, and FALSE or 0 when this is not the case. When any of the dates is NULL, the flag is also NULL.)',
     solution: `
 SELECT e_id, start_date > end_date AS wrong_info
 FROM emp_data;

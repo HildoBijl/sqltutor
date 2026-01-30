@@ -1,4 +1,4 @@
-import { Page, Section, Par, Quote, List, Term } from '@/components';
+import { Page, Section, Par, Info, Quote, List, Term } from '@/components';
 import { ISQL } from '@/components';
 
 import { FigureExampleQuery } from '@/curriculum/utils/queryFigures';
@@ -14,7 +14,7 @@ export function Summary() {
         <><Term>Cut columns</Term> to only get the required output.</>,
         <><Term>Remove duplicates</Term> if required.</>
       ]} />
-      <Par>It is also possible to use processed column values in the <ISQL>WHERE</ISQL> and <ISQL>ORDER BY</ISQL> clauses, as well as use new column names within the <ISQL>ORDER BY</ISQL> clause.</Par>
+      <Info>We can use processed column values in the <ISQL>WHERE</ISQL> and <ISQL>ORDER BY</ISQL> clauses too. Newly defined column names from the <ISQL>SELECT</ISQL> clause may be used within the <ISQL>ORDER BY</ISQL> clause as well. (But usually not within the <ISQL>WHERE</ISQL> clause.)</Info>
       <Quote>Find the income taxes paid per position, but only for contracts that lasted exactly one year, and only for the top 5 performance scores.</Quote>
       <FigureExampleQuery query={`SELECT
   position,

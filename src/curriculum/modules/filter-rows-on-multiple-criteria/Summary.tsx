@@ -16,7 +16,7 @@ export function Summary() {
       <Par>If we want to filter rows based on multiple conditions, we can combine them using <ISQL>AND</ISQL>, <ISQL>OR</ISQL> and <ISQL>NOT</ISQL>.</Par>
       <FigureCombinedCondition />
       <Info>When evaluating the conditions, SQL always first resolves the comparisons, turning them into <ISQL>TRUE</ISQL>/<ISQL>FALSE</ISQL>. Then it applies any potential <ISQL>NOT</ISQL> operators. At the end it resolves <ISQL>AND</ISQL>/<ISQL>OR</ISQL>. Brackets can be used to indicate a different operation order.</Info>
-      <Par>A very different (and less common) way of applying multiple conditions is by <Term>merging</Term> two tables with identical columns.</Par>
+      <Par>A very different (and less common) way of applying multiple conditions is by <Term>merging</Term> two tables with <Em>identical column names</Em>.</Par>
       <List items={[
         <>The <ISQL>UNION</ISQL> command gathers all rows present in <Em>at least one</Em> of the two tables (like an <ISQL>OR</ISQL>).</>,
         <>The <ISQL>INTERSECT</ISQL> command gathers all rows present in <Em>both</Em> tables (like an <ISQL>AND</ISQL>).</>,
@@ -26,7 +26,7 @@ export function Summary() {
 FROM emp_data
 WHERE status = 'sick leave'`} query2={`SELECT *
 FROM emp_data
-WHERE position = 'logistics specialist'`} operator="UNION" />
+WHERE position = 'transportation supervisor'`} operator="UNION" />
     </Section>
   </Page>;
 }
@@ -40,7 +40,7 @@ function FigureCombinedCondition() {
 SELECT *
 FROM emp_data
 WHERE NOT (status = 'paid leave' OR status = 'sick leave')
-  AND start_date < '2018-01-01';`;
+  AND start_date < '2023-01-01';`;
   const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
 

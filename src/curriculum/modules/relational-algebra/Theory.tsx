@@ -11,7 +11,7 @@ export function Theory() {
 
     <Section title="The idea behind relational algebra">
       <Par>You probably know algebra. In algebra, we start off with various variables like <M>x</M> and <M>y</M>, which all represent numbers. We then subject these numbers to various operations, like multiplication, subtraction, division, and so forth. For instance, we may calculate <M>{`\\frac{3x-4y}{2}`}</M>. After every step, we wind up with yet another number. And the powerful thing is: if the values of <M>x</M> and <M>y</M> change, we can instantly redo all these steps.</Par>
-      <Par><Term>Relational algebra</Term> is very similar to algebra, but rather than working with numbers, it works with tables, which we now call <Term>relations</Term>. We start with one or more relations, and then apply various operations to them. (Think of selecting specific columns or rows, or joining two tables into one.) Every operation takes one or more relations and uses them to build some new relation. By manipulating the relations in this way, we eventually wind up with some final relation containing exactly the data that we want.</Par>
+      <Par><Term>Relational algebra</Term> is very similar to algebra, but rather than working with numbers, it works with tables, which we now call <Term>relations</Term>. We start with one or more relations, and then apply various operations to them. (Think of selecting specific columns or rows, or joining two relations into one.) Every operation takes one or more relations and uses them to build some new relation. By manipulating the relations in this way, we eventually wind up with some final relation containing exactly the data that we want.</Par>
       <Par>Relational algebra is a relatively small query language: it only has six fundamental operations, and a few more that are derived from them. This is not a weakness: it's its main strength! Most DBMSs use some advanced and complicated query language with lots of possibilities, but then internally they translate those queries into basic relational algebra operations, which are then applied to the data.</Par>
       <Info>Because most DBMSs internally use some form of relational algebra, you could say that relational algebra functions as the engine behind many DBMSs. So if you want to understand how a DBMS works under the hood, studying relational algebra is the way to go. If you only want to use databases in basic ways, you probably don't need relational algebra.</Info>
     </Section>
@@ -55,7 +55,7 @@ export function Theory() {
           <Info>Example: We may consider the relation instance <Em>departments(DepartmentsSchema)</Em> to be defined as:<br/><M>{`\\{(5000, \\textrm{Operations}, 41376655, 3308400, 12), (3000, \\textrm{Finance \\& Legal}, 41655533, 2563000, 8), \\ldots\\}`}</M></Info>
         </>,
       ]} />
-      <Par>These definitions have a few important implications. Most importantly, keep in mind that relationship instances are <Em>sets</Em>, based on mathematical set theory.</Par>
+      <Par>These definitions have a few important implications. Most importantly, keep in mind that relation instances are <Em>sets</Em>, based on mathematical set theory.</Par>
       <List items={[
         <>They have <Em>no order or sorting</Em>. The order of tuples within a relation instance is always fully irrelevant.</>,
         <>They <Em>cannot have duplicates</Em>. If a tuple is "added" to a relation instance, but it already exists in there, then the duplicate is automatically ignored.</>,

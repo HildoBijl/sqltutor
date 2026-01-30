@@ -4,7 +4,7 @@ const EXERCISES: StaticExercise[] = [
   {
     id: 'multi-filter-employees-between',
     version: 1,
-    prompt: 'Retrieve all departments where the number of employees is not between 10 and 20, and whose budget is known.',
+    prompt: 'Retrieve all departments where the number of employees is not between 10 and 20 (inclusive), and whose budget is known.',
     solution: `
 SELECT *
 FROM departments
@@ -36,7 +36,7 @@ WHERE phone LIKE '408%'
   },
 //   {
 //     id: 'multi-filter-amount-between',
-//     prompt: 'Retrieve all transactions where the amount is not between 100 and 1000 and were not validated by any employee.',
+//     prompt: 'Retrieve all transactions where the amount is not between 100 and 1000 (inclusive) and were not validated by any employee.',
 //     solution: `
 // SELECT *
 // FROM transactions
