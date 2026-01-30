@@ -54,17 +54,75 @@ const mapNormalizedToOriginal = (
   });
 };
 
+const EMPTY_RESULT_MESSAGE =
+  'Your output seems to be empty. Some records were expected here, so something has gone wrong.';
+const TOO_MANY_COLUMNS_MESSAGE =
+  'Your output seems to have more columns than was expected. Did you accidentally select too many columns?';
+const TOO_FEW_COLUMNS_MESSAGE =
+  'Your output seems to have fewer columns than was expected. Check that you have included all required attributes.';
+const TOO_MANY_ROWS_MESSAGE =
+  'You seem to have more rows than expected. Did you set up your filters well enough?';
+const TOO_FEW_ROWS_MESSAGE =
+  'You seem to have fewer rows than expected. Check that you included all required entries.';
+const COLUMN_ORDER_MESSAGE =
+  "It seems like you didn't give the columns in the required order. Please check the column order.";
+const ROW_VALUE_MISMATCH_MESSAGE =
+  'There seem to be rows which do not match the expected values.';
+
 const formatList = (items: string[], limit = 6): string => {
   if (items.length <= limit) return items.join(', ');
   const shown = items.slice(0, limit);
   return `${shown.join(', ')} (and ${items.length - limit} more)`;
 };
 
-const formatSampleDifferences = (differences: string[], limit = 2): string => {
+const formatQuotedList = (items: string[], limit = 6): string =>
+  formatList(items.map((item) => `"${item}"`), limit);
+
+const formatRowSample = (row: string): string => `(${row.split('|').join(', ')})`;
+
+const formatDifferenceSample = (
+  sample: { index: number; row: string },
+  includeIndex: boolean,
+): string =>
+  includeIndex
+    ? `row ${sample.index + 1}: ${formatRowSample(sample.row)}`
+    : formatRowSample(sample.row);
+
+const formatSampleDifferences = (
+  differences: Array<{ index: number; row: string }>,
+  includeIndex: boolean,
+  limit = 2,
+): string => {
   if (differences.length === 0) return '';
   const samples = differences.slice(0, limit);
   const label = samples.length === 1 ? 'Example' : 'Examples';
-  return ` ${label}: ${samples.join('; ')}`;
+  const rendered = samples.map((sample) => formatDifferenceSample(sample, includeIndex));
+  return ` ${label}: ${rendered.join('; ')}`;
+};
+
+const getColumnNameMismatchFeedback = (
+  missing: string[],
+  extra: string[],
+): string | null => {
+  if (missing.length === 0 && extra.length === 0) {
+    return null;
+  }
+
+  if (missing.length === 1) {
+    const missingName = missing[0];
+    if (extra.length === 1) {
+      return `Your output seems to be missing a column. I expected there to be one named "${missingName}". I did see "${extra[0]}" though, so check spelling.`;
+    }
+    return `Your output seems to be missing a column. I expected there to be one named "${missingName}".`;
+  }
+
+  if (missing.length > 1) {
+    return `Your output seems to be missing some columns. Check that you have ${formatQuotedList(
+      missing,
+    )} in your result.`;
+  }
+
+  return TOO_MANY_COLUMNS_MESSAGE;
 };
 
 const buildColumnSignatures = (
@@ -109,7 +167,7 @@ export function compareQueryResults(
   if (!expected || !actual) {
     return {
       match: false,
-      feedback: 'Requirement failed: query must return a result set. No result set was returned.',
+      feedback: EMPTY_RESULT_MESSAGE,
     };
   }
 
@@ -118,18 +176,6 @@ export function compareQueryResults(
   const expectedColumnCount = expected.columns.length;
   const actualColumnCount = actual.columns.length;
 
-  if (expectedColumnCount !== actualColumnCount) {
-    const columnDirection = actualColumnCount < expectedColumnCount ? 'too few' : 'too many';
-    return {
-      match: false,
-      feedback: `Requirement failed: number of columns. Expected ${expectedColumnCount} columns, got ${actualColumnCount} (${columnDirection}).`,
-      details: {
-        expectedRows: expectedRowCount,
-        actualRows: actualRowCount,
-      },
-    };
-  }
-
   const expectedCols = expected.columns.map((col) => normalizeColumn(col, caseSensitive));
   const actualCols = actual.columns.map((col) => normalizeColumn(col, caseSensitive));
 
@@ -137,80 +183,44 @@ export function compareQueryResults(
   let columnMapping = identityMapping;
 
   if (!ignoreColumnNames) {
+    const missingCols = expectedCols.filter((col) => !actualCols.includes(col));
+    const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
+    if (missingCols.length > 0 || extraCols.length > 0) {
+      const missingOriginal = mapNormalizedToOriginal(missingCols, expectedCols, expected.columns);
+      const extraOriginal = mapNormalizedToOriginal(extraCols, actualCols, actual.columns);
+      const feedbackMessage = getColumnNameMismatchFeedback(missingOriginal, extraOriginal);
+      return {
+        match: false,
+        feedback: feedbackMessage ?? TOO_MANY_COLUMNS_MESSAGE,
+        details: {
+          expectedRows: expectedRowCount,
+          actualRows: actualRowCount,
+          columnMismatch: [...missingOriginal, ...extraOriginal],
+        },
+      };
+    }
+
+    if (expectedColumnCount !== actualColumnCount) {
+      const columnCountMessage =
+        actualColumnCount > expectedColumnCount ? TOO_MANY_COLUMNS_MESSAGE : TOO_FEW_COLUMNS_MESSAGE;
+      return {
+        match: false,
+        feedback: columnCountMessage,
+        details: {
+          expectedRows: expectedRowCount,
+          actualRows: actualRowCount,
+        },
+      };
+    }
+
     if (ignoreColumnOrder) {
-      const missingCols = expectedCols.filter((col) => !actualCols.includes(col));
-      const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
-
-      if (missingCols.length > 0 || extraCols.length > 0) {
-        const missingOriginal = mapNormalizedToOriginal(missingCols, expectedCols, expected.columns);
-        const extraOriginal = mapNormalizedToOriginal(extraCols, actualCols, actual.columns);
-        let feedbackMessage = 'Requirement failed: column names. The result set has unexpected column names.';
-        if (missingOriginal.length === 1 && extraOriginal.length === 1) {
-          feedbackMessage = `Requirement failed: column name. Expected "${missingOriginal[0]}", got "${extraOriginal[0]}".`;
-        } else if (missingOriginal.length === extraOriginal.length && missingOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Expected: ${formatList(
-            missingOriginal,
-          )}. Got: ${formatList(extraOriginal)}.`;
-        } else if (missingOriginal.length > 0 && extraOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Missing: ${formatList(
-            missingOriginal,
-          )}. Extra: ${formatList(extraOriginal)}.`;
-        } else if (missingOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Missing: ${formatList(missingOriginal)}.`;
-        } else if (extraOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Extra: ${formatList(extraOriginal)}.`;
-        }
-        return {
-          match: false,
-          feedback: feedbackMessage,
-          details: {
-            expectedRows: expectedRowCount,
-            actualRows: actualRowCount,
-            columnMismatch: [...missingOriginal, ...extraOriginal],
-          },
-        };
-      }
-
       columnMapping = expectedCols.map((col) => actualCols.indexOf(col));
     } else {
-      const missingCols = expectedCols.filter((col) => !actualCols.includes(col));
-      const extraCols = actualCols.filter((col) => !expectedCols.includes(col));
-      if (missingCols.length > 0 || extraCols.length > 0) {
-        const missingOriginal = mapNormalizedToOriginal(missingCols, expectedCols, expected.columns);
-        const extraOriginal = mapNormalizedToOriginal(extraCols, actualCols, actual.columns);
-        let feedbackMessage = 'Requirement failed: column names. The result set has unexpected column names.';
-        if (missingOriginal.length === 1 && extraOriginal.length === 1) {
-          feedbackMessage = `Requirement failed: column name. Expected "${missingOriginal[0]}", got "${extraOriginal[0]}".`;
-        } else if (missingOriginal.length === extraOriginal.length && missingOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Expected: ${formatList(
-            missingOriginal,
-          )}. Got: ${formatList(extraOriginal)}.`;
-        } else if (missingOriginal.length > 0 && extraOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Missing: ${formatList(
-            missingOriginal,
-          )}. Extra: ${formatList(extraOriginal)}.`;
-        } else if (missingOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Missing: ${formatList(missingOriginal)}.`;
-        } else if (extraOriginal.length > 0) {
-          feedbackMessage = `Requirement failed: column names. Extra: ${formatList(extraOriginal)}.`;
-        }
-        return {
-          match: false,
-          feedback: feedbackMessage,
-          details: {
-            expectedRows: expectedRowCount,
-            actualRows: actualRowCount,
-            columnMismatch: [...missingOriginal, ...extraOriginal],
-          },
-        };
-      }
       for (let index = 0; index < expectedCols.length; index += 1) {
         if (expectedCols[index] !== actualCols[index]) {
-          const expectedOrder = formatList(expected.columns);
-          const actualOrder = formatList(actual.columns);
           return {
             match: false,
-            feedback: `Requirement failed: column order. Expected: ${expectedOrder}. Got: ${actualOrder}.`,
+            feedback: COLUMN_ORDER_MESSAGE,
             details: {
               expectedRows: expectedRowCount,
               actualRows: actualRowCount,
@@ -220,6 +230,32 @@ export function compareQueryResults(
       }
     }
   } else {
+    if (expectedColumnCount !== actualColumnCount) {
+      const columnCountMessage =
+        actualColumnCount > expectedColumnCount ? TOO_MANY_COLUMNS_MESSAGE : TOO_FEW_COLUMNS_MESSAGE;
+      return {
+        match: false,
+        feedback: columnCountMessage,
+        details: {
+          expectedRows: expectedRowCount,
+          actualRows: actualRowCount,
+        },
+      };
+    }
+
+    if (expectedRowCount !== actualRowCount) {
+      const rowCountMessage =
+        actualRowCount > expectedRowCount ? TOO_MANY_ROWS_MESSAGE : TOO_FEW_ROWS_MESSAGE;
+      return {
+        match: false,
+        feedback: rowCountMessage,
+        details: {
+          expectedRows: expectedRowCount,
+          actualRows: actualRowCount,
+        },
+      };
+    }
+
     const expectedSignatures = buildColumnSignatures(expected.values, caseSensitive, ignoreRowOrder);
     const actualSignatures = buildColumnSignatures(actual.values, caseSensitive, ignoreRowOrder);
 
@@ -236,15 +272,13 @@ export function compareQueryResults(
       });
 
       if (columnMapping.some((index) => index === -1)) {
-        const missingColumnLabels = columnMapping
-          .map((index, idx) => (index === -1 ? expected.columns[idx] ?? `column ${idx + 1}` : null))
-          .filter((label): label is string => Boolean(label));
-        const missingColumnsSummary = missingColumnLabels.length
-          ? ` Missing expected column data for: ${formatList(missingColumnLabels)}.`
-          : '';
+        const unmatchedActualColumns = actual.columns.filter((_, idx) => !usedActualColumns.has(idx));
+        const columnHint = unmatchedActualColumns.length
+          ? ` Check the values in ${formatQuotedList(unmatchedActualColumns)}.`
+          : ' Check the values in your columns.';
         return {
           match: false,
-          feedback: `Requirement failed: column values. The result set does not match the expected columns.${missingColumnsSummary}`,
+          feedback: `There seem to be incorrect values in one or more columns.${columnHint}`,
           details: {
             expectedRows: expectedRowCount,
             actualRows: actualRowCount,
@@ -254,13 +288,11 @@ export function compareQueryResults(
     } else {
       for (let index = 0; index < expectedSignatures.length; index += 1) {
         if (expectedSignatures[index] !== actualSignatures[index]) {
-          const expectedLabel = expected.columns[index];
           const actualLabel = actual.columns[index];
-          const expectedLabelText = expectedLabel ? ` Expected column ${index + 1}: ${expectedLabel}.` : '';
-          const actualLabelText = actualLabel ? ` Got: ${actualLabel}.` : '';
+          const columnLabel = actualLabel ? ` "${actualLabel}"` : '';
           return {
             match: false,
-            feedback: `Requirement failed: column values. Column ${index + 1} does not match expected values.${expectedLabelText}${actualLabelText}`,
+            feedback: `There seem to be incorrect values in the column${columnLabel}. Check the values from this column.`,
             details: {
               expectedRows: expectedRowCount,
               actualRows: actualRowCount,
@@ -272,8 +304,8 @@ export function compareQueryResults(
   }
 
   if (expectedRowCount !== actualRowCount) {
-    const rowDirection = actualRowCount < expectedRowCount ? 'too few' : 'too many';
-    const rowCountFeedback = `Requirement failed: number of rows. Expected ${expectedRowCount} rows, got ${actualRowCount} (${rowDirection}).`;
+    const rowCountFeedback =
+      actualRowCount > expectedRowCount ? TOO_MANY_ROWS_MESSAGE : TOO_FEW_ROWS_MESSAGE;
     return {
       match: false,
       feedback: rowCountFeedback,
@@ -297,21 +329,23 @@ export function compareQueryResults(
     actualRows.sort();
   }
 
-  const differences: string[] = [];
+  const differences: Array<{ index: number; row: string }> = [];
   for (let index = 0; index < expectedRows.length && differences.length < 3; index += 1) {
     if (expectedRows[index] !== actualRows[index]) {
-      differences.push(`Row ${index + 1}: expected (${expectedRows[index]}) but got (${actualRows[index]})`);
+      differences.push({ index, row: actualRows[index] });
     }
   }
 
   if (differences.length > 0) {
     return {
       match: false,
-      feedback: `Requirement failed: row values. Some rows differ from the expected data.${formatSampleDifferences(differences)}`,
+      feedback: `${ROW_VALUE_MISMATCH_MESSAGE}${formatSampleDifferences(differences, !ignoreRowOrder)}`,
       details: {
         expectedRows: expectedRowCount,
         actualRows: actualRowCount,
-        sampleDifferences: differences,
+        sampleDifferences: differences.map((sample) =>
+          formatDifferenceSample(sample, !ignoreRowOrder),
+        ),
       },
     };
   }
