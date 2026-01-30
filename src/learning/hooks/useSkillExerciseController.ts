@@ -154,7 +154,6 @@ export function useSkillExerciseController({
   const [showGiveUpDialog, setShowGiveUpDialog] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
-  const [hasSubmittedAttempt, setHasSubmittedAttempt] = useState(false);
   const [datasetWarning, setDatasetWarning] = useState<{ message: string; queryKey: string } | null>(null);
   const [pendingDatasetRefresh, setPendingDatasetRefresh] = useState(false);
   const latestQueryKeyRef = useRef('');
@@ -210,11 +209,10 @@ export function useSkillExerciseController({
     setRevealedSolution(null);
     updateFeedback(null);
     setHasExecutedQuery(false);
-    setHasSubmittedAttempt(false);
     setDatasetWarning(null);
     setPendingDatasetRefresh(false);
     lastExecutedQueryRef.current = '';
-  }, [currentExercise, setHasExecutedQuery, setHasSubmittedAttempt, setRevealedSolution, updateFeedback]);
+  }, [currentExercise, setHasExecutedQuery, setRevealedSolution, updateFeedback]);
 
   useEffect(() => {
     return () => {
@@ -363,7 +361,6 @@ export function useSkillExerciseController({
       const effectiveQuery = rawQuery.trim();
       if (!currentExercise || !effectiveQuery) return;
       lastExecutedQueryRef.current = effectiveQuery;
-      setHasSubmittedAttempt(true);
       setHasExecutedQuery(true);
 
       if (hasGivenUp) {
@@ -667,7 +664,6 @@ export function useSkillExerciseController({
     updateFeedback(null);
     setHasGivenUp(false);
     setHasExecutedQuery(false);
-    setHasSubmittedAttempt(false);
     setRevealedSolution(null);
   }, [exerciseCompleted, exerciseDispatch, hasGivenUp, setRevealedSolution, updateFeedback]);
 
@@ -756,7 +752,6 @@ export function useSkillExerciseController({
       updateFeedback(null);
       setHasGivenUp(false);
       setHasExecutedQuery(false);
-      setHasSubmittedAttempt(false);
       setRevealedSolution(null);
     },
     [
@@ -764,7 +759,6 @@ export function useSkillExerciseController({
       selectedExerciseId,
       setHasExecutedQuery,
       setHasGivenUp,
-      setHasSubmittedAttempt,
       setQuery,
       setRevealedSolution,
       skillModule,
@@ -810,7 +804,7 @@ export function useSkillExerciseController({
     dbReady &&
     !queryError;
 
-  const canGiveUp = Boolean(normalizedExercise) && !isExecuting && hasSubmittedAttempt;
+  const canGiveUp = Boolean(normalizedExercise) && !isExecuting;
 
   return {
     practice: {
