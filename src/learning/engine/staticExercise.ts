@@ -28,7 +28,8 @@ export interface ExerciseState {
 const MESSAGES = {
   validation: {
     syntaxError: 'SQL error: {error}',
-    noResultSet: 'Requirement failed: query must return a result set. No result set was returned.',
+    noResultSet:
+      'Your output seems to be empty. Some records were expected here, so something has gone wrong.',
   },
   verification: {
     correct: 'Correct!',
@@ -48,6 +49,19 @@ function formatMessage(template: string, context: Record<string, unknown>): stri
 
 function normalizeVersion(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : DEFAULT_VERSION;
+}
+
+function formatSentence(value: string): string {
+  let text = value.trim();
+  if (!text) return text;
+  const firstChar = text[0];
+  if (firstChar === firstChar.toLowerCase()) {
+    text = firstChar.toUpperCase() + text.slice(1);
+  }
+  if (!/[.!?]$/.test(text)) {
+    text += '.';
+  }
+  return text;
 }
 
 const SQL_ERROR_PATTERNS: Array<{
@@ -92,21 +106,21 @@ const SQL_ERROR_PATTERNS: Array<{
 function formatSqlErrorMessage(rawMessage: string): string {
   const message = rawMessage.replace(/\s+/g, ' ').trim();
   if (!message) {
-    return formatMessage(MESSAGES.validation.syntaxError, { error: 'Unknown error' });
+    return formatSentence(formatMessage(MESSAGES.validation.syntaxError, { error: 'Unknown error' }));
   }
 
   for (const { pattern, format } of SQL_ERROR_PATTERNS) {
     const match = message.match(pattern);
     if (match) {
-      return format(match);
+      return formatSentence(format(match));
     }
   }
 
   if (/syntax error/i.test(message)) {
-    return 'Syntax error.';
+    return formatSentence('Syntax error.');
   }
 
-  return formatMessage(MESSAGES.validation.syntaxError, { error: message });
+  return formatSentence(formatMessage(MESSAGES.validation.syntaxError, { error: message }));
 }
 
 export function buildStaticExerciseModule(exercises: StaticExercise[]) {
