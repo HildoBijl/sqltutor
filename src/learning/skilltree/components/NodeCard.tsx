@@ -26,6 +26,7 @@ interface NodeCardProps {
   onClick?: () => void;
   planningMode?: boolean;
   isGoalNode?: boolean;
+  isOnGoalPath?: boolean;
   onSetGoal?: () => void;
 }
 
@@ -40,6 +41,7 @@ export function NodeCard({
   onClick,
   planningMode,
   isGoalNode = false,
+  isOnGoalPath = false,
   onSetGoal,
 }: NodeCardProps) {
   const theme = useTheme();
@@ -80,9 +82,19 @@ export function NodeCard({
   // let borderOpacity: number;
 
   if (planningMode) {
-    nodeOpacity = 1.0;
+    if (isGoalNode || isOnGoalPath) {
+      nodeOpacity = 1.0;
+    } else {
+      nodeOpacity = 0.7;
+    }
     strokeWidth = isHovered ? 2 : 1;
-    if (completed) {
+    if (isGoalNode) {
+      fillColor = "purple";
+      borderColor = "purple";
+    } else if (isOnGoalPath && !completed) {
+      fillColor = "#d32f2f";
+      borderColor = "#d32f2f";
+    } else if (isOnGoalPath && completed) {
       fillColor = "#4CAF50";
       borderColor = "$4CAF50";
     } else {
@@ -313,7 +325,7 @@ export function NodeCard({
                   style={{ fontSize: checkmarkSize - 4, color: "purple" }}
                 />
               </div>
-            )} 
+            )}
 
             <div
               style={{
@@ -321,7 +333,10 @@ export function NodeCard({
                 textAlign: "center",
                 fontWeight: 500,
                 fontSize: "17px",
-                color: planningMode && completed ? "#ffffff" : "#000000",
+                color:
+                  planningMode && (isGoalNode || isOnGoalPath)
+                    ? "#ffffff"
+                    : "#000000",
               }}
             >
               {item.name}

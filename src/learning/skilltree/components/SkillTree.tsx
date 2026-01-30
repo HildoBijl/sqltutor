@@ -7,7 +7,6 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
 import { useTransformContext } from "react-zoom-pan-pinch";
 import { useDebouncedFunction } from "@/utils";
-import { Opacity } from "@mui/icons-material";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -60,6 +59,7 @@ export function SkillTree({
 }: SkillTreeProps) {
   const theme = useTheme();
 
+  // Local state for hovered node ID and prerequisite chain
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
 
@@ -96,6 +96,11 @@ export function SkillTree({
 
     return prerequisites;
   };
+
+  // Calculate prerequisites for goal node in planning mode
+  const goalPrerequisites = goalNodeId
+    ? getPrerequisites(goalNodeId)
+    : new Set<string>();
 
   // Tooltip state
   const [tooltip, setTooltip] = useState<string | null>(null);
@@ -149,11 +154,26 @@ export function SkillTree({
     return toIsInChain && fromIsInChain;
   };
 
+  // Check if a connector is part of the goal path
+  const isConnectorInGoalPath = (connector: {
+    from: string;
+    to: string;
+  }): boolean => {
+    if (!planningMode || !goalNodeId) return false;
+
+    const fromInPath =
+      goalPrerequisites.has(connector.from) || connector.from === goalNodeId;
+    const toInPath =
+      goalPrerequisites.has(connector.to) || connector.to === goalNodeId;
+
+    return fromInPath && toInPath;
+  };
+
   // Determine the style for connectors based on different cases
   const getConnectorStyle = (connector: { from: string; to: string }) => {
     // TO DO
     if (planningMode) {
-      return { opacity: 1 };
+      return { opacity: isConnectorInGoalPath(connector) ? 1 : 0.7 };
     }
     // Full opacity for connectors in the hovered path
     if (isConnectorInHoveredPath(connector)) {
@@ -188,10 +208,13 @@ export function SkillTree({
 
     if (planningMode) {
       // TO DO
-      if (bothCompleted) {
+      if (bothCompleted && isConnectorInGoalPath(connector)) {
         return "#4CAF50";
+      } else if (isConnectorInGoalPath(connector)) {
+        return "red";
+      } else {
+        return "#9aa0a6";
       }
-      return "#9aa0a6";
     }
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
@@ -268,8 +291,9 @@ export function SkillTree({
                 onClick={() => handleNodeClick(item)}
                 planningMode={planningMode}
                 isGoalNode={planningMode && goalNodeId === item.id}
+                isOnGoalPath={planningMode && goalPrerequisites.has(item.id)}
                 onSetGoal={() => {
-                  if (planningMode) {
+                  if (planningMode && setGoalNodeId) {
                     setGoalNodeId(goalNodeId === item.id ? null : item.id);
                   }
                 }}
