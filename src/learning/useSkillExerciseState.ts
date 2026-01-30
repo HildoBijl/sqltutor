@@ -46,7 +46,7 @@ export interface SkillExerciseOption {
 }
 
 export interface SkillExerciseModuleLike {
-  generate?: (helpers: ExerciseHelpers) => any;
+  generate?: (helpers: ExerciseHelpers, context?: { previousExercise?: unknown | null }) => any;
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
   validateOutput?: (exercise: any, result: unknown) => ValidationResult;
@@ -96,9 +96,12 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
   );
 
   const exerciseConfig = useMemo<SimpleExerciseConfig<any, string, unknown, unknown>>(() => {
-    const generateExercise = (exerciseHelpers: ExerciseHelpers) => {
+    const generateExercise = (
+      exerciseHelpers: ExerciseHelpers,
+      context?: { previousExercise?: unknown | null },
+    ) => {
       if (moduleLike?.generate) {
-        return moduleLike.generate(exerciseHelpers) || {};
+        return moduleLike.generate(exerciseHelpers, context) || {};
       }
       return {
         id: 'exercise',

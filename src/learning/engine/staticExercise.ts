@@ -144,8 +144,16 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     };
   };
 
-  function generate(utils: Utils): ExerciseState {
-    const exercise = utils.selectRandomly(exercises as readonly StaticExercise[]);
+  function generate(
+    utils: Utils,
+    context?: { previousExercise?: ExerciseState | null },
+  ): ExerciseState {
+    const previousId = context?.previousExercise?.id;
+    const available =
+      previousId && exercises.length > 1
+        ? exercises.filter((exercise) => exercise.id !== previousId)
+        : exercises;
+    const exercise = utils.selectRandomly(available as readonly StaticExercise[]);
     return toExerciseState(exercise);
   }
 

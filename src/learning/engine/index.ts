@@ -91,7 +91,10 @@ export interface ExerciseAttemptContext<Exercise, Input, Result> {
 export type ValidateInputArgs<Exercise, Input, Result> = ExerciseAttemptContext<Exercise, Input, Result>;
 
 export interface SimpleExerciseConfig<Exercise, Input, Result, Demo = unknown> {
-  generateExercise: (helpers: ExerciseHelpers) => Exercise;
+  generateExercise: (
+    helpers: ExerciseHelpers,
+    context?: { previousExercise?: Exercise | null },
+  ) => Exercise;
   validateInput?: (args: ValidateInputArgs<Exercise, Input, Result>) => ValidationResult;
   runDemo?: (args: { exercise: Exercise; helpers: ExerciseHelpers }) => Demo;
   deriveSolution?: (args: { exercise: Exercise; verification?: VerificationResult }) => PracticeSolution | null;
@@ -178,7 +181,7 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
         const exercise =
           action.exercise !== undefined && action.exercise !== null
             ? (action.exercise as Exercise)
-            : config.generateExercise(helpers);
+            : config.generateExercise(helpers, { previousExercise: state.exercise });
         const demo = config.runDemo ? config.runDemo({ exercise, helpers }) : undefined;
         const status: ExerciseStatus = demo ? 'demo-ready' : 'ready';
         const entry: ExerciseHistoryEntry<Input, Result> = {
