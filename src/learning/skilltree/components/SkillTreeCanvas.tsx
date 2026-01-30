@@ -1,4 +1,4 @@
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
@@ -8,6 +8,7 @@ import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
 import { useTheme } from "@mui/material/";
+import { useAppStore } from "@/learning/store";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -55,12 +56,22 @@ export function SkillTreeCanvas({
   containerRef,
   nodeRefs,
 }: SkillTreeCanvasProps) {
-  const dispatchScrollEvent = useDebouncedFunction(() => window.dispatchEvent(new Event("scroll")));
+  const dispatchScrollEvent = useDebouncedFunction(() =>
+    window.dispatchEvent(new Event("scroll")),
+  );
   const [isPanning, setIsPanning] = useState(false);
 
   // Added for planning mode
   const [planningMode, setPlanningMode] = useState(false);
-  const [goalNodeId, setGoalNodeId] = useState<string | null>(null);
+  const goalNodeId = useAppStore((state) => state.goalNodeID);
+  const setGoalNodeId = useAppStore((state) => state.setGoalNodeID);
+
+  useEffect(() => {
+  if (goalNodeId) {
+    setPlanningMode(true);
+  }
+}, [goalNodeId]);
+
   const theme = useTheme();
 
   return (
@@ -103,8 +114,7 @@ export function SkillTreeCanvas({
               onTogglePlanningMode={() => setPlanningMode(!planningMode)}
               planningMode={planningMode}
             />
-            <TreeLegend 
-            />
+            <TreeLegend />
             <TreeLegend />
             <TransformComponent
               wrapperStyle={{

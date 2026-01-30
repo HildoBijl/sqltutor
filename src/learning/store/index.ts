@@ -109,6 +109,7 @@ interface AppState {
   components: Record<string, ComponentState>;
   currentTheme: 'light' | 'dark';
   hideStories: boolean;
+  goalNodeID: string | null;
   _hasHydrated: boolean;
   updateComponent: (id: string, data: Partial<ComponentState>) => void;
   getComponent: (id: string) => ComponentState;
@@ -119,6 +120,7 @@ interface AppState {
   getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
   getAllExerciseInstances: (skillId: string) => StoredExerciseInstance[];
   getExerciseHistory: (skillId: string, instanceId: string) => StoredExerciseEvent[];
+  setGoalNodeID: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -127,6 +129,7 @@ export const useAppStore = create<AppState>()(
       components: {},
       currentTheme: 'light',
       hideStories: true,
+      goalNodeID: null,
       _hasHydrated: false,
 
       updateComponent: (id, data) =>
@@ -240,6 +243,7 @@ export const useAppStore = create<AppState>()(
         }
         return component.instances[instanceId]?.events ?? [];
       },
+      setGoalNodeID: (id: any) => set({ goalNodeID: id }),
     }),
     {
       name: 'sqltutor-storage',
@@ -247,6 +251,7 @@ export const useAppStore = create<AppState>()(
         components: state.components,
         currentTheme: state.currentTheme,
         hideStories: state.hideStories,
+        goalNodeID: state.goalNodeID,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
