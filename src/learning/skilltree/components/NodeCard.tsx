@@ -95,7 +95,7 @@ export function NodeCard({
       borderColor = "#d32f2f";
     } else if (isOnGoalPath && completed) {
       fillColor = "#4CAF50";
-      borderColor = "$4CAF50";
+      borderColor = "#4CAF50";
     } else {
       fillColor = theme.palette.background.paper;
       borderColor = isHovered
