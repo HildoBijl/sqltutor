@@ -7,6 +7,7 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
+import { PlanningProgressIndicator} from "./PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
 import { useAppStore } from "@/learning/store";
 
@@ -63,6 +64,7 @@ export function SkillTreeCanvas({
 
   // Added for planning mode
   const [planningMode, setPlanningMode] = useState(false);
+  const [goalProgress, setGoalProgress] = useState({ completed: 0, total: 0, nextStep: null as string | null});
   const goalNodeId = useAppStore((state) => state.goalNodeID);
   const setGoalNodeId = useAppStore((state) => state.setGoalNodeID);
 
@@ -114,7 +116,14 @@ export function SkillTreeCanvas({
               onTogglePlanningMode={() => setPlanningMode(!planningMode)}
               planningMode={planningMode}
             />
-            <TreeLegend />
+            {planningMode && goalNodeId && (
+              <PlanningProgressIndicator
+                nextStepName={goalProgress.nextStep || "All completed!"}
+                completedCount={goalProgress.completed}
+                totalCount={goalProgress.total}
+                
+              />
+            )}
             <TreeLegend />
             <TransformComponent
               wrapperStyle={{
@@ -145,6 +154,9 @@ export function SkillTreeCanvas({
                 planningMode={planningMode}
                 goalNodeId={goalNodeId}
                 setGoalNodeId={setGoalNodeId}
+                onGoalProgressChange={(completed, total, nextStep) =>
+                  setGoalProgress({ completed, total, nextStep })
+                }
               />
             </TransformComponent>
           </div>

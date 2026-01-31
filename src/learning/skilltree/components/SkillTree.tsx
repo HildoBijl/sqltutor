@@ -43,6 +43,11 @@ interface SkillTreeProps {
   planningMode: boolean;
   goalNodeId?: string | null;
   setGoalNodeId?: (id: string | null) => void;
+  onGoalProgressChange?: (
+    completedCount: number,
+    totalCount: number,
+    nextStepNode: string | null,
+  ) => void;
 }
 
 export function SkillTree({
@@ -56,6 +61,7 @@ export function SkillTree({
   planningMode,
   goalNodeId,
   setGoalNodeId,
+  onGoalProgressChange,
 }: SkillTreeProps) {
   const theme = useTheme();
 
@@ -101,6 +107,34 @@ export function SkillTree({
   const goalPrerequisites = goalNodeId
     ? getPrerequisites(goalNodeId)
     : new Set<string>();
+
+  useEffect(() => {
+    if (onGoalProgressChange && goalNodeId) {
+      const totalCount = goalPrerequisites.size;
+      const completedCount = Array.from(goalPrerequisites).filter((id) =>
+        isCompleted(id),
+      ).length;
+
+      const nodesOnPath = [...Array.from(goalPrerequisites), goalNodeId];
+      const nextStep = nodesOnPath.find((id) => {
+        if (isCompleted(id)) return false;
+        const item = contentItems[id];
+        const allPrereqsCompleted =
+          item.prerequisites?.every((prereqId) => isCompleted(prereqId)) ??
+          true;
+        return allPrereqsCompleted;
+      });
+
+      const nextStepName = nextStep ? contentItems[nextStep]?.name : null;
+      onGoalProgressChange(completedCount, totalCount, nextStepName);
+    }
+  }, [
+    goalNodeId,
+    goalPrerequisites,
+    isCompleted,
+    onGoalProgressChange,
+    contentItems,
+  ]);
 
   // Tooltip state
   const [tooltip, setTooltip] = useState<string | null>(null);

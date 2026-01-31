@@ -2,8 +2,8 @@ import { Box, Typography } from "@mui/material";
 import { EditNote, School } from "@mui/icons-material";
 
 /*
-* TreeLegend component that displays a legend for the skill tree nodes.
-*/
+ * TreeLegend component that displays a legend for the skill tree nodes.
+ */
 export function TreeLegend() {
   return (
     <Box
@@ -20,6 +20,7 @@ export function TreeLegend() {
           flexDirection: "column",
           gap: 1,
           p: 2,
+          border: (theme) => `1px solid ${theme.palette.divider}`,
           backgroundColor: "background.paper",
           borderRadius: 2,
         }}
@@ -32,9 +33,6 @@ export function TreeLegend() {
             sx={{
               width: 40,
               height: 20,
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -49,9 +47,6 @@ export function TreeLegend() {
             sx={{
               width: 40,
               height: 20,
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 6,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

@@ -8,8 +8,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
 import PushPinIcon from "@mui/icons-material/PushPin";
-import { fill } from "lodash";
-import { check } from "zod";
+
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
