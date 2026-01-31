@@ -275,8 +275,8 @@ export function NodeCard({
                 }}
                 style={{
                   position: "absolute",
-                  top: -5,
-                  right: -5,
+                  top: cardHeight - 25,
+                  right: -15,
                   width: 2 * checkmarkSize,
                   height: 2 * checkmarkSize,
                   backgroundColor: theme.palette.background.paper,
@@ -306,8 +306,8 @@ export function NodeCard({
                 }}
                 style={{
                   position: "absolute",
-                  top: -5,
-                  right: -5,
+                  top: cardHeight - 25,
+                  right: -15,
                   width: 2 * checkmarkSize,
                   height: 2 * checkmarkSize,
                   backgroundColor: theme.palette.background.paper,

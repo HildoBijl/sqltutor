@@ -53,7 +53,7 @@ export function PlanningProgressIndicator({
           borderRadius: 4,
           backgroundColor: theme.palette.grey[200],
           "& .MuiLinearProgress-bar": {
-            backgroundColor: progress < 33 ? "red" : progress < 66 ? "orange" : "green",
+            backgroundColor: progress < 33 ? "red" : progress < 66 ? "orange" : progress == 100 ? "purple" : "green",
             borderRadius: 4,
           },
         }}
