@@ -45,7 +45,7 @@ export function Theory() {
     <Section title="Use the set difference">
       <Par>To introduce the final set operator, we adjust the problem again. Now we want to find all the people who manage a department but do <Em>not</Em> earn less than 200,000 per year.</Par>
       <Par>The solution here is to take the first list, and <Em>remove</Em> all the people from it that appear on the second list. For this, we use the <Term>difference operator</Term> "<M>-</M>" (the minus sign).</Par>
-      <FigureExampleRAQuery query={<>ρ<sub>manager_id→e_id</sub>(∏<sub>manager_id</sub>(departments)) ∪ ∏<sub>e_id</sub>(σ<sub>salary &lt; 200000</sub>(employees))</>} actualQuery="SELECT manager_id AS e_id FROM departments EXCEPT SELECT e_id FROM employees WHERE current_salary < 200000" tableWidth={150} />
+      <FigureExampleRAQuery query={<>ρ<sub>manager_id→e_id</sub>(∏<sub>manager_id</sub>(departments)) - ∏<sub>e_id</sub>(σ<sub>salary &lt; 200000</sub>(employees))</>} actualQuery="SELECT manager_id AS e_id FROM departments EXCEPT SELECT e_id FROM employees WHERE current_salary < 200000" tableWidth={150} />
       <Par>The difference operator takes two relations and gives a relation that consists of all tuples that appear in the first but not in the second relation. The difference operator is formally defined, for two relations <M>r</M> and <M>s</M> having a common schema <M>R</M>, as</Par>
       <BM>{`r - s = \\{ t \\, | \\, t \\in r \\, \\textrm{and} \\, t \\notin s \\}.`}</BM>
       <Info>If you take the difference <M>r - s</M>, and if <M>s</M> has tuples that are <Em>not</Em> in <M>r</M>, then these tuples are ignored. They have no effect on the set difference.</Info>
