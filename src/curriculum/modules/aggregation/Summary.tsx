@@ -11,7 +11,7 @@ import { DataTable } from '@/components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par><Term>Aggregation</Term> is a table manipulation operation in which multiple rows in a table are squashed together into one or more statistics.</Par>
+      <Par><Term>Aggregation</Term> is a table manipulation operation in which groups of rows in a table are squashed together into one or more statistics.</Par>
       <List items={[
         <>We <Term>group</Term> the rows according to <Term>grouping attribute(s)</Term>: rows with equal grouping attributes are grouped together.</>,
         <>For each group, we combine all rows into one or more <Term>aggregated statistics</Term>.</>,
@@ -31,7 +31,7 @@ function FigureAggregation() {
 
   const [t1Ref, t1Bounds] = useRefWithBounds(drawingData);
   const [t2Ref, t2Bounds] = useRefWithBounds(drawingData);
-  const w1 = 800;
+  const w1 = 900;
   const w2 = 500;
   const delta = 20;
   const arrowMargin = 5;
