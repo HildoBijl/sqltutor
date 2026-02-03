@@ -26,7 +26,7 @@ WHERE (status = 'paid leave' OR status = 'sick leave')
   {
     id: 'multi-filter-phone-area',
     version: 1,
-    prompt: 'Retrieve all employees whose phone number starts with 408 and who live in either Mountain View or Menlo Park.',
+    prompt: 'Retrieve all employees whose phone number starts with 408 and who live in either Mountain View or Santa Clara.',
     solution: `
 SELECT *
 FROM employees
