@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/learning/store";
-import { contentIndex, contentItems } from "@/curriculum";
+import { moduleIndex, moduleItems } from "@/curriculum";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
-import { useContentProgress } from "@/learning/hooks/useContentProgress";
+import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
-import { contentPositions, connectors } from "@/learning/skilltree/utils/treeDefinition";
+import { modulePositions, connectors } from "@/learning/skilltree/utils/treeDefinition";
 import { markSkillTreeVisited } from "@/learning/utils/skillTreeTracking";
 
 /*
@@ -22,18 +22,18 @@ export default function LearningOverviewPage() {
     markSkillTreeVisited("sql");
   }, []);
 
-  const { isCompleted, getProgress } = useContentProgress(
-    contentIndex,
+  const { isCompleted, getProgress } = useModuleProgress(
+    moduleIndex,
     components
   );
 
-  const treeBounds = useTreeBounds(contentPositions);
+  const treeBounds = useTreeBounds(modulePositions);
 
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
-        contentItems={contentItems}
-        contentPositions={contentPositions}
+        moduleItems={moduleItems}
+        modulePositions={modulePositions}
         treeBounds={treeBounds}
         visiblePaths={connectors}
         isCompleted={isCompleted}

@@ -18,7 +18,7 @@ import { AccountTree } from '@mui/icons-material';
 import { DataTable } from '@/components';
 import { useDatabase } from '@/learning/databases';
 import { buildSchema } from '@/mockData';
-import { getContentTables, getContentSize } from '@/curriculum/utils/contentAccess';
+import { getModuleTables, getModuleSize } from '@/curriculum/utils/moduleAccess';
 
 interface DataExplorerTabProps {
   skillId: string;
@@ -49,15 +49,15 @@ export function DataExplorerTab({ skillId }: DataExplorerTabProps) {
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [isErDiagramOpen, setIsErDiagramOpen] = useState(false);
 
-  const resolvedTables = useMemo(() => getContentTables(skillId) ?? [], [skillId]);
-  const resolvedSize = useMemo(() => getContentSize(skillId, 'full'), [skillId]);
+  const resolvedTables = useMemo(() => getModuleTables(skillId) ?? [], [skillId]);
+  const resolvedSize = useMemo(() => getModuleSize(skillId, 'full'), [skillId]);
   const schemaSource = useMemo(
     () => buildSchema({ tables: resolvedTables, size: resolvedSize }),
     [resolvedTables, resolvedSize],
   );
   
   const { tableNames, executeQuery, queryResult } = useDatabase({
-    contentId: skillId,
+    moduleId: skillId,
     size: 'full',
     resetOnSchemaChange: false,
   });

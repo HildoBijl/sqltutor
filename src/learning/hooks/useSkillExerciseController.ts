@@ -117,7 +117,7 @@ export function useSkillExerciseController({
     resetDatabase: resetDisplayDatabase,
     clearQueryState,
   } = useDatabase({
-    contentId: skillId,
+    moduleId: skillId,
     size: selectedDatasetSize,
     resetOnSchemaChange: true,
   });
@@ -129,7 +129,7 @@ export function useSkillExerciseController({
     isReady: gradingDbReady,
     resetDatabase: resetGradingDatabase,
   } = useDatabase({
-    contentId: skillId,
+    moduleId: skillId,
     size: 'full',
     cacheKey: `${skillId}:grading`,
     resetOnSchemaChange: true,

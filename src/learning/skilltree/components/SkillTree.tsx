@@ -6,9 +6,9 @@ import {
   Curve,
   useDrawingMousePosition,
 } from "@/components";
-import { ContentMeta } from "@/curriculum";
+import { ModuleMeta } from "@/curriculum";
 import { NodeCard } from "./NodeCard";
-import { ContentPositionMeta } from "../utils/treeDefinition";
+import { ModulePositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
 import { useTransformContext } from "react-zoom-pan-pinch";
 import { useDebouncedFunction } from "@/utils";
@@ -18,19 +18,19 @@ import { useDebouncedFunction } from "@/utils";
  * This is a pure rendering component without zoom/pan controls.
  * Uses the Drawing library for coordinate-based positioning.
  *
- * @param contentItems - Array of content items (concepts and skills) with info about these contents.
- * @param contentPositions - Array of content position data entries to display.
+ * @param moduleItems - Array of modules (concepts and skills) with info about these modules.
+ * @param modulePositions - Array of module position data entries to display.
  * @param treeBounds - The bounding box of the tree layout.
  * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
- * @param isCompleted - Function to check if a content item is completed.
- * @param getProgress - Function to get progress string for a content item.
+ * @param isCompleted - Function to check if a module is completed.
+ * @param getProgress - Function to get progress string for a module.
  * @param setHoveredId - Function to set the hovered node ID.
  * @param containerRef - Ref to the container div for the tree.
  * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 interface SkillTreeProps {
-  contentItems: Record<string, ContentMeta>;
-  contentPositions: Record<string, ContentPositionMeta>;
+  moduleItems: Record<string, ModuleMeta>;
+  modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
     minX: number;
     minY: number;
@@ -48,8 +48,8 @@ interface SkillTreeProps {
 }
 
 export function SkillTree({
-  contentItems,
-  contentPositions,
+  moduleItems,
+  modulePositions,
   treeBounds,
   visiblePaths,
   isCompleted,
@@ -75,7 +75,7 @@ SkillTreeProps) {
   // Recursive function to get all prerequisites for a given item
   const getPrerequisites = (itemId: string): Set<string> => {
     const prerequisites = new Set<string>();
-    const item = contentItems[itemId];
+    const item = moduleItems[itemId];
 
     if (!item?.prerequisites || item.prerequisites.length === 0)
       return prerequisites;
@@ -103,7 +103,7 @@ SkillTreeProps) {
     setPrerequisites(chain);
 
     // Show tooltip at cursor position
-    const item = contentItems[id];
+    const item = moduleItems[id];
     setTooltip(item.description || "No description available");
   };
 
@@ -116,14 +116,14 @@ SkillTreeProps) {
   };
 
   // Handler for click events on nodes
-  const handleNodeClick = (item: ContentMeta) => {
+  const handleNodeClick = (item: ModuleMeta) => {
     const path =
       item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
     window.location.href = path;
   };
 
   // Determine if a node is ready to learn
-  const isReadyToLearn = (item: ContentMeta): boolean => {
+  const isReadyToLearn = (item: ModuleMeta): boolean => {
     const allPrequisitesCompleted =
       item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
     return !isCompleted(item.id) && allPrequisitesCompleted;
@@ -158,7 +158,7 @@ SkillTreeProps) {
     const bothCompleted =
       isCompleted(connector.from) && isCompleted(connector.to);
     const isNextToLearn =
-      isReadyToLearn(contentItems[connector.to]) && isCompleted(connector.from);
+      isReadyToLearn(moduleItems[connector.to]) && isCompleted(connector.from);
 
     if (bothCompleted) {
       return { opacity: 0.7 };
@@ -174,7 +174,7 @@ SkillTreeProps) {
     const toCompleted = isCompleted(connector.to);
     const bothCompleted = fromCompleted && toCompleted;
     const isNextToLearn =
-      isReadyToLearn(contentItems[connector.to]) && fromCompleted;
+      isReadyToLearn(moduleItems[connector.to]) && fromCompleted;
 
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
@@ -230,8 +230,8 @@ SkillTreeProps) {
         ))}
 
         {/* Rectangles in the SVG layer, and only those whose position is defined */}
-        {Object.values(contentPositions).map((positionData) => {
-          const item = contentItems[positionData.id];
+        {Object.values(modulePositions).map((positionData) => {
+          const item = moduleItems[positionData.id];
           const readyToLearn = isReadyToLearn(item);
 
           return (
@@ -242,7 +242,7 @@ SkillTreeProps) {
             >
               <NodeCard
                 item={item}
-                positionData={contentPositions[item.id]}
+                positionData={modulePositions[item.id]}
                 completed={isCompleted(item.id)}
                 isHovered={localHoveredId === item.id}
                 readyToLearn={readyToLearn}

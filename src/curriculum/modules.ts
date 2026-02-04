@@ -7,18 +7,18 @@ import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 import { keysToObject } from '@/utils';
 
-export type ContentType = 'concept' | 'skill';
+export type ModuleType = 'concept' | 'skill';
 
-export interface ContentMetaRaw {
+export interface ModuleMetaRaw {
   id: string;
   name: string;
-  type: ContentType;
+  type: ModuleType;
   description: string;
   prerequisites: string[];
 }
 
-// The contentIndexRaw contains all definitions of content items, before being processed into more derived objects.
-const contentIndexRaw: ContentMetaRaw[] = [
+// The moduleIndexRaw contains all definitions of modules, before being processed into more derived objects.
+const moduleIndexRaw: ModuleMetaRaw[] = [
   // Fundamental database concepts.
   {
     id: 'database',
@@ -285,48 +285,48 @@ const contentIndexRaw: ContentMetaRaw[] = [
   },
 ];
 
-// The contentItemsRaw contains all unprocessed content items, as an object.
-export const contentItemsRaw: Record<string, ContentMetaRaw> = keysToObject(contentIndexRaw.map(item => item.id), (_: string, index: number) => contentIndexRaw[index]);
+// The moduleItemsRaw contains all unprocessed modules, as an object.
+export const moduleItemsRaw: Record<string, ModuleMetaRaw> = keysToObject(moduleIndexRaw.map(item => item.id), (_: string, index: number) => moduleIndexRaw[index]);
 
 
-// Set up a new type for processed content items.
-export interface ContentMeta extends ContentMetaRaw {
+// Set up a new type for processed modules.
+export interface ModuleMeta extends ModuleMetaRaw {
   followUps: string[];
 }
 
-// Prepare the contentIndex and contentItems for processed content items.
-export const contentIndex: ContentMeta[] = [];
-export const contentItems: Record<string, ContentMeta> = {};
-contentIndexRaw.forEach(item => {
-  const processedItem: ContentMeta = {
+// Prepare the moduleIndex and moduleItems for processed modules.
+export const moduleIndex: ModuleMeta[] = [];
+export const moduleItems: Record<string, ModuleMeta> = {};
+moduleIndexRaw.forEach(item => {
+  const processedItem: ModuleMeta = {
     ...item,
     followUps: [],
   };
-  contentIndex.push(processedItem);
-  contentItems[item.id] = processedItem;
+  moduleIndex.push(processedItem);
+  moduleItems[item.id] = processedItem;
 });
 
-// Fill up the contentIndex and contentItems.
-contentIndexRaw.forEach(itemRaw => {
-  const item: ContentMeta = contentItems[itemRaw.id];
+// Fill up the moduleIndex and moduleItems.
+moduleIndexRaw.forEach(itemRaw => {
+  const item: ModuleMeta = moduleItems[itemRaw.id];
   (itemRaw.prerequisites || []).forEach(prerequisiteId => {
-    const prerequisite: ContentMeta = contentItems[prerequisiteId];
+    const prerequisite: ModuleMeta = moduleItems[prerequisiteId];
     if (!prerequisite)
-      throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at content item "${item.id}".`);
+      throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at module "${item.id}".`);
     prerequisite.followUps.push(item.id);
   });
 });
 
 
-export type ContentComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
+export type ModuleComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
 
-const ALLOWED_CONTENT_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video', 'Practice']);
+const ALLOWED_MODULE_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video', 'Practice']);
 
 type ComponentModule = {
   default?: ComponentType<any>;
 } & Record<string, ComponentType<any> | undefined>;
 
-const contentComponentModules = import.meta.glob('./modules/*/*.tsx') as Record<
+const moduleComponentModules = import.meta.glob('./modules/*/*.tsx') as Record<
   string,
   () => Promise<Record<string, unknown>>
 >;
@@ -346,20 +346,20 @@ function createLazyComponent(
   });
 }
 
-export const contentComponents: Record<string, ContentComponentMap> = Object.entries(
-  contentComponentModules,
-).reduce<Record<string, ContentComponentMap>>((acc, [path, loader]) => {
+export const moduleComponents: Record<string, ModuleComponentMap> = Object.entries(
+  moduleComponentModules,
+).reduce<Record<string, ModuleComponentMap>>((acc, [path, loader]) => {
   const match = path.match(/\.\/modules\/([^/]+)\/([^/]+)\.tsx$/);
   if (!match) {
     return acc;
   }
 
-  const [, contentId, section] = match;
-  if (!ALLOWED_CONTENT_SECTIONS.has(section)) {
+  const [, moduleId, section] = match;
+  if (!ALLOWED_MODULE_SECTIONS.has(section)) {
     return acc;
   }
 
-  const entry = acc[contentId] ?? (acc[contentId] = {} as ContentComponentMap);
+  const entry = acc[moduleId] ?? (acc[moduleId] = {} as ModuleComponentMap);
   entry[section] = createLazyComponent(loader, section, path);
 
   return acc;

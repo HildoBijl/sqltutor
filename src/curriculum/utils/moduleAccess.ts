@@ -1,25 +1,25 @@
 /**
- * Content access configuration - maps content IDs to their required tables and dataset sizes.
+ * Module access configuration - maps module IDs to their required tables and dataset sizes.
  */
 
 import type { TableKey } from '@/mockData/tables';
 import type { DatasetSize } from '@/mockData/types';
 
 /**
- * Default tables when no content-specific config exists.
+ * Default tables when no module-specific config exists.
  */
 const DEFAULT_TABLES: TableKey[] = ['employees'];
 
 /**
- * Default dataset size for content.
+ * Default dataset size for modules.
  */
 const DEFAULT_SIZE: DatasetSize = 'small';
 
 /**
- * Tables required for each content ID (skill or concept).
+ * Tables required for each module ID (skill or concept).
  * Use `undefined` for skills that don't use tables (e.g., RA skills).
  */
-const contentTableAccess: Record<string, TableKey[] | undefined> = {
+const moduleTableAccess: Record<string, TableKey[] | undefined> = {
   default: ['employees'],
   playground: ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
 
@@ -52,32 +52,32 @@ const contentTableAccess: Record<string, TableKey[] | undefined> = {
 };
 
 /**
- * Size overrides for specific content.
+ * Size overrides for specific modules.
  */
-const contentSizeOverrides: Record<string, DatasetSize> = {
+const moduleSizeOverrides: Record<string, DatasetSize> = {
   playground: 'full',
 };
 
 /**
- * Get the tables required for a given content ID.
+ * Get the tables required for a given module ID.
  * Returns `undefined` for skills that don't use tables.
  */
-export function getContentTables(contentId?: string): TableKey[] | undefined {
-  if (!contentId) return DEFAULT_TABLES;
-  // Check if contentId is explicitly defined (including undefined values)
-  if (contentId in contentTableAccess) {
-    return contentTableAccess[contentId];
+export function getModuleTables(moduleId?: string): TableKey[] | undefined {
+  if (!moduleId) return DEFAULT_TABLES;
+  // Check if moduleId is explicitly defined (including undefined values)
+  if (moduleId in moduleTableAccess) {
+    return moduleTableAccess[moduleId];
   }
   return DEFAULT_TABLES;
 }
 
 /**
- * Get the dataset size for a given content ID.
+ * Get the dataset size for a given module ID.
  */
-export function getContentSize(contentId?: string, override?: DatasetSize): DatasetSize {
+export function getModuleSize(moduleId?: string, override?: DatasetSize): DatasetSize {
   if (override) return override;
-  if (contentId && contentSizeOverrides[contentId]) {
-    return contentSizeOverrides[contentId];
+  if (moduleId && moduleSizeOverrides[moduleId]) {
+    return moduleSizeOverrides[moduleId];
   }
   return DEFAULT_SIZE;
 }

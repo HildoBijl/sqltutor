@@ -1,10 +1,10 @@
-import { contentItems } from "@/curriculum";
+import { moduleItems } from "@/curriculum";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
 import { cardWidth, cardHeight } from "../utils/settings";
 import { computeConnectorPath } from "../utils/pathCalculations";
 
-export interface ContentPositionMetaRaw {
+export interface ModulePositionMetaRaw {
 	position: VectorInput;
 }
 
@@ -34,7 +34,7 @@ const x6 = x5 + dx;
 export const treeWidth = x6 + cardWidth / 2 + margin;
 
 // Placeholder positions for RA skill tree
-const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
+const modulePositionsRaw: Record<string, ModulePositionMetaRaw> = {
 	// Fundamental database concepts (shared with SQL tree)
 	'database': { position: { x: (x2+x3)/2, y: y1 } },
 	'query-language': { position: { x: x2, y: y2 } },
@@ -60,18 +60,18 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	'ra-set-up-multi-step-query': { position: { x: (x2+x3)/2, y: y8 } },
 }
 
-export interface ContentPositionMeta extends Omit<ContentPositionMetaRaw, 'position'> {
+export interface ModulePositionMeta extends Omit<ModulePositionMetaRaw, 'position'> {
 	id: string;
 	position: Vector;
 	prerequisitesPathOrder: string[];
 	followUpsPathOrder: string[];
 }
 
-// Prepare the contentWithPosition mapping object with empty lists.
-export const raContentPositions: Record<string, ContentPositionMeta> = applyMapping(contentPositionsRaw, (positionDataRaw: ContentPositionMetaRaw, id: string) => {
+// Prepare the moduleWithPosition mapping object with empty lists.
+export const raModulePositions: Record<string, ModulePositionMeta> = applyMapping(modulePositionsRaw, (positionDataRaw: ModulePositionMetaRaw, id: string) => {
 	// Verify that all skills for which positions are defined exist.
-	if (!contentItems[id])
-		throw new Error(`Invalid content item ID "${id}" encountered when defining content positions for the RA Skill Tree.`);
+	if (!moduleItems[id])
+		throw new Error(`Invalid module ID "${id}" encountered when defining module positions for the RA Skill Tree.`);
 
 	// Set up the empty shell for the skill.
 	return {
@@ -84,15 +84,15 @@ export const raContentPositions: Record<string, ContentPositionMeta> = applyMapp
 })
 
 // Calculate the order in which prerequisites and follow-ups should be displayed.
-Object.values(raContentPositions).forEach(positionData => {
+Object.values(raModulePositions).forEach(positionData => {
 	const { position } = positionData;
 
 	// Determine an order for the prerequisites.
 	const prerequisiteRefPoint = position.add([0, -cardHeight / 2]);
-	positionData.prerequisitesPathOrder = contentItems[positionData.id].prerequisites
-		.filter(id => !!contentPositionsRaw[id]) // The prerequisite is in the tree.
+	positionData.prerequisitesPathOrder = moduleItems[positionData.id].prerequisites
+		.filter(id => !!modulePositionsRaw[id]) // The prerequisite is in the tree.
 		.map(id => {
-			const { position } = raContentPositions[id]
+			const { position } = raModulePositions[id]
 			const refPoint = position.add([0, cardHeight / 2]);
 			const relPoint = refPoint.subtract(prerequisiteRefPoint);
 			const angle = Math.atan2(relPoint.x, -relPoint.y); // Up is 0, left is -pi/2, right is pi/2, down is +/-pi.
@@ -103,10 +103,10 @@ Object.values(raContentPositions).forEach(positionData => {
 
 	// Determine an order for the follow-ups.
 	const followUpRefPoint = position.add([0, cardHeight / 2]);
-	positionData.followUpsPathOrder = contentItems[positionData.id].followUps
-		.filter(id => !!contentPositionsRaw[id]) // The follow-up is in the tree.
+	positionData.followUpsPathOrder = moduleItems[positionData.id].followUps
+		.filter(id => !!modulePositionsRaw[id]) // The follow-up is in the tree.
 		.map(id => {
-			const { position } = raContentPositions[id]
+			const { position } = raModulePositions[id]
 			const refPoint = position.add([0, -cardHeight / 2]);
 			const relPoint = refPoint.subtract(followUpRefPoint);
 			const angle = Math.atan2(relPoint.x, relPoint.y); // Down is 0, left is -pi/2, right is pi/2, up is +/-pi.
@@ -116,14 +116,14 @@ Object.values(raContentPositions).forEach(positionData => {
 		.map(data => data.id);
 });
 
-// Also export the contents with position data as list.
-export const raContentPositionList: ContentPositionMeta[] = Object.values(raContentPositions)
+// Also export the modules with position data as list.
+export const raModulePositionList: ModulePositionMeta[] = Object.values(raModulePositions)
 
 // Determine the connectors based on the item positions.
 export const raConnectors: { points: Vector[]; from: string; to: string }[] = [];
-Object.values(raContentPositions).forEach(positionData => {
+Object.values(raModulePositions).forEach(positionData => {
 	positionData.prerequisitesPathOrder.map(prerequisiteId => {
-		const prerequisitePositionData = raContentPositions[prerequisiteId];
+		const prerequisitePositionData = raModulePositions[prerequisiteId];
 		const points = computeConnectorPath(prerequisitePositionData, positionData);
 		raConnectors.push({ points, from: prerequisiteId, to: positionData.id });
 	});

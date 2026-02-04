@@ -1,14 +1,14 @@
 import { useMemo } from "react";
-import { ContentPositionMeta, treeHeight, treeWidth } from "../utils/treeDefinition";
+import { ModulePositionMeta, treeHeight, treeWidth } from "../utils/treeDefinition";
 
 
 /*
-* Calculate the bounding box of a set of content items in a tree layout.
+* Calculate the bounding box of a set of modules in a tree layout.
 *
-* @param contentItems - Array of content items with position and type.
+* @param modulePositions - Array of modules with position and type.
 * @returns An object containing minX, minY, maxX, maxY, width, and height of the bounding box.
 */
-export function useTreeBounds(contentPositions: Record<string, ContentPositionMeta>) {
+export function useTreeBounds(modulePositions: Record<string, ModulePositionMeta>) {
   return useMemo(() => {
     // Hardcoded bounds for testing
     return {
@@ -20,5 +20,5 @@ export function useTreeBounds(contentPositions: Record<string, ContentPositionMe
       height: treeHeight
     };
    
-  }, [contentPositions]);
+  }, [modulePositions]);
 }

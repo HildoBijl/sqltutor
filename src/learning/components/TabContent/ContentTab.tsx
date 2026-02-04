@@ -1,22 +1,22 @@
 import { Suspense } from 'react';
 import { Typography } from '@mui/material';
 
-import { useContent } from '../../hooks/useContent';
+import { useModule } from '../../hooks/useModule';
 
-interface ContentTabProps {
-  contentId?: string;
+interface ModuleTabProps {
+  contentId?: string; // Kept as contentId for backwards compatibility in JSX usage
 }
 
-interface CreateContentTabOptions {
+interface CreateModuleTabOptions {
   section: string;
   emptyMessage: string;
 }
 
-function createContentTab({ section, emptyMessage }: CreateContentTabOptions) {
-  return function ContentTab({ contentId }: ContentTabProps) {
-    const ContentComponent = useContent(contentId ?? null, section);
+function createModuleTab({ section, emptyMessage }: CreateModuleTabOptions) {
+  return function ModuleTab({ contentId: moduleId }: ModuleTabProps) {
+    const ModuleComponent = useModule(moduleId ?? null, section);
 
-    if (!ContentComponent) {
+    if (!ModuleComponent) {
       return (
         <Typography variant="body1" color="text.secondary">
           {emptyMessage}
@@ -28,32 +28,32 @@ function createContentTab({ section, emptyMessage }: CreateContentTabOptions) {
       <Suspense
         fallback={
           <Typography variant="body1" color="text.secondary">
-            Loading content...
+            Loading module...
           </Typography>
         }
       >
-        <ContentComponent />
+        <ModuleComponent />
       </Suspense>
     );
   };
 }
 
-export const StoryTab = createContentTab({
+export const StoryTab = createModuleTab({
   section: 'Story',
   emptyMessage: 'Story coming soon.',
 });
 
-export const TheoryTab = createContentTab({
+export const TheoryTab = createModuleTab({
   section: 'Theory',
   emptyMessage: 'Theory content coming soon.',
 });
 
-export const VideoTab = createContentTab({
+export const VideoTab = createModuleTab({
   section: 'Video',
   emptyMessage: 'Video coming soon.',
 });
 
-export const SummaryTab = createContentTab({
+export const SummaryTab = createModuleTab({
   section: 'Summary',
   emptyMessage: 'Summary coming soon.',
 });
