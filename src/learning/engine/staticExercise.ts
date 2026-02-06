@@ -1,4 +1,4 @@
-import { compareQueryResults, type CompareOptions } from './resultComparison';
+import { compareQueryResults, type CompareOptions } from './grading';
 import type {
   ExecutionResult,
   QueryResult,
