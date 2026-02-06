@@ -1,6 +1,6 @@
 import { Vector } from "@/utils/geometry";
 import { cardHeight, initialPathSpacing, maxPathSpace, minVerticalOffset, maxVerticalOffset } from "./settings";
-import { ContentPositionMeta } from "./treeDefinition";
+import { ModulePositionMeta } from "./treeDefinition";
 
 /*
 * Utility function to compute points for curved connectors between nodes in the skill tree.
@@ -12,8 +12,8 @@ import { ContentPositionMeta } from "./treeDefinition";
 * @returns An array of Vector points representing the curved connector path.
 */
 export function computeConnectorPath(
-  from: ContentPositionMeta,
-  to: ContentPositionMeta,
+  from: ModulePositionMeta,
+  to: ModulePositionMeta,
 ): Vector[] {
   // Calculate the index of the from/to with respect to all respective prerequisites/follow-ups.
   const toIndex = to.prerequisitesPathOrder.indexOf(from.id);
