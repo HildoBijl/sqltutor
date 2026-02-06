@@ -214,7 +214,7 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
       };
     }
 
-    const comparison = compareQueryResults(expectedResult, actualResult, {
+    const comparison = compareQueryResults(actualResult, expectedResult, {
       ...DEFAULT_COMPARISON_OPTIONS,
       ...(exercise.comparisonOptions ?? {}),
     });
