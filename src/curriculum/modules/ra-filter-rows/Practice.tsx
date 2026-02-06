@@ -32,12 +32,12 @@ const exercises = [
 		</>,
 	},
 	{
-		problem: <Par>Find the work data (name, company, salary) of all people not earning a modal salary between 40,000 and 100,000 (inclusive) per year.</Par>,
+		problem: <Par>Find the work data (name, company, salary) of all people <Em>not</Em> earning a modal salary between 40,000 and 100,000 (inclusive) per year.</Par>,
 		solution: <>
 			<Par>We need to take the <RelationName>works</RelationName> relation and filter it by <Em>salary</Em>. The easiest way to do so is through the "or" operator.</Par>
-			<RA>σ<sub>salary &lt; 40000 ∨ salary &gt; 10000</sub>(works)</RA>
+			<RA>σ<sub>salary &lt; 40000 ∨ salary &gt; 100000</sub>(works)</RA>
 			<Par>Another option is to use the "not" operator and brackets.</Par>
-			<RA>σ<sub>¬(salary ≥ 40000 ∧ salary ≤ 10000)</sub>(works)</RA>
+			<RA>σ<sub>¬(salary ≥ 40000 ∧ salary ≤ 100000)</sub>(works)</RA>
 			<Par>This gets all the work data of workers who fall outside of the described salary range.</Par>
 		</>,
 	},
