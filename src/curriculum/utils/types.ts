@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { QueryResult } from '@/components/sql/sqljs/types';
 
 // Content validation schemas
 export const ComponentMetaSchema = z.object({
@@ -93,11 +94,6 @@ export interface Utils {
   randomInt: (min: number, max: number) => number;
 }
 
-export interface QueryResult {
-  columns: string[];
-  values: unknown[][];
-}
-
 export interface ExecutionResult<T = QueryResult[]> {
   success: boolean;
   output?: T;
@@ -115,5 +111,4 @@ export interface VerificationResult {
   correct: boolean;
   message?: string;
   solution?: string;
-  details?: Record<string, unknown>;
 }

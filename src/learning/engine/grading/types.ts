@@ -5,12 +5,6 @@
 export interface ComparisonResult {
   match: boolean;
   feedback: string;
-  details?: {
-    expectedRows: number;
-    actualRows: number;
-    columnMismatch?: string[];
-    sampleDifferences?: string[];
-  };
 }
 
 export interface CompareOptions {

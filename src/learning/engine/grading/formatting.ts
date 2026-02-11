@@ -2,7 +2,10 @@
  * Functions for formatting feedback output.
  */
 
-import { TOO_MANY_COLUMNS_MESSAGE } from './messages';
+import {
+  DIFFERENCE_EXAMPLE_LABEL,
+  ROW_DIFFERENCE_LABEL,
+} from './messages';
 
 /**
  * Format a list of items with a limit.
@@ -36,7 +39,7 @@ export const formatDifferenceSample = (
   includeIndex: boolean,
 ): string =>
   includeIndex
-    ? `row ${sample.index + 1}: ${formatRowSample(sample.row)}`
+    ? `${ROW_DIFFERENCE_LABEL(sample.index)}: ${formatRowSample(sample.row)}`
     : formatRowSample(sample.row);
 
 /**
@@ -49,37 +52,9 @@ export const formatSampleDifferences = (
 ): string => {
   if (differences.length === 0) return '';
   const samples = differences.slice(0, limit);
-  const label = samples.length === 1 ? 'Example' : 'Examples';
+  const label = DIFFERENCE_EXAMPLE_LABEL(samples.length);
   const rendered = samples.map((sample) =>
     formatDifferenceSample(sample, includeIndex),
   );
   return ` ${label}: ${rendered.join('; ')}`;
-};
-
-/**
- * Generate feedback for column name mismatches.
- */
-export const getColumnNameMismatchFeedback = (
-  missing: string[],
-  extra: string[],
-): string | null => {
-  if (missing.length === 0 && extra.length === 0) {
-    return null;
-  }
-
-  if (missing.length === 1) {
-    const missingName = missing[0];
-    if (extra.length === 1) {
-      return `Your output seems to be missing a column. I expected there to be one named "${missingName}". I did see "${extra[0]}" though, so check spelling.`;
-    }
-    return `Your output seems to be missing a column. I expected there to be one named "${missingName}".`;
-  }
-
-  if (missing.length > 1) {
-    return `Your output seems to be missing some columns. Check that you have ${formatQuotedList(
-      missing,
-    )} in your result.`;
-  }
-
-  return TOO_MANY_COLUMNS_MESSAGE;
 };

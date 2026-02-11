@@ -25,3 +25,66 @@ export const ROW_VALUE_MISMATCH_MESSAGE =
 
 export const SUCCESS_MESSAGE =
   'Perfect! Your query returned the correct results.';
+
+export const ROW_DIFFERENCE_LABEL = (index: number): string =>
+  `row ${index + 1}`;
+
+export const DIFFERENCE_EXAMPLE_LABEL = (count: number): string =>
+  count === 1 ? 'Example' : 'Examples';
+
+export const ONE_MISSING_ONE_EXTRA_COLUMN_MESSAGE = (
+  missingColumnName: string,
+  extraColumnName: string,
+): string =>
+  `Your output seems to be missing a column. I expected there to be one named "${missingColumnName}". I did see "${extraColumnName}" though, so check spelling.`;
+
+export const ONE_MISSING_COLUMN_MESSAGE = (missingColumnName: string): string =>
+  `Your output seems to be missing a column. I expected there to be one named "${missingColumnName}".`;
+
+export const MULTIPLE_MISSING_COLUMNS_MESSAGE = (
+  formattedMissingColumnNames: string,
+): string =>
+  `Your output seems to be missing some columns. Check that you have ${formattedMissingColumnNames} in your result.`;
+
+export const getColumnNameMismatchFeedback = (
+  missingColumnNames: string[],
+  extraColumnNames: string[],
+  formattedMissingColumnNames: string,
+): string | null => {
+  if (missingColumnNames.length === 0 && extraColumnNames.length === 0) {
+    return null;
+  }
+
+  if (missingColumnNames.length === 1) {
+    const [missingColumnName] = missingColumnNames;
+    if (extraColumnNames.length === 1) {
+      return ONE_MISSING_ONE_EXTRA_COLUMN_MESSAGE(missingColumnName, extraColumnNames[0]);
+    }
+    return ONE_MISSING_COLUMN_MESSAGE(missingColumnName);
+  }
+
+  if (missingColumnNames.length > 1) {
+    return MULTIPLE_MISSING_COLUMNS_MESSAGE(formattedMissingColumnNames);
+  }
+
+  return TOO_MANY_COLUMNS_MESSAGE;
+};
+
+export const INCORRECT_VALUES_IN_COLUMNS_MESSAGE = (
+  formattedColumnNames?: string,
+): string => {
+  const hint = formattedColumnNames
+    ? ` Check the values in ${formattedColumnNames}.`
+    : ' Check the values in your columns.';
+  return `There seem to be incorrect values in one or more columns.${hint}`;
+};
+
+export const INCORRECT_VALUES_IN_COLUMN_MESSAGE = (
+  columnName?: string,
+): string => {
+  const columnLabel = columnName ? ` "${columnName}"` : '';
+  return `There seem to be incorrect values in the column${columnLabel}. Check the values from this column.`;
+};
+
+export const ROW_VALUE_MISMATCH_FEEDBACK = (samples: string): string =>
+  `${ROW_VALUE_MISMATCH_MESSAGE}${samples}`;

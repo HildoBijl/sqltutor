@@ -25,7 +25,6 @@ export interface VerificationResult {
   message?: string;
   expected?: unknown;
   solution?: PracticeSolutionLike;
-  details?: Record<string, unknown>;
 }
 
 export interface ExerciseAttempt<Input> extends StoredAttempt<Input> {

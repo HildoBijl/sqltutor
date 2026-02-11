@@ -1,11 +1,11 @@
 import { compareQueryResults, type CompareOptions } from './grading';
 import type {
   ExecutionResult,
-  QueryResult,
   Utils,
   ValidationResult,
   VerificationResult,
 } from '@/curriculum/utils/types';
+import type { QueryResult } from '@/components/sql/sqljs/types';
 
 export interface StaticExercise {
   id: string;
@@ -222,7 +222,6 @@ export function buildStaticExerciseModule(exercises: StaticExercise[]) {
     return {
       correct: comparison.match,
       message: comparison.match ? MESSAGES.verification.correct : comparison.feedback || MESSAGES.verification.mismatch,
-      details: comparison.details,
     };
   }
 

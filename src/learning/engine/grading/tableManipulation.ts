@@ -18,7 +18,7 @@ export const normalizeValue = (value: unknown, caseSensitive: boolean): string =
 /**
  * Normalize a column name for comparison.
  */
-export const normalizeColumn = (column: string, caseSensitive: boolean): string =>
+export const normalizeColumnName = (column: string, caseSensitive: boolean): string =>
   caseSensitive ? column : column.toLowerCase();
 
 /**
