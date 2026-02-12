@@ -109,7 +109,7 @@ export function SkillTree({
       return getPrerequisites(goalNodeId);
     }
     return new Set<string>();
-  }, [goalNodeId, contentItems]);
+  }, [goalNodeId, moduleItems]);
 
   useEffect(() => {
     if (onGoalProgressChange && goalNodeId) {
@@ -121,14 +121,14 @@ export function SkillTree({
 
       const nextStep = nodesOnPath.find((id) => {
         if (isCompleted(id)) return false;
-        const item = contentItems[id];
+        const item = moduleItems[id];
         const allPrereqsCompleted =
           item.prerequisites?.every((prereqId) => isCompleted(prereqId)) ??
           true;
         return allPrereqsCompleted;
       });
 
-      const nextStepName = nextStep ? contentItems[nextStep]?.name : null;
+      const nextStepName = nextStep ? moduleItems[nextStep]?.name : null;
       onGoalProgressChange(completedCount, totalCount, nextStepName);
     }
   }, [
@@ -136,7 +136,7 @@ export function SkillTree({
     goalPrerequisites,
     isCompleted,
     onGoalProgressChange,
-    contentItems,
+    moduleItems,
   ]);
 
   // Tooltip state
