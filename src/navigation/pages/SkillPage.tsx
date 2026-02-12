@@ -4,13 +4,13 @@ import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mu
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
 import { useAppStore, type SkillComponentState } from '@/learning/store';
-import { contentComponents, contentIndex } from '@/curriculum';
-import { getContentTables } from '@/curriculum/utils/contentAccess';
+import { moduleComponents, moduleIndex } from '@/curriculum';
+import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useSkillContent } from '@/learning/hooks/useSkillContent';
 import { useSkillExerciseController } from '@/learning/hooks/useSkillExerciseController';
-import { useContentProgress } from '@/learning/hooks/useContentProgress';
+import { useModuleProgress } from '@/learning/hooks/useModuleProgress';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
 import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { getBackToLearningPathFromHistory } from '@/learning/utils/skillTreeTracking';
@@ -40,8 +40,8 @@ export default function SkillPage() {
   );
 
   // Check what practice mode this skill uses
-  const hasStaticPractice = Boolean(skillId && contentComponents[skillId]?.Practice);
-  const hasTables = getContentTables(skillId) !== undefined;
+  const hasStaticPractice = Boolean(skillId && moduleComponents[skillId]?.Practice);
+  const hasTables = getModuleTables(skillId) !== undefined;
 
   const allTabs: TabConfig[] = [
     { key: 'story', label: 'Story', icon: <MenuBook /> },
@@ -87,7 +87,7 @@ export default function SkillPage() {
     setComponentState,
   });
 
-  const { isCompleted } = useContentProgress(contentIndex, components);
+  const { isCompleted } = useModuleProgress(moduleIndex, components);
   const isSkillMastered = skillId ? isCompleted(skillId) : false;
   const summaryUnlocked = isSkillMastered || isAdmin;
 
@@ -171,7 +171,7 @@ export default function SkillPage() {
         <ContentTabs value={currentTab} tabs={visibleTabs} onChange={handleTabChange}>
           {currentTab === 'practice' && hasStaticPractice && (
             <StaticPracticeTab
-              contentId={skillMeta.id}
+              moduleId={skillMeta.id}
               onComplete={handleStaticComplete}
               isCompleted={isSkillMastered}
             />
@@ -266,15 +266,15 @@ export default function SkillPage() {
  * Static practice tab that renders a Practice.tsx component with completion props.
  */
 function StaticPracticeTab({
-  contentId,
+  moduleId,
   onComplete,
   isCompleted,
 }: {
-  contentId: string;
+  moduleId: string;
   onComplete: () => void;
   isCompleted: boolean;
 }) {
-  const PracticeComponent = contentComponents[contentId]?.Practice;
+  const PracticeComponent = moduleComponents[moduleId]?.Practice;
 
   if (!PracticeComponent) {
     return null;

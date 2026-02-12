@@ -1,5 +1,5 @@
-import { contentPositions } from '@/learning/skilltree/utils/treeDefinition';
-import { raContentPositions } from '@/learning/skilltree/ra-skilltree/ra-treeDefinition';
+import { modulePositions } from '@/learning/skilltree/utils/treeDefinition';
+import { raModulePositions } from '@/learning/skilltree/ra-skilltree/ra-treeDefinition';
 
 export type SkillTreeId = 'sql' | 'ra' | 'datalog';
 
@@ -7,7 +7,7 @@ export interface SkillTreeDefinition {
   id: SkillTreeId;
   label: string;
   path: string;
-  contentIds: ReadonlySet<string>;
+  moduleIds: ReadonlySet<string>;
 }
 
 export const SKILL_TREE_CHANGE_EVENT = 'skill-tree-change';
@@ -20,19 +20,19 @@ const skillTreeDefinitions: SkillTreeDefinition[] = [
     id: 'sql',
     label: 'Learn SQL',
     path: '/learn',
-    contentIds: new Set(Object.keys(contentPositions)),
+    moduleIds: new Set(Object.keys(modulePositions)),
   },
   {
     id: 'ra',
     label: 'Learn RA',
     path: '/learn-ra',
-    contentIds: new Set(Object.keys(raContentPositions)),
+    moduleIds: new Set(Object.keys(raModulePositions)),
   },
   {
     id: 'datalog',
     label: 'Learn Datalog',
     path: '/learn-datalog',
-    contentIds: new Set<string>(),
+    moduleIds: new Set<string>(),
   },
 ];
 
@@ -102,15 +102,15 @@ export const markSkillTreeVisited = (treeId: SkillTreeId): SkillTreeId[] => {
 
 export const getBackToLearningPathFromHistory = (
   history: SkillTreeId[],
-  contentId?: string,
+  moduleId?: string,
 ): string => {
   const normalized = normalizeHistory(history);
   const fallbackId = normalized[normalized.length - 1] ?? DEFAULT_SKILL_TREE_HISTORY[0];
 
-  if (contentId) {
+  if (moduleId) {
     for (let index = normalized.length - 1; index >= 0; index -= 1) {
       const tree = skillTreeById.get(normalized[index]);
-      if (tree?.contentIds.has(contentId)) {
+      if (tree?.moduleIds.has(moduleId)) {
         return tree.path;
       }
     }
@@ -119,5 +119,5 @@ export const getBackToLearningPathFromHistory = (
   return skillTreeById.get(fallbackId)?.path ?? '/learn';
 };
 
-export const getBackToLearningPath = (contentId?: string) =>
-  getBackToLearningPathFromHistory(getSkillTreeHistory(), contentId);
+export const getBackToLearningPath = (moduleId?: string) =>
+  getBackToLearningPathFromHistory(getSkillTreeHistory(), moduleId);

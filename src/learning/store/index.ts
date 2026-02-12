@@ -10,6 +10,7 @@ import type {
   StoredExerciseEvent,
   StoredExerciseInstance,
 } from './types';
+import type { DatasetSize } from '@/mockData/types';
 
 type ComponentType = ComponentState['type'];
 
@@ -109,6 +110,7 @@ interface AppState {
   components: Record<string, ComponentState>;
   currentTheme: 'light' | 'dark';
   hideStories: boolean;
+  practiceDatasetSize: DatasetSize;
   goalNodeID: Record<string, string | null>;
   _hasHydrated: boolean;
   updateComponent: (id: string, data: Partial<ComponentState>) => void;
@@ -116,6 +118,7 @@ interface AppState {
   resetComponent: (id: string, type?: ComponentType) => void;
   toggleHideStories: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  setPracticeDatasetSize: (size: DatasetSize) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
   getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
   getAllExerciseInstances: (skillId: string) => StoredExerciseInstance[];
@@ -129,6 +132,7 @@ export const useAppStore = create<AppState>()(
       components: {},
       currentTheme: 'light',
       hideStories: true,
+      practiceDatasetSize: 'full',
       goalNodeID: {},
       _hasHydrated: false,
 
@@ -213,6 +217,9 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme) =>
         set({ currentTheme: theme }),
 
+      setPracticeDatasetSize: (size) =>
+        set({ practiceDatasetSize: size }),
+
       setHasHydrated: (hasHydrated) =>
         set({ _hasHydrated: hasHydrated }),
 
@@ -253,6 +260,7 @@ export const useAppStore = create<AppState>()(
         components: state.components,
         currentTheme: state.currentTheme,
         hideStories: state.hideStories,
+        practiceDatasetSize: state.practiceDatasetSize,
         goalNodeID: state.goalNodeID,
       }),
       onRehydrateStorage: () => (state) => {

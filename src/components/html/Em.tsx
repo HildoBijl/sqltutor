@@ -10,6 +10,7 @@ export function Em({ children, sx, ...props }: EmProps) {
     component="em"
     sx={{
       fontSize: 'inherit',
+      fontWeight: 'inherit',
       ...sx,
     }}
     {...props}

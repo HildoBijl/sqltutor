@@ -1,10 +1,10 @@
-import { contentItems } from "@/curriculum";
+import { moduleItems } from "@/curriculum";
 import { applyMapping } from '@/utils/javascript';
 import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
 import { cardWidth, cardHeight } from "./settings";
 import { computeConnectorPath } from "./pathCalculations";
 
-export interface ContentPositionMetaRaw {
+export interface ModulePositionMetaRaw {
 	position: VectorInput;
 }
 
@@ -31,7 +31,7 @@ const x6 = x5 + dx;
 // const x7 = x6 + dx;
 export const treeWidth = x6 + cardWidth / 2 + margin;
 
-const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
+const modulePositionsRaw: Record<string, ModulePositionMetaRaw> = {
 	// Fundamental database concepts.
 	'database': { position: { x: (x2+x3)/2, y: y1 } },
 	'query-language': { position: { x: x2, y: y2 } },
@@ -73,18 +73,18 @@ const contentPositionsRaw: Record<string, ContentPositionMetaRaw> = {
 	// 'create-pivot-table': { position: { x: x7, y: y6 } },
 }
 
-export interface ContentPositionMeta extends Omit<ContentPositionMetaRaw, 'position'> {
+export interface ModulePositionMeta extends Omit<ModulePositionMetaRaw, 'position'> {
 	id: string;
 	position: Vector;
 	prerequisitesPathOrder: string[];
 	followUpsPathOrder: string[];
 }
 
-// Prepare the contentWithPosition mapping object with empty lists.
-export const contentPositions: Record<string, ContentPositionMeta> = applyMapping(contentPositionsRaw, (positionDataRaw: ContentPositionMetaRaw, id: string) => {
+// Prepare the moduleWithPosition mapping object with empty lists.
+export const modulePositions: Record<string, ModulePositionMeta> = applyMapping(modulePositionsRaw, (positionDataRaw: ModulePositionMetaRaw, id: string) => {
 	// Verify that all skills for which positions are defined exist.
-	if (!contentItems[id])
-		throw new Error(`Invalid content item ID "${id}" encountered when defining content positions for the Skill Tree.`);
+	if (!moduleItems[id])
+		throw new Error(`Invalid module ID "${id}" encountered when defining module positions for the Skill Tree.`);
 
 	// Set up the empty shell for the skill.
 	return {
@@ -97,15 +97,15 @@ export const contentPositions: Record<string, ContentPositionMeta> = applyMappin
 })
 
 // Calculate the order in which prerequisites and follow-ups should be displayed.
-Object.values(contentPositions).forEach(positionData => {
+Object.values(modulePositions).forEach(positionData => {
 	const { position } = positionData;
 
 	// Determine an order for the prerequisites.
 	const prerequisiteRefPoint = position.add([0, -cardHeight / 2]);
-	positionData.prerequisitesPathOrder = contentItems[positionData.id].prerequisites
-		.filter(id => !!contentPositionsRaw[id]) // The prerequisite is in the tree.
+	positionData.prerequisitesPathOrder = moduleItems[positionData.id].prerequisites
+		.filter(id => !!modulePositionsRaw[id]) // The prerequisite is in the tree.
 		.map(id => {
-			const { position } = contentPositions[id]
+			const { position } = modulePositions[id]
 			const refPoint = position.add([0, cardHeight / 2]);
 			const relPoint = refPoint.subtract(prerequisiteRefPoint);
 			const angle = Math.atan2(relPoint.x, -relPoint.y); // Up is 0, left is -pi/2, right is pi/2, down is +/-pi.
@@ -116,10 +116,10 @@ Object.values(contentPositions).forEach(positionData => {
 
 	// Determine an order for the follow-ups.
 	const followUpRefPoint = position.add([0, cardHeight / 2]);
-	positionData.followUpsPathOrder = contentItems[positionData.id].followUps
-		.filter(id => !!contentPositionsRaw[id]) // The follow-up is in the tree.
+	positionData.followUpsPathOrder = moduleItems[positionData.id].followUps
+		.filter(id => !!modulePositionsRaw[id]) // The follow-up is in the tree.
 		.map(id => {
-			const { position } = contentPositions[id]
+			const { position } = modulePositions[id]
 			const refPoint = position.add([0, -cardHeight / 2]);
 			const relPoint = refPoint.subtract(followUpRefPoint);
 			const angle = Math.atan2(relPoint.x, relPoint.y); // Down is 0, left is -pi/2, right is pi/2, up is +/-pi.
@@ -129,14 +129,14 @@ Object.values(contentPositions).forEach(positionData => {
 		.map(data => data.id);
 });
 
-// Also export the contents with position data as list.
-export const contentPositionList: ContentPositionMeta[] = Object.values(contentPositions)
+// Also export the modules with position data as list.
+export const modulePositionList: ModulePositionMeta[] = Object.values(modulePositions)
 
 // Determine the connectors based on the item positions.
 export const connectors: { points: Vector[]; from: string; to: string }[] = [];
-Object.values(contentPositions).forEach(positionData => {
+Object.values(modulePositions).forEach(positionData => {
 	positionData.prerequisitesPathOrder.map(prerequisiteId => {
-		const prerequisitePositionData = contentPositions[prerequisiteId];
+		const prerequisitePositionData = modulePositions[prerequisiteId];
 		const points = computeConnectorPath(prerequisitePositionData, positionData);
 		connectors.push({ points, from: prerequisiteId, to: positionData.id });
 	});

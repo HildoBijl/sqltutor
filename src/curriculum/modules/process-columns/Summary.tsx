@@ -292,19 +292,6 @@ function FigureProcessingCommands() {
       <ISQL>'Sequel'</ISQL>
     </Element>
 
-    <Element position={[x21, titleHeight + headerHeight + lineHeight * 5]} anchor={[-1, 0]} behind>
-      <span style={operationStyle}>Search</span>
-    </Element>
-    <Element position={[x22, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
-      <ISQL>CHARINDEX('SQL Valley', 'Val')</ISQL>
-    </Element>
-    <Element position={[x2i, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
-      <ISQL>=</ISQL>
-    </Element>
-    <Element position={[x23, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
-      <ISQL>5</ISQL>
-    </Element>
-
     <Element position={[x21, titleHeight + headerHeight + lineHeight * 6]} anchor={[-1, 0]} behind>
       <span style={operationStyle}>Text part</span>
     </Element>
@@ -316,6 +303,19 @@ function FigureProcessingCommands() {
     </Element>
     <Element position={[x23, titleHeight + headerHeight + lineHeight * 6]} anchor={[0, 0]} behind>
       <ISQL>'L Val'</ISQL>
+    </Element>
+
+    <Element position={[x21, titleHeight + headerHeight + lineHeight * 5]} anchor={[-1, 0]} behind>
+      <span style={operationStyle}>Search</span>
+    </Element>
+    <Element position={[x22, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
+      <ISQL>CHARINDEX('SQL Valley', 'Val')</ISQL>
+    </Element>
+    <Element position={[x2i, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
+      <ISQL>=</ISQL>
+    </Element>
+    <Element position={[x23, titleHeight + headerHeight + lineHeight * 5]} anchor={[0, 0]} behind>
+      <ISQL>5</ISQL>
     </Element>
 
     {/* Fallback values */}
@@ -337,7 +337,7 @@ function FigureProcessingCommands() {
       <span style={operationStyle}>Fallback value</span>
     </Element>
     <Element position={[x22, titleHeight + headerHeight + lineHeight * 10]} anchor={[0, 0]} behind>
-      <ISQL>COALESCE(null, null, 'Default')</ISQL>
+      <ISQL>COALESCE(NULL, NULL, 'Default')</ISQL>
     </Element>
     <Element position={[x2i, titleHeight + headerHeight + lineHeight * 10]} anchor={[0, 0]} behind>
       <ISQL>=</ISQL>

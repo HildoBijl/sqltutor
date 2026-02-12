@@ -1,33 +1,33 @@
 import { useCallback, useMemo } from "react";
-import type { ContentMeta } from "@/curriculum";
+import type { ModuleMeta } from "@/curriculum";
 import type { ComponentState } from "@/learning/store";
 import { processProgress } from "@/learning/utils/processProgress";
 
 
 /*
-* Hook to determine completion status and progress of content items.
+* Hook to determine completion status and progress of modules.
 *
-* @param contentItems - Array of content items (concepts and skills).
-* @param components - Object mapping content item IDs to their progress data.
+* @param moduleItems - Array of modules (concepts and skills).
+* @param components - Object mapping module IDs to their progress data.
 * @returns An object with concepts, skills, isCompleted, getProgress, completedConcepts, and completedSkills.
 */
-export function useContentProgress(
-  contentItems: ContentMeta[],
+export function useModuleProgress(
+  moduleItems: ModuleMeta[],
   components: Record<string, ComponentState>,
 ) {
   const concepts = useMemo(
-    () => contentItems.filter((item) => item.type === "concept"),
-    [contentItems]
+    () => moduleItems.filter((item) => item.type === "concept"),
+    [moduleItems]
   );
 
   const skills = useMemo(
-    () => contentItems.filter((item) => item.type === "skill"),
-    [contentItems]
+    () => moduleItems.filter((item) => item.type === "skill"),
+    [moduleItems]
   );
 
   const processed = useMemo(
-    () => processProgress(contentItems, components),
-    [contentItems, components],
+    () => processProgress(moduleItems, components),
+    [moduleItems, components],
   );
 
   const isCompleted = useCallback(

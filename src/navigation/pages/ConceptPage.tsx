@@ -1,11 +1,12 @@
-﻿import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
 
 import { useAppStore, type ConceptComponentState } from '@/learning/store';
-import { contentIndex, type ContentMeta } from '@/curriculum';
+import { moduleIndex, type ModuleMeta } from '@/curriculum';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
+import { useModuleProgress } from '@/learning/hooks/useModuleProgress';
 import { useAdminMode } from '@/learning/hooks/useAdminMode';
 import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { ContentHeader } from '@/learning/components/ContentHeader';
@@ -19,6 +20,7 @@ export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
   const hideStories = useAppStore((state) => state.hideStories);
+  const components = useAppStore((state) => state.components);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();
@@ -27,9 +29,9 @@ export default function ConceptPage() {
     [skillTreeHistory, conceptId],
   );
 
-  const conceptMeta = useMemo<ContentMeta | undefined>(() => {
+  const conceptMeta = useMemo<ModuleMeta | undefined>(() => {
     if (!conceptId) return undefined;
-    return contentIndex.find((item) => item.type === 'concept' && item.id === conceptId);
+    return moduleIndex.find((item) => item.type === 'concept' && item.id === conceptId);
   }, [conceptId]);
 
   const allTabs: TabConfig[] = [
@@ -52,7 +54,8 @@ export default function ConceptPage() {
     defaultTab: 'theory',
   });
 
-  const isCompleted = componentState.understood ?? false;
+  const { isCompleted: isModuleCompleted } = useModuleProgress(moduleIndex, components);
+  const isCompleted = conceptId ? isModuleCompleted(conceptId) : componentState.understood ?? false;
   const summaryUnlocked = isCompleted || isAdmin;
 
   const visibleTabs = useMemo(

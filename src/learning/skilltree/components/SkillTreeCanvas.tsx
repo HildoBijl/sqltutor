@@ -2,8 +2,8 @@ import { RefObject, useEffect, useState, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
-import { ContentMeta } from "@/curriculum";
-import { ContentPositionMeta } from "../utils/treeDefinition";
+import { ModuleMeta } from "@/curriculum";
+import { ModulePositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
@@ -15,12 +15,12 @@ import { useAppStore } from "@/learning/store";
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
  * This component only handles the zoom/pan functionality and UI controls.
  *
- * @param contentItems - Array of content items (concepts and skills) with info about these contents.
- * @param contentPositions - Array of content position data entries to display.
+ * @param moduleItems - Array of modules (concepts and skills) with info about these modules.
+ * @param modulePositions - Array of module position data entries to display.
  * @param treeBounds - The bounding box of the tree layout.
  * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
- * @param isCompleted - Function to check if a content item is completed.
- * @param getProgress - Function to get progress string for a content item.
+ * @param isCompleted - Function to check if a module is completed.
+ * @param getProgress - Function to get progress string for a module.
  * @param hoveredId - ID of the currently hovered node, or null if none.
  * @param setHoveredId - Function to set the hovered node ID.
  * @param containerRef - Ref to the container div for the tree.
@@ -28,8 +28,8 @@ import { useAppStore } from "@/learning/store";
  */
 interface SkillTreeCanvasProps {
   treeId: string;
-  contentItems: Record<string, ContentMeta>;
-  contentPositions: Record<string, ContentPositionMeta>;
+  moduleItems: Record<string, ModuleMeta>;
+  modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
     minX: number;
     minY: number;
@@ -49,8 +49,8 @@ interface SkillTreeCanvasProps {
 
 export function SkillTreeCanvas({
   treeId,
-  contentItems,
-  contentPositions,
+  moduleItems,
+  modulePositions,
   treeBounds,
   visiblePaths,
   isCompleted,
@@ -155,8 +155,8 @@ export function SkillTreeCanvas({
               }}
             >
               <SkillTree
-                contentItems={contentItems}
-                contentPositions={contentPositions}
+                moduleItems={moduleItems}
+                modulePositions={modulePositions}
                 treeBounds={treeBounds}
                 visiblePaths={visiblePaths}
                 isCompleted={isCompleted}

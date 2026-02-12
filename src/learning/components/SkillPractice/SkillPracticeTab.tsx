@@ -79,10 +79,14 @@ export function SkillPracticeTab({
         onGiveUp={dialogs.openDialog}
         onNext={actions.nextExercise}
         leftActions={
-          isAdmin && !practice.exerciseCompleted && !practice.hasGivenUp ? (
+          isAdmin ? (
             <ExerciseAdminTools
               isAdmin
-              disabled={!practice.currentExercise || status.isExecuting}
+              solutionDisabled={!practice.currentExercise || status.isExecuting}
+              selectionDisabled={status.isExecuting || practice.exerciseOptions.length === 0}
+              exerciseOptions={practice.exerciseOptions}
+              selectedExerciseId={practice.selectedExerciseId}
+              onExerciseSelect={actions.selectExercise}
               onShowSolution={() => {
                 void actions.autoComplete();
               }}
@@ -101,6 +105,9 @@ export function SkillPracticeTab({
         queryError={practice.queryError}
         hasExecuted={practice.hasExecutedQuery}
         isComplete={isSolvedOrGivenUp}
+        datasetSize={practice.datasetSize}
+        onDatasetSizeChange={actions.setDatasetSize}
+        datasetWarning={practice.datasetWarning}
       />
 
       <GiveUpDialog

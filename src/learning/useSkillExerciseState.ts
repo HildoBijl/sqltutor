@@ -40,8 +40,13 @@ function generateInstanceId(): ExerciseInstanceId {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+export interface SkillExerciseOption {
+  id: string;
+  label: string;
+}
+
 export interface SkillExerciseModuleLike {
-  generate?: (helpers: ExerciseHelpers) => any;
+  generate?: (helpers: ExerciseHelpers, context?: { previousExercise?: unknown | null }) => any;
   validate?: (input: string, exerciseState: any, result: unknown) => boolean;
   validateInput?: (args: ValidateInputArgs<any, string, unknown>) => ValidationResult;
   validateOutput?: (exercise: any, result: unknown) => ValidationResult;
@@ -49,6 +54,9 @@ export interface SkillExerciseModuleLike {
   getSolution?: (exercise: any) => PracticeSolutionLike;
   getDescription?: (exercise: any) => string | null | undefined;
   runDemo?: (args: { exercise: any; helpers: ExerciseHelpers }) => unknown;
+  isExerciseValid?: (exercise: any) => boolean;
+  listExercises?: () => ReadonlyArray<SkillExerciseOption>;
+  getExerciseById?: (id: string) => any | null;
   solutionTemplate?: string;
   messages?: {
     correct?: string;
@@ -88,9 +96,12 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
   );
 
   const exerciseConfig = useMemo<SimpleExerciseConfig<any, string, unknown, unknown>>(() => {
-    const generateExercise = (exerciseHelpers: ExerciseHelpers) => {
+    const generateExercise = (
+      exerciseHelpers: ExerciseHelpers,
+      context?: { previousExercise?: unknown | null },
+    ) => {
       if (moduleLike?.generate) {
-        return moduleLike.generate(exerciseHelpers) || {};
+        return moduleLike.generate(exerciseHelpers, context) || {};
       }
       return {
         id: 'exercise',
@@ -178,32 +189,6 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
       setComponentState({ currentInstanceId: latest.id });
     }
   }, [componentState.currentInstanceId, componentState.instances, setComponentState]);
-
-  useEffect(() => {
-    const instanceId = componentState.currentInstanceId;
-    if (!instanceId) {
-      setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
-      return;
-    }
-
-    const instance = componentState.instances[instanceId];
-    if (!instance || instance.events.length === 0) {
-      setProgress(createInitialProgress());
-      return;
-    }
-
-    const lastEvent = instance.events[instance.events.length - 1];
-    setProgress((prev) => {
-      if (
-        prev.generatedAt === lastEvent.resultingState.generatedAt &&
-        prev.status === lastEvent.resultingState.status &&
-        prev.attempts.length === lastEvent.resultingState.attempts.length
-      ) {
-        return prev;
-      }
-      return rehydrateExerciseState(lastEvent.resultingState, exerciseConfig);
-    });
-  }, [componentState.currentInstanceId, componentState.instances, exerciseConfig]);
 
   const appendEvent = useCallback(
     (instanceId: ExerciseInstanceId, action: ExerciseAction<string, unknown>, storedState: SkillStoredExerciseState) => {
@@ -295,6 +280,39 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
     },
     [appendEvent, componentId, componentState.currentInstanceId, queueComponentStateUpdate, reducer],
   );
+
+  useEffect(() => {
+    const instanceId = componentState.currentInstanceId;
+    if (!instanceId) {
+      setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
+      return;
+    }
+
+    const instance = componentState.instances[instanceId];
+    if (!instance || instance.events.length === 0) {
+      setProgress(createInitialProgress());
+      return;
+    }
+
+    const lastEvent = instance.events[instance.events.length - 1];
+    const storedExercise = lastEvent.resultingState.exercise;
+
+    if (storedExercise && moduleLike?.isExerciseValid && !moduleLike.isExerciseValid(storedExercise)) {
+      dispatch({ type: 'generate' });
+      return;
+    }
+
+    setProgress((prev) => {
+      if (
+        prev.generatedAt === lastEvent.resultingState.generatedAt &&
+        prev.status === lastEvent.resultingState.status &&
+        prev.attempts.length === lastEvent.resultingState.attempts.length
+      ) {
+        return prev;
+      }
+      return rehydrateExerciseState(lastEvent.resultingState, exerciseConfig);
+    });
+  }, [componentState.currentInstanceId, componentState.instances, dispatch, exerciseConfig, moduleLike]);
 
   const previewValidation: ValidationPreview = useCallback(
     (input: string) => {

@@ -1,7 +1,7 @@
 import type { StoredAttempt, StoredExerciseState } from '@/learning/store/types';
 import type { PracticeSolution, PracticeSolutionLike } from '../types';
 
-export * from './resultComparison';
+export * from './grading';
 export * from './schemaHelpers';
 export * from './staticExercise';
 
@@ -25,7 +25,6 @@ export interface VerificationResult {
   message?: string;
   expected?: unknown;
   solution?: PracticeSolutionLike;
-  details?: Record<string, unknown>;
 }
 
 export interface ExerciseAttempt<Input> extends StoredAttempt<Input> {
@@ -62,7 +61,7 @@ export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unkn
 }
 
 export type ExerciseAction<Input = unknown, Result = unknown> =
-  | { type: 'generate'; seed?: number }
+  | { type: 'generate'; seed?: number; exercise?: unknown }
   | { type: 'reset'; keepExercise?: boolean }
   | {
       type: 'input';
@@ -91,7 +90,10 @@ export interface ExerciseAttemptContext<Exercise, Input, Result> {
 export type ValidateInputArgs<Exercise, Input, Result> = ExerciseAttemptContext<Exercise, Input, Result>;
 
 export interface SimpleExerciseConfig<Exercise, Input, Result, Demo = unknown> {
-  generateExercise: (helpers: ExerciseHelpers) => Exercise;
+  generateExercise: (
+    helpers: ExerciseHelpers,
+    context?: { previousExercise?: Exercise | null },
+  ) => Exercise;
   validateInput?: (args: ValidateInputArgs<Exercise, Input, Result>) => ValidationResult;
   runDemo?: (args: { exercise: Exercise; helpers: ExerciseHelpers }) => Demo;
   deriveSolution?: (args: { exercise: Exercise; verification?: VerificationResult }) => PracticeSolution | null;
@@ -175,7 +177,10 @@ export function createSimpleExerciseReducer<Exercise, Input, Result, Demo = unkn
 
     switch (action.type) {
       case 'generate': {
-        const exercise = config.generateExercise(helpers);
+        const exercise =
+          action.exercise !== undefined && action.exercise !== null
+            ? (action.exercise as Exercise)
+            : config.generateExercise(helpers, { previousExercise: state.exercise });
         const demo = config.runDemo ? config.runDemo({ exercise, helpers }) : undefined;
         const status: ExerciseStatus = demo ? 'demo-ready' : 'ready';
         const entry: ExerciseHistoryEntry<Input, Result> = {

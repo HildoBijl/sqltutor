@@ -3,7 +3,8 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'multi-filter-employees-between',
-    prompt: 'Retrieve all departments where the number of employees is not between 10 and 20, and whose budget is known.',
+    version: 1,
+    prompt: 'Retrieve all departments where the number of employees is not between 10 and 20 (inclusive), and whose budget is known.',
     solution: `
 SELECT *
 FROM departments
@@ -13,6 +14,7 @@ WHERE nr_employees NOT BETWEEN 10 AND 20
   },
   {
     id: 'multi-filter-on-leave',
+    version: 1,
     prompt: 'Retrieve all employee data records where the employee is either on sick leave or paid leave, and the end date is after 2024.',
     solution: `
 SELECT *
@@ -23,7 +25,8 @@ WHERE (status = 'paid leave' OR status = 'sick leave')
   },
   {
     id: 'multi-filter-phone-area',
-    prompt: 'Retrieve all employees whose phone number starts with 408 and who live in either Mountain View or Menlo Park.',
+    version: 1,
+    prompt: 'Retrieve all employees whose phone number starts with 408 and who live in either Mountain View or Santa Clara.',
     solution: `
 SELECT *
 FROM employees
@@ -33,7 +36,7 @@ WHERE phone LIKE '408%'
   },
 //   {
 //     id: 'multi-filter-amount-between',
-//     prompt: 'Retrieve all transactions where the amount is not between 100 and 1000 and were not validated by any employee.',
+//     prompt: 'Retrieve all transactions where the amount is not between 100 and 1000 (inclusive) and were not validated by any employee.',
 //     solution: `
 // SELECT *
 // FROM transactions
@@ -80,4 +83,6 @@ export const {
   validateOutput,
   verifyOutput,
   getSolution,
+  listExercises,
+  getExerciseById,
 } = buildStaticExerciseModule(EXERCISES);

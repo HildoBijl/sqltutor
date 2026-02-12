@@ -69,27 +69,32 @@ const companiesExercises = [
 	{
 		problem: <>
 			<Par>Consider the case where companies may be located in multiple cities: the primary key for the <RelationName>company</RelationName> relation is not <PrimaryKey>company_name</PrimaryKey> but (<PrimaryKey>company_name</PrimaryKey>, <PrimaryKey>city</PrimaryKey>).</Par>
-			<Par>Find the companies that have employees living in all cities in which they are located.</Par>
+			<Par>Find the companies that have employees living in all cities in which the company is located.</Par>
 		</>,
 		solution: <>
 			<Par>To solve this exercise, we need to walk through the companies. For each company, we must create a list of cities they are in, and then see if there's an employee living in each of these cities. Note that this list of cities is <Em>different</Em> per company: it depends on the company's employees. Since our requirement list is different, we cannot use division.</Par>
-			<Par>We rephrase our query without "every" using a double negative: "Find the companies for which there does not exist a city the company is located in but has no employee living there." To find this, we first find the opposite: we find the companies for which there <Em>exists</Em> a city the company is located on, but there does <Em>not</Em> exist an employee living in that city.</Par>
+			<Par>We rephrase our query without "every" using a double negative: "Find the companies for which there does not exist a city which the company is located in but has no employee living there." To find this, we first find the opposite: we find the companies for which there <Em>exists</Em> a city the company is located in but none of its employees are living there.</Par>
 			<Par>We first set up a list of companies (the entities) and cities (the requirements).</Par>
 			<RA>
 				all_companies ← ∏<sub>company_name</sub>(companies)<br />
 				all_cities ← ∏<sub>city</sub>(companies)
 			</RA>
-			<Par>The list of companies and their locations is given by the (already existing) relation</Par>
-			<RA>company</RA>
-			<Par>We could also find a list of companies including cities where their employees work at. For that, we join <RelationName>works</RelationName> with <RelationName>employee</RelationName> and extract "company_name" and "city".</Par>
-			<RA>company_employee_cities ← ∏<sub>company_name,city</sub>(works ⋈ employee)</RA>
+			<Par>The list of companies and their locations is given by the (already existing) <RelationName>company</RelationName> relation</Par>
+			<RA>company_is_in_city ← company</RA>
+			<Par>We can also find a list of companies including cities where their employees work at. For that, we join <RelationName>works</RelationName> with <RelationName>employee</RelationName> and extract "company_name" and "city".</Par>
+			<RA>company_has_employee_in_city ← ∏<sub>company_name,city</sub>(works ⋈ employee)</RA>
 			<Par>Now we have to apply the conditions to combine these latter two relations in some way. If we subtract the second relation from the first, we find the list of all (company_name, city) combinations where the company <Em>does</Em> appear in the city, but <Em>none</Em> of its employees live in that city.</Par>
-			<RA>company_city_without_employees ← company – company_employee_cities</RA>
-			<Par>We can extract the "company_name" attribute from this, to find a list of all companies who are located in a city without any of its employees.</Par>
-			<RA>companies_with_city_without_employees ← ∏<sub>company_name</sub>(company_city_without_employees)</RA>
+			<RA>company_in_city_without_employees ← company_is_in_city – company_has_employee_in_city</RA>
+			<Par>We can squash this (project onto "company_name") to find a list of all companies who are located in a city without any of its employees living there.</Par>
+			<RA>companies_with_city_without_employees ← ∏<sub>company_name</sub>(company_in_city_without_employees)</RA>
 			<Par>The opposite of this is then the list of companies who have an employee in all cities they are located in.</Par>
 			<RA>all_companies - companies_with_city_without_employees</RA>
 			<Par>This solves the exercise.</Par>
+			<Par>Another slightly more complicated way to solve this is by forcibly using division. The idea is to check every combination of (company_name, city) for the given condition. The given condition is "If a company is in a city, then there must also be an employee of it living there." This can be rephrased using logics as "The company is <Em>not</Em> located in the city, <Em>or</Em> there is an employee of the company living in the city." This results in the following checklist table.</Par>
+			<RA>company_not_in_city ← all_companies ⨯ all_cities - company_is_in_city<br/>company_city_satisfies_condition ← company_not_in_city ∪ company_has_employee_in_city</RA>
+			<Par>Every company for which <Em>all</Em> cities satisfy this check are suitable for our output. So the final result would then be given through</Par>
+			<RA>company_city_satisfies_condition ÷ all_cities</RA>
+			<Par>This gives all companies for which all cities satisfy the given condition.</Par>
 		</>,
 	},
 ]

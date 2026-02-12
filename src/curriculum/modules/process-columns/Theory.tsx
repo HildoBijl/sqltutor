@@ -38,8 +38,8 @@ FROM emp_data;`} tableWidth={350} />
       ]} />
       <Par>Next to general arithmetic, there is a wide variety of functions that can be used.</Par>
       <List items={[
-        <><Term>Rounding</Term>: <ISQL>ROUND(x)</ISQL> rounds <ISQL>x</ISQL> to the nearest integer. <ISQL>ROUND(x, 2)</ISQL> rounds <ISQL>x</ISQL> to two decimals. <ISQL>FLOOR(x)</ISQL> rounds <ISQL>x</ISQL> <Em>down</Em> to the nearest integer lower than <ISQL>x</ISQL>. <ISQL>CEIL(x)</ISQL> rounds <ISQL>x</ISQL> <Em>up</Em> to the nearest integer higher than <ISQL>x</ISQL>.</>,
-        <><Term>Maximum</Term>/<Term>Minimum</Term>: <ISQL>GREATEST(x1, x2, ...)</ISQL> gives the highest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, and so forth. <ISQL>LEAST(x1, x2, ...)</ISQL> gives the lowest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, etcetera. (Except in SQLite, where we use <ISQL>MAX</ISQL> and <ISQL>MIN</ISQL> instead.)</>,
+        <><Term>Rounding</Term>: <ISQL>ROUND(x)</ISQL> rounds <ISQL>x</ISQL> to the nearest integer. <ISQL>ROUND(x, 2)</ISQL> rounds <ISQL>x</ISQL> to two decimals. <ISQL>FLOOR(x)</ISQL> rounds <ISQL>x</ISQL> <Em>down</Em> to the nearest integer lower than (or equal to) <ISQL>x</ISQL>. <ISQL>CEIL(x)</ISQL> rounds <ISQL>x</ISQL> <Em>up</Em> to the nearest integer higher than (or equal to) <ISQL>x</ISQL>.</>,
+        <><Term>Maximum</Term>/<Term>Minimum</Term>: <ISQL>GREATEST(x1, x2, ...)</ISQL> gives the highest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, and so forth. <ISQL>LEAST(x1, x2, ...)</ISQL> gives the lowest value of the numbers <ISQL>x1</ISQL>, <ISQL>x2</ISQL>, etcetera. (Except in SQLite, where we have to use <ISQL>MAX</ISQL> and <ISQL>MIN</ISQL> instead.)</>,
         <><Term>Mathematical functions</Term>: <ISQL>POWER(x, y)</ISQL> calculates <ISQL>x^y</ISQL>. <ISQL>SQRT(x)</ISQL> calculates the square root of <ISQL>x</ISQL>. <ISQL>EXP(x)</ISQL> calculates <ISQL>e^x</ISQL>. <ISQL>ABS(x)</ISQL> gives the absolute value of <ISQL>x</ISQL>. And there is a wide variety of other functions, like, <ISQL>LOG(x)</ISQL>, <ISQL>SIN(x)</ISQL>, <ISQL>ATAN(x)</ISQL>, and so forth.</>
       ]} />
       <Warning>Every DBMS has its own variations of these functions. For instance, <ISQL>LOG(x)</ISQL> is a base-10 logarithm in MySQL and a natural logarithm in PostgreSQL. Always check out the specifications for your DBMS.</Warning>
@@ -52,15 +52,15 @@ FROM emp_data;`} tableWidth={350} />
   last_name,
   first_name || ' ' || last_name AS full_name
 FROM employees;`} tableWidth={350} />
-      <Info>The notation with <ISQL>||</ISQL> works in all large DBMSs. Some DBMSs also allow <ISQL>CONCAT(first_name, ' ', last_name)</ISQL> while others allow <ISQL>first_name + ' ' + last_name</ISQL>. As usual, things vary per DBMS.</Info>
+      <Info>The notation with <ISQL>||</ISQL> works in all large DBMSs. Some DBMSs also allow <ISQL>CONCAT(first_name, ' ', last_name)</ISQL> while others allow <ISQL>first_name + ' ' + last_name</ISQL>.</Info>
       <Par>There is a large variety of further text processing functions.</Par>
       <List items={[
         <><Term>Text length</Term>: <ISQL>LENGTH('Hello world')</ISQL> becomes <ISQL>11</ISQL>.</>,
-        <><Term>Trimming</Term>: <ISQL>TRIM(' user input ')</ISQL> becomes <ISQL>'user input'</ISQL>, removing spaces at the start/end.</>,
+        <><Term>Trimming</Term>: <ISQL>TRIM(' user input ')</ISQL> becomes <ISQL>'user input'</ISQL>, removing white space at the start/end.</>,
         <><Term>Upper/lower case</Term>: <ISQL>UPPER('Hello')</ISQL> becomes <ISQL>'HELLO'</ISQL> and <ISQL>LOWER('Hello')</ISQL> becomes <ISQL>'hello'</ISQL>. This is useful when checking if two columns <ISQL>A</ISQL> and <ISQL>B</ISQL> are (case-insensitive) equal to one another: just check if <ISQL>LOWER(A) = LOWER(B)</ISQL>.</>,
         <><Term>Text replace</Term>: <ISQL>REPLACE('Hello world', 'world', 'SQL Valley')</ISQL> becomes <ISQL>'Hello SQL Valley'</ISQL>.</>,
+        <><Term>Part of text</Term>: <ISQL>SUBSTRING('Hello world', 3, 7)</ISQL> becomes <ISQL>'llo wor'</ISQL>. The first number is the <Em>start</Em> and the second number is the <Em>length</Em>. SQL is 1-indexed: start at <ISQL>1</ISQL> to start at the beginning. (In some older DBMSs this function is called <ISQL>SUBSTR</ISQL> instead.)</>,
         <><Term>Text search</Term>: <ISQL>CHARINDEX('wor', 'Hello world')</ISQL> becomes <ISQL>7</ISQL>. Note that this is case sensitive: <ISQL>CHARINDEX('wor', 'Hello World')</ISQL> becomes <ISQL>0</ISQL> which indicates "not found".</>,
-        <><Term>Part of text</Term>: <ISQL>SUBSTRING('Hello world', 3, 7)</ISQL> becomes <ISQL>'llo wor'</ISQL>. The first number is the <Em>start</Em> and the second number is the <Em>length</Em>. SQL is 1-indexed: start at <ISQL>1</ISQL> to start at the beginning.</>,
       ]} />
     </Section>
 
@@ -84,7 +84,7 @@ FROM employees;`} tableWidth={350} />
   END AS dep_size
 FROM departments;`} tableWidth={350} />
       <Info>When using <ISQL>CASE</ISQL>, add as many <ISQL>WHEN ... THEN ...</ISQL> conditions as needed. SQL looks for the <Em>first</Em> condition that matches. If no condition matches, then the <ISQL>ELSE</ISQL> outcome is used. (Or when <ISQL>ELSE</ISQL> is omitted, then <ISQL>NULL</ISQL> is returned.)</Info>
-      <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value that is not <ISQL>NULL</ISQL>. An example (albeit a not very sensible one) is the following.</Par>
+      <Par>When dealing with a column containing <ISQL>NULL</ISQL> values, it could be useful to set up a fallback value. This is done through the <ISQL>COALESCE(v1, v2, ...)</ISQL> function. This function gives the <Em>first</Em> value that is not <ISQL>NULL</ISQL>. An example (albeit a not very sensible one) is the following query. It tries to get the performance score, but if that is unknown it divides the salary by 1000 and uses that, but if the salary is unknown too it just defaults to 20.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,

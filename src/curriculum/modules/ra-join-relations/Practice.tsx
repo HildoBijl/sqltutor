@@ -1,4 +1,4 @@
-import { Page, Section, Par, Term, RA, RelationName } from '@/components';
+import { Page, Section, Par, Term, Em, RA, RelationName } from '@/components';
 import { ManualExerciseSet } from '@/learning/components/SkillPractice';
 
 import { CompaniesSchema } from '../../utils';
@@ -30,17 +30,17 @@ const exercises = [
 		</>,
 	},
 	{
-		problem: <Par>Join the <RelationName>works</RelationName> and <RelationName>company</RelationName> relations to show, for all workers earning less than 20,000 per year, in which city the company they work for is located. (Excess attributes in the relation are OK: no projection is needed.)</Par>,
+		problem: <Par>Join the <RelationName>works</RelationName> and <RelationName>company</RelationName> relations to show, for all workers earning less than 50,000 per year, in which city the company they work for is located. (Excess attributes in the relation are OK: no projection is needed.)</Par>,
 		solution: <>
 			<Par>The first step is to join the relations, and the second step is to filter based on the salary requirement. Joining <RelationName>works</RelationName> and <RelationName>company</RelationName> can be done through either of the following two commands.</Par>
 			<RA>σ<sub>works.company_name = company.company_name</sub>(works⨯company)</RA>
 			<RA>works ⋈ company</RA>
 			<Par>Then the salary requirement should still be added. This can for instance be done through</Par>
-			<RA>σ<sub>salary &lt; 20000</sub>(works ⋈ company)</RA>
+			<RA>σ<sub>salary &lt; 50000</sub>(works ⋈ company)</RA>
 		</>,
 	},
 	{
-		problem: <Par>Join the <RelationName>works</RelationName> and <RelationName>manages</RelationName> relations to show for all workers what company their manager works for. (Excess attributes in the relation are OK: no projection is needed.)</Par>,
+		problem: <Par>Join the <RelationName>works</RelationName> and <RelationName>manages</RelationName> relations to show for all workers what company their <Em>manager</Em> works for. (Excess attributes in the relation are OK: no projection is needed.)</Par>,
 		solution: <>
 			<Par>The tricky part here is that we need to join the <RelationName>manages</RelationName> relation with the <RelationName>works</RelationName> relation, but we have to do so based on the foreign key "manager_name". The default way of doing this, through a Cartesian product, is</Par>
 			<RA>σ<sub>manages.manager_name = works.person_name</sub>(manages⨯works)</RA>

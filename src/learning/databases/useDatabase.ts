@@ -6,11 +6,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDatabaseContext, type QueryResult } from '@/components/sql/sqljs';
 import { buildSchema, getCompletionSchemaForTables, type DatasetSize, type TableKey } from '@/mockData';
-import { getContentTables, getContentSize } from '@/curriculum/utils/contentAccess';
+import { getModuleTables, getModuleSize } from '@/curriculum/utils/moduleAccess';
 
 interface DatabaseOptions {
-  /** Content ID (skill or concept) to determine tables and size */
-  contentId?: string;
+  /** Module ID (skill or concept) to determine tables and size */
+  moduleId?: string;
   /** Override tables (ignores contentId for table resolution) */
   tables?: TableKey[];
   /** Override dataset size */
@@ -39,7 +39,7 @@ interface UseDatabaseReturn {
 
 export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
   const {
-    contentId,
+    moduleId,
     tables,
     size,
     cacheKey,
@@ -64,8 +64,8 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
 
   // Resolve the dataset size
   const resolvedSize = useMemo(
-    () => size ?? getContentSize(contentId),
-    [size, contentId],
+    () => size ?? getModuleSize(moduleId),
+    [size, moduleId],
   );
 
   // Resolve the tables to include
@@ -73,9 +73,9 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     if (tables?.length) {
       return Array.from(new Set(tables)) as TableKey[];
     }
-    const contentTables = getContentTables(contentId);
-    return Array.from(new Set(contentTables)) as TableKey[];
-  }, [tables, contentId]);
+    const moduleTables = getModuleTables(moduleId);
+    return Array.from(new Set(moduleTables)) as TableKey[];
+  }, [tables, moduleId]);
 
   // Build the schema SQL
   const resolvedSchema = useMemo(
@@ -93,8 +93,8 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
   const contextKey = useMemo(() => {
     if (cacheKey) return cacheKey;
     const tablesSignature = resolvedTables.join('|');
-    return `${contentId ?? 'default'}:size=${resolvedSize}:tables=${tablesSignature}`;
-  }, [cacheKey, contentId, resolvedTables, resolvedSize]);
+    return `${moduleId ?? 'default'}:size=${resolvedSize}:tables=${tablesSignature}`;
+  }, [cacheKey, moduleId, resolvedTables, resolvedSize]);
 
   // Update database when schema changes, provider DB instance changes, or context is ready
   useEffect(() => {
@@ -115,7 +115,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     if (!providerDb) {
       const db = getDatabase(contextKey, resolvedSchema, {
         persistent,
-        metadata: { contentId, size: resolvedSize },
+        metadata: { moduleId, size: resolvedSize },
       });
       setDatabase(db);
       setCurrentSchema(resolvedSchema);
@@ -163,7 +163,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     currentSchema,
     contextKey,
     persistent,
-    contentId,
+    moduleId,
     resolvedSize,
     resetOnSchemaChange,
     getDatabase,
@@ -230,7 +230,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
 /** Playground database - full dataset, persistent */
 export function usePlaygroundDatabase() {
   return useDatabase({
-    contentId: 'playground',
+    moduleId: 'playground',
     size: 'full',
     persistent: true,
     resetOnSchemaChange: true,
@@ -245,10 +245,10 @@ export function useConceptDatabase() {
   });
 }
 
-/** Skill practice - content-specific tables (full dataset) */
+/** Skill practice - module-specific tables (full dataset) */
 export function useSkillDatabase(skillId: string) {
   return useDatabase({
-    contentId: skillId,
+    moduleId: skillId,
     size: 'full',
     resetOnSchemaChange: true,
   });
@@ -257,7 +257,7 @@ export function useSkillDatabase(skillId: string) {
 /** Theory examples - all tables with small dataset */
 export function useTheorySampleDatabase() {
   return useDatabase({
-    contentId: 'playground',
+    moduleId: 'playground',
     size: 'small',
     resetOnSchemaChange: true,
   });

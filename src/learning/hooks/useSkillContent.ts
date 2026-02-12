@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { contentIndex, type ContentMeta, skillExerciseLoaders } from '@/curriculum';
+import { moduleIndex, type ModuleMeta, skillExerciseLoaders } from '@/curriculum';
 
 import { normalizeSkillExerciseModule } from '../utils/normalizeSkillModule';
 import type { SkillExerciseModuleLike } from '../useSkillExerciseState';
@@ -10,7 +10,7 @@ type SkillExerciseModule = Awaited<ReturnType<SkillExerciseLoader>>;
 
 interface SkillContentState {
   isLoading: boolean;
-  skillMeta: (ContentMeta & { database?: string }) | null;
+  skillMeta: (ModuleMeta & { database?: string }) | null;
   skillModule: SkillExerciseModuleLike | null;
   error: string | null;
 }
@@ -49,7 +49,7 @@ export function useSkillContent(
     updateState({ isLoading: true, error: null });
 
     const entry =
-      contentIndex.find((item) => item.type === 'skill' && item.id === skillId) || null;
+      moduleIndex.find((item) => item.type === 'skill' && item.id === skillId) || null;
     updateState({ skillMeta: entry });
 
     if (!entry) {

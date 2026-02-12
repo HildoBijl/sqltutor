@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { Page, Section, Par, List, Info, Term, Em, M, RA, IRA, Link } from '@/components';
+import { Page, Section, Par, List, Info, Term, Em, M, RA, Link } from '@/components';
 import { FigureExampleRAQuery } from '../../utils';
 
 export function Theory() {
@@ -40,30 +40,34 @@ export function Theory() {
         </>,
         <>
           <Par>Set up assigned relations <Term>based on keys</Term>. Keys represent a tuple in its minimal form. They are far more manageable to work with than the full tuple. If needed, you can always use a natural join of the key with the full relation to get the other attributes of the relation back.</Par>
-          <Info>Often your assigned relations have keys of a single relation. But let's say we want to find all <Em>combinations</Em> of departments and employees that match some condition. In that case, we can set up relations with <Term>combinations of keys</Term> like (d_id, e_id) to track which of the combinations match our requirements.</Info>
+          <Info>Often your assigned relations have keys of a <Em>single</Em> relation. But let's say we want to find all <Em>combinations</Em> of departments and employees that match some condition. In that case, we can set up relations with <Term>combinations of keys</Term> like (d_id, e_id) to track which of the combinations match our requirements.</Info>
         </>,
         <>
           <Par>Set up assigned relations that are <Term>intuitive</Term>. Every relation you assign should mean something, and you should be able to explain to a colleague, ideally in a single sentence, what the relation stands for. Or even better: make the relation name you assigned self-explanatory! By making your relations intuitive, you support your own intuition too.</Par>
         </>,
         <>
           <Par>When you find the word "never" or "every" in a request, first <Term>do the opposite</Term>. Relational algebra is very good in existence checks: we just check if a tuple exists in a relation. But a "never" or "every" check is not something relational algebra can directly do.</Par>
-          <Par>To show how this "do the opposite" idea works, we use an example. Suppose we want to find all the employees who have <Em>never</Em> been on sick leave. This sounds hard, but we could first do the opposite: we find the employees that <Em>have</Em> been on sick leave.</Par>
-          <RA>had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))</RA>
-          <Par>The people who have <Em>never</Em> been on sick leave are all employees <Em>except</Em> the employees who had sick leave. So we <Term>flip</Term>/<Term>invert</Term> the relation: we take everyone except the employees we found.</Par>
-          <RA>all_employees ← ∏<sub>e_id</sub>(employees)<br />never_had_sick_leave ← all_employees - had_sick_leave</RA>
-          <Info>Note that we could have merged the two above steps into one step too as <IRA>never_had_sick_leave ← ∏<sub>e_id</sub>(employees) - had_sick_leave</IRA>. However, using smaller steps makes everything easier to read and understand. If every step is easy to follow, it is harder to make errors and it is easier to spot any errors that do occur.</Info>
-          <Par>Optionally, we can again join in extra data as output for our final result.</Par>
-          <Box>
-            <FigureExampleRAQuery query={<>
-              had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))<br />
-              all_employees ← ∏<sub>e_id</sub>(employees)<br />
-              never_had_sick_leave ← all_employees - had_sick_leave<br />
-              ∏<sub>first_name,last_name,salary</sub>(never_had_sick_leave ⋈ employees)
-            </>} actualQuery="SELECT first_name, last_name, current_salary FROM employees NATURAL JOIN (SELECT e_id FROM employees EXCEPT SELECT e_id FROM emp_data WHERE status = 'sick leave')" tableWidth={280} tableScale={0.8} />
-          </Box>
         </>,
       ]} />
-      <Par>By using the above tips and tricks, you should be able to turn most data requests into properly functioning relational algebra scripts. Just remember: the key is using keys.</Par>
+      <Par>To show how this last point of "doing the opposite" idea works, we use an example. Suppose we want to find all the employees who have <Em>never</Em> been on sick leave. This sounds hard, but we could first do the opposite: we find the employees that <Em>have</Em> been on sick leave.</Par>
+      <RA>had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))</RA>
+      <Par>The people who have <Em>never</Em> been on sick leave are all employees <Em>except</Em> the employees who had sick leave. So we <Term>flip</Term>/<Term>invert</Term> the relation: we take everyone except the employees we found.</Par>
+      <RA>all_employees ← ∏<sub>e_id</sub>(employees)<br />never_had_sick_leave ← all_employees - had_sick_leave</RA>
+      <Info>
+        <Par sx={{ mb: 1 }}>Note that we could have merged the two above steps into one step too as</Par>
+        <RA>never_had_sick_leave ← ∏<sub>e_id</sub>(employees) - had_sick_leave</RA>
+        <Par sx={{ mt: 1 }}>However, using smaller steps makes everything easier to read and understand. If every step is easy to follow, it is harder to make errors and it is easier to spot any errors that do occur.</Par>
+      </Info>
+      <Par>Optionally, we can again join in extra data as output for our final result.</Par>
+      <Box>
+        <FigureExampleRAQuery query={<>
+          had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))<br />
+          all_employees ← ∏<sub>e_id</sub>(employees)<br />
+          never_had_sick_leave ← all_employees - had_sick_leave<br />
+          ∏<sub>first_name,last_name,salary</sub>(never_had_sick_leave ⋈ employees)
+        </>} actualQuery="SELECT first_name, last_name, current_salary FROM employees NATURAL JOIN (SELECT e_id FROM employees EXCEPT SELECT e_id FROM emp_data WHERE status = 'sick leave')" tableWidth={280} tableScale={0.8} />
+      </Box>
+      <Par>By using the above tips and tricks, you should be able to turn most data requests into properly functioning relational algebra scripts.</Par>
     </Section>
   </Page>;
 }

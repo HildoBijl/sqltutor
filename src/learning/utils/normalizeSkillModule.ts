@@ -46,6 +46,15 @@ export function normalizeSkillExerciseModule(
     runDemo: isCallable<NonNullable<SkillExerciseModuleLike['runDemo']>>(candidate.runDemo)
       ? candidate.runDemo
       : undefined,
+    isExerciseValid: isCallable<NonNullable<SkillExerciseModuleLike['isExerciseValid']>>(candidate.isExerciseValid)
+      ? candidate.isExerciseValid
+      : undefined,
+    listExercises: isCallable<NonNullable<SkillExerciseModuleLike['listExercises']>>(candidate.listExercises)
+      ? candidate.listExercises
+      : undefined,
+    getExerciseById: isCallable<NonNullable<SkillExerciseModuleLike['getExerciseById']>>(candidate.getExerciseById)
+      ? candidate.getExerciseById
+      : undefined,
     solutionTemplate: typeof candidate.solutionTemplate === 'string' ? candidate.solutionTemplate : undefined,
     messages: isExerciseMessages(candidate.messages) ? candidate.messages : undefined,
   };

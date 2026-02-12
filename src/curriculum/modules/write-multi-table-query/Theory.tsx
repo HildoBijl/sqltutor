@@ -23,7 +23,7 @@ export function Theory() {
     </Section>
 
     <Section title="Trick 2. Get rid of ambiguous language: rephrase the request">
-      <Par>SQL would not understand the above example request. For starters, it does not know the concept of "buying", and the request also doesn't specify that "Fine Art" refers to <ISQL>category</ISQL>. It helps to bring our English-language request a bit closer to something SQL might understand, making the step we have to take turning it into a query a bit smaller. Specifically, we can do two things.</Par>
+      <Par>SQL would not understand the above example request. For starters, it does not know the concept of "buying", and the request also doesn't specify that "Fine Art" refers to <ISQL>category</ISQL>. It helps to bring our English-language request a bit closer to something that SQL might understand, making the step of turning it into a query a bit smaller. Specifically, we can do two things.</Par>
       <List items={[
         <>Change all <Em>verbs</Em> to words that SQL is familiar with. SQL is strong with things like "exists", "is in a list", or similar.</>,
         <>Change all <Em>nouns</Em> to things that exist in our database: either table rows, or specific attributes within a row. When rows are linked through foreign keys, we can use the word "corresponding".</>,
@@ -33,7 +33,7 @@ export function Theory() {
       <Quote>Find the IDs of all accounts for which there exists a corresponding transaction (as buyer), where the corresponding product has category equal to "Fine Art".</Quote>
       <Par>This is a query that can directly be turned into SQL. For "corresponding" we use a join, which gives the following result.</Par>
       <FigureExampleQuery query={`
-SELECT acct_id
+SELECT DISTINCT acct_id
 FROM accounts AS a
 JOIN transactions AS t
 ON a.acct_id = t.buyer_id
@@ -48,7 +48,7 @@ WHERE p.category = 'Fine Art';`} tableWidth={240} tableScale={0.7} />
       <Par>Let's try this out on our example. We have already realized we don't really need the <ISQL>accounts</ISQL> table. We could cut that out. That gives the following request/query.</Par>
       <Quote>Find the IDs of the transaction buyers for which the corresponding product has category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT buyer_id
+SELECT DISTINCT buyer_id
 FROM transactions AS t
 JOIN products AS p
 ON t.prod_id = p.p_id
@@ -56,10 +56,10 @@ WHERE p.category = 'Fine Art';`} tableWidth={240} tableScale={0.7} />
       <Par>We have also realized that we could first create a list of all "Fine Art" products. We then check if the product is in this list. Using this idea, we can again rewrite our request/query.</Par>
       <Quote>Find the IDs of the transaction buyers for which the corresponding product is in the list of products with category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT buyer_id
+SELECT DISTINCT buyer_id
 FROM transactions
 WHERE prod_id IN (
-  SELECT p_id
+  SELECT DISTINCT p_id
   FROM products
   WHERE category = 'Fine Art'
 );`} tableWidth={240} tableScale={0.7} />
@@ -72,17 +72,17 @@ WHERE prod_id IN (
       <Par>First we find a list of all Fine Art products. We can test it, to see if it works as intended.</Par>
       <Quote>Find the IDs of all products whose category equals "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT p_id
+SELECT DISTINCT p_id
 FROM products
 WHERE category = 'Fine Art';`} tableWidth={120} tableScale={0.7} />
       <Info>Testing parts of your query is very important. It's easy to make a mistake in SQL, so by testing early, you find your mistakes early, when it's still easy to identify them.</Info>
       <Par>Once we have this list, we can build the next step of our query <Em>around</Em> it.</Par>
       <Quote>Find the IDs of the transaction buyers for which the corresponding product is in the list of products with category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT buyer_id
+SELECT DISTINCT buyer_id
 FROM transactions
 WHERE prod_id IN (
-  SELECT p_id
+  SELECT DISTINCT p_id
   FROM products
   WHERE category = 'Fine Art'
 );`} tableWidth={240} tableScale={0.7} />
@@ -92,10 +92,10 @@ WHERE prod_id IN (
 SELECT acct_id, username
 FROM accounts
 WHERE acct_id IN (
-  SELECT buyer_id
+  SELECT DISTINCT buyer_id
   FROM transactions
   WHERE prod_id IN (
-    SELECT p_id
+    SELECT DISTINCT p_id
     FROM products
     WHERE category = 'Fine Art'
   )
@@ -145,10 +145,10 @@ WHERE NOT EXISTS (
 SELECT acct_id, username
 FROM accounts
 WHERE acct_id IN (
-  SELECT buyer_id
+  SELECT DISTINCT buyer_id
   FROM transactions
   WHERE prod_id IN (
-    SELECT p_id
+    SELECT DISTINCT p_id
     FROM products
     WHERE category = 'Fine Art'
   )

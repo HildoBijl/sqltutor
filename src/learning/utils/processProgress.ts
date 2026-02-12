@@ -1,4 +1,4 @@
-import type { ContentMeta } from '@/curriculum';
+import type { ModuleMeta } from '@/curriculum';
 import type { ComponentState } from '@/learning/store';
 import { EXERCISES_TO_COMPLETE } from '@/constants';
 
@@ -9,19 +9,19 @@ interface ProcessedProgress {
 }
 
 export function processProgress(
-  contentItems: ContentMeta[],
+  moduleItems: ModuleMeta[],
   components: Record<string, ComponentState>,
   requiredCount: number = EXERCISES_TO_COMPLETE,
 ): ProcessedProgress {
-  const contentById: Record<string, ContentMeta> = {};
-  for (const item of contentItems) {
-    contentById[item.id] = item;
+  const moduleById: Record<string, ModuleMeta> = {};
+  for (const item of moduleItems) {
+    moduleById[item.id] = item;
   }
 
   const baseCompleted: string[] = [];
   const skillProgress: Record<string, number> = {};
 
-  for (const item of contentItems) {
+  for (const item of moduleItems) {
     const component = components[item.id];
 
     if (item.type === 'concept') {
@@ -49,7 +49,7 @@ export function processProgress(
     if (visited.has(id)) return;
     visited.add(id);
 
-    const item = contentById[id];
+    const item = moduleById[id];
     if (!item?.prerequisites?.length) return;
 
     for (const prereqId of item.prerequisites) {
@@ -60,16 +60,6 @@ export function processProgress(
 
   for (const id of baseCompleted) {
     addPrerequisites(id);
-  }
-
-  for (const item of contentItems) {
-    if (item.type !== 'skill') continue;
-    if (completed.has(item.id)) {
-      const solved = skillProgress[item.id] ?? 0;
-      if (solved < requiredCount) {
-        skillProgress[item.id] = requiredCount;
-      }
-    }
   }
 
   return { completed, skillProgress, requiredCount };

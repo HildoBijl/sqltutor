@@ -32,8 +32,8 @@ const exercises = [
 	{
 		problem: <Par>Find the names of all the employees living in one of the Netherlands’ three largest cities (Amsterdam, Rotterdam, The Hague).</Par>,
 		solution: <>
-			<Par>We take the employee relation, first apply filtering on the city using an "or" operator, and then apply projection to retrieve only the respective names.</Par>
-			<RA>∏<sub>person_name</sub>(σ<sub>city = "Amsterdam" ∨ city = "Rotterdam" ∨ city = "The Hague"</sub>(works))</RA>
+			<Par>We take the <RelationName>employee</RelationName> relation, first apply filtering on the city using an "or" operator, and then apply projection to retrieve only the respective names.</Par>
+			<RA>∏<sub>person_name</sub>(σ<sub>city = "Amsterdam" ∨ city = "Rotterdam" ∨ city = "The Hague"</sub>(employee))</RA>
 		</>,
 	},
 ]

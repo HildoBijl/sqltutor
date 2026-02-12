@@ -33,7 +33,7 @@ export function Theory() {
     </Section>
 
     <Section title={<>Combine conditions using <ISQL>OR</ISQL></>}>
-      <Par>Very similar to the <ISQL>AND</ISQL> keyword is the <ISQL>OR</ISQL> keyword. This keyword also expects one value before it and one value after. The <ISQL>OR</ISQL> keyword resolves to <ISQL>TRUE</ISQL> when <Em>at least one</Em> of the two given values is <ISQL>TRUE</ISQL>. It is only <ISQL>FALSE</ISQL> when <Em>both</Em> values are <ISQL>FALSE</ISQL>.</Par>
+      <Par>Very similar to the <ISQL>AND</ISQL> keyword is the <ISQL>OR</ISQL> keyword. This keyword also expects one value before it and one value after it. The <ISQL>OR</ISQL> keyword resolves to <ISQL>TRUE</ISQL> when <Em>at least one</Em> of the two given values is <ISQL>TRUE</ISQL>. It is only <ISQL>FALSE</ISQL> when <Em>both</Em> values are <ISQL>FALSE</ISQL>.</Par>
       <FigureCombinedCondition c1="status" v1="sick leave" c2="position" v2="transportation supervisor" combiner="OR" />
       <Par>It is possible (and common) to combine the <ISQL>AND</ISQL> and <ISQL>OR</ISQL> keywords. When you do so, <Em>always</Em> use brackets to separate them. After all, it is very unclear what <ISQL>TRUE OR TRUE AND FALSE</ISQL> resolves to, while both <ISQL>(TRUE OR TRUE) AND FALSE</ISQL> and <ISQL>TRUE OR (TRUE AND FALSE)</ISQL> have a clear result.</Par>
       <Info><ISQL>OR</ISQL> and <ISQL>AND</ISQL> have interesting behavior when it comes to <ISQL>NULL</ISQL>. Keep in mind that <ISQL>NULL</ISQL> means "unknown". For this reason, both <ISQL>TRUE AND NULL</ISQL> as well as <ISQL>FALSE OR NULL</ISQL> resolve to <ISQL>NULL</ISQL>: their outcomes are unknown. However, <ISQL>FALSE AND NULL</ISQL> will certainly be <ISQL>FALSE</ISQL>, and <ISQL>TRUE OR NULL</ISQL> will always be <ISQL>TRUE</ISQL>, because no matter what value this unknown <ISQL>NULL</ISQL> may have, the outcome is already clear.</Info>
@@ -42,12 +42,12 @@ export function Theory() {
     <Section title={<>Negate conditions using <ISQL>NOT</ISQL></>}>
       <Par>Suppose that we want to find all employees that are <Em>not</Em> active transportation supervisors. To do so, we can use the <ISQL>NOT</ISQL> keyword.</Par>
       <FigureCombinedCondition c1="status" v1="active" c2="position" v2="transportation supervisor" combiner="AND" addNot={true} />
-      <Par>The <ISQL>NOT</ISQL> keyword expects a <ISQL>TRUE</ISQL>/<ISQL>FALSE</ISQL>/<ISQL>NULL</ISQL> value after it. It then inverts this value: <ISQL>NOT TRUE</ISQL> resolves to <ISQL>FALSE</ISQL> and <ISQL>NOT FALSE</ISQL> resolves as <ISQL>TRUE</ISQL>. (<ISQL>NOT NULL</ISQL> reduces to <ISQL>NULL</ISQL>, since the opposite of an unknown result is still unknown.)</Par>
+      <Par>The <ISQL>NOT</ISQL> keyword expects a <ISQL>TRUE</ISQL>/<ISQL>FALSE</ISQL>/<ISQL>NULL</ISQL> value after it. It then inverts this value: <ISQL>NOT TRUE</ISQL> resolves to <ISQL>FALSE</ISQL> and <ISQL>NOT FALSE</ISQL> resolves as <ISQL>TRUE</ISQL>. <ISQL>NOT NULL</ISQL> reduces to <ISQL>NULL</ISQL>, since the opposite of an unknown result is still unknown.</Par>
     </Section>
 
     <Section title="Use logic theory to rewrite conditions">
       <Par>Conditions can often be <Term>rewritten</Term>: we adjust them such that they still do the <Em>same</Em> thing. As a simple example, <ISQL>NOT status = 'active'</ISQL> can also be written as <ISQL>{`status <> 'active'`}</ISQL>.</Par>
-      <Par>A powerful trick in rewriting conditions is to expand brackes with <ISQL>NOT</ISQL>.
+      <Par>A powerful trick in rewriting conditions is to expand brackes with <ISQL>NOT</ISQL>. Suppose <ISQL>c1</ISQL> and <ISQL>c2</ISQL> are any conditions.
         <List items={[
           <><ISQL>NOT (c1 AND c2)</ISQL> may be written as <ISQL>NOT c1 OR NOT c2</ISQL>.</>,
           <><ISQL>NOT (c1 OR c2)</ISQL> may be written as <ISQL>NOT c1 AND NOT c2</ISQL>.</>,
@@ -67,7 +67,7 @@ WHERE NOT status = 'active' OR NOT position = 'transportation supervisor';`} />
 SELECT *
 FROM emp_data
 WHERE perf_score BETWEEN 70 AND 80;`} />
-      <Par>Now suppose we want to find all employees that are either on sick leave or on paid leave. The normal method is to use the condition <ISQL>status = 'sick leave' OR status = 'paid leave'</ISQL>. The short-cut is to create a list <ISQL>('sick leave', 'paid leave')</ISQL> of statuses we look for, and see if the status is <ISQL>IN</ISQL> this list.</Par>
+      <Par>Now suppose that we want to find all employees that are either on sick leave or on paid leave. The normal method is to use the condition <ISQL>status = 'sick leave' OR status = 'paid leave'</ISQL>. The short-cut is to create a list <ISQL>('sick leave', 'paid leave')</ISQL> of statuses we look for, and see if the status is <ISQL>IN</ISQL> this list.</Par>
       <FigureRewrittenQuery query={`
 SELECT *
 FROM emp_data
@@ -95,7 +95,7 @@ WHERE status = 'active'`} query2={`SELECT *
 FROM emp_data
 WHERE position = 'transportation supervisor'`} operator="EXCEPT" />
       <Par>Since the <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL> keywords do very similar things as <ISQL>AND</ISQL>, <ISQL>OR</ISQL> and <ISQL>NOT</ISQL>, their usage is not so common, but there are a few edge cases where they can be really useful.</Par>
-      <Info>Contrary to set theory in mathematics, SQL allows duplicate rows. The <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL> have fixed rules of how to deal with duplicate rows. If table A has five identical rows, and table B has three identical rows, then their <ISQL>UNION</ISQL> has five rows (maximum), their <ISQL>INTERSECT</ISQL> has three rows (minimum) and their <ISQL>EXCEPT</ISQL> has two rows (A minus B).</Info>
+      <Info>Contrary to set theory in mathematics, SQL allows duplicate rows. The <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL> have fixed rules of how to deal with duplicate rows. Suppose that table A consists of five identical rows, and table B consists of three of the same identical rows. Then <ISQL>A UNION B</ISQL> has five rows (maximum), <ISQL>A INTERSECT B</ISQL> has three rows (minimum) and <ISQL>A EXCEPT B</ISQL> has two rows (minus).</Info>
     </Section>
   </Page>;
 }
@@ -154,11 +154,12 @@ function FigureAndExplanation() {
   const db = useTheorySampleDatabase();
   const status = 'active';
   const position = 'director of pr';
+  const examplePosition = 'CIO';
   const data = useQueryResult(db?.database, `
 SELECT position, status
 FROM emp_data
 WHERE status = '${status}'
-  AND position = '${position}'
+  AND position = '${examplePosition}'
 LIMIT 1;`);
 
   // Find the editor bounds.
@@ -312,8 +313,9 @@ ${query2}`);
 
   const w1 = Math.max(e1Bounds?.width || 200, e2Bounds?.width || 200, eBounds?.width || 200);
   const delta3 = 50;
-  const w2 = 600;
+  const w2 = 700;
   const width = w1 + delta3 + w2;
+  const tableScale = 0.8;
 
   return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width} disableSVGPointerEvents>
     <Element ref={e1Ref} position={[0, 0]} anchor={[-1, -1]} behind>
@@ -330,20 +332,20 @@ ${operator}
 ${query2}`}</SQLDisplay>
     </Element>
 
-    <Element position={[width, 0]} anchor={[1, -1]} scale={0.8} behind>
-      <Box sx={{ width: w2 / 0.8 }}>
+    <Element position={[width, 0]} anchor={[1, -1]} scale={tableScale} behind>
+      <Box sx={{ width: w2 / tableScale }}>
         <DataTable ref={t1Ref} data={data1} showPagination={false} compact />
       </Box>
     </Element>
 
-    <Element position={[width, h1 + delta1]} anchor={[1, -1]} scale={0.8} behind>
-      <Box sx={{ width: w2 / 0.8 }}>
+    <Element position={[width, h1 + delta1]} anchor={[1, -1]} scale={tableScale} behind>
+      <Box sx={{ width: w2 / tableScale }}>
         <DataTable ref={t2Ref} data={data2} showPagination={false} compact />
       </Box>
     </Element>
 
-    <Element position={[width, h1 + delta1 + h2 + delta2]} anchor={[1, -1]} scale={0.8} behind>
-      <Box sx={{ width: w2 / 0.8 }}>
+    <Element position={[width, h1 + delta1 + h2 + delta2]} anchor={[1, -1]} scale={tableScale} behind>
+      <Box sx={{ width: w2 / tableScale }}>
         <DataTable ref={tRef} data={data} showPagination={false} compact />
       </Box>
     </Element>

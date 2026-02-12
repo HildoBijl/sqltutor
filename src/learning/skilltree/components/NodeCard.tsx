@@ -1,8 +1,8 @@
 import { Vector } from "@/utils/geometry";
 import { Rectangle, Element } from "@/components";
-import { ContentMeta } from "@/curriculum";
+import { ModuleMeta } from "@/curriculum";
 import { cardWidth, cardHeight } from "../utils/settings";
-import { ContentPositionMeta } from "../utils/treeDefinition";
+import { ModulePositionMeta } from "../utils/treeDefinition";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import School from "@mui/icons-material/School";
@@ -15,8 +15,8 @@ import PushPinIcon from "@mui/icons-material/PushPin";
  * Renders the Rectangle with text directly inside the SVG.
  */
 interface NodeCardProps {
-  item: ContentMeta;
-  positionData: ContentPositionMeta;
+  item: ModuleMeta;
+  positionData: ModulePositionMeta;
   completed: boolean;
   isHovered: boolean;
   readyToLearn?: boolean;

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/learning/store";
-import { contentIndex, contentItems } from "@/curriculum/index";
+import { moduleIndex, moduleItems } from "@/curriculum/index";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
-import { useContentProgress } from "@/learning/hooks/useContentProgress";
+import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
-import { raContentPositions, raConnectors } from "@/learning/skilltree/ra-skilltree/ra-treeDefinition";
+import { raModulePositions, raConnectors } from "@/learning/skilltree/ra-skilltree/ra-treeDefinition";
 import { markSkillTreeVisited } from "@/learning/utils/skillTreeTracking";
 
 /*
@@ -23,19 +23,19 @@ export default function RALearningOverviewPage() {
     markSkillTreeVisited("ra");
   }, []);
 
-  const { isCompleted, getProgress } = useContentProgress(
-    contentIndex,
+  const { isCompleted, getProgress } = useModuleProgress(
+    moduleIndex,
     components
   );
 
-  const treeBounds = useTreeBounds(raContentPositions);
+  const treeBounds = useTreeBounds(raModulePositions);
 
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
         treeId="ra"
-        contentItems={contentItems}
-        contentPositions={raContentPositions}
+        moduleItems={moduleItems}
+        modulePositions={raModulePositions}
         treeBounds={treeBounds}
         visiblePaths={raConnectors}
         isCompleted={isCompleted}

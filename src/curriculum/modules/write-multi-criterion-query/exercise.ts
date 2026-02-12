@@ -3,7 +3,8 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 const EXERCISES: StaticExercise[] = [
   {
     id: 'multi-criterion-start-date-range',
-    prompt: 'Retrieve the first 10 employees whose start date falls between January 1 and September 30 of 2025, sorted by start date.',
+    version: 1,
+    prompt: 'Retrieve the first 10 employees whose start date falls between January 1 and September 30 of 2025 (inclusive), sorted by start date.',
     solution: `
 SELECT e_id, start_date, position, perf_score
 FROM emp_data
@@ -24,6 +25,7 @@ LIMIT 10;
 //   },
   {
     id: 'multi-criterion-work-status-active',
+    version: 1,
     prompt: 'Retrieve the employee ID, status, and monthly salary of employees whose status is active and whose whose monthly salary is either above 10,000 or below 1,000.',
     solution: `
 SELECT e_id, status, salary / 12 AS monthly_salary
@@ -34,6 +36,7 @@ WHERE status = 'active'
   },
   {
     id: 'multi-criterion-departments-expenditure',
+    version: 1,
     prompt: 'Retrieve an overview of department names and their budget per employee, sorted from highest to lowest. Exclude the departments of Human Resources, Customer Support and Public Relations in this overview.',
     solution: `
 SELECT d_name AS name,
@@ -53,4 +56,6 @@ export const {
   validateOutput,
   verifyOutput,
   getSolution,
+  listExercises,
+  getExerciseById,
 } = buildStaticExerciseModule(EXERCISES);
