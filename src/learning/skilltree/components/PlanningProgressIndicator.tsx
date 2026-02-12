@@ -59,7 +59,7 @@ export function PlanningProgressIndicator({
         }}
       />
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        {completedCount} / {totalCount} prerequisites completed
+        {completedCount} / {totalCount} modules completed
       </Typography>
     </Box>
   );

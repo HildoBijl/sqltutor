@@ -113,12 +113,12 @@ export function SkillTree({
 
   useEffect(() => {
     if (onGoalProgressChange && goalNodeId) {
-      const totalCount = goalPrerequisites.size;
-      const completedCount = Array.from(goalPrerequisites).filter((id) =>
+      const nodesOnPath = [...Array.from(goalPrerequisites), goalNodeId];
+      const totalCount = nodesOnPath.length;
+      const completedCount = nodesOnPath.filter((id) =>
         isCompleted(id),
       ).length;
 
-      const nodesOnPath = [...Array.from(goalPrerequisites), goalNodeId];
       const nextStep = nodesOnPath.find((id) => {
         if (isCompleted(id)) return false;
         const item = contentItems[id];
