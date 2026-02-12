@@ -27,6 +27,7 @@ import { useAppStore } from "@/learning/store";
  * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 interface SkillTreeCanvasProps {
+  treeId: string;
   contentItems: Record<string, ContentMeta>;
   contentPositions: Record<string, ContentPositionMeta>;
   treeBounds: {
@@ -47,6 +48,7 @@ interface SkillTreeCanvasProps {
 }
 
 export function SkillTreeCanvas({
+  treeId,
   contentItems,
   contentPositions,
   treeBounds,
@@ -69,8 +71,9 @@ export function SkillTreeCanvas({
     total: 0,
     nextStep: null as string | null,
   });
-  const goalNodeId = useAppStore((state) => state.goalNodeID);
-  const setGoalNodeId = useAppStore((state) => state.setGoalNodeID);
+  const goalNodeId = useAppStore((state) => state.goalNodeID[treeId] ?? null);
+  const setGoalNodeIdInStore = useAppStore((state) => state.setGoalNodeID);
+  const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
 
   useEffect(() => {
     if (goalNodeId) {

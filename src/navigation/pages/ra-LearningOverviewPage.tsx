@@ -33,6 +33,7 @@ export default function RALearningOverviewPage() {
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
+        treeId="ra"
         contentItems={contentItems}
         contentPositions={raContentPositions}
         treeBounds={treeBounds}

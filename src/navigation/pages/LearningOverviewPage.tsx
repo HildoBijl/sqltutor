@@ -32,6 +32,7 @@ export default function LearningOverviewPage() {
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
+        treeId="sql"
         contentItems={contentItems}
         contentPositions={contentPositions}
         treeBounds={treeBounds}
