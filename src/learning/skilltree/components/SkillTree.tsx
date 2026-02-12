@@ -1,4 +1,4 @@
-import { type RefObject, type ReactNode, useState, useEffect } from "react";
+import { type RefObject, type ReactNode, useState, useEffect, useMemo } from "react";
 import type { Vector } from "@/utils/geometry";
 import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
 import { ContentMeta } from "@/curriculum";
@@ -104,9 +104,12 @@ export function SkillTree({
   };
 
   // Calculate prerequisites for goal node in planning mode
-  const goalPrerequisites = goalNodeId
-    ? getPrerequisites(goalNodeId)
-    : new Set<string>();
+  const goalPrerequisites = useMemo(() => {
+    if (goalNodeId) {
+      return getPrerequisites(goalNodeId);
+    }
+    return new Set<string>();
+  }, [goalNodeId, contentItems]);
 
   useEffect(() => {
     if (onGoalProgressChange && goalNodeId) {

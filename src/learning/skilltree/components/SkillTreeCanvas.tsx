@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect, useState, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
@@ -7,7 +7,7 @@ import { ContentPositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
-import { PlanningProgressIndicator} from "./PlanningProgressIndicator";
+import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
 import { useAppStore } from "@/learning/store";
 
@@ -64,17 +64,28 @@ export function SkillTreeCanvas({
 
   // Added for planning mode
   const [planningMode, setPlanningMode] = useState(false);
-  const [goalProgress, setGoalProgress] = useState({ completed: 0, total: 0, nextStep: null as string | null});
+  const [goalProgress, setGoalProgress] = useState({
+    completed: 0,
+    total: 0,
+    nextStep: null as string | null,
+  });
   const goalNodeId = useAppStore((state) => state.goalNodeID);
   const setGoalNodeId = useAppStore((state) => state.setGoalNodeID);
 
   useEffect(() => {
-  if (goalNodeId) {
-    setPlanningMode(true);
-  }
-}, [goalNodeId]);
+    if (goalNodeId) {
+      setPlanningMode(true);
+    }
+  }, [goalNodeId]);
 
   const theme = useTheme();
+
+  const handleGoalProgressChange = useCallback(
+    (completed: number, total: number, nextStep: string | null) => {
+      setGoalProgress({ completed, total, nextStep });
+    },
+    [],
+  );
 
   return (
     <div
@@ -121,7 +132,6 @@ export function SkillTreeCanvas({
                 nextStepName={goalProgress.nextStep || "All completed!"}
                 completedCount={goalProgress.completed}
                 totalCount={goalProgress.total}
-                
               />
             )}
             <TreeLegend />
@@ -154,9 +164,7 @@ export function SkillTreeCanvas({
                 planningMode={planningMode}
                 goalNodeId={goalNodeId}
                 setGoalNodeId={setGoalNodeId}
-                onGoalProgressChange={(completed, total, nextStep) =>
-                  setGoalProgress({ completed, total, nextStep })
-                }
+                onGoalProgressChange={handleGoalProgressChange}
               />
             </TransformComponent>
           </div>
