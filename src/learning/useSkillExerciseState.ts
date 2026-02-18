@@ -14,14 +14,14 @@ import {
   type VerificationResult,
   type ValidateInputArgs,
 } from './engine';
+import { useComponentState } from '@/learning/hooks/useComponentState';
 import {
-  useComponentState,
   type ExerciseInstanceId,
   type SkillComponentState,
   type StoredExerciseEvent,
   type StoredExerciseInstance,
   type StoredExerciseState,
-} from '@/learning/store';
+} from '@/store';
 import type { PracticeSolutionLike, PracticeSolution } from './types';
 import { normalizePracticeSolution } from './utils/normalizePracticeSolution';
 

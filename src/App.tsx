@@ -6,7 +6,7 @@ import { router } from './navigation';
 import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider, DatabaseProvider } from './components/sql/sqljs';
 import { ErrorBoundary } from './components';
-import { useAppStore, useIsStoreReady } from './learning/store';
+import { useAppStore, useIsStoreReady } from './store';
 
 export function App() {
   const mode = useAppStore((s) => s.currentTheme);
