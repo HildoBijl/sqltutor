@@ -1,4 +1,4 @@
-import { ensureInt, ensurePositive, compareNumbers, boundTo, findOptimum, findOptimumIndex, repeat } from '../javascript';
+import { ensureInt, ensurePositive, compareNumbers, clamp, findOptimum, findOptimumIndex, repeat } from '../javascript';
 import { Vector, ensureVector, type VectorInput } from './Vector';
 import { Span, ensureSpan, type SpanInput, type SpanSO } from './Span';
 import { ensureLine, Line, type LineInput } from './Line';
@@ -250,7 +250,7 @@ export class Rectangle {
 
 		// Handle the easy case where we don't forcefully put it on the edge.
 		if (!alwaysPutOnEdge || !this.contains(v))
-			return new Vector(v.coordinates.map((coord, axis) => boundTo(coord, ...this.getBounds(axis))));
+			return new Vector(v.coordinates.map((coord, axis) => clamp(coord, ...this.getBounds(axis))));
 
 		// The point is inside the Rectangle and must be moved to the edge. Find the axis along which the shortest distance can be moved to reach the rectangle, and then along this axis find the bound that is closest to the given point.
 		const distancesAlongAxes = v.coordinates.map((coord, axis) => Math.min(...this.getBounds(axis).map(bound => Math.abs(bound - coord))));
