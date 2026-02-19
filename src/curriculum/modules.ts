@@ -429,7 +429,6 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
 // The moduleItemsRaw contains all unprocessed modules, as an object.
 export const moduleItemsRaw: Record<string, ModuleMetaRaw> = keysToObject(moduleIndexRaw.map(item => item.id), (_: string, index: number) => moduleIndexRaw[index]);
 
-
 // Set up a new type for processed modules.
 export interface ModuleMeta extends ModuleMetaRaw {
   followUps: string[];
