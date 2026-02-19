@@ -19,6 +19,10 @@ export interface ModuleMetaRaw {
 
 // The moduleIndexRaw contains all definitions of modules, before being processed into more derived objects.
 const moduleIndexRaw: ModuleMetaRaw[] = [
+  /*
+   * Database concepts
+   */
+
   // Fundamental database concepts.
   {
     id: 'database',
@@ -79,12 +83,30 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     prerequisites: ['projection-and-filtering', 'foreign-key'],
   },
   {
+    id: 'database-view',
+    name: 'Database Views',
+    type: 'concept',
+    description: 'How can we represent new derived tables without storing new data?',
+    prerequisites: ['projection-and-filtering'],
+  },
+  {
     id: 'aggregation',
     name: 'Aggregation',
     type: 'concept',
     description: 'How can we merge multiple rows together into joint (aggregated) statistics?',
     prerequisites: ['data-types', 'projection-and-filtering'],
   },
+  {
+    id: 'recursive-query',
+    name: 'Recursive Queries',
+    type: 'concept',
+    description: 'How do we request data in an iterative way, jumping through links until we found everything?',
+    prerequisites: ['query-language', 'projection-and-filtering', 'foreign-key'],
+  },
+
+  /*
+   * SQL
+   */
 
   // SQL fundamentals.
   {
@@ -215,6 +237,10 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     prerequisites: ['pivot-table', 'write-single-criterion-query', 'aggregate-columns'],
   },
 
+  /*
+   * Relational Algebra
+   */
+
   // Relational Algebra fundamentals.
   {
     id: 'relational-algebra',
@@ -282,6 +308,121 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     type: 'skill',
     description: 'How do we set up relational algebra queries involving "for every" quantifiers and similar?',
     prerequisites: ['ra-set-up-multi-relation-query', 'ra-set-up-multi-condition-query', 'ra-set-up-multi-step-query'],
+  },
+
+  /*
+   * Datalog
+   */
+
+  // Positive Datalog.
+  {
+    id: 'datalog',
+    name: 'Datalog',
+    type: 'concept',
+    description: 'What is the Datalog query language, and what does a basic Datalog program look like?',
+    prerequisites: ['query-language', 'database-view'],
+  },
+  {
+    id: 'dl-define-projection-rule',
+    name: 'Define Projection Rule',
+    type: 'skill',
+    description: 'How do we use Datalog to apply projection and limit the arguments of a predicate?',
+    prerequisites: ['datalog'],
+  },
+  {
+    id: 'dl-define-filtering-rule',
+    name: 'Define Filtering Rule',
+    type: 'skill',
+    description: 'How do we use Datalog to filter the tuples within a predicate based on some condition?',
+    prerequisites: ['datalog'],
+  },
+  {
+    id: 'dl-define-derived-predicate',
+    name: 'Define Derived Predicate',
+    type: 'skill',
+    description: 'How can we set up a new view-like predicate from a single existing predicate?',
+    prerequisites: ['dl-define-projection-rule', 'dl-define-filtering-rule'],
+  },
+  {
+    id: 'dl-define-join-rule',
+    name: 'Define Join Rule',
+    type: 'skill',
+    description: 'How can we join multiple predicates together to set up new multi-predicate views?',
+    prerequisites: ['join-and-decomposition', 'dl-define-projection-rule', 'dl-define-filtering-rule'],
+  },
+
+  // Datalog with negation.
+  {
+    id: 'dl-rule-safety',
+    name: 'Rule Safety',
+    type: 'concept',
+    description: 'How does negation and/or arithmetic potentially lead to infinite outputs in Datalog?',
+    prerequisites: ['datalog'],
+  },
+  {
+    id: 'dl-check-rule-safety',
+    name: 'Check Rule Safety',
+    type: 'skill',
+    description: 'How can we check whether a Datalog rule is safe or not?',
+    prerequisites: ['dl-rule-safety'],
+  },
+  {
+    id: 'dl-define-negation-rule',
+    name: 'Define Negation Rule',
+    type: 'skill',
+    description: 'How can we adequately apply the word "not" in some Datalog rule?',
+    prerequisites: ['database-keys', 'dl-rule-safety', 'dl-define-derived-predicate'],
+  },
+  {
+    id: 'dl-write-multi-rule-program',
+    name: 'Write Multi-Rule Program',
+    type: 'skill',
+    description: 'How can we set up more complex Datalog predicates, combining joins with negation?',
+    prerequisites: ['dl-define-derived-predicate', 'dl-define-join-rule', 'dl-define-negation-rule'],
+  },
+
+  // Recursive Datalog.
+  {
+    id: 'dl-define-recursive-predicate',
+    name: 'Check Rule Safety',
+    type: 'skill',
+    description: 'How can we check whether a Datalog rule is safe or not?',
+    prerequisites: ['recursive-query', 'dl-define-derived-predicate'],
+  },
+  {
+    id: 'dl-predicate-dependency-graph',
+    name: 'Predicate Dependency Graph',
+    type: 'concept',
+    description: 'How can the structure of a Datalog program be visualized through the dependencies between predicates?',
+    prerequisites: ['datalog', 'recursive-query'],
+  },
+  {
+    id: 'dl-draw-predicate-dependency-graph',
+    name: 'Draw Predicate Dependency Graph',
+    type: 'skill',
+    description: 'How do we draw a Predicate Dependency Graph?',
+    prerequisites: ['dl-predicate-dependency-graph'],
+  },
+  {
+    id: 'dl-semi-positive-and-stratified-datalog',
+    name: 'Semi-Positive and Stratified Datalog',
+    type: 'concept',
+    description: 'How does restricting negation in Datalog affect the meaning and behavior of programs?',
+    prerequisites: ['dl-rule-safety', 'dl-predicate-dependency-graph'],
+  },
+  {
+    id: 'dl-check-program-stratification',
+    name: 'Check Program Stratification',
+    type: 'skill',
+    description: 'How can we determine if a Datalog program is stratified?',
+    prerequisites: ['dl-draw-predicate-dependency-graph', 'dl-semi-positive-and-stratified-datalog'],
+  },
+  {
+    id: 'dl-write-recursive-program',
+    name: 'Write Recursive Program',
+    type: 'skill',
+    description: 'How can we safely combine recursion and negation in Datalog programs to guarantee well-defined behavior?',
+    prerequisites: ['dl-write-multi-rule-program', 'dl-define-recursive-predicate', 'dl-check-program-stratification'],
   },
 ];
 
