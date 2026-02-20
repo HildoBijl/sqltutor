@@ -33,7 +33,7 @@ export function Theory() {
       ]} />
       <Par>And there are many more possible table manipulation operations.</Par>
     </Section>
-  </Page >;
+  </Page>;
 }
 
 function FigureProjection() {

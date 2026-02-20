@@ -41,5 +41,5 @@ export function Theory() {
       <Par>Once more, the solution is to create a view: the manager contact data view. We can then specifically give all employees access to this view, while only HR employees get access to the full employee table. Privacy breach averted! So with views we can properly control who can access which data, regardless of how the data is actually stored.</Par>
       <Info>A small note on terminology: we distinguish <Term>base tables</Term> (the tables that are stored) and <Term>views</Term> (tables that are not stored, but can be derived using fixed instructions). We call the original database (all base tables) the <Term>Extensional Database</Term> (EDB) and the extra tables added through views the <Term>Intensional Database</Term> (IDB). Those latter terms are however only used when you dive further into logic theory, for instance when using query languages like Datalog. So there's a good chance you'll never see them again.</Info>
     </Section>
-  </Page >;
+  </Page>;
 }
