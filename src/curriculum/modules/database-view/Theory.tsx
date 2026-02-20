@@ -32,7 +32,14 @@ export function Theory() {
       <Quote>Find the names of all department managers with a 650 area code.</Quote>
       <FigureSingleTable query={`SELECT first_name AS manager_name FROM departments JOIN employees ON manager_id=e_id WHERE phone LIKE '650%';`} tableWidth={100} tableScale={0.8} />
       <Par>The DBMS once more assembles the table for us, and then applies the requested operations.</Par>
-      <Info>Views are useful tools to easily access derived data, making queries more reusable. Another powerful use case is <Term>access control</Term>. In our example, we <Em>don't</Em> want to give all employees access to the full "employees" table: that would be a huge violation of privacy! But we <Em>can</Em> give all employees access to the "manager contact data" info. By setting up views and defining who has access to which view, we can easily manage who has access to which data, regardless of how we actually store that data.</Info>
+      <Info>Okay, in practice, the above isn't fully correct: the DBMS doesn't assemble the full manager contact data table. It always tries to make some optimizations. For example, in the above case, the department names aren't relevant, so those are never looked up. But again, query optimization is a whole concept of its own.</Info>
+    </Section>
+
+    <Section title="Use cases for views">
+      <Par>Views are useful tools to easily access derived data. As we have seen above, if we have set up some useful derived table, we can turn it into a view, and then easily access it later on.</Par>
+      <Par>Another powerful use case is <Term>access control</Term>. In our example, we want to give all company employees access to the phone numbers of all department managers. These phone numbers are stored in the "employees" table. But we <Em>don't</Em> want to give all employees access to this table. That would be a huge violation of privacy!</Par>
+      <Par>Once more, the solution is to create a view: the manager contact data view. We can then specifically give all employees access to this view, while only HR employees get access to the full employee table. Privacy breach averted! So with views we can properly control who can access which data, regardless of how the data is actually stored.</Par>
+      <Info>A small note on terminology: we distinguish <Term>base tables</Term> (the tables that are stored) and <Term>views</Term> (tables that are not stored, but can be derived using fixed instructions). We call the original database (all base tables) the <Term>Extensional Database</Term> (EDB) and the extra tables added through views the <Term>Intensional Database</Term> (IDB). Those latter terms are however only used when you dive further into logic theory, for instance when using query languages like Datalog. So there's a good chance you'll never see them again.</Info>
     </Section>
   </Page >;
 }
