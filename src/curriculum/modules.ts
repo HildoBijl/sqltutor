@@ -354,7 +354,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
   // Datalog with negation.
   {
     id: 'dl-rule-safety',
-    name: 'Rule Safety',
+    name: 'Negative Literals and Rule Safety',
     type: 'concept',
     description: 'How does negation and/or arithmetic potentially lead to infinite outputs in Datalog?',
     prerequisites: ['datalog'],
@@ -384,9 +384,9 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
   // Recursive Datalog.
   {
     id: 'dl-define-recursive-predicate',
-    name: 'Check Rule Safety',
+    name: 'Define Recursive Predicate',
     type: 'skill',
-    description: 'How can we check whether a Datalog rule is safe or not?',
+    description: 'How can we define a recursive predicate in Datalog?',
     prerequisites: ['recursive-query', 'dl-define-derived-predicate'],
   },
   {

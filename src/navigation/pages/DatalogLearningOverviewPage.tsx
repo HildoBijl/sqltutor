@@ -19,7 +19,7 @@ export default function DatalogLearningOverviewPage() {
   const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
   useEffect(() => {
-    markSkillTreeVisited("sql");
+    markSkillTreeVisited("datalog");
   }, []);
 
   const { isCompleted, getProgress } = useModuleProgress(
