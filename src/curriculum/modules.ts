@@ -371,7 +371,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     name: 'Define Negation Rule',
     type: 'skill',
     description: 'How can we adequately apply the word "not" in some Datalog rule?',
-    prerequisites: ['database-keys', 'dl-rule-safety', 'dl-define-derived-predicate'],
+    prerequisites: ['database-keys', 'dl-check-rule-safety', 'dl-define-derived-predicate'],
   },
   {
     id: 'dl-write-multi-rule-program',

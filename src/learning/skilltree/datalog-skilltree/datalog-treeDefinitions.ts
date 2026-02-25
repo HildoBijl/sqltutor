@@ -36,37 +36,37 @@ export const treeWidth = x6 + cardWidth / 2 + margin;
 // Placeholder positions for RA skill tree
 const modulePositionsRaw: Record<string, ModulePositionMetaRaw> = {
     // Fundamental database concepts (shared with SQL and RA tree)
-	'database': { position: { x: (x2+x3)/2, y: y1 } },
-	'query-language': { position: { x: x3, y: y2 } },
-	'database-table': { position: { x: x2, y: y2 } },
-	'database-keys': { position: { x: x3, y: y3 } },
-    'projection-and-filtering': { position: { x: x2, y: y3 } },
+	'database': { position: { x: (x2+x4)/2, y: y1 } },
+	'query-language': { position: { x: (x3+x4)/2, y: y2 } },
+	'database-table': { position: { x: (x2+x3)/2, y: y2 } },
+	'database-keys': { position: { x: (x3+x4)/2, y: y3 } },
+    'projection-and-filtering': { position: { x: (x2+x3)/2, y: y3 } },
 
-    'database-view': { position: { x: x2, y: y4 } },
-    'foreign-key': { position: { x: x3, y: y4 } },
+    'database-view': { position: { x: (x2+x3)/2, y: y4 } },
+    'foreign-key': { position: { x: (x3+x4)/2, y: y4 } },
     'datalog': { position: { x: x2, y: y5 } },
     'join-and-decomposition': { position: { x: x3, y: y5 } },
     'recursive-query': { position: { x: x4, y: y5 } },
 
     // Datalog concepts
-    'dl-define-projection-rule': { position: { x: (x1+x2)/2, y: y6 } },
-    'dl-define-filtering-rule': { position: { x: (x2+x3)/2, y: y6 } },
-    'dl-rule-safety': { position: { x: (x3+x4)/2, y: y6 } },
-    'dl-predicate-dependency-graph': { position: { x: x5, y: y6 } },
+    'dl-define-projection-rule': { position: { x: x1, y: y6 } },
+    'dl-define-filtering-rule': { position: { x: x2, y: y6 } },
+    'dl-rule-safety': { position: { x: x3, y: y6 } },
+    'dl-predicate-dependency-graph': { position: { x: x4, y: y6 } },
 
-    'dl-define-derived-predicate': { position: { x: (x1+x2)/2, y: y7 } },
-    'dl-define-join-rule': { position: { x: (x2+x3)/2, y: y7 } },
-    'dl-check-rule-safety': { position: { x: (x3+x4)/2, y: y7 } },
-    'dl-draw-predicate-dependency-graph': { position: { x: x5, y: y7 } },
-    'dl-semi-positive-and-stratified-datalog': { position: { x: x6, y: y7 } },
+    'dl-define-derived-predicate': { position: { x: x1, y: y7 } },
+    'dl-define-join-rule': { position: { x: x2, y: y7 } },
+    'dl-check-rule-safety': { position: { x: x3, y: y7 } },
+    'dl-draw-predicate-dependency-graph': { position: { x: x4, y: y7 } },
+    'dl-semi-positive-and-stratified-datalog': { position: { x: x5, y: y7 } },
 
     'dl-define-negation-rule': { position: { x: (x4+x3)/2, y: y8 } },
     'dl-define-recursive-predicate': { position: { x: (x4+x5)/2, y: y8 } },
     'dl-check-program-stratification': { position: { x: x6, y: y8 } },
 
-    'dl-write-multi-rule-program': { position: { x: (x2+x3)/2, y: y9 } },
+    'dl-write-multi-rule-program': { position: { x: (x1+x2)/2, y: y9 } },
 
-    'dl-write-recursive-program': { position: { x: x4, y: y10} },
+    'dl-write-recursive-program': { position: { x: x3, y: y10} },
 
 
     
