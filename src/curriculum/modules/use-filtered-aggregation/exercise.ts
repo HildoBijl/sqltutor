@@ -47,7 +47,7 @@ HAVING MAX(perf_score) - MIN(perf_score) > 40;
   {
     id: 'filtered-aggregation-rejected-tx',
     version: 1,
-    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all vendors (their IDs), their total number of transactions, and the number of rejected transactions. Limit the output to those vendors with more than 50 rejected transactions.',
+    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all vendors (their IDs), their total number of transactions, and the number of rejected transactions. Limit the output to those vendors with more than 1 rejected transaction.',
     solution: `
 SELECT 
   vendor_id,
@@ -55,13 +55,13 @@ SELECT
   SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected_tx
 FROM transactions
 GROUP BY vendor_id
-HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 50;
+HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 1;
     `,
   },
   {
     id: 'filtered-aggregation-product-revenue',
     version: 1,
-    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all products (their IDs), the number of times it has been sold, and the total revenue obtained from the product. Limit the output to products whose total revenue is more than 20,000, yet the average transaction value is less than 10.',
+    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all products (their IDs), the number of times it has been sold, and the total revenue obtained from the product. Limit the output to products whose total revenue is more than 20,000, yet the average transaction value is less than 5000.',
     solution: `
 SELECT 
     prod_id,
@@ -69,7 +69,7 @@ SELECT
     SUM(amount) AS revenue
 FROM transactions
 GROUP BY prod_id
-HAVING AVG(amount) < 10 AND SUM(amount) > 20000;
+HAVING AVG(amount) < 5000 AND SUM(amount) > 20000;
     `,
   },
 ];
