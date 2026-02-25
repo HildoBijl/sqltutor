@@ -354,7 +354,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
   // Datalog with negation.
   {
     id: 'dl-rule-safety',
-    name: 'Negative Literals and Rule Safety',
+    name: 'Rule Safety',
     type: 'concept',
     description: 'How does negation and/or arithmetic potentially lead to infinite outputs in Datalog?',
     prerequisites: ['datalog'],
@@ -374,10 +374,10 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     prerequisites: ['database-keys', 'dl-check-rule-safety', 'dl-define-derived-predicate'],
   },
   {
-    id: 'dl-write-multi-rule-program',
-    name: 'Write Multi-Rule Program',
+    id: 'dl-write-multi-predicate-program',
+    name: 'Write Multi-Predicate Program',
     type: 'skill',
-    description: 'How can we set up more complex Datalog predicates, combining joins with negation?',
+    description: 'How can we set up more complex Datalog programs, combining joins with negation?',
     prerequisites: ['dl-define-derived-predicate', 'dl-define-join-rule', 'dl-define-negation-rule'],
   },
 
@@ -422,7 +422,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     name: 'Write Recursive Program',
     type: 'skill',
     description: 'How can we safely combine recursion and negation in Datalog programs to guarantee well-defined behavior?',
-    prerequisites: ['dl-write-multi-rule-program', 'dl-define-recursive-predicate', 'dl-check-program-stratification'],
+    prerequisites: ['dl-write-multi-predicate-program', 'dl-define-recursive-predicate', 'dl-check-program-stratification'],
   },
 ];
 
