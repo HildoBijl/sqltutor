@@ -7,7 +7,7 @@ const attributes = {
   p_id: 'id',
   name: 'string',
   category: 'string',
-  owner_id: 'string',
+  owned_by: 'string',
   est_value: 'number',
   status: 'string',
 } as const satisfies Attributes;
@@ -19,7 +19,7 @@ export const productsTable: TableDefinition = {
   p_id INTEGER PRIMARY KEY,
   name TEXT,
   category TEXT,
-  owner_id TEXT,
+  owned_by TEXT,
   est_value REAL,
   status TEXT,
   FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)

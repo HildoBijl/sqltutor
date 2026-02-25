@@ -4,12 +4,12 @@ import { parseCsv, buildRows } from '../../utils';
 import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
-  acct_id: 'string',
   username: 'string',
   phone: 'string',
   email: 'string',
   verified: 'boolean',
-  full_name: 'string',
+  first_name: 'string',
+  last_name: "string",
   address: 'string',
   city: 'string',
   created_at: 'date',
@@ -20,8 +20,7 @@ export const accountsTable: TableDefinition = {
   name: 'accounts',
   attributes,
   createStatement: `CREATE TABLE accounts (
-  acct_id TEXT PRIMARY KEY,
-  username TEXT,
+  username TEXT PRIMARY KEY,
   phone TEXT,
   email TEXT,
   email_verified BOOLEAN,

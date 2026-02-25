@@ -5,8 +5,8 @@ import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   t_id: 'id',
-  vendor_id: 'string',
-  buyer_id: 'string',
+  vendor_username: 'string',
+  buyer_username: 'string',
   prod_id: 'id',
   date_time: 'date',
   amount: 'number',
@@ -19,8 +19,8 @@ export const transactionsTable: TableDefinition = {
   attributes,
   createStatement: `CREATE TABLE transactions (
   t_id INTEGER PRIMARY KEY,
-  vendor_id TEXT,
-  buyer_id TEXT,
+  vendor_username TEXT,
+  buyer_username TEXT,
   prod_id INTEGER,
   date_time DATETIME,
   amount REAL,
