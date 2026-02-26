@@ -22,7 +22,7 @@ export const productsTable: TableDefinition = {
   owned_by TEXT,
   est_value REAL,
   status TEXT,
-  FOREIGN KEY (owner_id) REFERENCES accounts(acct_id)
+  FOREIGN KEY (owned_by) REFERENCES accounts(acct_id)
 );`,
   rows: {
     full: buildRows(parseCsv(fullCsv), attributes),

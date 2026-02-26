@@ -1,4 +1,4 @@
-t_id,vendor_username,buyer_username,prod_id,date_time, price  ,validated_by,status
+t_id,vendor_username,buyer_username,prod_id,date_time,price,validated_by,status
 1,Jim_Business,XxMrMelonxX,151879,7/11/2024,2,41378877,completed
 2,Jim_Business,Jim_Business,214320,11/20/2024,4,41651199,completed
 3,CANTSPOTUS,lizardman,732499,12/9/2023,200000,41378877,in_escrow

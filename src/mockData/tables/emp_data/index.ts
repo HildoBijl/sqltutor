@@ -20,8 +20,8 @@ export const empDataTable: TableDefinition = {
   e_id INTEGER NOT NULL,
   position TEXT,
   salary REAL,
-  start_date DATE,
-  end_date DATE,
+  start_date TEXT,
+  end_date TEXT,
   perf_score INTEGER,
   status TEXT,
   FOREIGN KEY (e_id) REFERENCES employees(e_id)
