@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 
-import { Page, Section, Par, List, Warning, Info, Quote, Term, Em } from '@/components';
+import { Page, Section, Par, List, Warning, Info, Quote, Term, Em, DL, IDL } from '@/components';
 
 import { useQueryResult, type QueryResult } from '@/components/sql/sqljs';
 import { useTheorySampleDatabase } from '@/learning/databases';
@@ -47,21 +47,19 @@ export function Theory() {
 
     <Section title="Step 2: the rules">
       <Par>The main part of any Datalog program is the rules part. In Datalog, we define a <Term>rule</Term> like this.</Par>
-      <Par><pre><code>
-        highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, c, hd, cs), cs &gt;= 200000.
-      </code></pre></Par>
+      <DL>highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, c, hd, cs), cs &gt;= 200000.</DL>
       <Par>This statement can be read in English as:</Par>
       <Quote>The tuple (id, fn, ln, p, e, a, c, hd, cs) is a highEarningEmployee, when the tuple (id, fn, ln, p, e, a, c, hd, cs) is an employee <strong>and</strong> when the value of cs is at least 200000.</Quote>
       <Par>To see why it says this, let's dissect the rule.</Par>
       <List items={[
         <>
-          <Par sx={{ mb: 0.5 }}>On the left is the <Term>head</Term> of the rule: <code>highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs)</code>. We can see this as a claim someone can make: a potential new fact that may be true. <Em>The tuple (id, fn, ln, p, e, a, c, hd, cs) is considered a high-earning employee.</Em></Par>
+          <Par sx={{ mb: 0.5 }}>On the left is the <Term>head</Term> of the rule: <IDL>highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs)</IDL>. We can see this as a claim someone can make: a potential new fact that may be true. <Em>The tuple (id, fn, ln, p, e, a, c, hd, cs) is considered a high-earning employee.</Em></Par>
           <Info>We may use any argument names we like – only the order matters – so for convenience we use short argument names.</Info>
         </>,
         <>In-between is the <Term>rule operator</Term> ":-". It can be read as "is true when". This is the main operator in Datalog to define rules.</>,
         <>On the right is the <Term>body</Term> of the rule. It is a list of <Term>literals</Term>: claims that may or may not be true, based on existing data. The literals are separated by commas, where each comma functions as an "and". The rule only evaluates to true when <Em>all</Em> literals hold true.
           <List sx={{ listStyleType: 'circle' }} items={[
-            <>The first literal requires the fact <code>employee(id, fn, ln, p, e, a, c, hd, cs)</code> to be true. Or thinking in terms of tables: "The row (id, fn, ln, p, e, a, c, hd, cs) is in the employees table."</>,
+            <>The first literal requires the fact <IDL>employee(id, fn, ln, p, e, a, c, hd, cs)</IDL> to be true. Or thinking in terms of tables: "The row (id, fn, ln, p, e, a, c, hd, cs) is in the employees table."</>,
             <>The second literal adds an extra condition for the variable cs: it must be at least 200000.</>,
           ]} />
         </>,
@@ -72,9 +70,7 @@ export function Theory() {
       <Par>Or displayed more clearly for us, as a table:</Par>
       <FigureSingleTable query={q2} title="High-earning employees" tableWidth={750} tableScale={0.6} />
       <Par>A typical <Term>Datalog program</Term> contains multiple rules. We could for instance find the names of these high-earning employees with a second rule.</Par>
-      <Par><pre><code>
-        highEarningEmployeeName(fn, ln) :- highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs).
-      </code></pre></Par>
+      <DL>highEarningEmployeeName(fn, ln) :- highEarningEmployee(id, fn, ln, p, e, a, c, hd, cs).</DL>
       <Par>We can read this in English as:</Par>
       <Quote>The tuple (fn, ln) is a high-earning employee name, when there exists some combination of values (id, fn, ln, p, e, a, c, hd, cs) that is considered a high-earning employee.</Quote>
       <Par>It creates yet another predicate for us.</Par>
@@ -85,17 +81,17 @@ export function Theory() {
 
     <Section title="Step 3: the query">
       <Par>Eventually we want to get some data out of a Datalog program. That is done through the third step: the <Term>query</Term>. A typical Datalog query is:</Par>
-      <Par><pre><code>?- highEarningEmployeeName(firstName, lastName).</code></pre></Par>
+      <DL>?- highEarningEmployeeName(firstName, lastName).</DL>
       <Par>In English language, this command can be read as:</Par>
       <Quote>Find all variables firstName and lastName for which (firstName, lastName) is a high-earning employee name.</Quote>
       <Par>At this point Datalog will do all the work. (Note that it didn't do any work when we only defined rules.) It then generates the following output.</Par>
       <DatalogOutput data={{ values: data3.values, columns: ['firstName', 'lastName'] }} />
       <Info>The above is how Datalog usually returns data. On SQL Valley, we will display the output of Datalog programs as tables, rather than in the usual Datalog format, just so it's easier for us to understand it. Just keep in mind that Datalog doesn't actually work with tables.</Info>
-      <Par>Let's dissect what is happening in the query. The command "?-" can be read as "Find all possible combinations of variables for which ...". Within the query, there are only two variables: <code>firstName</code> and <code>lastName</code>. Datalog will find <Em>all</Em> possible combinations of values for these variables for which all the given literals (conditions) hold true. It then outputs these combinations of variables.</Par>
+      <Par>Let's dissect what is happening in the query. The command "?-" can be read as "Find all possible combinations of variables for which ...". Within the query, there are only two variables: <IDL>firstName</IDL> and <IDL>lastName</IDL>. Datalog will find <Em>all</Em> possible combinations of values for these variables for which all the given literals (conditions) hold true. It then outputs these combinations of variables.</Par>
       <Info>Note that in the output step the variable names do matter! It is how Datalog shows the output. Of course we can use any variable names that we want here.</Info>
       <Warning>Some Datalog engines don't use "?-" but instead use "?" for queries. When using Datalog, always check out the local syntax.</Warning>
       <Par>It is worthwhile to note that we could in theory also add more conditions to the query. In fact, we could have skipped the rules altogether and immediately set up the following query.</Par>
-      <Par><pre><code>?- employee(id, fn, ln, p, e, a, c, hd, cs), cs &gt;= 200000.</code></pre></Par>
+      <DL>?- employee(id, fn, ln, p, e, a, c, hd, cs), cs &gt;= 200000.</DL>
       <Par>This would instantly get us all high-earning employees (with all arguments). However, we are now setting up queries that contain conditions, which is generally frowned upon in Datalog. It's cleaner to first define a rule for a predicate (in table-terms: define a view) and only then set up a simple query that requests the full predicate (in table-terms: query the view). So we'll try to stick to that convention.</Par>
       <Info>Datalog programs can have any number of queries, each retrieving different data. When we set up Datalog programs, we will usually do so to find specific data, which is why our programs usually end with a single query. This query then marks the end of our program.</Info>
     </Section>
@@ -103,19 +99,19 @@ export function Theory() {
 }
 
 export function DatalogFacts({ data, predicate }: { data: QueryResult; predicate: string }) {
-  return <Par><pre><code>
+  return <DL>
     {data.values.map((fact, index) => <Fragment key={index}>
       {predicate}({fact.map(argument => JSON.stringify(argument)).join(', ')}).
       {index < data.values.length - 1 ? <br /> : null}
     </Fragment>)}
-  </code></pre></Par>
+  </DL>
 }
 
 export function DatalogOutput({ data }: { data: QueryResult }) {
-  return <Par><pre><code>
+  return <DL>
     {data.values.map((fact, index) => <Fragment key={index}>
       {fact.map((argument, argumentIndex) => `${data.columns[argumentIndex]} = ${JSON.stringify(argument)}`).join(', ')}
       {index < data.values.length - 1 ? <br /> : null}
     </Fragment>)}
-  </code></pre></Par>
+  </DL>
 }
