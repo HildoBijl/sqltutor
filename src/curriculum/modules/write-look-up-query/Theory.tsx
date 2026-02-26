@@ -59,9 +59,9 @@ WHERE EXISTS (
       <FigureExampleQuery query={`SELECT current_salary
 FROM employees
 WHERE e_id = 41651199;`} tableWidth={120} />
-      <Par>Then we go through all the contracts in <ISQL>emp_data</ISQL> to find which ones had a higher salary. That can be done through the following query.</Par>
+      <Par>Then we go through all the contracts in <ISQL>contracts</ISQL> to find which ones had a higher salary. That can be done through the following query.</Par>
       <FigureExampleQuery query={`SELECT DISTINCT e_id, position
-FROM emp_data
+FROM contracts
 WHERE salary > (
   SELECT current_salary
   FROM employees
@@ -70,22 +70,22 @@ WHERE salary > (
       <Par>This works because the inner query returns a table with only one column and one row: it gives a single value.</Par>
       <Par>If we want to compare against <Em>multiple</Em> values, we can use the <ISQL>ANY</ISQL>/<ISQL>SOME</ISQL> and <ISQL>ALL</ISQL> keywords. (The keywords <ISQL>ANY</ISQL> and <ISQL>SOME</ISQL> do the exact same thing.) Consider for instance the following request.</Par>
       <Quote>Find the names of all employees who currently earn more than any current or past salary of Elvis Vallelonga (ID <ISQL>41651199</ISQL>).</Quote>
-      <Par>We can find the current and past salaries through the <ISQL>emp_data</ISQL> table.</Par>
+      <Par>We can find the current and past salaries through the <ISQL>contracts</ISQL> table.</Par>
       <FigureExampleQuery query={`SELECT salary
-FROM emp_data
+FROM contracts
 WHERE e_id = 41651199 AND salary IS NOT NULL;`} tableWidth={260} />
       <Par>If we require some value to be bigger than <Em>all</Em> of these values, we use the <ISQL>ALL</ISQL> keyword.</Par>
       <FigureExampleQuery query={`SELECT first_name, last_name, current_salary
 FROM employees
 WHERE current_salary > ALL (
   SELECT salary
-  FROM emp_data
+  FROM contracts
   WHERE e_id = 41651199 AND salary IS NOT NULL
 );`} actualQuery={`SELECT first_name, last_name, current_salary
 FROM employees
 WHERE current_salary > (
   SELECT MAX(salary)
-  FROM emp_data
+  FROM contracts
   WHERE e_id = 41651199 AND salary IS NOT NULL
 );`} tableWidth={260} />
       <Warning>The <ISQL>ANY</ISQL>/<ISQL>SOME</ISQL> and <ISQL>ALL</ISQL> keywords work in nearly all DBMSs, but sadly not in SQLite. Since we use SQLite on SQL Valley, we cannot use those keywords on this site. Luckily there are various alternatives to do the same thing, for instance through <Link to="/skill/aggregate-columns">aggregation</Link>.</Warning>

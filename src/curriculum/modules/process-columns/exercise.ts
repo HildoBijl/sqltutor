@@ -4,10 +4,10 @@ const EXERCISES: StaticExercise[] = [
   {
     id: 'process-pay-ratio',
     version: 1,
-    prompt: 'Retrieve the employee ID, start date, and the ratio of salary to performance score for all employees.',
+    prompt: 'For all contracts, retrieve the employee ID, start date, and the ratio of salary to performance score.',
     solution: `
 SELECT e_id, start_date, salary / perf_score AS pay_ratio
-FROM emp_data;
+FROM contracts;
     `,
   },
   {
@@ -23,10 +23,10 @@ FROM departments;
   {
     id: 'process-date-flag',
     version: 1,
-    prompt: 'Retrieve the employee ID and a flag indicating if the start date is after the end date for each employee. (The flag is TRUE or 1 when the start date is after the end date, and FALSE or 0 when this is not the case. When any of the dates is NULL, the flag is also NULL.)',
+    prompt: 'For all contracts, retrieve the employee ID and a flag indicating if the start date is after the end date. (The flag is TRUE or 1 when the start date is after the end date, and FALSE or 0 when this is not the case. When any of the dates is NULL, the flag is also NULL.)',
     solution: `
 SELECT e_id, start_date > end_date AS wrong_info
-FROM emp_data;
+FROM contracts;
     `,
   },
 ];

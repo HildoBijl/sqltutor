@@ -8,7 +8,7 @@ export function Summary() {
     <Section>
       <Par>To <Term>filter rows</Term> using <Term>SQL</Term> we add the <ISQL>WHERE</ISQL> keyword to our query, followed by a condition like <ISQL>column_name = some_value</ISQL>. We can set up a comparison for equals <ISQL>=</ISQL>, unequals <ISQL>{`<>`}</ISQL>, larger than <ISQL>{`>`}</ISQL>, smaller than <ISQL>{`<`}</ISQL>, larger-or-equal <ISQL>{`>=`}</ISQL>, or smaller-or-equal <ISQL>{`<=`}</ISQL>. For larger/smaller than, text is compared lexicographically and dates/times are compared time-wise, with earlier being smaller.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position >= 's';`} columnName="position" />
       <Warning>When entering string values in SQL, always use <Em>single</Em> qoutation marks. Both "no quotation marks" and "double quotation marks" represent column/table names.</Warning>
       <Par>On top of the usual comparisons, there are various special comparison methods. <List items={[

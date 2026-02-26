@@ -19,7 +19,7 @@ export function Summary() {
       <FigureExampleQuery query={`SELECT
   position,
   0.3*salary AS taxes
-FROM emp_data
+FROM contracts
 WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={240} tableScale={0.7} />

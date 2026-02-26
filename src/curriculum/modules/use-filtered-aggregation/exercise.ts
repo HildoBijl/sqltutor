@@ -39,7 +39,7 @@ SELECT
   e_id,
   MIN(perf_score) AS lowest_score,
   MAX(perf_score) AS highest_score
-FROM emp_data
+FROM contracts
 GROUP BY e_id
 HAVING MAX(perf_score) - MIN(perf_score) > 40;
     `,

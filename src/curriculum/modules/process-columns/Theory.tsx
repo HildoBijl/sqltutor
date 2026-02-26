@@ -18,12 +18,12 @@ export function Theory() {
     </Section>
 
     <Section title="Create new (processed) columns">
-      <Par>Suppose that we have a list of employee data with corresponding salaries. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
+      <Par>Suppose that we have a list of contracts with corresponding salaries. When paying those salaries, taxes also need to be paid. We could calculate this income tax by multiplying the salaries by a factor, for instance <ISQL>0.3</ISQL>. (Or whatever the tax rate is.) In SQL it is possible to directly create a new column <ISQL>taxes</ISQL> whose value is <ISQL>0.3 * salary</ISQL>.</Par>
       <FigureExampleQuery query={`SELECT
   position,
   salary,
   0.3*salary AS taxes
-FROM emp_data;`} tableWidth={350} />
+FROM contracts;`} tableWidth={350} />
       <Par>Behind the scenes, the DBMS walks through all the rows. For each row, it performs the given calculation <ISQL>0.3*salary</ISQL>, where it uses the salary for that row. The result is then put this in the new <ISQL>taxes</ISQL> column. In this way, a new column is created within the query output.</Par>
     </Section>
 
@@ -90,7 +90,7 @@ FROM departments;`} tableWidth={350} />
   salary,
   perf_score,
   COALESCE(perf_score, salary/1000, 20) AS backup_score
-FROM emp_data;`} tableWidth={400} />
+FROM contracts;`} tableWidth={400} />
     </Section>
   </Page>;
 }

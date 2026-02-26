@@ -50,7 +50,7 @@ export function Theory() {
         </>,
       ]} />
       <Par>To show how this last point of "doing the opposite" idea works, we use an example. Suppose we want to find all the employees who have <Em>never</Em> been on sick leave. This sounds hard, but we could first do the opposite: we find the employees that <Em>have</Em> been on sick leave.</Par>
-      <RA>had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))</RA>
+      <RA>had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(contracts))</RA>
       <Par>The people who have <Em>never</Em> been on sick leave are all employees <Em>except</Em> the employees who had sick leave. So we <Term>flip</Term>/<Term>invert</Term> the relation: we take everyone except the employees we found.</Par>
       <RA>all_employees ← ∏<sub>e_id</sub>(employees)<br />never_had_sick_leave ← all_employees - had_sick_leave</RA>
       <Info>
@@ -61,11 +61,11 @@ export function Theory() {
       <Par>Optionally, we can again join in extra data as output for our final result.</Par>
       <Box>
         <FigureExampleRAQuery query={<>
-          had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(emp_data))<br />
+          had_sick_leave ← ∏<sub>e_id</sub>(σ<sub>status = "sick leave"</sub>(contracts))<br />
           all_employees ← ∏<sub>e_id</sub>(employees)<br />
           never_had_sick_leave ← all_employees - had_sick_leave<br />
           ∏<sub>first_name,last_name,salary</sub>(never_had_sick_leave ⋈ employees)
-        </>} actualQuery="SELECT first_name, last_name, current_salary FROM employees NATURAL JOIN (SELECT e_id FROM employees EXCEPT SELECT e_id FROM emp_data WHERE status = 'sick leave')" tableWidth={280} tableScale={0.8} />
+        </>} actualQuery="SELECT first_name, last_name, current_salary FROM employees NATURAL JOIN (SELECT e_id FROM employees EXCEPT SELECT e_id FROM contracts WHERE status = 'sick leave')" tableWidth={280} tableScale={0.8} />
       </Box>
       <Par>By using the above tips and tricks, you should be able to turn most data requests into properly functioning relational algebra scripts.</Par>
     </Section>

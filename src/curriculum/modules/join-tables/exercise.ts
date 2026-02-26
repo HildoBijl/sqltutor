@@ -20,7 +20,7 @@ WHERE e.hire_date < '2018-01-01';
     solution: `
 SELECT DISTINCT first_name, last_name, position
 FROM employees
-NATURAL LEFT JOIN emp_data;
+NATURAL LEFT JOIN contracts;
     `,
   },
   {
@@ -30,7 +30,7 @@ NATURAL LEFT JOIN emp_data;
     solution: `
 SELECT first_name, last_name, position, start_date, end_date
 FROM employees
-NATURAL JOIN emp_data
+NATURAL JOIN contracts
 WHERE status = 'sick leave';
     `,
   },

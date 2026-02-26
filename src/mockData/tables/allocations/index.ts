@@ -5,26 +5,18 @@ import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   e_id: 'id',
-  position: 'string',
-  salary: 'number',
-  start_date: 'date',
-  end_date: 'date',
-  perf_score: 'number',
-  status: 'string',
+  d_id: 'id',
 } as const satisfies Attributes;
 
-export const empDataTable: TableDefinition = {
-  name: 'emp_data',
+export const allocationsTable: TableDefinition = {
+  name: 'allocations',
   attributes,
-  createStatement: `CREATE TABLE emp_data (
+  createStatement: `CREATE TABLE allocations (
   e_id INTEGER NOT NULL,
-  position TEXT,
-  salary REAL,
-  start_date TEXT,
-  end_date TEXT,
-  perf_score INTEGER,
-  status TEXT,
-  FOREIGN KEY (e_id) REFERENCES employees(e_id)
+  d_id INTEGER NOT NULL,
+  PRIMARY KEY (e_id, d_id),
+  FOREIGN KEY (e_id) REFERENCES employees(e_id),
+  FOREIGN KEY (d_id) REFERENCES departments(d_id)
 );`,
   rows: {
     full: buildRows(parseCsv(fullCsv), attributes),

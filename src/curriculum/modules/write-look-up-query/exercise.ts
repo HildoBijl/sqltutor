@@ -24,7 +24,7 @@ SELECT first_name, last_name
 FROM employees
 WHERE e_id IN (
     SELECT e_id
-    FROM emp_data
+    FROM contracts
     WHERE position = 'warehouse associate'
 );
     `,
@@ -38,7 +38,7 @@ SELECT d_name
 FROM departments
 WHERE manager_id IN (
     SELECT e_id
-    FROM emp_data
+    FROM contracts
     WHERE status = 'sick leave'
 );
     `,
