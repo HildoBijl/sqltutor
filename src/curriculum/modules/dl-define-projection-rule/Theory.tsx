@@ -1,4 +1,4 @@
-import { Page, Section, Par, Info, Warning, List, Em, Term, DL, IDL } from '@/components';
+import { Page, Section, Par, Quote, Info, Warning, List, Em, Term, DL, IDL } from '@/components';
 import { FigureExampleDLQuery } from '../../utils';
 
 export function Theory() {
@@ -11,7 +11,9 @@ export function Theory() {
       <Par>Suppose that we have a predicate (table) containing all employees of a company. Let's say we only want the first name and last name from this predicate. How can this be achieved?</Par>
       <Par>The best way to do so, is by setting up a new predicate (like a view) that <Em>only</Em> has these arguments. This can be done in Datalog through</Par>
       <DL>employeeName(fn, ln) :- employee(id, fn, ln, p, e, a, c, hd, cs).</DL>
-      <Par>Let's study what's happening here.</Par>
+      <Par>You could read this rule as:</Par>
+      <Quote>The two values <IDL>(fn, ln)</IDL> are an employee name, if there is some set of values (id, fn, ln, p, e, a, c, hd, cs) that is known to be an employee.</Quote>
+      <Par>Behind the scenes, what happens is the following.</Par>
       <List items={[
         <>As always, Datalog will find all possible combinations of all variables such that all literals hold true. In this case, that's the set of <IDL>(id, fn, ln, p, e, a, c, hd, cs)</IDL> for which the entry appears in the employee predicate (table).</>,
         <>Datalog assembles a new predicate (a view) called <IDL>employeeName</IDL> with only two arguments: <IDL>fn</IDL> and <IDL>ln</IDL>, which correspond to the second and third argument from <IDL>employee</IDL>.</>,
@@ -22,7 +24,7 @@ export function Theory() {
       <Info>Datalog does not do duplicates. If there are multiple employees with the same first and last name, then they will only appear once in the <IDL>employeeName</IDL> predicate.</Info>
     </Section>
 
-    <Section title="Use the underscore for anonymous variables">
+    <Section title="Use anonymous variables to simplify the rule">
       <Par>The above Datalog rule is a bit elaborate: we have defined names for lots of variables which are subsequently not used. This can be easier.</Par>
       <Par>If we have variables that we don't use anywhere, we can replace them by the special underscore character <IDL>_</IDL>. This character effectively means, "I don't care what the value of this is, and I won't be using it anywhere." It turns the respective variable into an <Term>anonymous variable</Term>.</Par>
       <Par>Using this new symbol, we can rewrite the above query through</Par>
