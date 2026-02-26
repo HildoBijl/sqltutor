@@ -67,7 +67,7 @@ export default function SkillPage() {
     componentState,
     setComponentState,
   } = useContentTabs<SkillComponentState>(skillId, 'skill', availableTabs, {
-    defaultTab: 'practice',
+    defaultTab: 'theory',
   });
 
   const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId, {

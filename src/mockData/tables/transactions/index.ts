@@ -27,7 +27,7 @@ export const transactionsTable: TableDefinition = {
   validated_by INTEGER,
   status TEXT,
   FOREIGN KEY (vendor_username) REFERENCES accounts(username),
-  FOREIGN KEY (buyer_username) REFERENCES accounts(acct_id),
+  FOREIGN KEY (buyer_username) REFERENCES accounts(username),
   FOREIGN KEY (prod_id) REFERENCES products(p_id),
   FOREIGN KEY (validated_by) REFERENCES employees(e_id)
 );`,

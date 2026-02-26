@@ -40,7 +40,7 @@ WHERE status = 'sick leave';
   //     solution: `
   // SELECT t.prod_id, a.username
   // FROM transactions t
-  // JOIN accounts a ON t.vendor_id = a.acct_id
+  // JOIN accounts a ON t.vendor_username = a.username
   // WHERE t.date_time < a.created_at;
   //     `,
   //   },
@@ -50,8 +50,8 @@ WHERE status = 'sick leave';
   //     solution: `
   // SELECT vendor.full_name, customer.full_name
   // FROM transactions AS t
-  // JOIN accounts AS vendor ON vendor.acct_id = t.vendor_id
-  // JOIN accounts AS customer ON customer.acct_id = t.buyer_id
+  // JOIN accounts AS vendor ON vendor.username = t.vendor_username
+  // JOIN accounts AS customer ON customer.username = t.buyer_username
   // WHERE vendor.created_at = customer.created_at;
   //     `,
   //   },
@@ -62,7 +62,7 @@ WHERE status = 'sick leave';
   // SELECT t.amount, p.name
   // FROM transactions t
   // JOIN products p ON t.prod_id = p.p_id
-  // WHERE t.vendor_id != p.owner_id;
+  // WHERE t.vendor_username != p.owner_id;
   //     `,
   //   },
 ];

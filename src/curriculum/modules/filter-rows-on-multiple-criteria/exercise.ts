@@ -50,7 +50,7 @@ WHERE phone LIKE '408%'
 //     solution: `
 // SELECT *
 // FROM transactions
-// WHERE (vendor_id IS NULL OR buyer_id IS NULL)
+// WHERE (vendor_username IS NULL OR buyer_username IS NULL)
 //   AND status = 'approved';
 //     `,
 //   },
