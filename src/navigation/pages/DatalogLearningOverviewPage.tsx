@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
 import { useAppStore } from "@/store";
-import { moduleIndex, moduleItems } from "@/curriculum/index";
+import { moduleIndex, moduleItems } from "@/curriculum";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
-import { raModulePositions, raConnectors } from "@/learning/skilltree/ra-skilltree/ra-treeDefinition";
+import { datalogModulePositions, datalogConnectors } from "@/learning/skilltree/datalog-skilltree/datalog-treeDefinitions";
 import { markSkillTreeVisited } from "@/learning/utils/skillTreeTracking";
 
 /*
- * RALearningOverviewPage component that displays the Relational Algebra skill tree overview page.
- * This page is accessible at /learn-ra and shows the RA skill tree.
+ * Datalog-LearningOverviewPage component that displays the skill tree overview page.
  */
-export default function RALearningOverviewPage() {
+export default function DatalogLearningOverviewPage() {
   const components = useAppStore((state) => state.components);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -20,7 +19,7 @@ export default function RALearningOverviewPage() {
   const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
   useEffect(() => {
-    markSkillTreeVisited("ra");
+    markSkillTreeVisited("datalog");
   }, []);
 
   const { isCompleted, getProgress } = useModuleProgress(
@@ -28,15 +27,15 @@ export default function RALearningOverviewPage() {
     components
   );
 
-  const treeBounds = useTreeBounds(raModulePositions);
+  const treeBounds = useTreeBounds(datalogModulePositions);
 
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
         moduleItems={moduleItems}
-        modulePositions={raModulePositions}
+        modulePositions={datalogModulePositions}
         treeBounds={treeBounds}
-        visiblePaths={raConnectors}
+        visiblePaths={datalogConnectors}
         isCompleted={isCompleted}
         getProgress={getProgress}
         hoveredId={hoveredId}

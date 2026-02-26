@@ -58,7 +58,7 @@ export function Theory() {
       ]} />
       <Par>It's not necessary to remember all these types. The main lesson is that every data type has limitations on exactly what it can store and with what precision. These limitations should be taken into account.</Par>
     </Section>
-  </Page >;
+  </Page>;
 }
 
 export function FigureDataTypeDemo() {

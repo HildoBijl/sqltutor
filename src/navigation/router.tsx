@@ -5,6 +5,7 @@ import { LoadingScreen, ErrorBoundary } from "@/components";
 import HomePage from "./pages/HomePage";
 import LearningOverviewPage from "./pages/LearningOverviewPage";
 import RALearningOverviewPage from "./pages/ra-LearningOverviewPage";
+import DatalogLearningOverviewPage from "./pages/DatalogLearningOverviewPage";
 import ConceptPage from "./pages/ConceptPage";
 import SkillPage from "./pages/SkillPage";
 import PlaygroundPage from "./pages/PlaygroundPage";
@@ -52,6 +53,14 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrapper>
             <RALearningOverviewPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "learn-datalog",
+        element: (
+          <SuspenseWrapper>
+            <DatalogLearningOverviewPage />
           </SuspenseWrapper>
         ),
       },

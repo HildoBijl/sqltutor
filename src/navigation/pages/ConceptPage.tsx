@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Button, Alert } from '@mui/material';
 import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
 
-import { useAppStore, type ConceptComponentState } from '@/learning/store';
+import { useAppStore, type ConceptComponentState } from '@/store';
 import { moduleIndex, type ModuleMeta } from '@/curriculum';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useModuleProgress } from '@/learning/hooks/useModuleProgress';

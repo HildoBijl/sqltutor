@@ -1,3 +1,7 @@
+/**
+ * Learning store types.
+ */
+
 import type { ExerciseAction, ExerciseStatus } from '@/learning/engine';
 
 export type ExerciseInstanceId = string;
@@ -72,3 +76,5 @@ export type ComponentState =
   | ConceptComponentState
   | SkillComponentState
   | PlaygroundComponentState;
+
+export type ComponentType = ComponentState['type'];

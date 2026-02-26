@@ -51,6 +51,7 @@ FROM quarterly_performance;`} tableWidth={320} />
         ]} />
         <Par>To find the number of rows in the table, irrespective of <ISQL>NULL</ISQL> values, use <ISQL>COUNT(*)</ISQL> instead.</Par>
       </Info>
+      <Warning>Aggregation functions don't care about duplicates. When using <ISQL>COUNT</ISQL> on some column, it simply counts the number of values that are not <ISQL>NULL</ISQL>, regardless of any duplicate values being present. So <ISQL>COUNT(fiscal_year)</ISQL> results in <ISQL>6</ISQL>. If you want the number of <Em>unique</Em> values, apply <ISQL>DISTINCT</ISQL> to the column <Em>before</Em> aggregating. So <ISQL>COUNT(DISTINCT fiscal_year)</ISQL> will result in <ISQL>2</ISQL>.</Warning>
     </Section>
 
     <Section title="Group rows before aggregating">
