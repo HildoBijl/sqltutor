@@ -20,17 +20,17 @@ export function Theory() {
 
     <Section title="Use argument matching for equality constraints">
       <Par>So far we have used inequality constraints. If we have <Term>equality constraints</Term>, there's an extra short-cut.</Par>
-      <Par>Suppose that we want to find all employees named "Bob". We could do so using the method from above.</Par>
-      <FigureExampleDLQuery query={<>employeeNamedBob(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, c, hd, cs), fn = 'Bob'.</>} actualQuery="SELECT * FROM employees WHERE first_name = 'Bob'" tableWidth={940} below />
-      <Par>However, we could also directly fill in this name into the <IDL>employee</IDL> predicate. This is called <Term>argument matching</Term>. A naive implementation would be</Par>
-      <DL>employeeNamedBob(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, 'Bob', ln, p, e, a, c, hd, cs).</DL>
-      <Par>This almost works, except for one tiny problem. In the head (the left side) of the rule, there's a variable <IDL>fn</IDL> which isn't defined anywhere! This prevents the rule from working as intended.</Par>
-      <Par>One solution is to also fill in 'Bob' in the head of the rule.</Par>
-      <DL>employeeNamedBob(id, 'Bob', ln, p, e, a, c, hd, cs) :- employee(id, 'Bob', ln, p, e, a, c, hd, cs).</DL>
-      <Par>This would work. However, it's considered bad practice in Datalog, since the predicate name already specifies that it only contains employees named Bob. If we already know that all employees in this predicate have first name 'Bob', why would we still include this argument? It's far better to drop it. We then get the following query.</Par>
-      <FigureExampleDLQuery query={<>employeeNamedBob(id, ln, p, e, a, c, hd, cs) :- employee(id, 'Bob', ln, p, e, a, c, hd, cs).</>} actualQuery="SELECT e_id, last_name, phone, email, address, city, hire_date, current_salary FROM employees WHERE first_name = 'Bob'" tableWidth={940} below />
-      <Par>Note that we have lost a column along the way, but that's not a problem.</Par>
-      <Par>The above method of instantly filling in values into Datalog rules is very common practice. It's one of the things which keeps Datalog rules short, making them easy to read and write.</Par>
+      <Par>Suppose that we want to find all employees that live in Palo Alto. We could do so using the method from above.</Par>
+      <FigureExampleDLQuery query={<>employeeFromPaloAlto(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, c, hd, cs), c = 'Palo Alto'.</>} actualQuery="SELECT * FROM employees WHERE city='Palo Alto'" tableWidth={940} below />
+      <Par>This would work. However, as a short-cut, we could also directly fill in this name into the <IDL>employee</IDL> predicate. This is called <Term>argument matching</Term>. A naive implementation would be</Par>
+      <DL>employeeFromPaloAlto(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</DL>
+      <Par>This almost works, except for one tiny problem. In the head (the left side) of the rule, there's a variable <IDL>c</IDL> which isn't defined anywhere! This prevents the rule from working as intended.</Par>
+      <Par>One solution is to also fill in 'Palo Alto' in the head of the rule.</Par>
+      <DL>employeeFromPaloAlto(id, fn, ln, p, e, a, 'Palo Alto', hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</DL>
+      <Par>This would work. However, it's considered bad practice in Datalog. The predicate name here already specifies that the predicate only contains employees from Palo Alto. If all tuples in this predicate have their city equal to 'Palo Alto', why would we include this argument in the first place? It's easier to drop it. If we do, we get the following query.</Par>
+      <FigureExampleDLQuery query={<>employeeFromPaloAlto(id, fn, ln, p, e, a, hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</>} actualQuery="SELECT e_id, first_name, last_name, phone, email, address, hire_date, current_salary FROM employees WHERE city='Palo Alto'" tableWidth={940} below />
+      <Par>Note that we have lost a column along the way, which was exactly what we wanted.</Par>
+      <Info>Argument matching is a useful trick to keep Datalog rules short, making them easy to read and write. It's used very often in practice.</Info>
     </Section>
 
     <Section title="Use multiple rules for or-conditions">
@@ -38,8 +38,8 @@ export function Theory() {
       <Par>Or-conditions are far less common than and-conditions, so the syntax in Datalog is a bit more elaborate for it. To set up an or-condition, the idea is to use multiple rules.</Par>
       <FigureExampleDLQuery query={<>employeeFromHillyCity(id, fn, ln, p, e, a, 'Palo Alto', hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).<br/>employeeFromHillyCity(id, fn, ln, p, e, a, 'Los Altos', hd, cs) :- employee(id, fn, ln, p, e, a, 'Los Altos', hd, cs).</>} actualQuery="SELECT * FROM employees WHERE city='Palo Alto' OR city='Los Altos'" tableWidth={940} below />
       <Par>To people new to Datalog, it looks like we have defined the same predicate in two different ways, which would cause an error. But this is actually very far from the truth. In Datalog, it is very well possible to set up multiple rules for the same predicate. After all, they are <Em>rules</Em>, not definitions. We have effectively said the following:</Par>
-      <Quote>An employee lives in a hilly city if this employee is from Palo Alto.<br/>
-      An employee (also) lives in a hilly city, if this employee is from Los Altos.</Quote>
+      <Quote>An employee is from a hilly city, if this employee lives in Palo Alto.<br/>
+      An employee (also) is from a hilly city, if this employee lives in Los Altos.</Quote>
       <Par>If, for some set of variables, one (or both) of these rules holds true, then this set of variables is considered part of the predicate.</Par>
       <Info>Sometimes we have conditions that are a mix of and-conditions and or-conditions. In that case, it's best to set up <Em>multiple predicates</Em>. Suppose that we want to find all employees from Palo Alto and Los Altos earning more than 200000. We then <Em>first</Em> set up a list of all high-earning employees, and <Em>then</Em> restrict this list to people from hilly cities. (Or the other way around.) In Datalog, using lots of easily-defined predicates is better than trying to fit everything into one complicated rule.</Info>
     </Section>
