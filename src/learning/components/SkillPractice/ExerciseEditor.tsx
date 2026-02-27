@@ -27,7 +27,7 @@ export function ExerciseEditor({
       <SQLEditor
         value={query}
         onChange={onQueryChange}
-        height="200px"
+        height="125px" // Six rows of input should be sufficient.
         onExecute={onExecute}
         onLiveExecute={onLiveExecute}
         enableLiveExecution={!readOnly}
