@@ -6,7 +6,7 @@ import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable,
 import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
 
-export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 60, arrowRadius = 60, Component = RA }) {
+export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = false, tableWidth = 300, tableScale = 0.8, delta = 20, arrowLength = 50, arrowRadius = 60, Component = RA }) {
   const themeColor = useThemeColor();
   const [drawingRef, drawingData] = useRefWithValue<DrawingData>();
 
