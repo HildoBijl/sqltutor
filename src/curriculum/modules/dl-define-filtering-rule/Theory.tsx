@@ -4,7 +4,7 @@ import { FigureExampleDLQuery } from '../../utils';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know that <Term>filtering</Term> comes down to finding the right rows in a relation, subject to some condition. Let's take a look at how we can do that using Datalog.</Par>
+      <Par>We know that <Term>filtering</Term> comes down to finding the right rows in a table, subject to some condition. Let's take a look at how we can do that using Datalog.</Par>
     </Section>
 
     <Section title="Add constraints to rules to restrict arguments">
@@ -20,7 +20,7 @@ export function Theory() {
 
     <Section title="Use argument matching for equality constraints">
       <Par>So far we have used inequality constraints. If we have <Term>equality constraints</Term>, there's an extra short-cut.</Par>
-      <Par>Suppose that we want to find all employees that live in Palo Alto. We could do so using the method from above.</Par>
+      <Par>Suppose that we want to find all employees that live in Palo Alto. We could do so using the above method.</Par>
       <FigureExampleDLQuery query={<>employeeFromPaloAlto(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, c, hd, cs), c = 'Palo Alto'.</>} actualQuery="SELECT * FROM employees WHERE city='Palo Alto'" tableWidth={940} below />
       <Par>This would work. However, as a short-cut, we could also directly fill in this name into the <IDL>employee</IDL> predicate. This is called <Term>argument matching</Term>. A naive implementation would be</Par>
       <DL>employeeFromPaloAlto(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</DL>
@@ -35,12 +35,12 @@ export function Theory() {
 
     <Section title="Use multiple rules for or-conditions">
       <Par>So far we have set up rules where employees must require <Em>all</Em> conditions from a given list. But what if we have an or-condition: we are looking for employees that meet <Em>some</Em> of a list of conditions? What if we, for instance, want to find all employees living in either Palo Alto or Los Altos? (As their names imply, both these cities are rather hilly.)</Par>
-      <Par>Or-conditions are far less common than and-conditions, so the syntax in Datalog is a bit more elaborate for it. To set up an or-condition, the idea is to use multiple rules.</Par>
+      <Par>Or-conditions are far less common than and-conditions, so the syntax in Datalog is a bit more elaborate for it. To set up an or-condition, we use multiple rules for the same predicate.</Par>
       <FigureExampleDLQuery query={<>employeeFromHillyCity(id, fn, ln, p, e, a, 'Palo Alto', hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).<br/>employeeFromHillyCity(id, fn, ln, p, e, a, 'Los Altos', hd, cs) :- employee(id, fn, ln, p, e, a, 'Los Altos', hd, cs).</>} actualQuery="SELECT * FROM employees WHERE city='Palo Alto' OR city='Los Altos'" tableWidth={940} below />
       <Par>To people new to Datalog, it looks like we have defined the same predicate in two different ways, which would cause an error. But this is actually very far from the truth. In Datalog, it is very well possible to set up multiple rules for the same predicate. After all, they are <Em>rules</Em>, not definitions. We have effectively said the following:</Par>
       <Quote>An employee is from a hilly city, if this employee lives in Palo Alto.<br/>
       An employee (also) is from a hilly city, if this employee lives in Los Altos.</Quote>
-      <Par>If, for some set of variables, one (or both) of these rules holds true, then this set of variables is considered part of the predicate.</Par>
+      <Par>If, for some set of variables, the body of one (or both) of these rules holds true, then this set of variables is considered part of the predicate.</Par>
       <Info>Sometimes we have conditions that are a mix of and-conditions and or-conditions. In that case, it's best to set up <Em>multiple predicates</Em>. Suppose that we want to find all employees from Palo Alto and Los Altos earning more than 200000. We then <Em>first</Em> set up a list of all high-earning employees, and <Em>then</Em> restrict this list to people from hilly cities. (Or the other way around.) In Datalog, using lots of easily-defined predicates is better than trying to fit everything into one complicated rule.</Info>
     </Section>
   </Page>;

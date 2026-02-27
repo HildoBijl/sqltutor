@@ -10,7 +10,7 @@ export function Summary() {
       <FigureExampleDLQuery query={<>employeeFromPaloAlto(id, fn, ln, p, e, a, c, hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</>} actualQuery="SELECT e_id, first_name, last_name, phone, email, address, hire_date, current_salary FROM employees WHERE city='Palo Alto'" tableWidth={900} below />
       <Par>The comma in Datalog represents "and". To use an "or" connective, set up multiple rules for the same predicate.</Par>
       <FigureExampleDLQuery query={<>employeeFromHillyCity(id, fn, ln, p, e, a, 'Palo Alto', hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).<br />employeeFromHillyCity(id, fn, ln, p, e, a, 'Los Altos', hd, cs) :- employee(id, fn, ln, p, e, a, 'Los Altos', hd, cs).</>} actualQuery="SELECT * FROM employees WHERE city='Palo Alto' OR city='Los Altos'" tableWidth={980} below />
-      <Info>In the special case where "and" and "or" are both used, it's best to use multiple predicates, applying the filtering in steps.</Info>
+      <Info>In the special case where "and" and "or" are both used, it's best to use multiple predicates, applying the filtering condition in steps.</Info>
     </Section>
   </Page>;
 }

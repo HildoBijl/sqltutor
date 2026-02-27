@@ -4,11 +4,11 @@ import { FigureExampleDLQuery } from '../../utils';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know that <Term>projection</Term> comes down to selecting various columns from a relation. How do we do so using Datalog?</Par>
+      <Par>We know that <Term>projection</Term> comes down to selecting various columns from a table. How do we do so using Datalog?</Par>
     </Section>
 
     <Section title="Limit a predicate to specific variables">
-      <Par>Suppose that we have a predicate (table) containing all employees of a company. Let's say we only want the first name and last name from this predicate. How can this be achieved?</Par>
+      <Par>Suppose that we have a predicate (a table) containing all employees of a company. Let's say we only want the first name and last name from this predicate. How can this be achieved?</Par>
       <Par>The best way to do so, is by setting up a new predicate (like a view) that <Em>only</Em> has these arguments. This can be done in Datalog through</Par>
       <DL>employeeName(fn, ln) :- employee(id, fn, ln, p, e, a, c, hd, cs).</DL>
       <Par>You could read this rule as:</Par>
@@ -25,7 +25,7 @@ export function Theory() {
     </Section>
 
     <Section title="Use anonymous variables to simplify the rule">
-      <Par>The above Datalog rule is a bit elaborate: we have defined names for lots of variables which are subsequently not used. This can be easier.</Par>
+      <Par>The above Datalog rule is a bit elaborate: we have defined names for lots of variables which are subsequently not used. This can be done easier.</Par>
       <Par>If we have variables that we don't use anywhere, we can replace them by the special underscore character <IDL>_</IDL>. This character effectively means, "I don't care what the value of this is, and I won't be using it anywhere." It turns the respective variable into an <Term>anonymous variable</Term>.</Par>
       <Par>Using this new symbol, we can rewrite the above query through</Par>
       <FigureExampleDLQuery query={<>employeeName(fn, ln) :- employee(_, fn, ln, _, _, _, _, _, _).</>} actualQuery="SELECT first_name, last_name FROM employees" tableWidth={200} />
