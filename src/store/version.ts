@@ -6,12 +6,15 @@
 
 export const STORE_VERSION = 1;
 
+import type { PersistedMain } from './main/persist';
+import type { PersistedSettings } from './settings/persist';
+import type { PersistedLearning } from './learning/persist';
+
 export interface PersistedState {
   version?: number;
-  components?: Record<string, unknown>;
-  currentTheme?: string;
-  hideStories?: boolean;
-  practiceDatasetSize?: string;
+  main?: PersistedMain;
+  settings?: PersistedSettings;
+  learning?: PersistedLearning;
 }
 
 /** Migrations: index i transforms state from version i to version i+1 */

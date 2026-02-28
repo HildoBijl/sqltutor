@@ -78,3 +78,7 @@ export type ComponentState =
   | PlaygroundComponentState;
 
 export type ComponentType = ComponentState['type'];
+
+export interface LearningState {
+  components: Record<string, ComponentState>;
+}
