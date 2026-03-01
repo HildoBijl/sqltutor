@@ -1,4 +1,4 @@
-﻿t_id,vendor_username,buyer_username,prod_id,date_time,price,validated_by,status
+﻿t_id,vendor,buyer,prod_id,date_time,price,validated_by,status
 1,umothersdale6n,umothersdale6n,469008,24/10/2013,594820000,41378877,rejected
 2,drossonbl,drossonbl,318287,28/07/2013,136290000,41378877,pending
 3,drossonbl,ztavnerc4,110645,17/05/2013,50850000,41378877,pending

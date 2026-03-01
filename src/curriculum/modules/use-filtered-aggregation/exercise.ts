@@ -7,11 +7,11 @@ const EXERCISES: StaticExercise[] = [
     prompt: '[Exercise is under development: data may not be present yet.] Any transaction whose amount is less than 5 is considered a microtransaction. Create an overview of the buyers (their IDs) and the number of microtransactions they have made. Limit the output to buyers whose total amount spent is more than 20000.',
     solution: `
 SELECT 
-  buyer_username,
+  buyer,
   COUNT(*) AS num_micro_tx
 FROM transactions
 WHERE amount < 5.00        
-GROUP BY buyer_username
+GROUP BY buyer
 HAVING SUM(amount) > 20000;
     `,
   },

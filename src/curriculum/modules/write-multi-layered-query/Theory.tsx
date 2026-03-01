@@ -17,7 +17,7 @@ FROM employees
 WHERE current_salary < 200000;`} tableScale={0.8} tableWidth={120} />
       <Par>Then we need the transactions they have validated. This results in a subquery.</Par>
       <FigureExampleQuery query={`
-SELECT vendor_username, buyer_username
+SELECT vendor, buyer
 FROM transactions
 WHERE validated_by IN (
   SELECT e_id
@@ -26,7 +26,7 @@ WHERE validated_by IN (
 );`} tableScale={0.8} tableWidth={300} />
       <Par>We want a list of all involved users, so we need to merge the two lists. We can do that using a union.</Par>
       <FigureExampleQuery query={`
-SELECT vendor_username AS username
+SELECT vendor AS username
 FROM transactions
 WHERE validated_by IN (
   SELECT e_id
@@ -34,7 +34,7 @@ WHERE validated_by IN (
   WHERE current_salary < 200000
 )
 UNION
-SELECT buyer_username AS username
+SELECT buyer AS username
 FROM transactions
 WHERE validated_by IN (
   SELECT e_id
@@ -53,11 +53,11 @@ WITH low_salary_employees AS (
   WHERE current_salary < 200000
 )
 
-SELECT vendor_username AS username
+SELECT vendor AS username
 FROM transactions
 WHERE validated_by IN low_salary_employees
 UNION
-SELECT buyer_username AS username
+SELECT buyer AS username
 FROM transactions
 WHERE validated_by IN low_salary_employees;`} tableScale={0.8} tableWidth={150} />
       <Par>Such temporary tables are formally called <Term>Common Table Expressions (CTEs)</Term>. They are very powerful tools at structuring queries and making them easier to read. But keep in mind that they are temporary: as soon as the query ends they are forgotten!</Par>
@@ -74,9 +74,9 @@ WITH low_salary_employees AS (
   WHERE validated_by IN low_salary_employees
 )
 
-SELECT vendor_username AS username FROM affected_transactions
+SELECT vendor AS username FROM affected_transactions
 UNION
-SELECT buyer_username AS username FROM affected_transactions;`} tableScale={0.8} tableWidth={150} />
+SELECT buyer AS username FROM affected_transactions;`} tableScale={0.8} tableWidth={150} />
       <Warning>Later CTEs may use earlier ones, but not the other way around! Make sure you write your CTEs in a sensible order.</Warning>
       <Par>Let's continue extending our query. Now that the affected users are known, we should get their email addresses. We could do so through a nested query, but it's better to simply add yet another CTE.</Par>
       <FigureExampleQuery query={`
@@ -89,9 +89,9 @@ WITH low_salary_employees AS (
   FROM transactions
   WHERE validated_by IN low_salary_employees
 ), affected_users AS (
-  SELECT vendor_username AS username FROM affected_transactions
+  SELECT vendor AS username FROM affected_transactions
   UNION
-  SELECT buyer_username AS username FROM affected_transactions
+  SELECT buyer AS username FROM affected_transactions
 )
 
 SELECT email
@@ -102,7 +102,7 @@ WHERE username IN affected_users;`} tableScale={0.8} tableWidth={250} />
 SELECT email
 FROM accounts
 WHERE username IN (
-  SELECT vendor_username AS username
+  SELECT vendor AS username
   FROM transactions
   WHERE validated_by IN (
     SELECT e_id
@@ -110,7 +110,7 @@ WHERE username IN (
     WHERE current_salary < 200000
   )
   UNION
-  SELECT buyer_username AS username
+  SELECT buyer AS username
   FROM transactions
   WHERE validated_by IN (
     SELECT e_id
