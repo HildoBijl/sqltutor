@@ -1,4 +1,23 @@
+import { Fragment } from 'react';
+
+import { type TableKey } from '@/mockData';
 import { List, Term, RelationName, PrimaryKey, ForeignKey } from '@/components';
+
+export function SQLValleySchema({ tables = [], singular = false }: { tables: TableKey[], singular?: boolean }) {
+	const entries = {
+		departments: <><RelationName>department{singular ? '' : 's'}</RelationName> (<PrimaryKey>d_id</PrimaryKey>, d_name, manager_id, budget, nr_employees)</>,
+		employees: <><RelationName>employee{singular ? '' : 's'}</RelationName> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
+		emp_data: <><RelationName>emp_data</RelationName> (<PrimaryKey>e_id</PrimaryKey>, position, salary, start_date, end_date, perf_score, status)</>,
+		emp_dept: <><RelationName>emp_dept</RelationName> (<PrimaryKey>e_id</PrimaryKey>, <PrimaryKey>d_id</PrimaryKey>)</>,
+		accounts: <><RelationName>account{singular ? '' : 's'}</RelationName> (<PrimaryKey>acct_id</PrimaryKey>, username, phone, email, verified, full_name, address, city, created_at, last_login_at)</>,
+		products: <><RelationName>product{singular ? '' : 's'}</RelationName> (<PrimaryKey>p_id</PrimaryKey>, name, category, owner_id, est_value, status)</>,
+		transactions: <><RelationName>transaction{singular ? '' : 's'}</RelationName> (<PrimaryKey>t_id</PrimaryKey>, vendor_id, buyer_id, prod_id, date_time, amount, validated_by, status)</>,
+		expenses: <><RelationName>expense{singular ? '' : 's'}</RelationName> (<PrimaryKey>exp_id</PrimaryKey>, amount, d_id, description, date, requested_by, approved_by)</>,
+		quarterly_performance: <><RelationName>quarterly_performance</RelationName> (<PrimaryKey>quarter</PrimaryKey>, <PrimaryKey>fiscal_year</PrimaryKey>, revenue, operating_expenses, total_transactions, growth_rate, updated_at)</>,
+	}
+
+	return <List items={tables.map(table => <Fragment key={table}>{entries[table]}</Fragment>)} />
+}
 
 export function CompaniesSchema() {
 	return <List items={[
