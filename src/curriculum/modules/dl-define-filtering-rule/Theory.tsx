@@ -27,13 +27,13 @@ export function Theory() {
       <Par>This almost works, except for one tiny problem. In the head (the left side) of the rule, there's a variable <IDL>c</IDL> which isn't defined anywhere! This prevents the rule from working as intended.</Par>
       <Par>One solution is to also fill in 'Palo Alto' in the head of the rule.</Par>
       <DL>employeeFromPaloAlto(id, fn, ln, p, e, a, 'Palo Alto', hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</DL>
-      <Par>This would work. However, it's considered bad practice in Datalog.
-        <List items={[
-          <>We use the piece of text 'Palo Alto' twice in one rule. If we want to change this city, we'd have to change it in multiple locations, which is not ideal.</>,
-          <>Datalog considers the 'Palo Alto' string in the head as "new data" since technically it's a piece of text we as programmers wrote. Though technically allowed, it's considered cleaner if all data in derived Datalog predicates comes from facts (original tables).</>,
-          <>The predicate name <IDL>employeeFromPaloAlto</IDL> already specifies that the predicate only contains employees from Palo Alto. If all tuples in this predicate have their city equal to 'Palo Alto', why would we include this argument in the first place? It's a waste of space!</>,
-        ]} />
-        All these problems are solved if we drop the "city" argument (drop the column) from the predicate. If we do, we get the following query.</Par>
+      <Par>This would work. However, it's considered bad practice in Datalog, and there's three reasons why.</Par>
+      <List items={[
+        <>We use the piece of text 'Palo Alto' twice in one rule. If we want to change this city, we'd have to change it in multiple locations, which is not ideal.</>,
+        <>Datalog considers the 'Palo Alto' string in the head as "new data" since technically it's a piece of text we as programmers wrote. Though technically allowed, it's considered cleaner if all data in derived Datalog predicates comes from facts (original tables).</>,
+        <>The predicate name <IDL>employeeFromPaloAlto</IDL> already specifies that the predicate only contains employees from Palo Alto. If all tuples in this predicate have their city equal to 'Palo Alto', why would we include this argument in the first place? It's a waste of space!</>,
+      ]} />
+      <Par>All these problems are solved if we drop the "city" argument (drop the column) from the predicate.</Par>
       <FigureExampleDLQuery query={<>employeeFromPaloAlto(id, fn, ln, p, e, a, hd, cs) :- employee(id, fn, ln, p, e, a, 'Palo Alto', hd, cs).</>} actualQuery="SELECT e_id, first_name, last_name, phone, email, address, hire_date, current_salary FROM employees WHERE city='Palo Alto'" tableWidth={940} below />
       <Info>Argument matching is a useful trick to keep Datalog rules short, making them easy to read and write. It's used very often in practice.</Info>
     </Section>

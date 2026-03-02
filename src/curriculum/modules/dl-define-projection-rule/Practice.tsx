@@ -6,9 +6,9 @@ import { SQLValleySchema } from '../../utils';
 export function Practice() {
 	return <Page>
 		<Section>
-			<Par>The following exercises use the <Term>SQL Valley</Term> database. It is defined by the following schema.</Par>
+			<Par>The following exercises use the <Term>SQL Valley</Term> database. It contains the following predicates.</Par>
 			<SQLValleySchema tables={['departments', 'employees', 'products']} singular />
-			<Par>When an exercise says "Find ... " or "Create an overview of ... " then it means "Set up a rule (or rules) for a predicate that contains (and only contains) ... ".</Par>
+			<Par>When an exercise says "Find ... " or "Create an overview of ... " then it means "Set up a Datalog rule (or rules) for a new predicate that contains (and only contains) ... ".</Par>
 			<ManualExerciseSet exercises={exercises} />
 		</Section>
 	</Page>;
