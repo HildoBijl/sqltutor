@@ -23,9 +23,9 @@ export function Summary() {
         <>The <ISQL>EXCEPT</ISQL> command gathers all rows present in the first table but <Em>not</Em> in the second table (like a subtraction).</>,
       ]} />
       <FigureMergingTables query1={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status = 'sick leave'`} query2={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position = 'transportation supervisor'`} operator="UNION" />
     </Section>
   </Page>;
@@ -38,7 +38,7 @@ function FigureCombinedCondition() {
   // Set up query data.
   const query = `
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE NOT (status = 'paid leave' OR status = 'sick leave')
   AND start_date < '2023-01-01';`;
   const db = useTheorySampleDatabase();

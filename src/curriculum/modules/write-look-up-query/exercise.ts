@@ -24,7 +24,7 @@ SELECT first_name, last_name
 FROM employees
 WHERE e_id IN (
     SELECT e_id
-    FROM emp_data
+    FROM contracts
     WHERE position = 'warehouse associate'
 );
     `,
@@ -38,7 +38,7 @@ SELECT d_name
 FROM departments
 WHERE manager_id IN (
     SELECT e_id
-    FROM emp_data
+    FROM contracts
     WHERE status = 'sick leave'
 );
     `,
@@ -52,7 +52,7 @@ WHERE manager_id IN (
   // WHERE e_id IN (
   //   SELECT validated_by
   //   FROM transactions
-  //   WHERE buyer_id = vendor_id
+  //   WHERE buyer_username = vendor_username
   // );
   //     `,
   //   },
@@ -65,7 +65,7 @@ WHERE manager_id IN (
   // WHERE t.date_time < (
   //     SELECT a.created_at
   //     FROM accounts a
-  //     WHERE a.acct_id = t.vendor_id
+  //     WHERE a.username = t.vendor_username
   // );
   //     `,
   //   },

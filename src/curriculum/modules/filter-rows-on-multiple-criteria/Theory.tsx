@@ -15,7 +15,7 @@ export function Theory() {
     </Section>
 
     <Section title={<>Combine conditions using <ISQL>AND</ISQL></>}>
-      <Par>Suppose that we have a list of employee data and want to find all active PR directors. We now have two conditions: we want the employee contract to be active <Em>and</Em> we want the position to be "director of pr". To combine these two conditions in SQL, we can use the <ISQL>AND</ISQL> keyword.</Par>
+      <Par>Suppose that we have a list of contracts and want to find all active PR directors. We now have two conditions: we want the employee contract to be active <Em>and</Em> we want the position to be "director of pr". To combine these two conditions in SQL, we can use the <ISQL>AND</ISQL> keyword.</Par>
       <FigureCombinedCondition c1="status" v1="active" c2="position" v2="director of pr" combiner="AND" />
     </Section>
 
@@ -55,7 +55,7 @@ export function Theory() {
         In other words: pulling a <ISQL>NOT</ISQL> inside brackets will turn <ISQL>AND</ISQL> into <ISQL>OR</ISQL> and vice versa. This could help us recreate the previous table. We can rewrite the condition <ISQL>NOT (status = 'active' AND position = 'transportation supervisor')</ISQL>.</Par>
       <FigureRewrittenQuery query={`
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE NOT status = 'active' OR NOT position = 'transportation supervisor';`} />
       <Info>The <ISQL>NOT</ISQL> keyword is evaluated <Em>after</Em> the comparison, but <Em>before</Em> the <ISQL>OR</ISQL> keyword. The above condition is equivalent to <ISQL>{`(NOT (status = 'active')) OR (NOT (position = 'transportation supervisor'))`}</ISQL>. The brackets here can be added for clarity, but SQL programmers should know the evaluation orders, so usually they are omitted.</Info>
     </Section>
@@ -65,12 +65,12 @@ WHERE NOT status = 'active' OR NOT position = 'transportation supervisor';`} />
       <Par>Suppose that we want to find all employees having a performance score between <ISQL>70</ISQL> and <ISQL>80</ISQL> (inclusive). The normal method is to use the condition <ISQL>{`perf_score >= 70 AND perf_score <= 80`}</ISQL>. The short-cut says we can use the <ISQL>BETWEEN</ISQL> keyword.</Par>
       <FigureRewrittenQuery query={`
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE perf_score BETWEEN 70 AND 80;`} />
       <Par>Now suppose that we want to find all employees that are either on sick leave or on paid leave. The normal method is to use the condition <ISQL>status = 'sick leave' OR status = 'paid leave'</ISQL>. The short-cut is to create a list <ISQL>('sick leave', 'paid leave')</ISQL> of statuses we look for, and see if the status is <ISQL>IN</ISQL> this list.</Par>
       <FigureRewrittenQuery query={`
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE status IN ('sick leave', 'paid leave');`} />
       <Par>Given how broad SQL is, there are dozens more short-cuts like this. If you ever see a keyword you don't recognize, simply look up its specifications to see how it works. In this way, you learn more and more commands as you go.</Par>
     </Section>
@@ -78,21 +78,21 @@ WHERE status IN ('sick leave', 'paid leave');`} />
     <Section title={<>Merge tables using <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL></>}>
       <Par>A completely different way to combine different conditions is through <Term>merging tables</Term>. If we have two tables with <Em>identical columns</Em>, we can merge them together. One way to do so is through the <ISQL>UNION</ISQL> operator. This operator merges two tables, and it keeps a row if it is in <Em>either</Em> (or both) of the given tables. So it kind of functions like an <ISQL>OR</ISQL>.</Par>
       <FigureMergingTables query1={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status = 'sick leave'`} query2={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position = 'transportation supervisor'`} operator="UNION" />
       <Par>A similar command is the <ISQL>INTERSECT</ISQL> operator. This one also merges two tables, but it only keeps a row if it is in <Em>both</Em> tables. So it more or less acts like an <ISQL>AND</ISQL>.</Par>
       <FigureMergingTables query1={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status = 'active'`} query2={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position = 'transportation supervisor'`} operator="INTERSECT" />
       <Par>The final merging operator is the <ISQL>EXCEPT</ISQL>. This one functions as a subtraction: it takes the first table, and it then removes all the rows from it that are in the second table.</Par>
       <FigureMergingTables query1={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status = 'active'`} query2={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position = 'transportation supervisor'`} operator="EXCEPT" />
       <Par>Since the <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL> keywords do very similar things as <ISQL>AND</ISQL>, <ISQL>OR</ISQL> and <ISQL>NOT</ISQL>, their usage is not so common, but there are a few edge cases where they can be really useful.</Par>
       <Info>Contrary to set theory in mathematics, SQL allows duplicate rows. The <ISQL>UNION</ISQL>, <ISQL>INTERSECT</ISQL> and <ISQL>EXCEPT</ISQL> have fixed rules of how to deal with duplicate rows. Suppose that table A consists of five identical rows, and table B consists of three of the same identical rows. Then <ISQL>A UNION B</ISQL> has five rows (maximum), <ISQL>A INTERSECT B</ISQL> has three rows (minimum) and <ISQL>A EXCEPT B</ISQL> has two rows (minus).</Info>
@@ -107,7 +107,7 @@ function FigureCombinedCondition({ c1 = '', v1 = '', c2 = '', v2 = '', combiner 
   // Set up query data.
   const query = `
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE ${addNot ? 'NOT (' : ''}${c1} = '${v1}'
   ${combiner} ${c2} = '${v2}'${addNot ? ')' : ''};`
   const db = useTheorySampleDatabase();
@@ -157,7 +157,7 @@ function FigureAndExplanation() {
   const examplePosition = 'CIO';
   const data = useQueryResult(db?.database, `
 SELECT position, status
-FROM emp_data
+FROM contracts
 WHERE status = '${status}'
   AND position = '${examplePosition}'
 LIMIT 1;`);

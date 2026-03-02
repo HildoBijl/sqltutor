@@ -21,7 +21,7 @@ export const expensesTable: TableDefinition = {
   amount REAL,
   d_id INTEGER,
   description TEXT,
-  date DATE,
+  date TEXT,
   requested_by INTEGER,
   approved_by INTEGER,
   FOREIGN KEY (d_id) REFERENCES departments(d_id),

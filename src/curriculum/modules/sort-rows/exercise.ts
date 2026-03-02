@@ -4,10 +4,10 @@ const EXERCISES: StaticExercise[] = [
   {
     id: 'sort-by-perf-salary',
     version: 1,
-    prompt: 'Retrieve all employee data, sorted first by performance score ascending, and for equal scores, by salary descending.',
+    prompt: 'Retrieve all contracts, sorted first by performance score ascending, and for equal scores, by salary descending.',
     solution: `
 SELECT *
-FROM emp_data
+FROM contracts
 ORDER BY perf_score ASC, salary DESC;
     `,
   },
@@ -25,10 +25,10 @@ LIMIT 5 OFFSET 3;
   {
     id: 'sort-end-date-null-last',
     version: 1,
-    prompt: 'Retrieve the data of all employees, ordered by end date with later end dates shown first. Put everyone with an unlimited contract at the start.',
+    prompt: 'Retrieve all contracts of all employees, ordered by end date with later end dates shown first. Put everyone with an unlimited contract at the start.',
     solution: `
 SELECT *
-FROM emp_data
+FROM contracts
 ORDER BY end_date DESC NULLS FIRST;
     `,
   },

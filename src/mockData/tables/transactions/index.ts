@@ -5,11 +5,11 @@ import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   t_id: 'id',
-  vendor_id: 'string',
-  buyer_id: 'string',
+  vendor_username: 'string',
+  buyer_username: 'string',
   prod_id: 'id',
   date_time: 'date',
-  amount: 'number',
+  price: 'number',
   validated_by: 'id',
   status: 'string',
 } as const satisfies Attributes;
@@ -19,15 +19,15 @@ export const transactionsTable: TableDefinition = {
   attributes,
   createStatement: `CREATE TABLE transactions (
   t_id INTEGER PRIMARY KEY,
-  vendor_id TEXT,
-  buyer_id TEXT,
+  vendor_username TEXT,
+  buyer_username TEXT,
   prod_id INTEGER,
-  date_time DATETIME,
-  amount REAL,
+  date_time TEXT,
+  price REAL,
   validated_by INTEGER,
   status TEXT,
-  FOREIGN KEY (vendor_id) REFERENCES accounts(acct_id),
-  FOREIGN KEY (buyer_id) REFERENCES accounts(acct_id),
+  FOREIGN KEY (vendor_username) REFERENCES accounts(username),
+  FOREIGN KEY (buyer_username) REFERENCES accounts(username),
   FOREIGN KEY (prod_id) REFERENCES products(p_id),
   FOREIGN KEY (validated_by) REFERENCES employees(e_id)
 );`,

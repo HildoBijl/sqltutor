@@ -22,34 +22,34 @@ export function Theory() {
     <Section title="Set up equality-based conditions">
       <Par>The most common filter is on equality: we want some row attribute to have a certain value. We usually set up this condition using an <Term>equals sign</Term>, in the format <ISQL>column_name = some_value</ISQL>. We can for instance find all the positions held by the employee with employee ID <ISQL>{e_id}</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE e_id = ${e_id};`} columnName="e_id" />
       <Par>Let's study what the DBMS does internally when it receives a query like this. First it pulls the table from memory. (Or at least, the necessary parts of it.) Then, for every row, it evaluates the condition. To do so, it replaces the column name <ISQL>e_id</ISQL> by the respective value <Em>of that row</Em>. Then it checks if the left and right side of the equals sign have the same value. If so, the condition evaluates as <ISQL>TRUE</ISQL> for that row and the DBMS keeps it around. If not, the condition evaluates as <ISQL>FALSE</ISQL> for that row and the DBMS removes it from the output. After doing this for all rows, the remaining output is sent back.</Par>
       <Info>Note that this mechanism also allows us to compare two different columns with each other. We can set up a condition <ISQL>column1 = column2</ISQL>, which gets us all the rows where these two columns have equal value. We could for example use the condition <ISQL>start_date = end_date</ISQL> to find the people who got fired on their starting date.</Info>
       <Par>We can set up a similar comparison with text. We could for instance find all contracts that are currently active. This comparison is case sensitive.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status = 'active';`} columnName="status" />
       <Warning>When entering text in SQL, always use <Em>single</Em> quotation marks. This is how SQL recognizes that it is a piece of text, and not a column name or similar. (Both <Em>no quotation marks</Em> and <Em>double quotation marks</Em> will be interpreted as column/table names by SQL.)</Warning>
       <Par>We could also do the opposite, and find all contracts that are <Em>not</Em> active. In this case, we use the <Term>unequals sign</Term>, which in SQL is <ISQL>{`<>`}</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status <> 'active';`} columnName="status" />
     </Section>
 
     <Section title="Set up larger/smaller than conditions">
       <Par>Instead of requiring equality, we can set up larger/small than conditions. As is customary in mathematics, we use <ISQL>{`>`}</ISQL> for <Term>larger than</Term> and <ISQL>{`<`}</ISQL> for <Term>smaller than</Term>. We could for instance find all employees who obtained performance score of <Em>more</Em> than <ISQL>90</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE perf_score > 90;`} columnName="perf_score" />
       <Info>You use <ISQL>{`>=`}</ISQL> for <Term>larger than or equal to</Term> and you use <ISQL>{`<=`}</ISQL> for <Term>smaller than or equal to</Term>. The = symbol that indicates "or equal" should always come <Em>after</Em> the comparison symbol, and never before.</Info>
       <Par>This works similarly for text. SQL compares text lexicographically: whichever entry comes first in the dictionary is considered smaller. So one way to find all employee positions starting with a letter in the range <ISQL>s-z</ISQL> is the following.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE position >= 's';`} columnName="position" />
       <Par>For dates/times, the comparison is done using earlier/later than. Earlier dates are considered smaller and later dates are considered larger.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE start_date >= '2025-01-01';`} columnName="start_date" />
       <Info>
         <Par sx={{ mb: 0.5 }}>Most DBMSs store a date/time value as an object, having various functionalities. You could say the column value is "aware" that it is a date or time. This for instance allows us to compare dates.</Par>
@@ -60,7 +60,7 @@ WHERE start_date >= '2025-01-01';`} columnName="start_date" />
     <Section title="Compare text">
       <Par>The <ISQL>LIKE</ISQL> comparison is a useful extra method for comparing text. Using <ISQL>LIKE</ISQL> is like using <ISQL>=</ISQL>, but it allows us to use the <ISQL>%</ISQL> symbol as a filler to represent "any text", or (less used) the <ISQL>_</ISQL> symbol to represent "any single character". We could for instance find all employees who are on some kind of leave.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE status LIKE '%leave';`} columnName="status" />
       <Info>For most DBMSs the <ISQL>LIKE</ISQL> comparison is case insensitive. For some DBMSs it is case sensitive, but there is a case insensitive <ISQL>ILIKE</ISQL> equivalent. To invert the result, you can use <ISQL>NOT LIKE</ISQL>.</Info>
     </Section>
@@ -68,7 +68,7 @@ WHERE status LIKE '%leave';`} columnName="status" />
     <Section title={<>Compare with <ISQL>NULL</ISQL></>}>
       <Par>You may remember that table cells can have the special value <ISQL>NULL</ISQL>, which means "unknown" or "not applicable". If you want to find all rows where some column has <ISQL>NULL</ISQL>, you <Em>cannot</Em> use the condition <ISQL>column_name = NULL</ISQL>. Instead, you have to use the special <ISQL>IS</ISQL> comparison, for instance through <ISQL>column_name IS NULL</ISQL> or similarly <ISQL>column_name IS NOT NULL</ISQL>.</Par>
       <FigureFiltering query={`SELECT *
-FROM emp_data
+FROM contracts
 WHERE perf_score IS NULL;`} columnName="perf_score" />
       <Info>Because <ISQL>NULL</ISQL> means "unknown", any comparison involving <ISQL>NULL</ISQL>, like for instance <ISQL>{`NULL < 10`}</ISQL>, always resolves to <ISQL>NULL</ISQL>, and never to <ISQL>TRUE</ISQL> or <ISQL>FALSE</ISQL>. After all, it is also unknown whether "some unknown value" is smaller than <ISQL>10</ISQL>. Even the comparison <ISQL>NULL = NULL</ISQL> resolves to <ISQL>NULL</ISQL>, since two unknown values are not necessarily equal. Only <ISQL>NULL IS NULL</ISQL> resolves to <ISQL>TRUE</ISQL>.</Info>
     </Section>

@@ -13,15 +13,15 @@ const attributes = {
   status: 'string',
 } as const satisfies Attributes;
 
-export const empDataTable: TableDefinition = {
-  name: 'emp_data',
+export const contractsTable: TableDefinition = {
+  name: 'contracts',
   attributes,
-  createStatement: `CREATE TABLE emp_data (
+  createStatement: `CREATE TABLE contracts (
   e_id INTEGER NOT NULL,
   position TEXT,
   salary REAL,
-  start_date DATE,
-  end_date DATE,
+  start_date TEXT,
+  end_date TEXT,
   perf_score INTEGER,
   status TEXT,
   FOREIGN KEY (e_id) REFERENCES employees(e_id)

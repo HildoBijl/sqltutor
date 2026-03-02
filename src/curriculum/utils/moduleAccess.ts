@@ -8,7 +8,7 @@ import type { DatasetSize } from '@/mockData/types';
 /**
  * List of all tables that exist.
  */
-const ALL_TABLES: TableKey[] = ['employees', 'departments', 'emp_data', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'];
+const ALL_TABLES: TableKey[] = ['employees', 'departments', 'contracts', 'allocations', 'accounts', 'products', 'transactions', 'expenses', 'quarterly_performance'];
 
 /**
  * Default dataset size for modules.
@@ -24,20 +24,20 @@ const moduleTableAccess: Record<string, TableKey[] | undefined> = {
 
   // SQL Skills
   'choose-columns': ['departments', 'employees'],
-  'filter-rows': ['departments', 'employees', 'emp_data'],
-  'filter-rows-on-multiple-criteria': ['departments', 'employees', 'emp_data'],
-  'sort-rows': ['departments', 'employees', 'emp_data'],
-  'process-columns': ['departments', 'employees', 'emp_data'],
-  'write-single-criterion-query': ['departments', 'employees', 'emp_data'],
-  'write-multi-criterion-query': ['departments', 'employees', 'emp_data'],
-  'write-look-up-query': ['departments', 'employees', 'emp_data'],
-  'join-tables': ['departments', 'employees', 'emp_data'],
-  'aggregate-columns': ['departments', 'employees', 'emp_data', 'quarterly_performance', 'expenses'],
-  'use-filtered-aggregation': ['departments', 'employees', 'emp_data', 'quarterly_performance', 'expenses', 'transactions'],
-  'use-dynamic-aggregation': ['departments', 'employees', 'emp_data', 'quarterly_performance', 'expenses', 'transactions'],
-  'create-pivot-table': ['departments', 'employees', 'emp_data', 'quarterly_performance', 'expenses', 'transactions'],
-  'write-multi-table-query': ['departments', 'employees', 'emp_data', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
-  'write-multi-layered-query': ['departments', 'employees', 'emp_data', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
+  'filter-rows': ['departments', 'employees', 'contracts'],
+  'filter-rows-on-multiple-criteria': ['departments', 'employees', 'contracts'],
+  'sort-rows': ['departments', 'employees', 'contracts'],
+  'process-columns': ['departments', 'employees', 'contracts'],
+  'write-single-criterion-query': ['departments', 'employees', 'contracts'],
+  'write-multi-criterion-query': ['departments', 'employees', 'contracts'],
+  'write-look-up-query': ['departments', 'employees', 'contracts'],
+  'join-tables': ['departments', 'employees', 'contracts'],
+  'aggregate-columns': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses'],
+  'use-filtered-aggregation': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
+  'use-dynamic-aggregation': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
+  'create-pivot-table': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
+  'write-multi-table-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
+  'write-multi-layered-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
 };
 
 /**

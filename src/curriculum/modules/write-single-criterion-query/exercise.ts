@@ -45,7 +45,7 @@ WHERE current_salary > 150000;
     prompt: 'Find all the job positions where at some point someone performed less than a performance score of 60. Ensure there are no duplicates.',
     solution: `
 SELECT DISTINCT position
-FROM emp_data
+FROM contracts
 WHERE perf_score < 60;
     `,
   },
