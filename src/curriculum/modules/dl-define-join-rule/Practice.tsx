@@ -16,7 +16,7 @@ export function Practice() {
 
 const exercises = [
 	{
-		problem: <Par>Find for every employee (first and last name) which positions they have held throughout their career.</Par>,
+		problem: <Par>Find, for every employee (first and last name), which positions they have held throughout their career.</Par>,
 		solution: <>
 			<Par>The employee's first and last name come from the <IDL>employee</IDL> predicate, while the <IDL>contract</IDL> predicate lists the positions they held. We hence have to join those predicates through the employee ID.</Par>
 			<DL>employeePosition(fn, ln, pos) :- employee(id, fn, ln, _, _, _, _, _, _), contract(id, pos, _, _, _, _, _).</DL>
@@ -31,7 +31,7 @@ const exercises = [
 		</>,
 	},
 	{
-		problem: <Par>Find for every employee (first and last name) the name of the department they are allocated to.</Par>,
+		problem: <Par>Find, for every employee (first and last name), the name of the department they are allocated to.</Par>,
 		solution: <>
 			<Par>We need a three-way join for this: we join <IDL>employee</IDL> to <IDL>allocation</IDL> and then again to <IDL>department</IDL>. It is customary to combine both joins into one rule.</Par>
 			<DL>employeeDepartment(fn, ln, dn) :- employee(eid, fn, ln, _, _, _, _, _, _), allocation(eid, did), department(did, dn, _, _ , _).</DL>
