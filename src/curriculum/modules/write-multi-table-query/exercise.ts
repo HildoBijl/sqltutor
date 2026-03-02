@@ -2,72 +2,51 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 
 const EXERCISES: StaticExercise[] = [
   {
-    id: 'multitable-mock-dept-expense',
+    id: 'multitable-mock-intersect',
     version: 1,
-    prompt: 'Retrieve the id, budget and total amount spent of all the departments whose total recorded expenses never exceeded their allocated budget',
+    prompt: 'Retrieve the usernames of all users who have bought one or more products from the "Fine Art" category at any point in time, that also appear as owners of products categorized as "Designer Fashion"',
     solution: `
-  WITH dept_expenses AS (
-	SELECT 
-		d_id, SUM(amount) AS total_spent
-	FROM expenses
-	GROUP BY d_id
-),
-dept_budget AS (
-	SELECT d_id, budget
-	FROM departments
+  SELECT DISTINCT buyer
+FROM transactions
+WHERE prod_id IN (
+	SELECT p_id
+	FROM products
+	WHERE category = 'Fine Art'
 )
-SELECT b.d_id, b.budget, e.total_spent
-FROM dept_budget b
-JOIN dept_expenses e 
-	ON b.d_id = e.d_id
-WHERE e.total_spent <= b.budget
+INTERSECT
+SELECT DISTINCT owned_by
+FROM products
+WHERE category = 'Designer Fashion'
     `,
   },
   {
-    id: 'multitable-mock-buyer-vendor',
+    id: 'multitable-mock-in-notin',
     version: 1,
-    prompt: 'Identify the username, amount spent and amount earned, for all users whose total revenue as vendor exceeds their total spending as buyer',
+    prompt: 'Find the first name and last name of unverified accounts who appear as buyers, but not as vendors in transactions',
     solution: `
-  WITH vendor_totals AS (
-    SELECT vendor AS username, SUM(price) AS earned
-    FROM transactions
-    GROUP BY vendor
-  ),
-  buyer_totals AS (
-    SELECT buyer AS username, SUM(price) AS spent
-    FROM transactions
-    GROUP BY buyer
-  )
-  SELECT v.username,
-       v.earned,
-       b.spent
-  FROM vendor_totals v
-  JOIN buyer_totals b
-    ON v.username = b.username
-  WHERE v.earned > b.spent;
+  SELECT first_name, last_name
+FROM accounts a
+WHERE a.email_verified = FALSE
+AND a.username IN (
+	SELECT buyer
+	FROM transactions
+	)
+	AND a. username NOT IN (
+		SELECT vendor
+		FROM transactions
+		)
     `,
   },
   {
-    id: 'multitable-mock-owners-not-buyers',
+    id: 'multitable-mock-join-le',
     version: 1,
-    prompt: 'Retrieve the name of the products owned by users who never appear as buyers in any transaction',
+    prompt: 'List the name of products that have been sold at least once for less than half of their estimated value',
     solution: `
-  WITH buyers AS (
-    SELECT DISTINCT buyer
-    FROM transactions
-  ),
-  eligible_owners AS (
-    SELECT username
-    FROM accounts
-    WHERE username NOT IN (
-      SELECT buyer
-      FROM buyers
-    )
-  )
   SELECT p.name
-  FROM products p
-  JOIN eligible_owners o
-    ON p.owned_by = o.username
+FROM products p
+JOIN transactions t
+ON t.prod_id = p.p_id
+WHERE t.price < 0.5*p.est_value
     `,
   },
 ];
