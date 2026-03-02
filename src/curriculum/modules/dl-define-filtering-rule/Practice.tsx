@@ -19,7 +19,7 @@ const exercises = [
 		problem: <Par>Find all contracts that started in the year 2024.</Par>,
 		solution: <>
 			<Par>We take the <IDL>contracts</IDL> predicate and make sure the start date is in the right time frame.</Par>
-			<DL>contractsFrom2024(id, pos, sal, start, end, per, stat) :- contracts(id, pos, sal, start, end, per, stat), start &gt;= '2024-01-01', start &lt;= '2024-12-31'.</DL>
+			<DL>contractFrom2024(id, pos, sal, start, end, per, stat) :- contract(id, pos, sal, start, end, per, stat), start &gt;= '2024-01-01', start &lt;= '2024-12-31'.</DL>
 			<Par>Note that the argument names don't matter, as long as they match within the rule. Given that many arguments start with the letter s, it's hard shortening them in a clear way.</Par>
 		</>,
 	},
