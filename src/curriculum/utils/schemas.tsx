@@ -7,8 +7,8 @@ export function SQLValleySchema({ tables = [], singular = false }: { tables: Tab
 	const entries = {
 		departments: <><RelationName>department{singular ? '' : 's'}</RelationName> (<PrimaryKey>d_id</PrimaryKey>, d_name, manager_id, budget, nr_employees)</>,
 		employees: <><RelationName>employee{singular ? '' : 's'}</RelationName> (<PrimaryKey>e_id</PrimaryKey>, first_name, last_name, phone, email, address, city, hire_date, current_salary)</>,
-		contracts: <><RelationName>contracts</RelationName> (<PrimaryKey>e_id</PrimaryKey>, position, salary, start_date, end_date, perf_score, status)</>,
-		allocations: <><RelationName>allocations</RelationName> (<PrimaryKey>e_id</PrimaryKey>, <PrimaryKey>d_id</PrimaryKey>)</>,
+		contracts: <><RelationName>contract{singular ? '' : 's'}</RelationName> (<PrimaryKey>e_id</PrimaryKey>, position, salary, start_date, end_date, perf_score, status)</>,
+		allocations: <><RelationName>allocation{singular ? '' : 's'}</RelationName> (<PrimaryKey>e_id</PrimaryKey>, <PrimaryKey>d_id</PrimaryKey>)</>,
 		accounts: <><RelationName>account{singular ? '' : 's'}</RelationName> (<PrimaryKey>username</PrimaryKey>, phone, email, verified, first_name, last_name, address, city, created_at, last_login_at)</>,
 		products: <><RelationName>product{singular ? '' : 's'}</RelationName> (<PrimaryKey>p_id</PrimaryKey>, name, category, owned_by, est_value, status)</>,
 		transactions: <><RelationName>transaction{singular ? '' : 's'}</RelationName> (<PrimaryKey>t_id</PrimaryKey>, vendor_username, buyer_username, prod_id, date_time, price, validated_by, status)</>,

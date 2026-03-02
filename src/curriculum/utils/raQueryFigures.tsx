@@ -26,11 +26,11 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
   // Determine the arrow position: 'between', 'topRight' or 'bottomLeft'.
   if (below) {
     if (we + arrowRadius * 1.5 < wt)
-    arrowPos = 'topRight';
-  else if (wt + arrowRadius * 1.5 < we)
-    arrowPos = 'bottomLeft';
-  else
-    arrowPos = 'between';
+      arrowPos = 'topRight';
+    else if (wt + arrowRadius * 1.5 < we)
+      arrowPos = 'bottomLeft';
+    else
+      arrowPos = 'between';
   } else {
     if (he + arrowRadius * 1.5 < ht)
       arrowPos = 'bottomLeft';
@@ -42,11 +42,11 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
   const width = below ? Math.max(we, wt) : (we + (arrowPos === 'between' ? arrowLength : delta) + wt);
   const height = below ? he + (arrowPos === 'between' ? arrowLength : delta) + ht : Math.max(he, ht);
 
-  if (eBounds && tBounds) {  
+  if (eBounds && tBounds) {
     // Determine the table position.
     if (below) {
       if (arrowPos === 'between') {
-        tx = (we - wt) / 2;
+        tx = Math.max(0, (we - wt) / 2);
         ty = he + arrowLength;
         const middleX = Math.min(eBounds.middle.x, tBounds.middle.x);
         arrowPoints = [[middleX, eBounds.bottom + 4], [middleX, ty - 4]];
@@ -78,7 +78,7 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
   }
 
   return <Drawing ref={drawingRef} width={width} height={height} maxWidth={width} disableSVGPointerEvents>
-    <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
+    <Element ref={eRef} position={[below && arrowPos === 'between' ? Math.max(0, (wt - we) / 2) : 0, 0]} anchor={[-1, -1]} behind>
       <Component>{query}</Component>
     </Element>
 

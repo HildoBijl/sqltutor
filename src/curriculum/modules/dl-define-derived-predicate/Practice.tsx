@@ -1,4 +1,4 @@
-import { Page, Section, Info, Par, Term, Em, DL, IDL } from '@/components';
+import { Page, Section, Par, Term, DL, IDL } from '@/components';
 import { ManualExerciseSet } from '@/learning/components/SkillPractice';
 
 import { SQLValleySchema } from '../../utils';
@@ -27,7 +27,7 @@ const exercises = [
 		problem: <Par>Find the names of all large departments: either the number of employees is more than 12, or the budget is more than 2000000.</Par>,
 		solution: <>
 			<Par>We take the <IDL>department</IDL> predicate and apply the conditions. Since it is an or-condition, we set up two rules.</Par>
-			<DL>largeDepartment(n) :- department(_, n, _, _, e), e &gt; 12.<br/>largeDepartment(n) :- department(_, n, _, b, _), b &gt; 2000000.</DL>
+			<DL>largeDepartment(n) :- department(_, n, _, _, ne), ne &gt; 12.<br/>largeDepartment(n) :- department(_, n, _, b, _), b &gt; 2000000.</DL>
 			<Par>You can read this as "A department is a large department if the number of employees is larger than 12. A department is also a large department if the budget is larger than two million."</Par>
 		</>,
 	},
