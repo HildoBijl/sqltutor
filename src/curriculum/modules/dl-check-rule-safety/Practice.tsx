@@ -1,12 +1,9 @@
 import { Page, Section, Par, Em, DL, IDL } from '@/components';
 import { ManualExerciseSet } from '@/learning/components/SkillPractice';
 
-import { SQLValleySchema } from '../../utils';
-
 export function Practice() {
 	return <Page>
 		<Section>
-			<SQLValleySchema tables={['departments', 'employees', 'contracts', 'accounts', 'allocations', 'products', 'transactions']} singular />
 			<ManualExerciseSet exercises={exercises} />
 		</Section>
 	</Page>;
@@ -15,7 +12,7 @@ export function Practice() {
 const exercises = [
 	{
 		problem: <>
-			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear. (You may assume any predicate used is defined appropriately beforehand.)</Par>
+			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear.</Par>
 			<DL>userThatNeverSold(vendor) :- not transaction(tid, vendor, buyer, pid, date, price, validatedBy, status).</DL>
 		</>,
 		solution: <>
@@ -25,7 +22,7 @@ const exercises = [
 	},
 	{
 		problem: <>
-			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear. (You may assume any predicate used is defined appropriately beforehand.)</Par>
+			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear.</Par>
 			<DL>userThatNeverSold(vendor) :-<br />        account(vendor, p, e, v, fn, ln, a, c, ca, lla),<br />        not transaction(tid, vendor, buyer, pid, date, price, validatedBy, status).</DL>
 		</>,
 		solution: <>
@@ -35,7 +32,7 @@ const exercises = [
 	},
 	{
 		problem: <>
-			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear. (You may assume any predicate used is defined appropriately beforehand.)</Par>
+			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear.</Par>
 			<DL>buyerOfExpensiveProduct(buyer) :-<br/>        transactions(tid, vendor, buyer, pid, date, price, validatedBy, status),<br/>        price &gt; limit.</DL>
 		</>,
 		solution: <>
@@ -45,7 +42,7 @@ const exercises = [
 	},
 	{
 		problem: <>
-			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear. (You may assume any predicate used is defined appropriately beforehand.)</Par>
+			<Par>Is the following Datalog rule safe? If not, indicate due to which variable(s) and what type of problem will appear.</Par>
 			<DL>managerContactInfo(dn, fn, ln, p, e) :-<br/>        department(did, dn, mid, b, ne),<br/>        employee(eid, fn, ln, p, e, a, c, hd, cs),<br/>        pid = eid.</DL>
 		</>,
 		solution: <>
