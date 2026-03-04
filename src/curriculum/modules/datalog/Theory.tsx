@@ -31,16 +31,16 @@ export function Theory() {
       <DatalogFacts data={data1} predicate="employee" />
       <Par>What the first line here basically says is, "There is an employee with employee ID '{e1[0]}', first name '{e1[1]}', last name '{e1[2]}', and so forth." This is now treated as a known fact.</Par>
       <Info>Because of the way Datalog defines facts, <Term>duplicates facts</Term> are <Em>not</Em> possible. If we define the same fact twice, Datalog will still treat it as a single fact. It's just like how saying "The sky is blue" twice won't make the sky any more blue.</Info>
-      <Warning>You may wonder, "Our table is called employees, not employee. This will fail!" You would be correct: we of course have to use the right name. The reason why we use "employee" here is a naming convention. In SQL tables are collections of rows like "the employees table" so table names are often <Term>plural</Term>. In Datalog, predicates describe properties like "This combination of values is an employee" so predicate names are often <Term>singular</Term>. That's why we use "employee" here in Datalog. It helps us get used to this convention.</Warning>
-      <Par>In reality, Datalog scripts actually don't mention the facts at the top. To be precise: the facts step is usually skipped altogether, since the facts are assumed known, based on stored tables. But it's helpful to imagine the facts mentioned at the top of any script anyway.</Par>
+      <Warning>You may wonder, "Our table is called employees, not employee. This will fail!" You would be correct: we of course have to use the right name. The reason why we use "employee" here is a naming convention. In SQL tables are collections of rows like "the employees table" so table names are often <Term>plural</Term>. In Datalog, facts describe properties like "This combination of values is an employee" so table/predicate names are often <Term>singular</Term>. That's why we use "employee" here in Datalog. It helps us get used to this convention.</Warning>
+      <Par>In reality, Datalog scripts actually don't mention the facts at the top. To be precise: the facts step is usually skipped altogether, since the facts are assumed known, based on stored tables. But it's helpful to imagine the facts mentioned at the top of any script anyway, and in a few rare cases, we can still add facts of our own.</Par>
     </Section>
 
     <Section title="Datalog terminology">
       <Par>You may have noticed that the terminology in Datalog is a bit different from what we are used to when dealing with tables. For clarity, let's go over all terminology, just so that we're all speaking the same language.</Par>
       <List items={[
-        <>The name "employee" in the above example is called a <Term>predicate</Term>. We can see it as a claim we can make, "The given person is now defined as being an employee." Compared to tables, a predicate equates to a full table.</>,
-        <>Predicates have a fixed number of <Term>arguments</Term>. These are the parameters we should provide to the predicate. Compared to tables, the arguments are the columns/attributes of tables.</>,
-        <>For every predicate, there can be any number of <Term>facts</Term> (sometimes also called <Term>tuples</Term>). We've seen {data1.values.length} of these facts in the example above. Compared to tables, the facts are the rows of tables.</>,
+        <>The name "employee" in the above example is called a <Term>predicate</Term>. We can see it as a claim we can make, "The given person is now defined as being an employee." Compared to our old terminology, a predicate equates to a full table.</>,
+        <>Predicates have a fixed number of <Term>arguments</Term>. These are the parameters we should provide to the predicate. Compared to our old terminology, the arguments are the columns/attributes of tables.</>,
+        <>For every predicate, there can be any number of <Term>facts</Term> (sometimes also called <Term>tuples</Term>). We've seen {data1.values.length} of these facts in the example above. Compared to our old terminology, the facts are the rows of tables.</>,
       ]} />
       <Info>In Datalog, arguments have no names! Predicates are <Term>order-based</Term>: the order of the arguments determines what is what. When defining the predicate, we effectively agree, "The second argument of the 'employee' predicate is the first name." Datalog has no idea of the concept "first name". It doesn't even know the second argument is called "first name"! For Datalog, the only thing that matters is the number of arguments and their order.</Info>
     </Section>
@@ -59,13 +59,16 @@ export function Theory() {
         <>In-between is the <Term>rule operator</Term> ":-". It can be read as "is true when". This is the main operator in Datalog to define rules.</>,
         <>On the right is the <Term>body</Term> of the rule. It is a list of <Term>literals</Term>: claims that may or may not be true, based on existing data. The literals are separated by commas, where each comma functions as an "and". The rule only evaluates to true when <Em>all</Em> literals hold true.
           <List sx={{ listStyleType: 'circle' }} items={[
-            <>The first literal requires the fact <IDL>employee(id, fn, ln, p, e, a, c, hd, cs)</IDL> to be true. Or thinking in terms of tables: "The row (id, fn, ln, p, e, a, c, hd, cs) is in the employees table."</>,
-            <>The second literal adds an extra condition for the variable cs: it must be at least 200000.</>,
+            <>The first literal requires the fact <IDL>employee(id, fn, ln, p, e, a, c, hd, cs)</IDL> to be true. Or thinking in terms of tables: "The row <IDL>(id, fn, ln, p, e, a, c, hd, cs)</IDL> is in the employees table."</>,
+            <>The second literal adds an extra condition for the variable <IDL>cs</IDL>: it must be at least 200000.</>,
           ]} />
         </>,
-        <>At the end is a period. Datalog commands (facts, rules, queries) are always ended by a period. It shows the command is complete.</>,
+        <>
+          <Par sx={{ mb: 0.5 }}>At the end is a period. Datalog commands (facts, rules, queries) always end with a period. It shows the command is complete.</Par>
+          <Info>Datalog ignores superfluous white-space. Because of this, when writing long rules, tabs and enters can be used to keep the rule legible.</Info>
+        </>,
       ]} />
-      <Par>The rule contains <Term>variables</Term> like "id", "fn", "ln", etcetera. When Datalog receives a rule like this, it will try to find <Em>all</Em> possible combinations of values for <Em>all</Em> variables in the rule, such that <Em>all</Em> conditions hold. In our example, there are only three sets of variable values for which all conditions are met. In this way, we get the following three new facts.</Par>
+      <Par>The rule contains <Term>variables</Term> like <IDL>id</IDL>, <IDL>fn</IDL>, <IDL>ln</IDL>, etcetera. When Datalog receives a rule like this, it will try to find <Em>all</Em> possible combinations of values for <Em>all</Em> variables in the rule, such that <Em>all</Em> literals hold true. (This is an important idea, so read that sentence again!) In our example, there are only three possible sets of variable values for which all conditions can be met. So we get the following three new facts.</Par>
       <DatalogFacts data={data2} predicate="highEarningEmployee" />
       <Par>Or displayed more clearly for us, as a table:</Par>
       <FigureSingleTable query={q2} title="High-earning employees" tableWidth={750} tableScale={0.6} />
@@ -84,7 +87,7 @@ export function Theory() {
       <DL>?- highEarningEmployeeName(firstName, lastName).</DL>
       <Par>In English language, this command can be read as:</Par>
       <Quote>Find all variables firstName and lastName for which (firstName, lastName) is a high-earning employee name.</Quote>
-      <Par>At this point Datalog will do all the work. (Note that it didn't do any work when we only defined rules.) It then generates the following output.</Par>
+      <Par>At this point Datalog will do all the work. (Note that it didn't do any work when we only defined rules. It only stored their definitions.) It then generates the following output.</Par>
       <DatalogOutput data={{ values: data3.values, columns: ['firstName', 'lastName'] }} />
       <Info>The above is how Datalog usually returns data. On SQL Valley, we will display the output of Datalog programs as tables, rather than in the usual Datalog format, just so it's easier for us to understand it. Just keep in mind that Datalog doesn't actually work with tables.</Info>
       <Par>Let's dissect what is happening in the query. The command "?-" can be read as "Find all possible combinations of variables for which ...". Within the query, there are only two variables: <IDL>firstName</IDL> and <IDL>lastName</IDL>. Datalog will find <Em>all</Em> possible combinations of values for these variables for which all the given literals (conditions) hold true. It then outputs these combinations of variables.</Par>
@@ -92,7 +95,7 @@ export function Theory() {
       <Warning>Some Datalog engines don't use "?-" but instead use "?" for queries. When using Datalog, always check out the local syntax.</Warning>
       <Par>It is worthwhile to note that we could in theory also add more conditions to the query. In fact, we could have skipped the rules altogether and immediately set up the following query.</Par>
       <DL>?- employee(id, fn, ln, p, e, a, c, hd, cs), cs &gt;= 200000.</DL>
-      <Par>This would instantly get us all high-earning employees (with all arguments). However, we are now setting up queries that contain conditions, which is generally frowned upon in Datalog. It's cleaner to first define a rule for a predicate (in table-terms: define a view) and only then set up a simple query that requests the full predicate (in table-terms: query the view). So we'll try to stick to that convention.</Par>
+      <Par>This would instantly get us all high-earning employees (with all nine arguments). However, we are now setting up queries that contain conditions, which is generally frowned upon in Datalog. It's cleaner to <Em>first</Em> define a rule for a new predicate (in table-terms: define a new view) and only <Em>then</Em> set up a simple query that requests the full predicate (in table-terms: query the view). This keeps every line in your Datalog program short and comprehensible.</Par>
       <Info>Datalog programs can have any number of queries, each retrieving different data. When we set up Datalog programs, we will usually do so to find specific data, which is why our programs usually end with a single query. This query then marks the end of our program.</Info>
     </Section>
   </Page>;

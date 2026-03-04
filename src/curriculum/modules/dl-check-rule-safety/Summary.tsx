@@ -3,7 +3,7 @@ import { Page, Section, Par, Info, List, Em } from '@/components';
 export function Summary() {
   return <Page>
     <Section>
-      <Par>A Datalog rule is safe if <Em>every</Em> variable in the rule appears in at least one positive non-arithmetic predicate in the rule body. To check if a rule is safe, there are two simple steps.</Par>
+      <Par>A Datalog rule is safe if <Em>every</Em> variable in the rule appears in at least one positive non-arithmetic literal in the rule body. To check if a rule is safe, there are two simple steps.</Par>
       <List useNumbers items={[
         <>Set up a list of all variables that appear anywhere in the rule.</>,
         <>Check that each variable is bound: that it appears in a positive non-arithmetic literal.</>,

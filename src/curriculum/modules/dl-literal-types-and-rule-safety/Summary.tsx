@@ -11,7 +11,7 @@ export function Summary() {
       <Par>A literal that uses arithmetics (like the comparison <IDL>ne &gt; 10</IDL>) is called an <Term>arithmetic literal</Term>.</Par>
       <FigureExampleDLQuery query={<>largeDepartment(id, n, mid, b, ne) :- department(id, n, mid, b, ne), ne &gt; 10.</>} actualQuery="SELECT * FROM departments WHERE nr_employees > 10" tableWidth={500} below />
       <Par>Negative literals and arithmetic literals generally do not bound variables: the variables involved can take a multitude of values that do not originate from any of the original predicates. Having <Term>unbounded variables</Term> may cause <Term>infinitely large outputs</Term> (if any unbounded variables appear in the rule head) or result in <Term>ineffective literals</Term> (if all unbounded variables only appear in the rule body).</Par>
-      <Par>A Datalog rule is <Term>safe</Term> if <Em>every</Em> variable in the rule appears in at least one positive non-arithmetic predicate in the rule body. In general, all rules in a Datalog program must be safe.</Par>
+      <Par>A Datalog rule is <Term>safe</Term> if <Em>every</Em> variable in the rule appears in at least one positive non-arithmetic literal in the rule body. In general, all rules in a Datalog program must be safe.</Par>
     </Section>
   </Page>;
 }
