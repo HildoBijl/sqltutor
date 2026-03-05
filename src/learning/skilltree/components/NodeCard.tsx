@@ -24,6 +24,7 @@ interface NodeCardProps {
   isSomethingHovered?: boolean;
   onClick?: () => void;
   planningMode?: boolean;
+  hasGoal?: boolean;
   isGoalNode?: boolean;
   isOnGoalPath?: boolean;
   onSetGoal?: () => void;
@@ -39,6 +40,7 @@ export function NodeCard({
   isSomethingHovered = false,
   onClick,
   planningMode,
+  hasGoal = false,
   isGoalNode = false,
   isOnGoalPath = false,
   onSetGoal,
@@ -84,17 +86,17 @@ export function NodeCard({
     if (isGoalNode || isOnGoalPath) {
       nodeOpacity = 1.0;
     } else {
-      nodeOpacity = 0.7;
+      nodeOpacity = hasGoal ? 0.15 : 1.0;
     }
-    strokeWidth = isHovered ? 2 : 1;
+    strokeWidth = isGoalNode ? 2 : isHovered ? 2 : 1;
     if (isGoalNode) {
       fillColor = "purple";
       borderColor = "purple";
     } else if (isOnGoalPath && !completed) {
-      fillColor = "#d32f2f";
+      fillColor = theme.palette.background.paper;
       borderColor = "#d32f2f";
     } else if (isOnGoalPath && completed) {
-      fillColor = "#4CAF50";
+      fillColor = theme.palette.background.paper;
       borderColor = "#4CAF50";
     } else {
       fillColor = theme.palette.background.paper;
@@ -333,7 +335,7 @@ export function NodeCard({
                 fontWeight: 500,
                 fontSize: "17px",
                 color:
-                  planningMode && (isGoalNode || isOnGoalPath)
+                  planningMode && (isGoalNode)
                     ? "#ffffff"
                     : "#000000",
               }}

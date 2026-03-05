@@ -210,7 +210,8 @@ export function SkillTree({
   const getConnectorStyle = (connector: { from: string; to: string }) => {
     // TO DO
     if (planningMode) {
-      return { opacity: isConnectorInGoalPath(connector) ? 1 : 0.7 };
+      if (!goalNodeId) return { opacity: 0.7 };
+      return { opacity: isConnectorInGoalPath(connector) ? 1 : 0.15 };
     }
     // Full opacity for connectors in the hovered path
     if (isConnectorInHoveredPath(connector)) {
@@ -327,6 +328,7 @@ export function SkillTree({
                 isSomethingHovered={localHoveredId !== null}
                 onClick={() => handleNodeClick(item)}
                 planningMode={planningMode}
+                hasGoal={planningMode && !!goalNodeId}
                 isGoalNode={planningMode && goalNodeId === item.id}
                 isOnGoalPath={planningMode && goalPrerequisites.has(item.id)}
                 onSetGoal={() => {
