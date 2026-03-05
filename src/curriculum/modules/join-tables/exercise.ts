@@ -62,11 +62,7 @@ WHERE status = 'sick leave';
   // SELECT t.amount, p.name
   // FROM transactions t
   // JOIN products p ON t.prod_id = p.p_id
-<<<<<<< HEAD
   // WHERE t.vendor != p.owner_id;
-=======
-  // WHERE t.vendor_username != p.owned_by;
->>>>>>> alpha
   //     `,
   //   },
 ];
