@@ -1,14 +1,5 @@
-/**
- * Store package. API for the memory store.
- */
-
 export { useAppStore } from './useAppStore';
 export { useIsStoreReady } from './hooks';
-
-export {
-  createComponentState,
-  DEFAULT_COMPONENT_TYPE,
-} from './learning/support';
 
 export type {
   ComponentState,
@@ -24,3 +15,8 @@ export type {
   StoredExerciseInstance,
   StoredExerciseState,
 } from './learning/types';
+
+export {
+  createComponentState,
+  DEFAULT_COMPONENT_TYPE,
+} from './learning/support';

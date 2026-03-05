@@ -1,30 +1,47 @@
-/**
- * Settings store slice.
- */
+import type { SetState } from '../utils';
 
-import type { SettingsState, Theme } from './types';
+import type { SettingsSlice, SettingsState, SettingsPersisted, SettingsActions } from './types';
 
-export type { SettingsState } from './types';
-import type { DatasetSize } from '@/mockData/types';
-
-export const initialSettingsState: SettingsState = {
+const initialState: SettingsState = {
   currentTheme: 'light',
   hideStories: true,
-  practiceDatasetSize: 'full',
+  practiceDatasetSize: 'small',
 };
 
-export interface SettingsActions {
-  toggleHideStories: () => void;
-  setTheme: (theme: Theme) => void;
-  setPracticeDatasetSize: (size: DatasetSize) => void;
-}
-
-type SetState<T> = (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
-
-export function createSettingsActions(set: SetState<SettingsState>): SettingsActions {
+function createActions(set: SetState<SettingsState>): SettingsActions {
   return {
     toggleHideStories: () => set((state) => ({ hideStories: !state.hideStories })),
     setTheme: (theme) => set({ currentTheme: theme }),
     setPracticeDatasetSize: (size) => set({ practiceDatasetSize: size }),
   };
+}
+
+function partialize(state: SettingsState): SettingsPersisted {
+  console.log('Returning!', {
+    currentTheme: state.currentTheme,
+    hideStories: state.hideStories,
+    practiceDatasetSize: state.practiceDatasetSize,
+  })
+  return {
+    currentTheme: state.currentTheme,
+    hideStories: state.hideStories,
+    practiceDatasetSize: state.practiceDatasetSize,
+  };
+}
+
+function rehydrate(a, b): void {
+  console.log('Rehydrate', a, b)
+}
+
+function migrate(state: SettingsPersisted, _version: number): SettingsPersisted {
+  return state
+}
+
+export const slice: SettingsSlice = {
+  key: 'settings',
+  initialState,
+  createActions,
+  partialize,
+  rehydrate,
+  migrate,
 }

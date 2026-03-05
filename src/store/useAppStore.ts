@@ -1,66 +1,61 @@
-/**
- * Assembled app store.
- */
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { createMainActions, initialMainState } from './main/slice';
-import { createSettingsActions, initialSettingsState } from './settings/slice';
-import { createLearningActions, initialLearningState } from './learning/slice';
-import { partializeMain, rehydrateMain } from './main/persist';
-import { partializeSettings, rehydrateSettings } from './settings/persist';
-import { partializeLearning, rehydrateLearning } from './learning/persist';
-import { migrateState, STORE_VERSION, type PersistedState } from './version';
-import type { MainState, MainActions } from './main/slice';
-import type { SettingsState, SettingsActions } from './settings/slice';
-import type { LearningActions } from './learning/slice';
+import { slice as mainSlice } from './main';
+import { slice as settingsSlice } from './settings';
+import { slice as learningSlice } from './learning';
+import { AppState } from './types';
 
-export interface AppState
-  extends MainState,
-    MainActions,
-    SettingsState,
-    SettingsActions,
-    LearningActions {
-  components: Record<string, import('./learning/types').ComponentState>;
-}
+// On state changes, bump the version number and add a migration to the respective slice.
+export const STORE_VERSION = 1;
+
+// Collect slices.
+const slices = [mainSlice, settingsSlice, learningSlice] as const;
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
-      ...initialMainState,
-      ...initialSettingsState,
-      ...initialLearningState,
-      ...createMainActions(set as Parameters<typeof createMainActions>[0]),
-      ...createSettingsActions(set as Parameters<typeof createSettingsActions>[0]),
-      ...createLearningActions(
-        (fn) => set((state) => fn(state as any)),
-        () => get() as any,
-      ),
-    }),
+    (set, get) => {
+      const state = {} as AppState;
+      for (const slice of slices) {
+        state[slice.key] = {
+          ...slice.initialState,
+          ...slice.createActions?.(set, get),
+        };
+      }
+      console.log(state)
+      return state;
+    },
     {
-      name: 'sqltutor-storage',
-      partialize: (state) => ({
-        version: STORE_VERSION,
-        main: partializeMain(state),
-        settings: partializeSettings(state),
-        learning: partializeLearning(state),
-      }),
+      name: "sqltutor-storage",
+      version: STORE_VERSION,
+
+      partialize: (state) => {
+        const result: Record<string, unknown> = {};
+        for (const slice of slices) {
+          result[slice.key] = slice.partialize(state[slice.key]);
+        }
+        return result;
+      },
+
       onRehydrateStorage: () => (state) => {
+        console.log("Raw localStorage:", localStorage.getItem("sqltutor-storage"));
+        console.log('Rehydrate received:', state, state?.settings, state?.currentTheme, state?.settings?.currentTheme)
         if (!state) return;
+        for (const slice of slices) {
+          slice.rehydrate?.(state[slice.key]);
+        }
+        console.log(state)
+        state.main.setHasHydrated(true);
+      },
 
-        const migrated = migrateState({
-          version: (state as { version?: number }).version,
-          main: (state as unknown as PersistedState).main,
-          settings: (state as unknown as PersistedState).settings,
-          learning: (state as unknown as PersistedState).learning,
-        });
-
-        rehydrateMain(state, migrated.main);
-        rehydrateSettings(state, migrated.settings);
-        rehydrateLearning(state, migrated.learning);
-
-        state.setHasHydrated(true);
+      migrate: (persisted, version) => {
+        const state = persisted as Record<string, unknown>;
+        for (const slice of slices) {
+          if (slice.migrate && slice.key in state) {
+            state[slice.key] = slice.migrate(state[slice.key], version);
+          }
+        }
+        return state;
       },
     },
   ),

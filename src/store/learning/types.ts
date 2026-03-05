@@ -1,52 +1,29 @@
-/**
- * Learning store types.
- */
+import type { ExerciseAction, ExerciseStatus } from '@/learning/engine'; // ToDo: remove cyclic dependency. The store should not depend on the learning tools.
 
-import type { ExerciseAction, ExerciseStatus } from '@/learning/engine';
+import type { StoreSlice } from '../utils';
 
-export type ExerciseInstanceId = string;
+// Fundamental types for the Learning Store.
 
-export interface StoredAttempt<Input = string> {
-  index: number;
-  input: Input;
-  normalizedInput: string;
-  status: 'invalid' | 'incorrect' | 'correct';
-  timestamp: number;
+export interface LearningState {
+  components: Record<string, ComponentState>;
 }
 
-export interface StoredExerciseState<Exercise = unknown, Input = string> {
-  exercise: Exercise;
-  status: ExerciseStatus;
-  attempts: StoredAttempt<Input>[];
-  generatedAt?: number;
+export interface LearningPersisted {
+  components?: Record<string, Partial<ComponentState> | ComponentState>;
 }
 
-export interface StoredExerciseEvent {
-  timestamp: number;
-  action: ExerciseAction<unknown, unknown>;
-  resultingState: StoredExerciseState;
+export interface LearningActions {
+  updateComponent: (id: string, data: Partial<ComponentState>) => void;
+  getComponent: (id: string) => ComponentState;
+  resetComponent: (id: string, type?: ComponentType) => void;
+  getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
+  getAllExerciseInstances: (skillId: string) => StoredExerciseInstance[];
+  getExerciseHistory: (skillId: string, instanceId: string) => StoredExerciseEvent[];
 }
 
-export interface StoredExerciseInstance {
-  id: ExerciseInstanceId;
-  skillId: string;
-  createdAt: number;
-  completedAt?: number;
-  finalStatus: ExerciseStatus;
-  events: StoredExerciseEvent[];
-}
+export type LearningSlice = StoreSlice<LearningState, LearningPersisted, LearningActions>
 
-export interface QueryHistory {
-  query: string;
-  timestamp: number;
-  success: boolean;
-  rowCount?: number;
-}
-
-export interface SavedQuery {
-  name: string;
-  query: string;
-}
+// Types for components.
 
 interface BaseComponentState {
   id: string;
@@ -79,6 +56,50 @@ export type ComponentState =
 
 export type ComponentType = ComponentState['type'];
 
-export interface LearningState {
-  components: Record<string, ComponentState>;
+// Types for exercises.
+
+export type ExerciseInstanceId = string;
+
+export interface StoredExerciseState<Exercise = unknown, Input = string> {
+  exercise: Exercise;
+  status: ExerciseStatus;
+  attempts: StoredAttempt<Input>[];
+  generatedAt?: number;
+}
+
+export interface StoredExerciseEvent {
+  timestamp: number;
+  action: ExerciseAction<unknown, unknown>;
+  resultingState: StoredExerciseState;
+}
+
+export interface StoredExerciseInstance {
+  id: ExerciseInstanceId;
+  skillId: string;
+  createdAt: number;
+  completedAt?: number;
+  finalStatus: ExerciseStatus;
+  events: StoredExerciseEvent[];
+}
+
+// Types for exercise attempts/submissions.
+
+export interface StoredAttempt<Input = string> {
+  index: number;
+  input: Input;
+  normalizedInput: string;
+  status: 'invalid' | 'incorrect' | 'correct';
+  timestamp: number;
+}
+
+export interface QueryHistory {
+  query: string;
+  timestamp: number;
+  success: boolean;
+  rowCount?: number;
+}
+
+export interface SavedQuery {
+  name: string;
+  query: string;
 }

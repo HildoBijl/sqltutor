@@ -1,13 +1,11 @@
-/**
- * Derived hooks for the app store.
- */
-
 import { useEffect, useState } from 'react';
 
 import { useAppStore } from './useAppStore';
 
 export function useIsStoreReady() {
-  const hasHydrated = useAppStore((state) => state._hasHydrated);
+  const state = useAppStore((state) => state);
+  console.log(state)
+  const hasHydrated = useAppStore((state) => state.main._hasHydrated);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {

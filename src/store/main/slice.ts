@@ -1,22 +1,32 @@
-/**
- * Main store slice.
- */
+import type { SetState } from '../utils';
 
-import type { MainState } from './types';
+import type { MainSlice, MainState, MainPersisted, MainActions } from './types';
 
-export type { MainState } from './types';
-export const initialMainState: MainState = {
+export const initialState: MainState = {
   _hasHydrated: false,
 };
 
-export interface MainActions {
-  setHasHydrated: (hasHydrated: boolean) => void;
-}
-
-type SetState<T> = (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
-
-export function createMainActions(set: SetState<MainState>): MainActions {
+export function createActions(set: SetState<MainState>): MainActions {
   return {
     setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   };
+}
+
+export function partialize(): MainPersisted {
+  return {};
+}
+
+export function rehydrate(): void {}
+
+export function migrate(state: MainPersisted, _version: number): MainPersisted {
+  return state
+}
+
+export const slice: MainSlice = {
+  key: 'main',
+  initialState,
+  createActions,
+  partialize,
+  rehydrate,
+  migrate,
 }
