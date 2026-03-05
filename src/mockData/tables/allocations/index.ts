@@ -8,10 +8,10 @@ const attributes = {
   d_id: 'id',
 } as const satisfies Attributes;
 
-export const empDeptTable: TableDefinition = {
-  name: 'emp_dept',
+export const allocationsTable: TableDefinition = {
+  name: 'allocations',
   attributes,
-  createStatement: `CREATE TABLE emp_dept (
+  createStatement: `CREATE TABLE allocations (
   e_id INTEGER NOT NULL,
   d_id INTEGER NOT NULL,
   PRIMARY KEY (e_id, d_id),

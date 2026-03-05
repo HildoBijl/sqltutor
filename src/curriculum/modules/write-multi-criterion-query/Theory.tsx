@@ -30,21 +30,21 @@ export function Theory() {
   *,
   0.3*salary AS taxes,
   JULIANDAY(end_date) - JULIANDAY(start_date) AS duration
-FROM emp_data;`} tableWidth={800} tableScale={0.7} below />
+FROM contracts;`} tableWidth={800} tableScale={0.7} below />
       <Par>As second step, we want to apply the filter. We can add a <ISQL>WHERE</ISQL> clause with this newly found <ISQL>duration</ISQL>. There is one caveat though.</Par>
       <Warning>When the DBMS evaluates the query, it starts with <ISQL>FROM</ISQL>, then applies <ISQL>WHERE</ISQL>, then <ISQL>SELECT</ISQL> and it ends with <ISQL>ORDER BY</ISQL>. Newly created columns get created at the <ISQL>SELECT</ISQL> step. We therefore usually <Em>cannot</Em> use newly defined column names within the <ISQL>WHERE</ISQL> clause! So using <ISQL>duration BETWEEN 365 AND 366</ISQL> would fail. Some DBMSs do allow this through a work-around, but it's better not to count on this, and simply copy the full calculation into the <ISQL>WHERE</ISQL> clause.</Warning>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
   JULIANDAY(end_date) - JULIANDAY(start_date) AS duration
-FROM emp_data
+FROM contracts
 WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366;`} tableWidth={800} tableScale={0.7} below />
       <Par>For the third step, we sort and limit the results. We want to sort by the performance score (high to low) and only take the top 5 performers.</Par>
       <FigureExampleQuery query={`SELECT
   *,
   0.3*salary AS taxes,
   JULIANDAY(end_date) - JULIANDAY(start_date) AS duration
-FROM emp_data
+FROM contracts
 WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={800} tableScale={0.7} below />
@@ -52,7 +52,7 @@ LIMIT 5;`} tableWidth={800} tableScale={0.7} below />
       <FigureExampleQuery query={`SELECT
   position,
   0.3*salary AS taxes
-FROM emp_data
+FROM contracts
 WHERE JULIANDAY(end_date) - JULIANDAY(start_date) BETWEEN 365 AND 366
 ORDER BY perf_score DESC
 LIMIT 5;`} tableWidth={240} tableScale={0.7} />

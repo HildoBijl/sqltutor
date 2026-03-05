@@ -19,14 +19,14 @@ export function Theory() {
     </Section>
 
     <Section title="Each column has a data type">
-      <Par>In a database table, every column has a specific <Term>data type</Term>. Let's consider for instance an "employee data" table tracking the various positions of employees as they move through a company.</Par>
+      <Par>In a database table, every column has a specific <Term>data type</Term>. Let's consider for instance a <ISQL>contracts</ISQL> table tracking the various positions of employees as they move through a company.</Par>
       <FigureDataTypeDemo />
       <Par>Note that some columns contain <Term>numbers</Term>, others contain <Term>text</Term>, and others have <Term>date/time</Term> values. A column with a certain type <Em>cannot</Em> contain values of another type!</Par>
       <Par>Optionally, columns may be given further restrictions. For instance, the <ISQL>perf_score</ISQL> column may be set up to only allow numbers between <ISQL>0</ISQL> and <ISQL>100</ISQL>, and the <ISQL>status</ISQL> column may be set up to only take values from a list of possible employee statuses. The set of all possible values that can be put in a column is formally called the <Term>domain</Term> of that column.</Par>
     </Section>
 
     <Section title={<>The <ISQL>NULL</ISQL> value</>}>
-      <Par>The cells in a database table generally <Em>cannot</Em> be empty. However, they <Em>can</Em> be given the value <ISQL>NULL</ISQL>. This is a special value recognized by DBMSs. Having <ISQL>NULL</ISQL> in a cell usually means "This value is not known", although it may also mean "This value is not applicable here." Like for instance when a contract has a <ISQL>start_date</ISQL> but is on-going, and hence does not have an <ISQL>end_date</ISQL> yet.</Par>
+      <Par>The cells in a database table generally <Em>cannot</Em> be empty. However, they often <Em>can</Em> be given the value <ISQL>NULL</ISQL>. This is a special value recognized by most DBMSs. Having <ISQL>NULL</ISQL> in a cell usually means "This value is not known", although it may also mean "This value is not applicable here." Like for instance when a contract has a <ISQL>start_date</ISQL> but is on-going, and hence does not have an <ISQL>end_date</ISQL> yet.</Par>
       <Warning>You can only put <ISQL>NULL</ISQL> in a cell, if the corresponding column allows this. This depends on the domain that is specified for that column when creating the table.</Warning>
     </Section>
 
@@ -58,7 +58,7 @@ export function Theory() {
       ]} />
       <Par>It's not necessary to remember all these types. The main lesson is that every data type has limitations on exactly what it can store and with what precision. These limitations should be taken into account.</Par>
     </Section>
-  </Page >;
+  </Page>;
 }
 
 export function FigureDataTypeDemo() {
@@ -67,7 +67,7 @@ export function FigureDataTypeDemo() {
 
   // Set up query data.
   const db = useTheorySampleDatabase();
-  const data = useQueryResult(db?.database, `SELECT * FROM emp_data;`);
+  const data = useQueryResult(db?.database, `SELECT * FROM contracts;`);
 
   // Find the bounds of the table.
   const [tableRef, tableBounds, table] = useRefWithBounds(drawingData);
@@ -87,7 +87,7 @@ export function FigureDataTypeDemo() {
   const delta = 20; // How much do we jump in from the left of the column?
 
   return <Drawing ref={drawingRef} width={800} height={25 + height + 48} maxWidth={800} disableSVGPointerEvents>
-    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>The emp_data table</span></Element>
+    <Element position={[10, 0]} anchor={[-1, -1]}><span style={{ fontWeight: 500, fontSize: '0.8em' }}>The contracts table</span></Element>
     <Element position={[0, 25]} anchor={[-1, -1]} scale={0.8} behind>
       <Box sx={{ width: 800 / 0.8 }}>
         <DataTable ref={tableRef} data={data} showPagination={false} compact />

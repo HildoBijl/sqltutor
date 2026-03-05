@@ -4,32 +4,32 @@ const EXERCISES: StaticExercise[] = [
   {
     id: 'sort-by-perf-salary',
     version: 1,
-    prompt: 'Retrieve all employee data, sorted first by performance score ascending, and for equal scores, by salary descending.',
+    prompt: 'Retrieve all contracts, sorted first by performance score ascending, and for equal scores, by salary descending.',
     solution: `
 SELECT *
-FROM emp_data
+FROM contracts
 ORDER BY perf_score ASC, salary DESC;
     `,
   },
   {
     id: 'sort-dept-budget-skip',
     version: 1,
-    prompt: 'Retrieve 5 departments with the smallest budgets, skipping the first 3.',
+    prompt: 'Retrieve 5 departments with the smallest budgets, skipping the first 3. Put departments with unknown budget at the end.',
     solution: `
 SELECT *
 FROM departments
-ORDER BY budget ASC
+ORDER BY budget ASC NULLS LAST
 LIMIT 5 OFFSET 3;
     `,
   },
   {
     id: 'sort-end-date-null-last',
     version: 1,
-    prompt: 'Retrieve the data of all employees, ordered by end date. Put everyone with an unlimited contract at the end.',
+    prompt: 'Retrieve all contracts of all employees, ordered by end date with later end dates shown first. Put everyone with an unlimited contract at the start.',
     solution: `
 SELECT *
-FROM emp_data
-ORDER BY end_date ASC NULLS LAST;
+FROM contracts
+ORDER BY end_date DESC NULLS FIRST;
     `,
   },
 ];

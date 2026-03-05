@@ -7,11 +7,11 @@ const EXERCISES: StaticExercise[] = [
     prompt: '[Exercise is under development: data may not be present yet.] Any transaction whose amount is less than 5 is considered a microtransaction. Create an overview of the buyers (their IDs) and the number of microtransactions they have made. Limit the output to buyers whose total amount spent is more than 20000.',
     solution: `
 SELECT 
-  buyer_id,
+  buyer_username,
   COUNT(*) AS num_micro_tx
 FROM transactions
 WHERE amount < 5.00        
-GROUP BY buyer_id
+GROUP BY buyer_username
 HAVING SUM(amount) > 20000;
     `,
   },
@@ -39,7 +39,7 @@ SELECT
   e_id,
   MIN(perf_score) AS lowest_score,
   MAX(perf_score) AS highest_score
-FROM emp_data
+FROM contracts
 GROUP BY e_id
 HAVING MAX(perf_score) - MIN(perf_score) > 40;
     `,
@@ -47,21 +47,21 @@ HAVING MAX(perf_score) - MIN(perf_score) > 40;
   {
     id: 'filtered-aggregation-rejected-tx',
     version: 1,
-    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all vendors (their IDs), their total number of transactions, and the number of rejected transactions. Limit the output to those vendors with more than 50 rejected transactions.',
+    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all vendors (their IDs), their total number of transactions, and the number of rejected transactions. Limit the output to those vendors with more than 1 rejected transaction.',
     solution: `
 SELECT 
-  vendor_id,
+  vendor_username,
   COUNT(*) AS total_tx,
   SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected_tx
 FROM transactions
-GROUP BY vendor_id
-HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 50;
+GROUP BY vendor_username
+HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 1;
     `,
   },
   {
     id: 'filtered-aggregation-product-revenue',
     version: 1,
-    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all products (their IDs), the number of times it has been sold, and the total revenue obtained from the product. Limit the output to products whose total revenue is more than 20,000, yet the average transaction value is less than 10.',
+    prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all products (their IDs), the number of times it has been sold, and the total revenue obtained from the product. Limit the output to products whose total revenue is more than 20,000, yet the average transaction value is less than 5000.',
     solution: `
 SELECT 
     prod_id,
@@ -69,7 +69,7 @@ SELECT
     SUM(amount) AS revenue
 FROM transactions
 GROUP BY prod_id
-HAVING AVG(amount) < 10 AND SUM(amount) > 20000;
+HAVING AVG(amount) < 5000 AND SUM(amount) > 20000;
     `,
   },
 ];

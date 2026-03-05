@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mui/material';
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
-import { useAppStore, type SkillComponentState } from '@/learning/store';
+import { useAppStore, type SkillComponentState } from '@/store';
 import { moduleComponents, moduleIndex } from '@/curriculum';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
@@ -67,7 +67,7 @@ export default function SkillPage() {
     componentState,
     setComponentState,
   } = useContentTabs<SkillComponentState>(skillId, 'skill', availableTabs, {
-    defaultTab: 'practice',
+    defaultTab: 'theory',
   });
 
   const { isLoading, skillMeta, skillModule, error: contentError } = useSkillContent(skillId, {

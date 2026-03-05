@@ -15,10 +15,10 @@ WHERE nr_employees NOT BETWEEN 10 AND 20
   {
     id: 'multi-filter-on-leave',
     version: 1,
-    prompt: 'Retrieve all employee data records where the employee is either on sick leave or paid leave, and the end date is after 2024.',
+    prompt: 'Retrieve all contracts where the employee is either on sick leave or paid leave, and the end date is after 2024.',
     solution: `
 SELECT *
-FROM emp_data
+FROM contracts
 WHERE (status = 'paid leave' OR status = 'sick leave')
   AND end_date > '2024-12-31';
     `,
@@ -50,7 +50,7 @@ WHERE phone LIKE '408%'
 //     solution: `
 // SELECT *
 // FROM transactions
-// WHERE (vendor_id IS NULL OR buyer_id IS NULL)
+// WHERE (vendor_username IS NULL OR buyer_username IS NULL)
 //   AND status = 'approved';
 //     `,
 //   },

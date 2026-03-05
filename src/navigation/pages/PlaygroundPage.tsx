@@ -20,12 +20,12 @@ import {
 } from '@mui/icons-material';
 import { SQLEditor, DataTable } from '@/components';
 import { usePlaygroundDatabase } from '@/learning/databases';
+import { useComponentState } from '@/learning/hooks/useComponentState';
 import {
-  useComponentState,
   type PlaygroundComponentState,
   type QueryHistory,
   type SavedQuery,
-} from '@/learning/store';
+} from '@/store';
 
 export default function PlaygroundPage() {
   const [query, setQuery] = useState('SELECT * FROM employees LIMIT 10;');

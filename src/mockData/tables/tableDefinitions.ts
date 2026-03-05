@@ -3,9 +3,9 @@
  */
 
 import { accountsTable } from './accounts';
+import { allocationsTable } from './allocations';
+import { contractsTable } from './contracts';
 import { departmentsTable } from './departments';
-import { empDataTable } from './emp_data';
-import { empDeptTable } from './emp_dept';
 import { employeesTable } from './employees';
 import { expensesTable } from './expenses';
 import { productsTable } from './products';
@@ -14,15 +14,15 @@ import { transactionsTable } from './transactions';
 import type { TableDefinition } from '../types';
 
 export const tableDefinitions = {
-  employees: employeesTable,
-  emp_data: empDataTable,
-  emp_dept: empDeptTable,
-  departments: departmentsTable,
   accounts: accountsTable,
-  products: productsTable,
-  transactions: transactionsTable,
+  allocations: allocationsTable,
+  contracts: contractsTable,
+  departments: departmentsTable,
+  employees: employeesTable,
   expenses: expensesTable,
+  products: productsTable,
   quarterly_performance: quarterlyPerformanceTable,
+  transactions: transactionsTable,
 } satisfies Record<string, TableDefinition>;
 
 export type TableKey = keyof typeof tableDefinitions;

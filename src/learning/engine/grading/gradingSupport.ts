@@ -3,6 +3,7 @@ import type { QueryResult } from '@/components/sql/sqljs/types';
 import type { ComparisonResult } from './types';
 import {
   EMPTY_RESULT_MESSAGE,
+  SUCCESS_MESSAGE,
   TOO_MANY_COLUMNS_MESSAGE,
   TOO_FEW_COLUMNS_MESSAGE,
   TOO_MANY_ROWS_MESSAGE,
@@ -50,12 +51,15 @@ interface ColumnComparisonResult {
 }
 
 /**
- * Validate that both query results are present and non-empty.
+ * Validate that both query results are present, or allow both empty (match).
  */
 export function validateInputs(
   actual: QueryResult | undefined,
   expected: QueryResult | undefined,
 ): ComparisonResult | null {
+  if (!actual && !expected) {
+    return { match: true, feedback: SUCCESS_MESSAGE };
+  }
   if (!expected || !actual) {
     return {
       match: false,

@@ -7,7 +7,8 @@ import {
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { useComponentState, type ComponentState } from '@/learning/store';
+import { useComponentState } from '@/learning/hooks/useComponentState';
+import type { ComponentState } from '@/store';
 
 import type { TabConfig } from '../types';
 

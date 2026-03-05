@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
-import { useAppStore } from "@/learning/store";
+import { useAppStore } from "@/store";
 import { moduleIndex, moduleItems } from "@/curriculum/index";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";

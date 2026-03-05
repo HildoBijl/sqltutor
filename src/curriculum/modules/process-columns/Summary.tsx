@@ -13,7 +13,7 @@ export function Summary() {
   position,
   salary,
   0.3*salary AS taxes
-FROM emp_data;`} tableWidth={350} />
+FROM contracts;`} tableWidth={350} />
       <Par>The most commonly used processing functions for numbers and text are shown below. There are far more, so whenever you want to process some values, do a quick search on which functions might come in handy.</Par>
       <FigureProcessingCommands />
       <Info>Processing functions for <ISQL>DATE</ISQL> values are also available, but they strongly differ per DBMS. Look up the specifications for your own DBMS whenever you need them.</Info>
