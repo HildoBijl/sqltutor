@@ -353,8 +353,8 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
 
   // Datalog with negation.
   {
-    id: 'dl-rule-safety',
-    name: 'Rule Safety',
+    id: 'dl-literal-types-and-rule-safety',
+    name: 'Literal Types and Rule Safety',
     type: 'concept',
     description: 'How does negation and/or arithmetic potentially lead to infinite outputs in Datalog?',
     prerequisites: ['datalog'],
@@ -364,7 +364,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     name: 'Check Rule Safety',
     type: 'skill',
     description: 'How can we check whether a Datalog rule is safe or not?',
-    prerequisites: ['dl-rule-safety'],
+    prerequisites: ['dl-literal-types-and-rule-safety'],
   },
   {
     id: 'dl-define-negation-rule',
@@ -408,7 +408,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     name: 'Semi-Positive and Stratified Datalog',
     type: 'concept',
     description: 'How does restricting negation in Datalog affect the meaning and behavior of programs?',
-    prerequisites: ['dl-rule-safety', 'dl-predicate-dependency-graph'],
+    prerequisites: ['dl-literal-types-and-rule-safety', 'dl-predicate-dependency-graph'],
   },
   {
     id: 'dl-check-program-stratification',

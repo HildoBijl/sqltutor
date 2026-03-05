@@ -2,11 +2,48 @@ import { buildStaticExerciseModule, type ExerciseState as StaticExerciseState, t
 
 const EXERCISES: StaticExercise[] = [
   {
+    id: 'multitable-mock-join-le',
+    version: 1,
+    prompt: 'List the email addresses of unverified accounts who have bought a product for less than half of its estimated value.',
+    solution: `
+SELECT email
+FROM accounts
+WHERE email_verified = FALSE AND username IN (
+  SELECT t.buyer
+  FROM products AS p
+  JOIN transactions AS t
+  ON t.prod_id = p.p_id
+  WHERE t.price < 0.5*p.est_value
+)
+    `,
+  },
+  {
+    id: 'multitable-mock-in-notin',
+    version: 1,
+    prompt: 'Find the first name and last name of accounts who appear as buyers in transactions related to "Musical Instruments" products, but never sold anything (of any type).',
+    solution: `
+SELECT first_name, last_name
+FROM accounts
+AND username IN (
+	SELECT buyer
+	FROM transactions
+  WHERE prod_id IN (
+    SELECT p_id
+    FROM products
+    WHERE category = 'Musical Instruments'
+  )
+) AND username NOT IN (
+	SELECT vendor
+	FROM transactions
+)
+    `,
+  },
+  {
     id: 'multitable-mock-intersect',
     version: 1,
-    prompt: 'Retrieve the usernames of all users who have bought one or more products from the "Fine Art" category at any point in time, that also appear as owners of products categorized as "Designer Fashion"',
+    prompt: 'Retrieve the usernames of all users who have bought one or more products from the "Fine Art" category at any point in time, that also appear as owners of products categorized as "Designer Fashion".',
     solution: `
-  SELECT DISTINCT buyer
+SELECT DISTINCT buyer
 FROM transactions
 WHERE prod_id IN (
 	SELECT p_id
@@ -17,36 +54,6 @@ INTERSECT
 SELECT DISTINCT owned_by
 FROM products
 WHERE category = 'Designer Fashion'
-    `,
-  },
-  {
-    id: 'multitable-mock-in-notin',
-    version: 1,
-    prompt: 'Find the first name and last name of unverified accounts who appear as buyers, but not as vendors in transactions',
-    solution: `
-  SELECT first_name, last_name
-FROM accounts a
-WHERE a.email_verified = FALSE
-AND a.username IN (
-	SELECT buyer
-	FROM transactions
-	)
-	AND a. username NOT IN (
-		SELECT vendor
-		FROM transactions
-		)
-    `,
-  },
-  {
-    id: 'multitable-mock-join-le',
-    version: 1,
-    prompt: 'List the name of products that have been sold at least once for less than half of their estimated value',
-    solution: `
-  SELECT p.name
-FROM products p
-JOIN transactions t
-ON t.prod_id = p.p_id
-WHERE t.price < 0.5*p.est_value
     `,
   },
 ];

@@ -6,9 +6,9 @@ import type { TableKey } from '@/mockData/tables';
 import type { DatasetSize } from '@/mockData/types';
 
 /**
- * Default tables when no module-specific config exists.
+ * List of all tables that exist.
  */
-const DEFAULT_TABLES: TableKey[] = ['employees'];
+const ALL_TABLES: TableKey[] = ['employees', 'departments', 'contracts', 'allocations', 'accounts', 'products', 'transactions', 'expenses', 'quarterly_performance'];
 
 /**
  * Default dataset size for modules.
@@ -20,8 +20,7 @@ const DEFAULT_SIZE: DatasetSize = 'small';
  * Use `undefined` for skills that don't use tables (e.g., RA skills).
  */
 const moduleTableAccess: Record<string, TableKey[] | undefined> = {
-  default: ['employees'],
-  playground: ['employees', 'departments', 'contracts', 'transactions', 'accounts', 'products', 'expenses', 'quarterly_performance'],
+  playground: ALL_TABLES,
 
   // SQL Skills
   'choose-columns': ['departments', 'employees'],
@@ -39,16 +38,6 @@ const moduleTableAccess: Record<string, TableKey[] | undefined> = {
   'create-pivot-table': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
   'write-multi-table-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
   'write-multi-layered-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
-
-  // RA Skills (no database tables)
-  'ra-choose-columns': undefined,
-  'ra-filter-rows': undefined,
-  'ra-set-up-single-relation-query': undefined,
-  'ra-set-up-multi-condition-query': undefined,
-  'ra-join-relations': undefined,
-  'ra-set-up-multi-relation-query': undefined,
-  'ra-set-up-multi-step-query': undefined,
-  'ra-set-up-universal-condition-query': undefined,
 };
 
 /**
@@ -63,12 +52,8 @@ const moduleSizeOverrides: Record<string, DatasetSize> = {
  * Returns `undefined` for skills that don't use tables.
  */
 export function getModuleTables(moduleId?: string): TableKey[] | undefined {
-  if (!moduleId) return DEFAULT_TABLES;
-  // Check if moduleId is explicitly defined (including undefined values)
-  if (moduleId in moduleTableAccess) {
-    return moduleTableAccess[moduleId];
-  }
-  return DEFAULT_TABLES;
+  if (!moduleId) return undefined;
+  return moduleTableAccess[moduleId];
 }
 
 /**

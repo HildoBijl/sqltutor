@@ -6,6 +6,7 @@ import type {
   ComponentState,
   ComponentType,
   ConceptComponentState,
+  LearningState,
   PlaygroundComponentState,
   SkillComponentState,
   StoredExerciseEvent,
@@ -17,7 +18,7 @@ import {
   normalizeComponentState,
 } from './support';
 
-export const initialLearningState = {
+export const initialLearningState: LearningState = {
   components: {} as Record<string, ComponentState>,
 };
 
@@ -30,10 +31,10 @@ export interface LearningActions {
   getExerciseHistory: (skillId: string, instanceId: string) => StoredExerciseEvent[];
 }
 
-export function createLearningActions(
-  set: (fn: (state: { components: Record<string, ComponentState> }) => Partial<{ components: Record<string, ComponentState> }>) => void,
-  get: () => { components: Record<string, ComponentState> },
-): LearningActions {
+type SetState = (updater: (state: LearningState) => Partial<LearningState>) => void;
+type GetState = () => LearningState;
+
+export function createLearningActions(set: SetState, get: GetState): LearningActions {
   return {
     updateComponent: (id, data) =>
       set((state) => {

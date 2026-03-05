@@ -40,6 +40,12 @@ function generateInstanceId(): ExerciseInstanceId {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+function getExerciseId(exercise: unknown): string | null {
+  if (!exercise || typeof exercise !== 'object') return null;
+  const id = (exercise as Record<string, unknown>).id;
+  return typeof id === 'string' && id.trim().length > 0 ? id : null;
+}
+
 export interface SkillExerciseOption {
   id: string;
   label: string;
@@ -174,6 +180,38 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
   const [progress, setProgress] = useState<SkillExerciseProgress>(() => createInitialProgress());
 
+  const resolveCurrentExercise = useCallback(
+    (exercise: unknown) => {
+      if (!moduleLike?.getExerciseById) {
+        return exercise;
+      }
+
+      const exerciseId = getExerciseId(exercise);
+      if (!exerciseId) {
+        return exercise;
+      }
+
+      return moduleLike.getExerciseById(exerciseId) ?? exercise;
+    },
+    [moduleLike],
+  );
+
+  const toPersistedExercise = useCallback(
+    (exercise: unknown) => {
+      if (!moduleLike?.getExerciseById) {
+        return exercise;
+      }
+
+      const exerciseId = getExerciseId(exercise);
+      if (!exerciseId) {
+        return exercise;
+      }
+
+      return { id: exerciseId };
+    },
+    [moduleLike],
+  );
+
   useEffect(() => {
     if (componentState.currentInstanceId) return;
     const instances = Object.values(componentState.instances || {});
@@ -233,7 +271,11 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         const next = reducer(prev, action);
         if (next === prev) return prev;
 
-        const storedState = extractStorableState<any, string, unknown, unknown>(next);
+        const extractedState = extractStorableState<any, string, unknown, unknown>(next);
+        const storedState: SkillStoredExerciseState = {
+          ...extractedState,
+          exercise: toPersistedExercise(extractedState.exercise),
+        };
 
         if (action.type === 'generate') {
           const instanceId = generateInstanceId();
@@ -278,7 +320,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         return next;
       });
     },
-    [appendEvent, componentId, componentState.currentInstanceId, queueComponentStateUpdate, reducer],
+    [appendEvent, componentId, componentState.currentInstanceId, queueComponentStateUpdate, reducer, toPersistedExercise],
   );
 
   useEffect(() => {
@@ -296,23 +338,29 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
     const lastEvent = instance.events[instance.events.length - 1];
     const storedExercise = lastEvent.resultingState.exercise;
+    const latestExercise = resolveCurrentExercise(storedExercise);
 
-    if (storedExercise && moduleLike?.isExerciseValid && !moduleLike.isExerciseValid(storedExercise)) {
+    if (latestExercise && moduleLike?.isExerciseValid && !moduleLike.isExerciseValid(latestExercise)) {
       dispatch({ type: 'generate' });
       return;
     }
 
+    const resolvedState = {
+      ...lastEvent.resultingState,
+      exercise: latestExercise,
+    };
+
     setProgress((prev) => {
       if (
-        prev.generatedAt === lastEvent.resultingState.generatedAt &&
-        prev.status === lastEvent.resultingState.status &&
-        prev.attempts.length === lastEvent.resultingState.attempts.length
+        prev.generatedAt === resolvedState.generatedAt &&
+        prev.status === resolvedState.status &&
+        prev.attempts.length === resolvedState.attempts.length
       ) {
         return prev;
       }
-      return rehydrateExerciseState(lastEvent.resultingState, exerciseConfig);
+      return rehydrateExerciseState(resolvedState, exerciseConfig);
     });
-  }, [componentState.currentInstanceId, componentState.instances, dispatch, exerciseConfig, moduleLike]);
+  }, [componentState.currentInstanceId, componentState.instances, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
 
   const previewValidation: ValidationPreview = useCallback(
     (input: string) => {

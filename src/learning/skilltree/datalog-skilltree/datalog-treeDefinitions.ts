@@ -55,7 +55,7 @@ const modulePositionsRaw: Record<string, ModulePositionMetaRaw> = {
     'dl-define-join-rule': { position: { x: x2, y: y7 } },
     
     // Datalog with negation
-    'dl-rule-safety': { position: { x: x3, y: y6 } },
+    'dl-literal-types-and-rule-safety': { position: { x: x3, y: y6 } },
     'dl-define-negation-rule': { position: { x: (x2+x3)/2, y: y8 } },
     'dl-check-rule-safety': { position: { x: x3, y: y7 } },
     'dl-write-multi-predicate-program': { position: { x: x2, y: y9 } },

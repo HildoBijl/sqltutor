@@ -1,4 +1,4 @@
-import { Page, Section, Par, List, Info, Term, Em, M, RA, IRA, RelationName, Link } from '@/components';
+import { Page, Section, Par, List, Info, Warning, Term, Em, M, RA, IRA, RelationName, Link } from '@/components';
 import { FigureExampleRAQuery } from '../../utils';
 
 import { FigureTwoTables } from '../database/Theory';
@@ -45,7 +45,12 @@ export function Theory() {
       <RA>σ<sub>employees.current_salary &gt; 0.2*departments.budget</sub>(σ<sub>departments.manager_id = employees.e_id</sub>(departments ⨯ employees))</RA>
       <RA>σ<sub>departments.manager_id = employees.e_id ∧ employees.current_salary &gt; 0.2*departments.budget</sub>(departments ⨯ employees)</RA>
       <Par>Both options are fine. It is however recommended for clarity to keep the <Term>join conditions</Term> (needed to complete the join) separate from the <Term>external conditions</Term> (given by the problem statement). Don't alternate join conditions and external conditions!</Par>
-      <Par>When we use the natural join, there is only one option: add a filtering operator after performing the join.</Par>
+      <Warning>
+        <Par sx={{ mb: 1 }}>There exists an alternate join notation: the <Term>theta-join</Term>. In this notation, we add the join conditions as subscript to the <M>\bowtie</M> symbol: the notation <M>{`r_1 \\bowtie_{\\theta} r_2`}</M> is per definition equivalent to <M>{`\\sigma_{\\theta}(r_1 \\times r_2)`}</M>, where <M>\theta</M> can be any condition. Using this notation, we could also write the above queries as</Par>
+        <RA>σ<sub>employees.current_salary &gt; 0.2*departments.budget</sub>(departments ⋈<sub>departments.manager_id = employees.e_id</sub> employees)</RA>
+        <Par sx={{ mt: 1 }}>Note that only the join condition is added as subscript to the <M>\bowtie</M> symbol, and not the external condition. The theta-join is not so common because it's rather confusing: the <M>\bowtie</M> symbol now suddenly does <Em>not</Em> represent the natural join. To prevent confusion we will not use the theta-join, but you may see it used elsewhere.</Par>
+      </Warning>
+      <Par>When we use the natural join, there is only one option for adding an external condition: add a filtering operator after performing the join.</Par>
       <FigureExampleRAQuery query={<>σ<sub>current_salary &gt; 0.2*budget</sub>(departments ⋈ ρ<sub>e_id→manager_id</sub>(employees))</>} actualQuery="SELECT * FROM departments NATURAL JOIN (SELECT e_id AS manager_id, first_name, last_name, phone, email, address, city, hire_date, current_salary FROM employees) WHERE current_salary < 0.2*budget" tableWidth={900} tableScale={0.5} below />
       <Info>When filtering after using a natural join, we never need the dot-notation to indicate where an attribute comes from. After all, the natural join guarantees there are no equally-named attributes left. Any sets of equally-named attributes are required to be equal, and are hence automatically merged into single attributes!</Info>
     </Section>
