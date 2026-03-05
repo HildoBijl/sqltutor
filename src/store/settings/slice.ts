@@ -11,12 +11,14 @@ export const initialSettingsState: SettingsState = {
   currentTheme: 'light',
   hideStories: true,
   practiceDatasetSize: 'full',
+  goalNodeID: {},
 };
 
 export interface SettingsActions {
   toggleHideStories: () => void;
   setTheme: (theme: Theme) => void;
   setPracticeDatasetSize: (size: DatasetSize) => void;
+  setGoalNodeID: (treeId: string, id: string | null) => void;
 }
 
 type SetState<T> = (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
@@ -26,5 +28,8 @@ export function createSettingsActions(set: SetState<SettingsState>): SettingsAct
     toggleHideStories: () => set((state) => ({ hideStories: !state.hideStories })),
     setTheme: (theme) => set({ currentTheme: theme }),
     setPracticeDatasetSize: (size) => set({ practiceDatasetSize: size }),
+    setGoalNodeID: (treeId, id) => set((state) => ({
+      goalNodeID: { ...state.goalNodeID, [treeId]: id },
+    })),
   };
 }

@@ -9,7 +9,7 @@ import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
 import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
-import { useAppStore } from "@/learning/store";
+import { useAppStore } from "@/store";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
