@@ -1,21 +1,27 @@
 import { Dialog, DialogTitle, DialogActions, Button, Typography, Box, Stack } from '@mui/material';
-import { ArrowBack, Bolt, EmojiEvents, Replay } from '@mui/icons-material';
+import { ArrowBack, Bolt, EmojiEvents, ArrowForward, Replay } from '@mui/icons-material';
 
 interface ConceptCompletionDialogProps {
   open: boolean;
   conceptName?: string;
+  nextUp?: string[];
   onClose: () => void;
   onViewSummary: () => void;
   onReturnToOverview: () => void;
+  onNavigateToNext?: (id: string) => void;
 }
 
 export function ConceptCompletionDialog({
   open,
   conceptName,
+  nextUp,
   onClose,
   onViewSummary,
   onReturnToOverview,
+  onNavigateToNext,
 }: ConceptCompletionDialogProps) {
+  const nextId = nextUp?.[0];
+
   return (
     <Dialog
       open={open}
@@ -54,6 +60,17 @@ export function ConceptCompletionDialog({
             View summary
           </Button>
 
+          {nextId && onNavigateToNext && (
+            <Button
+              onClick={() => onNavigateToNext(nextId)}
+              variant="contained"
+              startIcon={<ArrowForward />}
+              fullWidth
+            >
+              Continue to next
+            </Button>
+          )}
+
           <Button
             onClick={onReturnToOverview}
             variant="outlined"
@@ -63,9 +80,9 @@ export function ConceptCompletionDialog({
             Return to learning overview
           </Button>
 
-          <Button onClick={onClose} variant="outlined" startIcon={<Replay />} fullWidth>
+          {/* <Button onClick={onClose} variant="outlined" startIcon={<Replay />} fullWidth>
             Stay on this concept
-          </Button>
+          </Button> */}
         </Stack>
       </DialogActions>
     </Dialog>

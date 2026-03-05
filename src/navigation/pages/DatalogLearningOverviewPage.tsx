@@ -32,6 +32,7 @@ export default function DatalogLearningOverviewPage() {
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
+        treeId="datalog"
         moduleItems={moduleItems}
         modulePositions={datalogModulePositions}
         treeBounds={treeBounds}

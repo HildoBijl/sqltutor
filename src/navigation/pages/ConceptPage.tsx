@@ -1,20 +1,37 @@
-import { useMemo, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Box, Button, Alert } from '@mui/material';
-import { CheckCircle, School, Lightbulb, MenuBook, Bolt } from '@mui/icons-material';
+import { useMemo, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Container, Box, Button, Alert } from "@mui/material";
+import {
+  CheckCircle,
+  School,
+  Lightbulb,
+  MenuBook,
+  Bolt,
+} from "@mui/icons-material";
 
-import { useAppStore, type ConceptComponentState } from '@/store';
-import { moduleIndex, type ModuleMeta } from '@/curriculum';
-import { useContentTabs } from '@/learning/hooks/useContentTabs';
-import { useModuleProgress } from '@/learning/hooks/useModuleProgress';
-import { useAdminMode } from '@/learning/hooks/useAdminMode';
-import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
-import { ContentHeader } from '@/learning/components/ContentHeader';
-import { ContentTabs } from '@/learning/components/ContentTabs';
-import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/learning/components/TabContent/ContentTab';
-import type { TabConfig } from '@/learning/types';
-import { ConceptCompletionDialog } from '@/learning/components/ConceptCompletionDialog';
-import { getBackToLearningPathFromHistory, SkillTreeDefinition } from '@/learning/utils/skillTreeTracking';
+import { useAppStore, type ConceptComponentState } from "@/store";
+import { moduleIndex, type ModuleMeta } from "@/curriculum";
+import { useContentTabs } from "@/learning/hooks/useContentTabs";
+import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
+import { useAdminMode } from "@/learning/hooks/useAdminMode";
+import { useSkillTreeHistory } from "@/learning/hooks/useSkillTreeHistory";
+import { ContentHeader } from "@/learning/components/ContentHeader";
+import { ContentTabs } from "@/learning/components/ContentTabs";
+import {
+  StoryTab,
+  TheoryTab,
+  VideoTab,
+  SummaryTab,
+} from "@/learning/components/TabContent/ContentTab";
+import type { TabConfig } from "@/learning/types";
+import { ConceptCompletionDialog } from "@/learning/components/ConceptCompletionDialog";
+import {
+  getBackToLearningPathFromHistory,
+  getSkillTreeDefinitions,
+} from "@/learning/utils/skillTreeTracking";
+
+import { moduleItems } from "@/curriculum";
+import { getPrerequisites } from "@/learning/skilltree/utils/goalPath";
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
@@ -31,17 +48,21 @@ export default function ConceptPage() {
 
   const conceptMeta = useMemo<ModuleMeta | undefined>(() => {
     if (!conceptId) return undefined;
-    return moduleIndex.find((item) => item.type === 'concept' && item.id === conceptId);
+    return moduleIndex.find(
+      (item) => item.type === "concept" && item.id === conceptId,
+    );
   }, [conceptId]);
 
   const allTabs: TabConfig[] = [
-    { key: 'story', label: 'Story', icon: <MenuBook /> },
-    { key: 'theory', label: 'Theory', icon: <Lightbulb /> },
+    { key: "story", label: "Story", icon: <MenuBook /> },
+    { key: "theory", label: "Theory", icon: <Lightbulb /> },
     // { key: 'video', label: 'Video', icon: <OndemandVideo /> },
-    { key: 'summary', label: 'Summary', icon: <Bolt /> },
+    { key: "summary", label: "Summary", icon: <Bolt /> },
   ];
 
-  const availableTabs = hideStories ? allTabs.filter((tab) => tab.key !== 'story') : allTabs;
+  const availableTabs = hideStories
+    ? allTabs.filter((tab) => tab.key !== "story")
+    : allTabs;
 
   const {
     currentTab,
@@ -50,25 +71,36 @@ export default function ConceptPage() {
     tabs,
     componentState,
     setComponentState,
-  } = useContentTabs<ConceptComponentState>(conceptId, 'concept', availableTabs, {
-    defaultTab: 'theory',
-  });
+  } = useContentTabs<ConceptComponentState>(
+    conceptId,
+    "concept",
+    availableTabs,
+    {
+      defaultTab: "theory",
+    },
+  );
 
-  const { isCompleted: isModuleCompleted } = useModuleProgress(moduleIndex, components);
-  const isCompleted = conceptId ? isModuleCompleted(conceptId) : componentState.understood ?? false;
+  const { isCompleted: isModuleCompleted } = useModuleProgress(
+    moduleIndex,
+    components,
+  );
+  const isCompleted = conceptId
+    ? isModuleCompleted(conceptId)
+    : (componentState.understood ?? false);
   const summaryUnlocked = isCompleted || isAdmin;
 
   const visibleTabs = useMemo(
-    () => (summaryUnlocked ? tabs : tabs.filter((tab) => tab.key !== 'summary')),
+    () =>
+      summaryUnlocked ? tabs : tabs.filter((tab) => tab.key !== "summary"),
     [summaryUnlocked, tabs],
   );
 
   useEffect(() => {
-    if (!summaryUnlocked && currentTab === 'summary') {
+    if (!summaryUnlocked && currentTab === "summary") {
       const fallbackTab =
-        tabs.find((tab) => tab.key === 'theory')?.key ??
-        tabs.find((tab) => tab.key !== 'summary')?.key ??
-        'theory';
+        tabs.find((tab) => tab.key === "theory")?.key ??
+        tabs.find((tab) => tab.key !== "summary")?.key ??
+        "theory";
       selectTab(fallbackTab);
     }
   }, [currentTab, summaryUnlocked, selectTab, tabs]);
@@ -78,7 +110,9 @@ export default function ConceptPage() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error">
           Concept not found
-          <Button onClick={() => navigate(backToLearningPath)}>Return to learning</Button>
+          <Button onClick={() => navigate(backToLearningPath)}>
+            Return to learning
+          </Button>
         </Alert>
       </Container>
     );
@@ -90,8 +124,25 @@ export default function ConceptPage() {
     setShowCompletionDialog(true);
   };
 
+  // Calculate in which skill tree this concept is located
+  const conceptTree = conceptId
+    ? getSkillTreeDefinitions().find((tree) => tree.moduleIds.has(conceptId))
+    : undefined;
 
-  //const nextStep 
+  // Calculate the current goal node ID for this tree (if any)
+  const goalNodeID = useAppStore((state) =>
+    conceptTree ? (state.goalNodeID[conceptTree.id] ?? null) : null,
+  );
+
+  // Get all prerequisites for the current goal node
+  const prerequisitesOfGoal = goalNodeID
+    ? getPrerequisites(goalNodeID, moduleItems)
+    : new Set<string>();
+
+  const allFollowUps = conceptId ? (moduleItems[conceptId]?.followUps ?? []) : [];
+  const nextUp = goalNodeID
+    ? allFollowUps.filter((id) => prerequisitesOfGoal.has(id) || id === goalNodeID)
+    : allFollowUps;
 
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
@@ -104,18 +155,24 @@ export default function ConceptPage() {
       />
 
       {visibleTabs.length > 0 && (
-        <ContentTabs value={currentTab} tabs={visibleTabs} onChange={handleTabChange}>
-          {currentTab === 'theory' && <TheoryTab contentId={conceptMeta.id} />}
-          {currentTab === 'video' && <VideoTab contentId={conceptMeta.id} />}
-          {currentTab === 'summary' && summaryUnlocked && <SummaryTab contentId={conceptMeta.id} />}
-          {currentTab === 'story' && <StoryTab contentId={conceptMeta.id} />}
+        <ContentTabs
+          value={currentTab}
+          tabs={visibleTabs}
+          onChange={handleTabChange}
+        >
+          {currentTab === "theory" && <TheoryTab contentId={conceptMeta.id} />}
+          {currentTab === "video" && <VideoTab contentId={conceptMeta.id} />}
+          {currentTab === "summary" && summaryUnlocked && (
+            <SummaryTab contentId={conceptMeta.id} />
+          )}
+          {currentTab === "story" && <StoryTab contentId={conceptMeta.id} />}
         </ContentTabs>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
         <span />
 
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           {!isCompleted && (
             <Button
               variant="contained"
@@ -131,10 +188,15 @@ export default function ConceptPage() {
       <ConceptCompletionDialog
         open={showCompletionDialog}
         conceptName={conceptMeta.name}
+        nextUp={nextUp}
+        onNavigateToNext={(id) => {
+          const type = moduleItems[id]?.type;
+          navigate(type === "skill" ? `/skill/${id}` : `/concept/${id}`);
+        }}
         onClose={() => setShowCompletionDialog(false)}
         onViewSummary={() => {
           setShowCompletionDialog(false);
-          selectTab('summary');
+          selectTab("summary");
         }}
         onReturnToOverview={() => navigate(backToLearningPath)}
       />
