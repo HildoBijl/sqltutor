@@ -17,11 +17,6 @@ function createActions(set: SetState<SettingsState>): SettingsActions {
 }
 
 function partialize(state: SettingsState): SettingsPersisted {
-  console.log('Returning!', {
-    currentTheme: state.currentTheme,
-    hideStories: state.hideStories,
-    practiceDatasetSize: state.practiceDatasetSize,
-  })
   return {
     currentTheme: state.currentTheme,
     hideStories: state.hideStories,
@@ -29,8 +24,9 @@ function partialize(state: SettingsState): SettingsPersisted {
   };
 }
 
-function rehydrate(a, b): void {
-  console.log('Rehydrate', a, b)
+function rehydrate(state: SettingsPersisted, storedState: SettingsPersisted, initialState: SettingsState & SettingsActions): void {
+  Object.assign(state, initialState);
+  Object.assign(state, storedState);
 }
 
 function migrate(state: SettingsPersisted, _version: number): SettingsPersisted {

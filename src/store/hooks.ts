@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { useAppStore } from './useAppStore';
 
+// Check if the data store has hydrated its data from local storage.
 export function useIsStoreReady() {
-  const state = useAppStore((state) => state);
-  console.log(state)
   const hasHydrated = useAppStore((state) => state.main._hasHydrated);
   const [isReady, setIsReady] = useState(false);
 
@@ -16,4 +15,9 @@ export function useIsStoreReady() {
   }, [hasHydrated]);
 
   return isReady;
+}
+
+// Get easy access to the settings object.
+export function useSettings() {
+  return useAppStore(state => state.settings);  
 }

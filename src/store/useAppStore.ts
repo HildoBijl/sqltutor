@@ -15,14 +15,24 @@ const slices = [mainSlice, settingsSlice, learningSlice] as const;
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => {
-      const state = {} as AppState;
+      // Walk through the slices and set up initial states in the "initial" attribute of the state, to be hydrated in later.
+      let state = { initial: {} };
       for (const slice of slices) {
-        state[slice.key] = {
+        // Set up custom getters and setters to work within the respective state slice.
+        const { key } = slice;
+        const sliceSet = (updater: Partial<typeof slice.initialState> | ((state: typeof slice.initialState) => Partial<typeof slice.initialState>)) => {
+          set((fullState) => {
+            const sliceState = fullState[key] as typeof slice.initialState;
+            const updatedSlice = typeof updater === "function" ? updater(sliceState) : updater;
+            return { [key]: { ...sliceState, ...updatedSlice } };
+          });
+        };
+        const sliceGet = () => get()[key] as typeof slice.initialState;
+        state.initial[key] = {
           ...slice.initialState,
-          ...slice.createActions?.(set, get),
+          ...slice.createActions?.(sliceSet, sliceGet),
         };
       }
-      console.log(state)
       return state;
     },
     {
@@ -38,13 +48,12 @@ export const useAppStore = create<AppState>()(
       },
 
       onRehydrateStorage: () => (state) => {
-        console.log("Raw localStorage:", localStorage.getItem("sqltutor-storage"));
-        console.log('Rehydrate received:', state, state?.settings, state?.currentTheme, state?.settings?.currentTheme)
         if (!state) return;
+        // Hydrate each slice separately. Give the object to adjust, the state received from storage (a clone, so as not to adjust it) and the initial state including actions.
         for (const slice of slices) {
-          slice.rehydrate?.(state[slice.key]);
+          slice.rehydrate?.(state[slice.key], { ...state[slice.key] }, state.initial[slice.key]);
         }
-        console.log(state)
+        delete state.initial; // Remove initialization, now that it's been implemented.
         state.main.setHasHydrated(true);
       },
 

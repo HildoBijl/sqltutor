@@ -9,5 +9,5 @@ export interface StoreSlice<State, PersistedState, Actions> {
   createActions?: (set: SetState<State>, get: GetState<State>) => Actions,
   partialize: (state: State) => PersistedState,
   migrate?: (state: PersistedState, version: number) => PersistedState,
-  rehydrate?: (state: State) => void,
+  rehydrate?: (state: PersistedState, storedState: PersistedState, initialState: State & Actions) => void,
 }

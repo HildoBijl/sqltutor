@@ -2,23 +2,26 @@ import type { SetState } from '../utils';
 
 import type { MainSlice, MainState, MainPersisted, MainActions } from './types';
 
-export const initialState: MainState = {
+const initialState: MainState = {
   _hasHydrated: false,
 };
 
-export function createActions(set: SetState<MainState>): MainActions {
+function createActions(set: SetState<MainState>): MainActions {
   return {
     setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   };
 }
 
-export function partialize(): MainPersisted {
+function partialize(): MainPersisted {
   return {};
 }
 
-export function rehydrate(): void {}
+function rehydrate(state: MainPersisted, storedState: MainPersisted, initialState: MainState & MainActions): void {
+  Object.assign(state, initialState);
+  Object.assign(state, storedState);
+}
 
-export function migrate(state: MainPersisted, _version: number): MainPersisted {
+function migrate(state: MainPersisted, _version: number): MainPersisted {
   return state
 }
 

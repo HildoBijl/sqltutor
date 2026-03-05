@@ -1,4 +1,4 @@
-import type { LearningSlice, LearningState, LearningPersisted, ComponentState } from './types';
+import type { LearningSlice, LearningState, LearningPersisted, LearningActions, ComponentState } from './types';
 import { normalizeComponentState } from './support';
 import { createActions } from './createActions';
 
@@ -12,8 +12,9 @@ function partialize(state: LearningState): LearningPersisted {
   };
 }
 
-function rehydrate(state: LearningState): void {
-  const rawComponents = state?.components;
+function rehydrate(state: LearningPersisted, storedState: LearningPersisted, initialState: LearningState & LearningActions): void {
+  Object.assign(state, initialState);
+  const rawComponents = storedState?.components;
   if (!rawComponents) {
     return;
   }

@@ -6,20 +6,19 @@ import { router } from './navigation';
 import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider, DatabaseProvider } from './components/sql/sqljs';
 import { ErrorBoundary } from './components';
-import { useAppStore, useIsStoreReady } from './store';
+import { useSettings, useIsStoreReady } from './store';
 
 export function App() {
-  const mode = useAppStore((s) => s.currentTheme);
-  const setTheme = useAppStore((s) => s.setTheme);
+  const {currentTheme, setTheme } = useSettings();
   const isStoreReady = useIsStoreReady();
 
-  const muiTheme = useMemo(() => getTheme(mode), [mode]);
+  const muiTheme = useMemo(() => getTheme(currentTheme), [currentTheme]);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', mode);
-  }, [mode]);
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  }, [currentTheme]);
 
-  const toggleColorMode = () => setTheme(mode === 'light' ? 'dark' : 'light');
+  const toggleColorMode = () => setTheme(currentTheme === 'light' ? 'dark' : 'light');
 
   if (!isStoreReady) {
     return null;
@@ -28,7 +27,7 @@ export function App() {
   return (
     <StrictMode>
       <ErrorBoundary>
-        <ColorModeContext.Provider value={{ mode, toggleColorMode }}>
+        <ColorModeContext.Provider value={{ mode: currentTheme, toggleColorMode }}>
           <ThemeProvider theme={muiTheme}>
             <CssBaseline />
             <SQLJSProvider>
