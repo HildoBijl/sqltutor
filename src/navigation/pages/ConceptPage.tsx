@@ -14,7 +14,7 @@ import { ContentTabs } from '@/learning/components/ContentTabs';
 import { StoryTab, TheoryTab, VideoTab, SummaryTab } from '@/learning/components/TabContent/ContentTab';
 import type { TabConfig } from '@/learning/types';
 import { ConceptCompletionDialog } from '@/learning/components/ConceptCompletionDialog';
-import { getBackToLearningPathFromHistory } from '@/learning/utils/skillTreeTracking';
+import { getBackToLearningPathFromHistory, SkillTreeDefinition } from '@/learning/utils/skillTreeTracking';
 
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
@@ -89,6 +89,9 @@ export default function ConceptPage() {
 
     setShowCompletionDialog(true);
   };
+
+
+  //const nextStep 
 
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>

@@ -7,6 +7,7 @@ import { ModulePositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
 import { useTransformContext } from "react-zoom-pan-pinch";
 import { useDebouncedFunction } from "@/utils";
+import { getPrerequisites } from "../utils/goalPath";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -84,29 +85,10 @@ export function SkillTree({
     transformState.positionY,
   ]);
 
-  // Recursive function to get all prerequisites for a given item
-  const getPrerequisites = (itemId: string): Set<string> => {
-    const prerequisites = new Set<string>();
-    const item = moduleItems[itemId];
-
-    if (!item?.prerequisites || item.prerequisites.length === 0)
-      return prerequisites;
-
-    for (const prereqId of item.prerequisites) {
-      prerequisites.add(prereqId);
-      const nestedPrereqs = getPrerequisites(prereqId);
-      for (const p of nestedPrereqs) {
-        prerequisites.add(p);
-      }
-    }
-
-    return prerequisites;
-  };
-
   // Calculate prerequisites for goal node in planning mode
   const goalPrerequisites = useMemo(() => {
     if (goalNodeId) {
-      return getPrerequisites(goalNodeId);
+      return getPrerequisites(goalNodeId, moduleItems);
     }
     return new Set<string>();
   }, [goalNodeId, moduleItems]);
@@ -146,7 +128,7 @@ export function SkillTree({
   const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
     setHoveredId(id);
-    const chain = getPrerequisites(id);
+    const chain = getPrerequisites(id, moduleItems);
     // Calculate full prerequisite chain
     setPrerequisites(chain);
 
