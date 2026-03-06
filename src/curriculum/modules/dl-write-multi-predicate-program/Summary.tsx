@@ -5,7 +5,7 @@ export function Summary() {
   return <Page>
     <Section>
       <Par>A typical Datalog program consists of many small rules defining predicates, ending with a query.</Par>
-      <FigureExampleDLQuery query={<>fineArtProduct(id) :- product(id, _, 'Fine Art', _, _, _).<br />boughtFineArt(u) :- transaction(_, _, u, id, _, _, _, _), fineArtProduct(id).<br />neverBoughtFineArt(u) :- account(u, _, _, _, _, _, _, _, _, _), not boughtFineArt(u).<br />?- neverBoughtFineArt(username).</>} actualQuery="SELECT username AS username FROM accounts EXCEPT SELECT buyer_username AS username FROM transactions WHERE prod_id IN (SELECT p_id FROM products WHERE category='Fine Art')" tableWidth={150} />
+      <FigureExampleDLQuery query={<>fineArtProduct(id) :- product(id, _, 'Fine Art', _, _, _).<br />boughtFineArt(u) :- transaction(_, _, u, id, _, _, _, _), fineArtProduct(id).<br />neverBoughtFineArt(u) :- account(u, _, _, _, _, _, _, _, _, _), not boughtFineArt(u).<br />?- neverBoughtFineArt(username).</>} actualQuery="SELECT username AS username FROM accounts EXCEPT SELECT buyer AS username FROM transactions WHERE prod_id IN (SELECT p_id FROM products WHERE category='Fine Art')" tableWidth={150} />
       <Par>Getting good at setting up these programs mainly requires practice. There are a few helpful tips and tricks.</Par>
       <List useNumbers items={[
         <>First <Term>manually execute</Term> the data request for a few entries to gain intuition about the data.</>,

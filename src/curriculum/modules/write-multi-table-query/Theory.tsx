@@ -36,7 +36,7 @@ export function Theory() {
 SELECT DISTINCT username
 FROM accounts AS a
 JOIN transactions AS t
-ON a.username = t.buyer_username
+ON a.username = t.buyer
 JOIN products AS p
 ON t.prod_id = p.p_id
 WHERE p.category = 'Fine Art';`} tableWidth={150} tableScale={0.7} />
@@ -48,7 +48,7 @@ WHERE p.category = 'Fine Art';`} tableWidth={150} tableScale={0.7} />
       <Par>Let's try this out on our example. We have already realized we don't really need the <ISQL>accounts</ISQL> table. We could cut that out. That gives the following request/query.</Par>
       <Quote>Find the usernames of the transaction buyers for which the corresponding product has category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT DISTINCT buyer_username
+SELECT DISTINCT buyer
 FROM transactions AS t
 JOIN products AS p
 ON t.prod_id = p.p_id
@@ -56,7 +56,7 @@ WHERE p.category = 'Fine Art';`} tableWidth={150} tableScale={0.7} />
       <Par>We have also realized that we could first create a list of all "Fine Art" products. We then check if the product is in this list. Using this idea, we can again rewrite our request/query.</Par>
       <Quote>Find the usernames of the transaction buyers for which the corresponding product is in the list of products with category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT DISTINCT buyer_username
+SELECT DISTINCT buyer
 FROM transactions
 WHERE prod_id IN (
   SELECT DISTINCT p_id
@@ -79,7 +79,7 @@ WHERE category = 'Fine Art';`} tableWidth={120} tableScale={0.7} />
       <Par>Once we have this list, we can build the next step of our query <Em>around</Em> it.</Par>
       <Quote>Find the IDs of the transaction buyers for which the corresponding product is in the list of products with category equal to "Fine Art".</Quote>
       <FigureExampleQuery query={`
-SELECT DISTINCT buyer_username
+SELECT DISTINCT buyer
 FROM transactions
 WHERE prod_id IN (
   SELECT DISTINCT p_id
@@ -92,7 +92,7 @@ WHERE prod_id IN (
 SELECT username, email
 FROM accounts
 WHERE username IN (
-  SELECT DISTINCT buyer_username
+  SELECT DISTINCT buyer
   FROM transactions
   WHERE prod_id IN (
     SELECT DISTINCT p_id
@@ -126,7 +126,7 @@ WHERE NOT EXISTS (
     FROM transactions AS t
     JOIN products AS p2
     ON t.prod_id = p2.p_id
-    WHERE a.username = t.buyer_username
+    WHERE a.username = t.buyer
       AND p1.category = p2.category
   )
 );`} tableWidth={300} tableScale={0.7} />
@@ -145,7 +145,7 @@ WHERE NOT EXISTS (
 SELECT username, email
 FROM accounts
 WHERE username IN (
-  SELECT DISTINCT buyer_username
+  SELECT DISTINCT buyer
   FROM transactions
   WHERE prod_id IN (
     SELECT DISTINCT p_id
@@ -160,7 +160,7 @@ WHERE username IN (
 SELECT a.username, t.t_id, t.date_time, p.p_id, p.name, p.category
 FROM accounts AS a
 JOIN transactions AS t
-ON a.username = t.buyer_username
+ON a.username = t.buyer
 JOIN products AS p
 ON t.prod_id = p.p_id
 WHERE a.username = 'Jim_Business';`} tableWidth={600} tableScale={0.7} below />

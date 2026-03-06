@@ -7,11 +7,11 @@ const EXERCISES: StaticExercise[] = [
     prompt: '[Exercise is under development: data may not be present yet.] Any transaction whose amount is less than 5 is considered a microtransaction. Create an overview of the buyers (their IDs) and the number of microtransactions they have made. Limit the output to buyers whose total amount spent is more than 20000.',
     solution: `
 SELECT 
-  buyer_username,
+  buyer,
   COUNT(*) AS num_micro_tx
 FROM transactions
 WHERE amount < 5.00        
-GROUP BY buyer_username
+GROUP BY buyer
 HAVING SUM(amount) > 20000;
     `,
   },
@@ -50,11 +50,11 @@ HAVING MAX(perf_score) - MIN(perf_score) > 40;
     prompt: '[Exercise is under development: data may not be present yet.] Create an overview of all vendors (their IDs), their total number of transactions, and the number of rejected transactions. Limit the output to those vendors with more than 1 rejected transaction.',
     solution: `
 SELECT 
-  vendor_username,
+  vendor,
   COUNT(*) AS total_tx,
   SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected_tx
 FROM transactions
-GROUP BY vendor_username
+GROUP BY vendor
 HAVING SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) > 1;
     `,
   },

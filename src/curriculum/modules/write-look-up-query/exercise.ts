@@ -52,7 +52,7 @@ WHERE manager_id IN (
   // WHERE e_id IN (
   //   SELECT validated_by
   //   FROM transactions
-  //   WHERE buyer_username = vendor_username
+  //   WHERE buyer = vendor
   // );
   //     `,
   //   },
@@ -65,7 +65,7 @@ WHERE manager_id IN (
   // WHERE t.date_time < (
   //     SELECT a.created_at
   //     FROM accounts a
-  //     WHERE a.username = t.vendor_username
+  //     WHERE a.username = t.vendor
   // );
   //     `,
   //   },

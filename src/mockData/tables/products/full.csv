@@ -1,20 +1,20 @@
 p_id,name,category,owned_by,est_value,status
-151879,Chippendale Mahogany Chair Set,Antique Furniture,0ebb889c-dcfa-4dc9-9ac4-de2879d4a61b,94602,sold
-501342,Lincoln Head Copper Penny,Collectible Coins,e81b1f78-27a6-4e3d-bc6e-980e331c2e0b,2572009,sold
-110345,"Hermès Birkin Bag (Crocodile, 35cm)",Designer Fashion,92398d57-2c85-4417-89c3-115135a104e0,334221,sold
-214320,Gucci Jackie Bag (Vintage),Designer Fashion,9eb22f71-12a3-48ae-b7bb-246cb4feb6fb,15649,sold
-732499,Frida Kahlo Self-Portrait Sketch,Fine Art,92398d57-2c85-4417-89c3-115135a104e0,874299,sold
+151879,Chippendale Mahogany Chair Set,Antique Furniture,XxMrMelonxX,90000,listed
+501342, Lincoln Head Copper Penny,Collectible Coins,XxMrMelonxX,255000,listed
+110345,"Herm�s Birkin Bag (Crocodile, 35cm)",Designer Fashion,vanilla_coke,33000,listed
+214320,Gucci Jackie Bag (Vintage),Designer Fashion,Jim_Business,16000,withdrawn
+732499,Frida Kahlo Self-Portrait Sketch,Fine Art,lizardman,85000,in_escrow
 986603,Princess Diana's Revenge Dress (Replica),Haute Couture,7e1543c0-0b3d-45f7-8557-9dca6efe25fc,165155,sold
 535322,Dior Gala Vintage Dress,Haute Couture,7a3520ed-ccf4-4ef6-b184-f2be8831e0ad,19645,sold
 938790,Ancient Roman Gladius Sword,Historical Artifacts,11ce6126-9b47-40a8-81a9-a9fd49caf3f7,286539,sold
 878470,McLaren P1 GTR,Luxury Vehicles,b01afa48-40e5-4fc1-b1b4-4d013ad0de04,5398574,sold
 823173,Aston Martin DB5 from James Bond Films,Luxury Vehicles,38fc8ee7-7126-459a-a21a-0bd283e80529,4638572,sold
 182438,Steinway & Sons Concert Grand Piano,Musical Instruments,bcd40f55-1c09-4c5d-98f2-768fae06d08c,249483,sold
-145104,Original Marilyn Monroe Film Costume,Other,dc48f39b-344c-4151-adce-7acfc85f1380,166025,sold
-132849,Meteorite Fragment (Martian),Other,0ebb889c-dcfa-4dc9-9ac4-de2879d4a61b,182441,sold
-486668,Frida Kahlo's Paint-Stained Easel,Other,81091a02-84d3-4c9c-9d0a-dc8c70986cf1,630777,sold
-565145,Original Dune Manuscript by Frank Herbert,Rare Books & Manuscripts,729f8593-133e-40c9-afd7-09f8bc19ec76,1219390,sold
-939534,Dom Pérignon 1921,Vintage Wine & Spirits,e35ec7b2-ef2b-4f30-bfbd-5466320eed5f,76108,sold
+145104,Original Marilyn Monroe Film Costume,Other,XxMrMelonxX,166025,sold
+132849,Meteorite Fragment (Martian),Other,XxMrMelonxX,182441,sold
+486668,Frida Kahlo's Paint-Stained Easel,Other,vanilla_coke,630777,sold
+565145,Original Dune Manuscript by Frank Herbert,Rare Books & Manuscripts,Jim_Business,1219390,sold
+939534,Dom Pérignon 1921,Vintage Wine & Spirits,lizardman,76108,sold
 101751,O'Keeffe Desert Flower Painting,Fine Art,1de8463a-aaab-4442-8b3d-a195ed10dc8b,841869,sold
 106915,Hockney Swimming Pool Painting,Fine Art,92fe1b42-96fd-4b95-b2c0-5657964f78b8,5380397,sold
 110645,Steve Jobs' Mercedes SL55 AMG,Luxury Vehicles,e5c65e13-3f89-4f82-bf39-a8560e52f115,519253,sold
@@ -35,11 +35,11 @@ p_id,name,category,owned_by,est_value,status
 171067,Florence Nightingale's Medical Kit,Other,0d9585b1-64d5-460c-bade-92357c693e31,286538,sold
 180812,Bonnie Parker's Pistol,Other,e8215a60-18b2-4cc7-8597-fd8f055c7704,402331,sold
 184265,Ming Dynasty Dragon Throne Chair,Antique Furniture,06ffa6ee-2815-45fe-8c5a-d2956a399311,2259336,sold
-189233,Julius Caesar Silver Denarius,Collectible Coins,38368c7b-b088-4c50-b3fe-777d13e46ce1,201952,sold
-192439,Wright Brothers' Plane Blueprint,Historical Artifacts,7089bbea-a444-4967-ad5f-7adb4089a68e,1226904,sold
-206993,Elizabeth Taylor's Diamond Brooch,Jewelry,090d7e86-c8d4-47b8-bbdb-34887efc4088,498635,sold
-208242,Amelia Earhart's Flight Goggles,Other,3f34272c-f0f4-43eb-9b0d-ac0fe94b5051,701315,sold
-212931,Keith Haring Original Mural Sketch,Fine Art,37c65474-3a76-4d04-9b08-9e4c87de7f8f,548770,sold
+189233,Julius Caesar Silver Denarius,Collectible Coins,XxMrMelonxX,201952,sold
+192439,Wright Brothers' Plane Blueprint,Historical Artifacts,XxMrMelonxX,1226904,sold
+206993,Elizabeth Taylor's Diamond Brooch,Jewelry,vanilla_coke,498635,sold
+208242,Amelia Earhart's Flight Goggles,Other,Jim_Business,701315,sold
+212931,Keith Haring Original Mural Sketch,Fine Art,lizardman,548770,sold
 213897,Elton John's Platform Shoes,Designer Fashion,79a0f558-4c32-4140-81d1-1f5518b3df29,78444,sold
 227930,Chief Joseph's Headdress,Other,fa4ea72e-eefe-461a-8011-018f6cdce2c1,1940050,sold
 228268,Darth Vader's Helmet (Original),Other,6782c60e-32d6-45fd-ae16-0d1c29697e30,2554510,sold
@@ -49,11 +49,11 @@ p_id,name,category,owned_by,est_value,status
 273988,Genghis Khan's Sword,Other,5e4755d5-5233-4cb2-b6f2-873393fedaac,1606967,sold
 289452,Tom Brady's Super Bowl Football,Other,0c2b6f43-9e1e-4535-98b9-762890ffcf03,715475,sold
 294959,Sacagawea's Beaded Pouch,Other,added80d-b90d-4c55-934f-3933792aa860,439097,sold
-302560,Audrey Hepburn's Givenchy Hat,Designer Fashion,1f6d0ff4-252c-454b-a127-b48e35e44139,81800,sold
-309190,Brasher Doubloon 1787,Collectible Coins,661b6f1c-2127-405f-b975-eac24b89767d,11128759,sold
-313146,Queen Anne Walnut Bureau,Antique Furniture,3e657da6-c29e-41ac-af33-032f874927fb,249349,sold
-318287,Copernicus' Star Chart,Other,d500e6b2-c946-43c1-b899-3da59e0dba6c,1373258,sold
-335024,Blackbeard's Pistol,Other,2533ec8d-b373-45e4-a9be-f1526c882964,746635,sold
+302560,Audrey Hepburn's Givenchy Hat,Designer Fashion,lizardman,81800,sold
+309190,Brasher Doubloon 1787,Collectible Coins,XxMrMelonxX,11128759,sold
+313146,Queen Anne Walnut Bureau,Antique Furniture,vanilla_coke,249349,sold
+318287,Copernicus' Star Chart,Other,Jim_Business,1373258,sold
+335024,Blackbeard's Pistol,Other,lizardman,746635,sold
 335038,Vivien Leigh's Gone with the Wind Dress,Haute Couture,a7625e72-fadf-4bf8-8554-9622acc3fbcb,982231,sold
 335860,Buffalo Bill's Show Poster (Original),Other,7e350d5c-3a9f-41f9-ade3-a605388355b7,114104,sold
 353033,Galileo's Telescope Lens,Other,37c65474-3a76-4d04-9b08-9e4c87de7f8f,2012709,sold
@@ -61,11 +61,11 @@ p_id,name,category,owned_by,est_value,status
 378209,Imperial Russian Sapphire Parure,Jewelry,5b80f103-4cca-442b-9f32-67056e27da75,1277056,sold
 381280,Edward VIII Sovereign (Unissued),Collectible Coins,02bf0600-bf7b-4cae-9e5f-d5461ac3eab5,1092145,sold
 384951,Napoleon's Campaign Bed,Antique Furniture,be054df8-784e-4588-aff3-b2f6c2428ec3,905054,sold
-396273,Jesse James' Revolver,Other,5cab340a-6412-4f3e-b052-510fde129ed2,872309,sold
-398941,Van Gogh's Easel,Other,b5986977-6896-4cfd-90f6-03eeee1b22a9,2372534,sold
-400716,Sitting Bull's Peace Pipe,Other,fc6c7c83-0121-4780-ba83-ff0c0b4517e8,1148750,sold
-417459,Joan of Arc's Armor Piece,Other,e8215a60-18b2-4cc7-8597-fd8f055c7704,1340095,sold
-450010,Kandinsky Abstract Composition,Fine Art,d20dfd17-0b63-45e2-93d4-68a2a08ee478,1543464,sold
+396273,Jesse James' Revolver,Other,XxMrMelonxX,872309,sold
+398941,Van Gogh's Easel,Other,XxMrMelonxX,2372534,sold
+400716,Sitting Bull's Peace Pipe,Other,vanilla_coke,1148750,sold
+417459,Joan of Arc's Armor Piece,Other,Jim_Business,1340095,sold
+450010,Kandinsky Abstract Composition,Fine Art,lizardman,1543464,sold
 451095,Mark Twain's Handwritten Novel,Rare Books & Manuscripts,7e350d5c-3a9f-41f9-ade3-a605388355b7,1015289,sold
 451168,Anne Frank's Diary Page,Historical Artifacts,5b87ccdb-ce9f-4b52-97a7-24669d0c3c92,1431124,sold
 454129,Pol Roger 1874 Champagne,Vintage Wine & Spirits,193ff851-1e85-4b2c-b511-e794c8525564,100671,sold

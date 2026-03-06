@@ -17,9 +17,9 @@ WITH low_salary_employees AS (
   FROM transactions
   WHERE validated_by IN low_salary_employees
 ), affected_users AS (
-  SELECT vendor_username AS username FROM affected_transactions
+  SELECT vendor AS username FROM affected_transactions
   UNION
-  SELECT buyer_username AS username FROM affected_transactions
+  SELECT buyer AS username FROM affected_transactions
 )
 
 SELECT email
