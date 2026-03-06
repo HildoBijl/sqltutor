@@ -46,6 +46,35 @@ function getExerciseId(exercise: unknown): string | null {
   return typeof id === 'string' && id.trim().length > 0 ? id : null;
 }
 
+function getExerciseFingerprint(exercise: unknown): string {
+  const seen = new WeakSet<object>();
+
+  const serialize = (value: unknown): string => {
+    if (value === null) return 'null';
+    if (value === undefined) return 'undefined';
+    if (Array.isArray(value)) {
+      return `[${value.map((item) => serialize(item)).join(',')}]`;
+    }
+    if (typeof value === 'object') {
+      const objectValue = value as Record<string, unknown>;
+      if (seen.has(objectValue)) {
+        return '[Circular]';
+      }
+      seen.add(objectValue);
+      const entries = Object.entries(value as Record<string, unknown>)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, nested]) => `${JSON.stringify(key)}:${serialize(nested)}`);
+      return `{${entries.join(',')}}`;
+    }
+    if (typeof value === 'string') {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
+  return serialize(exercise);
+}
+
 export interface SkillExerciseOption {
   id: string;
   label: string;
@@ -188,10 +217,10 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
 
       const exerciseId = getExerciseId(exercise);
       if (!exerciseId) {
-        return exercise;
+        return null;
       }
 
-      return moduleLike.getExerciseById(exerciseId) ?? exercise;
+      return moduleLike.getExerciseById(exerciseId);
     },
     [moduleLike],
   );
@@ -354,7 +383,8 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
       if (
         prev.generatedAt === resolvedState.generatedAt &&
         prev.status === resolvedState.status &&
-        prev.attempts.length === resolvedState.attempts.length
+        prev.attempts.length === resolvedState.attempts.length &&
+        getExerciseFingerprint(prev.exercise) === getExerciseFingerprint(resolvedState.exercise)
       ) {
         return prev;
       }
