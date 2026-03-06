@@ -265,13 +265,13 @@ export function compareRows(
 
   // Normalize rows for comparison
   const expectedRows = expected.values.map((row) =>
-    normalizeRow(row, ignoreColumnOrder ? columnMapping : identityMapping, caseSensitive),
+    normalizeRow(row, identityMapping, caseSensitive),
   );
 
   const actualRows = actual.values.map((row) =>
     normalizeRow(
       row,
-      actual.columns.map((_, idx) => idx),
+      ignoreColumnOrder ? columnMapping : identityMapping,
       caseSensitive,
     ),
   );
