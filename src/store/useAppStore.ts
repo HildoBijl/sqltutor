@@ -16,30 +16,7 @@ import type { MainState, MainActions } from './main/slice';
 import type { SettingsState, SettingsActions } from './settings/slice';
 import type { LearningActions } from './learning/slice';
 
-const APP_STORAGE_KEY = 'sqlvalley-storage';
-const LEGACY_APP_STORAGE_KEY = 'sqltutor-storage';
-
-const migrateLegacyAppStorage = () => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    const existing = window.localStorage.getItem(APP_STORAGE_KEY);
-    if (existing !== null) {
-      return;
-    }
-
-    const legacy = window.localStorage.getItem(LEGACY_APP_STORAGE_KEY);
-    if (legacy !== null) {
-      window.localStorage.setItem(APP_STORAGE_KEY, legacy);
-    }
-  } catch (error) {
-    console.warn('Failed to migrate legacy app storage.', error);
-  }
-};
-
-migrateLegacyAppStorage();
+const APP_STORAGE_KEY = 'sqltutor-storage';
 
 export interface AppState
   extends MainState,
