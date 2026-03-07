@@ -12,7 +12,8 @@ export interface SkillTreeDefinition {
 
 export const SKILL_TREE_CHANGE_EVENT = 'skill-tree-change';
 
-const SKILL_TREE_HISTORY_KEY = 'sqltutor-skilltree-history';
+const SKILL_TREE_HISTORY_KEY = 'sqlvalley-skilltree-history';
+const LEGACY_SKILL_TREE_HISTORY_KEY = 'sqltutor-skilltree-history';
 const DEFAULT_SKILL_TREE_HISTORY: SkillTreeId[] = ['sql'];
 
 const skillTreeDefinitions: SkillTreeDefinition[] = [
@@ -65,13 +66,28 @@ const normalizeHistory = (raw: unknown): SkillTreeId[] => {
 
 export const getSkillTreeDefinitions = () => skillTreeDefinitions;
 
+const readSkillTreeHistoryFromStorage = (): string | null => {
+  const current = window.localStorage.getItem(SKILL_TREE_HISTORY_KEY);
+  if (current !== null) {
+    return current;
+  }
+
+  const legacy = window.localStorage.getItem(LEGACY_SKILL_TREE_HISTORY_KEY);
+  if (legacy !== null) {
+    window.localStorage.setItem(SKILL_TREE_HISTORY_KEY, legacy);
+    return legacy;
+  }
+
+  return null;
+};
+
 export const getSkillTreeHistory = (): SkillTreeId[] => {
   if (typeof window === 'undefined') {
     return [...DEFAULT_SKILL_TREE_HISTORY];
   }
 
   try {
-    const stored = window.localStorage.getItem(SKILL_TREE_HISTORY_KEY);
+    const stored = readSkillTreeHistoryFromStorage();
     const parsed = stored ? JSON.parse(stored) : null;
     return normalizeHistory(parsed);
   } catch (error) {
