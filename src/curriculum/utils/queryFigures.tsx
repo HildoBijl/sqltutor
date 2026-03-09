@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@/utils/dom';
@@ -6,7 +7,7 @@ import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable,
 import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
 
-export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }) {
+export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }: { query?: string, title?: ReactNode, tableWidth?: number, tableScale?: number }) {
   // Get the data.
   const db = useTheorySampleDatabase();
   const data = useQueryResult(db?.database, query);
