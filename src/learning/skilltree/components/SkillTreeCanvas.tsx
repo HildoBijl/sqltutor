@@ -10,6 +10,7 @@ import { TreeLegend } from "./TreeLegend";
 import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
 import { useAppStore } from "@/store";
+import { PlanningModeIntro } from "./PlanningModeIntro";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -74,6 +75,14 @@ export function SkillTreeCanvas({
   const goalNodeId = useAppStore((state) => state.goalNodeID[treeId] ?? null);
   const setGoalNodeIdInStore = useAppStore((state) => state.setGoalNodeID);
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
+  const setHasAccessedPlanningMode = useAppStore(
+    (state) => state.setHasAccessedPlanningMode,
+  );
+  const hasAccessedPlanningMode = useAppStore(
+    (state) => state.hasAccessedPlanningMode,
+  );
+
+  const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 
   useEffect(() => {
     if (goalNodeId) {
@@ -127,7 +136,13 @@ export function SkillTreeCanvas({
               onZoomOut={zoomOut}
               onReset={resetTransform}
               onCenter={centerView}
-              onTogglePlanningMode={() => setPlanningMode(!planningMode)}
+              onTogglePlanningMode={() => {
+                if (!planningMode && !hasAccessedPlanningMode) {
+                  setShowPlanningModeModal(true);
+                  setHasAccessedPlanningMode(true);
+                }
+                setPlanningMode(!planningMode);
+              }}
               planningMode={planningMode}
             />
             {planningMode && goalNodeId && (
@@ -173,6 +188,10 @@ export function SkillTreeCanvas({
           </div>
         )}
       </TransformWrapper>
+      <PlanningModeIntro
+        open={showPlanningModeModal}
+        onClose={() => setShowPlanningModeModal(false)}
+      />
     </div>
   );
 }
