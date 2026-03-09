@@ -10,6 +10,7 @@ export interface PersistedSettings {
   hideStories?: boolean;
   practiceDatasetSize?: DatasetSize;
   goalNodeID?: Record<string, string | null>;
+  hasAccessedPlanningMode?: boolean;
 }
 
 export function partializeSettings(state: SettingsState): PersistedSettings {
@@ -18,6 +19,7 @@ export function partializeSettings(state: SettingsState): PersistedSettings {
     hideStories: state.hideStories,
     practiceDatasetSize: state.practiceDatasetSize,
     goalNodeID: state.goalNodeID,
+    hasAccessedPlanningMode: state.hasAccessedPlanningMode,
   };
 }
 
@@ -38,6 +40,9 @@ export function rehydrateSettings(
   }
   if (persisted.goalNodeID) {
     state.goalNodeID = persisted.goalNodeID;
+  }
+  if (typeof persisted.hasAccessedPlanningMode === 'boolean') {
+    state.hasAccessedPlanningMode = persisted.hasAccessedPlanningMode;
   }
 }
 

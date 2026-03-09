@@ -11,4 +11,5 @@ export interface SettingsState {
   hideStories: boolean;
   practiceDatasetSize: DatasetSize;
   goalNodeID: Record<string, string | null>;
+  hasAccessedPlanningMode: boolean; 
 }

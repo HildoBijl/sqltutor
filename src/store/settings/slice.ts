@@ -12,6 +12,7 @@ export const initialSettingsState: SettingsState = {
   hideStories: true,
   practiceDatasetSize: 'full',
   goalNodeID: {},
+  hasAccessedPlanningMode: false, 
 };
 
 export interface SettingsActions {
@@ -19,6 +20,7 @@ export interface SettingsActions {
   setTheme: (theme: Theme) => void;
   setPracticeDatasetSize: (size: DatasetSize) => void;
   setGoalNodeID: (treeId: string, id: string | null) => void;
+  setHasAccessedPlanningMode: (accessed: boolean) => void;
 }
 
 type SetState<T> = (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
@@ -31,5 +33,6 @@ export function createSettingsActions(set: SetState<SettingsState>): SettingsAct
     setGoalNodeID: (treeId, id) => set((state) => ({
       goalNodeID: { ...state.goalNodeID, [treeId]: id },
     })),
+    setHasAccessedPlanningMode: (accessed) => set({ hasAccessedPlanningMode: accessed }),
   };
 }
