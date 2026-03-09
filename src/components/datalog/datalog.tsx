@@ -9,6 +9,8 @@ export interface DLProps {
 }
 
 export function DL({ children, inline = false, className, style, ref }: DLProps) {
+	children = typeof children === 'string' ? children.trim() : children
+	
 	if (inline) {
 		return <code ref={ref} className={className} style={{ whiteSpace: "pre", ...style }}>
 			{children}

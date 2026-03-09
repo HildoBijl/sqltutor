@@ -8,7 +8,7 @@ export function Practice() {
 		<Section>
 			<Par>The following exercises use the <Term>SQL Valley</Term> database. It contains the following predicates.</Par>
 			<SQLValleySchema tables={['departments', 'employees', 'contracts', 'allocations', 'products', 'accounts', 'transactions']} singular />
-			<Par>When an exercise says "Find ... " or "Create an overview of ... " then it means "Set up a Datalog rule (or rules) for a new predicate that contains (and only contains) ... ".</Par>
+			<Par>When an exercise says "Find ... " or "Create an overview of ... " then it means "Set up a Datalog program (including query) that outputs (and only outputs) ... ".</Par>
 			<ManualExerciseSet exercises={exercises} />
 		</Section>
 	</Page>;
