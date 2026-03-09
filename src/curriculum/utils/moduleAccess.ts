@@ -25,18 +25,19 @@ const moduleTableAccess: Record<string, TableKey[] | undefined> = {
   // SQL Skills
   'choose-columns': ['departments', 'employees'],
   'filter-rows': ['departments', 'employees', 'contracts'],
+  'write-single-criterion-query': ['departments', 'employees', 'contracts'],
+
   'filter-rows-on-multiple-criteria': ['departments', 'employees', 'contracts'],
   'sort-rows': ['departments', 'employees', 'contracts'],
   'process-columns': ['departments', 'employees', 'contracts'],
-  'write-single-criterion-query': ['departments', 'employees', 'contracts'],
   'write-multi-criterion-query': ['departments', 'employees', 'contracts'],
+
   'write-look-up-query': ['departments', 'employees', 'contracts'],
   'join-tables': ['departments', 'employees', 'contracts'],
+  'write-multi-table-query': ['departments', 'employees', 'allocations', 'contracts', 'accounts', 'transactions', 'products'],
+
   'aggregate-columns': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses'],
   'use-filtered-aggregation': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
-  'use-dynamic-aggregation': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
-  'create-pivot-table': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
-  'write-multi-table-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
   'write-multi-layered-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
 };
 

@@ -785,8 +785,8 @@ export function useSkillExerciseController({
     if (typeof prompt === 'string' && prompt.trim().length > 0) {
       return prompt;
     }
-    return 'Practice exercise';
-  }, [normalizedExercise, skillModule]);
+    return practiceExerciseTitle;
+  }, [normalizedExercise, practiceExerciseTitle, skillModule]);
 
   useEffect(() => {
     const description = exerciseDescription?.trim() ?? '';

@@ -28,7 +28,7 @@ NATURAL LEFT JOIN contracts;
     version: 1,
     prompt: 'Create an overview of all sick leaves. More specific: find the names (first and last) of all employees who have been on sick leave. Also include the starting date and ending date of the respective contract in which they had sick leave. (In case of multiple contracts with sick leave, include multiple rows.)',
     solution: `
-SELECT first_name, last_name, position, start_date, end_date
+SELECT first_name, last_name, start_date, end_date
 FROM employees
 NATURAL JOIN contracts
 WHERE status = 'sick leave';
@@ -40,7 +40,7 @@ WHERE status = 'sick leave';
   //     solution: `
   // SELECT t.prod_id, a.username
   // FROM transactions t
-  // JOIN accounts a ON t.vendor_username = a.username
+  // JOIN accounts a ON t.vendor = a.username
   // WHERE t.date_time < a.created_at;
   //     `,
   //   },
@@ -50,8 +50,8 @@ WHERE status = 'sick leave';
   //     solution: `
   // SELECT vendor.full_name, customer.full_name
   // FROM transactions AS t
-  // JOIN accounts AS vendor ON vendor.username = t.vendor_username
-  // JOIN accounts AS customer ON customer.username = t.buyer_username
+  // JOIN accounts AS vendor ON vendor.username = t.vendor
+  // JOIN accounts AS customer ON customer.username = t.buyer
   // WHERE vendor.created_at = customer.created_at;
   //     `,
   //   },
@@ -62,7 +62,7 @@ WHERE status = 'sick leave';
   // SELECT t.amount, p.name
   // FROM transactions t
   // JOIN products p ON t.prod_id = p.p_id
-  // WHERE t.vendor_username != p.owned_by;
+  // WHERE t.vendor != p.owner_id;
   //     `,
   //   },
 ];

@@ -16,6 +16,8 @@ import type { MainState, MainActions } from './main/slice';
 import type { SettingsState, SettingsActions } from './settings/slice';
 import type { LearningActions } from './learning/slice';
 
+const APP_STORAGE_KEY = 'sqltutor-storage';
+
 export interface AppState
   extends MainState,
     MainActions,
@@ -39,7 +41,7 @@ export const useAppStore = create<AppState>()(
       ),
     }),
     {
-      name: 'sqltutor-storage',
+      name: APP_STORAGE_KEY,
       partialize: (state) => ({
         version: STORE_VERSION,
         main: partializeMain(state),
