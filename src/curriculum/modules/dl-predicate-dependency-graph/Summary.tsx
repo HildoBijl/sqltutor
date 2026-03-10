@@ -1,19 +1,12 @@
 import { Page, Section, Par, Info, Term, Em, IDL, DL } from '@/components';
 
-import { CleanedFirstDependencyGraph, CleanedSecondDependencyGraph } from './Theory';
+import { SampleDatalogScriptForDependencyGraph, CleanedFirstDependencyGraph, CleanedSecondDependencyGraph } from './Theory';
 
 export function Summary() {
   return <Page>
     <Section>
       <Par>A <Term>predicate dependency graph</Term> shows which predicates <Term>directly depend</Term> on each other: the second predicate is mentioned in a rule describing the first predicate. Dependency graphs are usually ordered in <Term>layers</Term>, where the nodes in each layer <Em>only</Em> depend on nodes in earlier layers.</Par>
-      <DL>{`
-sold(v, b, p, d) :- transaction(_, v, b, p, d, _, _, _).
-soldAndBoughtBack(v, p) :- sold(v, _, p, d1), sold(_, v, p, d2), d2 > d1.
-withNames(fn, ln, pn) :-
-        soldAndBoughtBack(v, p),
-        account(v, _, _, _, fn, ln, _, _, _, _),
-        product(p, pn, _, _, _).
-      `}</DL>
+      <SampleDatalogScriptForDependencyGraph />
       <CleanedFirstDependencyGraph layer={3} />
       <Par>It may happen that there are <Term>cycles</Term> in the dependency graph: there is <Term>recursion</Term>. In this case, the idea is to find a <Term>Strongly Connected Component</Term> (SCC) in the graph: a set of nodes in which every node can reach every other node. Those SCCs are <Term>collapsed</Term> into a single node. If we repeat this until there are no cycles left, we can once more draw the graph using layers.</Par>
       <DL>{`

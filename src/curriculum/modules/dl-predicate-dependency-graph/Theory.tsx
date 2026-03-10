@@ -58,8 +58,23 @@ withNames(fn, ln, pn) :-
     </Section>
 
     <Section title="Cycles in the predicate dependency graph">
-      <Par>The previous example was of a Datalog program with no cycles. Now let's study an example <Em>with</Em> cycles. We'll use an abstract example here, to keep it simple to grasp. Let's consider a database where the EDB consists of predicates <IDL>A</IDL>, <IDL>B</IDL> and <IDL>C</IDL>. We examine the following program.</Par>
-      <DL>{`
+      <Par>The previous example was of a Datalog program with no cycles. Now let's study an example <Em>with</Em> cycles. We'll use an abstract example here, to keep it simple to grasp. Let's consider a database where the EDB consists of predicates <IDL>A</IDL>, <IDL>B</IDL> and <IDL>C</IDL>. We examine the following program. (The arguments within the predicates are irrelevant, so we just call them <IDL>x</IDL>.)</Par>
+      <SampleDatalogScriptForDependencyGraph />
+      <Par>We could draw a predicate dependency graph for this script. The first version (without layers) looks like this.</Par>
+      <SecondDependencyGraph />
+      <Par>Note that there is a <Term>cycle</Term> in the dependency graph! Specifically, <IDL>E</IDL> depends on <IDL>F</IDL>, <IDL>F</IDL> depends on <IDL>G</IDL>, and <IDL>G</IDL> depends on <IDL>E</IDL>. When there is a cycle in the dependency graph, it is impossible to create layers. After all, each of these three predicates should be lower than the other one.</Par>
+      <Par>To solve this, we first have to get rid of the cycles. The goal is to find a <Term>Strongly Connected Component</Term> (SCC) in our graph: a set of nodes in which <Em>every</Em> node in this component can be reached (directly or indirectly) from <Em>every</Em> other node of the component. Here we see that <IDL>(E,F,G)</IDL> is a SCC.</Par>
+      <Par>When we find a SCC within our dependency graph, we <Term>collapse</Term> it into a single node. We draw this node in our graph in the place of the original nodes.</Par>
+      <SecondDependencyGraph collapsed />
+      <Par>We continue doing this until there are no cycles left, and we are once more left with a DAG. (Luckily our example only had one cycle.) Since we now have a DAG, we can divide the graph into layers as usual. The result is a dependency graph with layers, where some predicates are grouped together into a single node.</Par>
+      <CleanedSecondDependencyGraph />
+      <Info>Whenever Datalog encounters multiple predicates in a single node, it knows it has to apply the fixed-point algorithm to evaluate these predicates.</Info>
+    </Section>
+  </Page>;
+}
+
+export function SampleDatalogScriptForDependencyGraph() {
+  return <DL>{`
 D(x) :- A(x), B(x).
 E(x) :- C(x), F(x).
 F(x) :- G(x).
@@ -67,18 +82,6 @@ G(x) :- D(x), E(x).
 H(x) :- D(x), B(x).
 I(x) :- G(x), H(x).
 `}</DL>
-      <Par>We could draw a predicate dependency graph for this script. The first version (without layers) looks like this.</Par>
-      <SecondDependencyGraph />
-      <Par>Note that there is a <Term>cycle</Term> in the dependency graph! Specifically, <IDL>E</IDL> depends on <IDL>F</IDL>, <IDL>F</IDL> depends on <IDL>G</IDL>, and <IDL>G</IDL> depends on <IDL>E</IDL>. When there is a cycle in the dependency graph, it is impossible to create layers. After all, each of these three predicates should be lower than the other one.</Par>
-      <Par>To solve this, we first have to get rid of the cycles. The goal is to find a <Term>Strongly Connected Component</Term> (SCC) in our graph: a set of nodes in which <Em>every</Em> node in this component can be reached (directly or indirectly) from <Em>every</Em> other node of the component. Here we see that <IDL>(E,F,G)</IDL> is a SCC.</Par>
-      <Par>When we find a SCC within our dependency graph, we <Term>collapse</Term> it into a single node. We draw this node in our graph in the place of the original nodes.</Par>
-      <SecondDependencyGraph collapsed />
-      <Warning>In very rare cases, you have multiple cycles that depend on each other. In that case, pick the largest possible SCC: the one containing <Em>all</Em> the cycles that depend on each other. Collapse that one into a single node.</Warning>
-      <Par>We continue doing this until there are no cycles left, and we are once more left with a DAG. (Luckily our example only had one cycle.) Since we now have a DAG, we can divide the graph into layers as usual. The result is a dependency graph with layers, where some predicates are grouped together into a single node.</Par>
-      <CleanedSecondDependencyGraph />
-      <Info>Whenever Datalog encounters multiple predicates in a single node, it knows it has to apply the fixed-point algorithm to evaluate these predicates.</Info>
-    </Section>
-  </Page>;
 }
 
 export function FirstDependencyGraph() {
@@ -246,8 +249,8 @@ export function CleanedSecondDependencyGraph() {
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p567Bounds && p8Bounds && p9Bounds ? <>
       <Curve points={[p4Bounds.topLeft.add([5, -3]), p1Bounds.bottomRight.add([-5, 3])]} endArrow={true} color={themeColor} />
       <Curve points={[p4Bounds.topRight.add([0, -2]), p2Bounds.bottomLeft.add([0, 2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p8Bounds.topRight.add([0, -2]), p2Bounds.middleBottom.add([-10, 4])]} endArrow={true} color={themeColor} />
-      <Curve points={[p8Bounds.middleTop.add([-5, -2]), p4Bounds.middleBottom.add([5, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p8Bounds.topRight.add([-2, -1]), p2Bounds.middleBottom.add([-10, 4])]} endArrow={true} color={themeColor} />
+      <Curve points={[p8Bounds.middleTop.add([-5, -3]), p4Bounds.middleBottom.add([5, 2])]} endArrow={true} color={themeColor} />
       <Curve points={[p567Bounds.middleTop.add([20, -4]), p3Bounds.bottomLeft.add([10, 3])]} endArrow={true} color={themeColor} />
       <Curve points={[p567Bounds.topLeft.add([-2, 1]), p4Bounds.bottomRight.add([1, -2])]} endArrow={true} color={themeColor} />
       <Curve points={[p9Bounds.topLeft.add([5, -3]), p8Bounds.bottomRight.add([-5, 3])]} endArrow={true} color={themeColor} />
