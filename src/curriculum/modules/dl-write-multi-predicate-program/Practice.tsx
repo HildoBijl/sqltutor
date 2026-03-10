@@ -79,7 +79,7 @@ validatedAllUsers(eid) :- employeeId(eid), not didNotValidateSomeUser(eid).
 		</>,
 	},
 	{
-		problem: <Par>Find the IDs of the employees who <Em>only</Em> validated transactions (either as vendor or buyer) from users from their <Em>own</Em> city. (That is, the employee and the respective user must live in the same city.)</Par>,
+		problem: <Par>Find the IDs of the employees who <Em>only</Em> validated transactions from users (vendors and buyers) from their <Em>own</Em> city. (That is, the employee and the respective user must live in the same city.)</Par>,
 		solution: <>
 			<Par>We'll have to rephrase this request: we want to find the employees for which there does <Em>not</Em> exist a user they validated a transaction for who lives in a <Em>different</Em> city. To do this, we first do the opposite: we find the employees who <Em>did</Em> validate a transaction for a user outside their own city. Then we flip the result. This gives the following program.</Par>
 			<DL>{`
@@ -90,7 +90,9 @@ validatedUserFromDifferentCity(eid) :-
         employee(eid, _, _, _, _, _, ec, _, _),
         account(u, _, _, _, _, _, _, uc, _, _),
         ec != uc.
-onlyValidatedFromOwnCity(eid) :- employee(eid, _, _, _, _, _, _, _, _), not validatedUserFromDifferentCity(eid).
+onlyValidatedFromOwnCity(eid) :-
+        employee(eid, _, _, _, _, _, _, _, _),
+        not validatedUserFromDifferentCity(eid).
 ?- onlyValidatedFromOwnCity(eid).
 `}</DL>
 			<Par>If further data is required from this employee, we could of course also join that in at the end.</Par>
