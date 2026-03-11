@@ -32,7 +32,7 @@ soldProductTo(v, b, p) :- soldProductTo(v, x, p), transaction(_, x, b, p, _, _, 
 			<Par>We can add a recursion counter in the usual way.</Par>
 			<DL>{`
 soldProductInSteps(v, b, p, 1) :- transaction(_, v, b, p, _, _, _, _).
-soldProductInSteps(v, b, p, m) :- soldProductInSteps(v, x, p, n), transaction(_, x, b, p, _, _, _, _), m = n+1.
+soldProductInSteps(v, b, p, n) :- soldProductInSteps(v, x, p, m), transaction(_, x, b, p, _, _, _, _), n = m + 1.
 `}</DL>
 		</>,
 	},
@@ -91,7 +91,7 @@ receivedMoneyFrom(v, b, d2) :- receivedMoneyFrom(x, b, d1), transaction(_, v, x,
 			<Par>We add a recursion counter in the usual way to both rules.</Par>
 			<DL>{`
 receivedMoneyFrom(v, b, d, 1) :- transaction(_, v, b, _, d, _, _, _).
-receivedMoneyFrom(v, b, d2, m) :- receivedMoneyFrom(x, b, d1, n), transaction(_, v, x, _, d2, _, _, _), d2 > d1, m = n + 1.
+receivedMoneyFrom(v, b, d2, n) :- receivedMoneyFrom(x, b, d1, m), transaction(_, v, x, _, d2, _, _, _), d2 > d1, n = m + 1.
 `}</DL>
 			<Par>Interestingly enough, because every chain is a series of transactions of <Em>increasing</Em> date, there <Em>can</Em> never be cycles. It is simply impossible to have a cycle of transactions where each transaction in the cycle is later than the next one. So we have found a practical way of getting around the issue that cycles cause Datalog queries to have infinitely large outputs.</Par>
 		</>,

@@ -20,7 +20,7 @@ export function Summary() {
       <Par>In case the number of links matters, we can add a <Term>recursion counter</Term> to the predicate.</Par>
       <DL>{`
 receivedMoneyInSteps(v, b, 1) :- transaction(_, v, b, _, _, _, _, _).
-receivedMoneyInSteps(v, b, m) :- receivedMoneyInSteps(v, x, n), transaction(_, x, b, _, _, _, _, _), m = n + 1.      
+receivedMoneyInSteps(v, b, n) :- receivedMoneyInSteps(v, x, m), transaction(_, x, b, _, _, _, _, _), n = m + 1.      
 `}</DL>
       <Warning>Recursion counters are technically unsafe: if there are cycles in the links, the resulting predicate will become infinitely large. Solving this issue requires Datalog techniques we have not mastered yet, so for now we'll have to assume there are no cycles in the links.</Warning>
     </Section>
