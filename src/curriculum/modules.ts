@@ -407,7 +407,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     id: 'dl-semi-positive-and-stratified-datalog',
     name: 'Semi-Positive and Stratified Datalog',
     type: 'concept',
-    description: 'How does restricting negation in Datalog affect the meaning and behavior of programs?',
+    description: 'How does restricting negation in Datalog prevent the problem of having multiple possible outputs?',
     prerequisites: ['dl-literal-types-and-rule-safety', 'dl-predicate-dependency-graph'],
   },
   {
