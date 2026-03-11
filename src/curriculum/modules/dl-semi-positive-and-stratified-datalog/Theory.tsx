@@ -1,9 +1,10 @@
-import { type ReactNode } from 'react'
+import { type ReactNode } from 'react';
+import { useTheme } from '@mui/material/';
 
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
 import { Page, Section, Par, List, Info, Warning, Term, Em, M, DL, IDL } from '@/components';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
+import { type DrawingData, Drawing, Element, Curve, Rectangle, useRefWithBounds } from '@/components';
 
 function DPGDL({ children }: { children: ReactNode }) {
   return <DL style={{ padding: '10px 20px' }}>{children}</DL>
@@ -24,7 +25,7 @@ stressed(x) :- person(x), not happy(x).
 `}</DL>
       <Par>We can evaluate this program. To evaluate programs, Datalog starts off with a set of facts – here <IDL>{`{ person('Alice') }`}</IDL> – and evaluates all rules with this set of facts to update/extend its set of facts. This is repeated until nothing changes anymore.</Par>
       <Par>When updating the set of facts, Datalog generally evaluate all rules <Em>together</Em> for this set of facts. When we apply this to our example, <Em>both</Em> rules are triggered: Alice is currently neither happy nor stressed. The updated set of facts will then be <IDL>{`{ person('Alice'), happy('Alice'), stressed('Alice') }`}</IDL>. So Alice is now both happy and stressed. We then evaluate the rules again, and this time we come back to <IDL>{`{ person('Alice') }`}</IDL>. We're back where we started. This process is repeated, and the algorithm never ends!</Par>
-      <Par>You might think this procedure is silly, and we should just evaluate rules one at a time. We could do so, but which of the two rules should we then check first? If we check the first rule first, we'll end up with <IDL>{`{ person('Alice'), happy('Alice') }`}</IDL>. But if we check the second rule first, we'll wind up with <IDL>{`{ person('Alice'), stressed('Alice') }`}</IDL>. Both these sets won't change further, and are hence valid outcomes of the program. But they're different!</Par>
+      <Par>You might think this procedure is silly, and we should just evaluate rules one at a time. We could do so, but which of the two rules should we then check first? If we check the first rule first, we'll end up with <IDL>{`{ person('Alice'), happy('Alice') }`}</IDL>. If we check the second rule first, we'll wind up with <IDL>{`{ person('Alice'), stressed('Alice') }`}</IDL>. Both these sets won't change further, and are hence valid outcomes of the program. But they're different!</Par>
       <Par>We define a <Term>model</Term> as a set of facts that makes all rules true. Previously our programs always had a single model, but this program seems to have two! Having multiple models is not desirable. Which output should our program give?</Par>
     </Section>
 
@@ -95,7 +96,8 @@ stressed(x) :- working(x).
         <><Term>Semi-positive Datalog</Term>: You can negate original predicates, but not new predicates you defined yourself.</>,
         <><Term>Stratified Datalog</Term>: You can negate any predicate you like, as long as we can finish computing it beforehand.</>,
       ]} />
-      <Par>Any positive Datalog program is also semi-positive and stratified, and similarly any semi-positive Datalog program is also stratisfied. The opposite doesn't always hold.</Par>
+      <Par>Any positive Datalog program is also semi-positive and stratified, and similarly any semi-positive Datalog program is also stratisfied. The opposite doesn't always hold. This is also shown by the following Venn diagram. It shows the hierarchy of types of Datalog programs, including which type of program is guaranteed to have which property.</Par>
+      <DatalogTypeVennDiagram />
     </Section>
   </Page>;
 }
@@ -140,3 +142,35 @@ export function DependencyGraph() {
   </Drawing>;
 }
 
+export function DatalogTypeVennDiagram() {
+  const theme = useTheme();
+  const themeColor = theme.palette.primary.main;
+  const infoColor = theme.palette.info.main;
+  const warningColor = theme.palette.warning.main;
+
+  // Render the drawing.
+  const w = 700, h = 300;
+  const circleHeight = 200;
+  const circleY = h / 2 + 20;
+  const circles = [
+    { w: 0.25 * w, h: circleHeight / 4, x: 220, y: circleY },
+    { w: 0.50 * w, h: circleHeight / 2, x: 280, y: circleY },
+    { w: 0.75 * w, h: circleHeight * 3 / 4, x: 340, y: circleY },
+    { w: w, h: circleHeight, x: 400, y: circleY },
+  ]
+  return <Drawing width={w} height={h} maxWidth={w}>
+    <Rectangle style={{ fill: infoColor, fillOpacity: 0.06, stroke: infoColor, strokeWidth: 2 }} dimensions={[[circles[1].x - circles[1].w / 2 - 8, 40], [circles[1].x + circles[1].w / 2 + 12, h - 8]]} cornerRadius={10} />
+    <Element position={[circles[1].x - circles[1].w / 2 - 8 + 6, 40 + 2]} anchor={[-1, -1]} style={{ color: infoColor, fontWeight: 'bold', textAlign: 'center' }}>Monotonic programs</Element>
+
+    <Rectangle style={{ fill: warningColor, fillOpacity: 0.1, stroke: warningColor, strokeWidth: 2 }} dimensions={[[circles[2].x - circles[2].w / 2 - 8, 0], [circles[2].x + circles[2].w / 2 + 12, h]]} cornerRadius={10} />
+    <Element position={[circles[2].x - circles[2].w / 2 - 8 + 6, 2]} anchor={[-1, -1]} style={{ color: warningColor, fontWeight: 'bold', textAlign: 'center' }}>Programs with a unique model</Element>
+
+    {circles.map((circle, index) => <Rectangle key={index} dimensions={[[circle.x - circle.w / 2, circle.y - circle.h / 2], [circle.x + circle.w / 2, circle.y + circle.h / 2]]} cornerRadius={circle.w / 2} style={{ fill: themeColor, fillOpacity: 0.04 + 0.03*index, stroke: themeColor, strokeWidth: 2 }} />)}
+
+    <Element position={[circles[0].x, circles[0].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Positive<br />Datalog</Element>
+    <Element position={[circles[1].x + circles[1].w / 2 - 82, circles[1].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Semi-Positive<br />Datalog</Element>
+    <Element position={[circles[2].x + circles[2].w / 2 - 77, circles[1].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Stratified<br />Datalog</Element>
+    <Element position={[circles[3].x + circles[3].w / 2 - 72, circles[1].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Datalog</Element>
+
+  </Drawing>
+}
