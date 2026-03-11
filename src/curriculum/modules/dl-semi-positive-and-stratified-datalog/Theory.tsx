@@ -24,9 +24,9 @@ happy(x) :- person(x), not stressed(x).
 stressed(x) :- person(x), not happy(x).
 `}</DL>
       <Par>We can evaluate this program. To evaluate programs, Datalog starts off with a set of facts – here <IDL>{`{ person('Alice') }`}</IDL> – and evaluates all rules with this set of facts to update/extend its set of facts. This is repeated until nothing changes anymore.</Par>
-      <Par>When updating the set of facts, Datalog generally evaluate all rules <Em>together</Em> for this set of facts. When we apply this to our example, <Em>both</Em> rules are triggered: Alice is currently neither happy nor stressed. The updated set of facts will then be <IDL>{`{ person('Alice'), happy('Alice'), stressed('Alice') }`}</IDL>. So Alice is now both happy and stressed. We then evaluate the rules again, and this time we come back to <IDL>{`{ person('Alice') }`}</IDL>. We're back where we started. This process is repeated, and the algorithm never ends!</Par>
+      <Par>When updating the set of facts, Datalog generally evaluates all rules <Em>together</Em> for this set of facts. When we apply this to our example, <Em>both</Em> rules are triggered: Alice is currently neither happy nor stressed. The updated set of facts will then be <IDL>{`{ person('Alice'), happy('Alice'), stressed('Alice') }`}</IDL>. So Alice is now both happy and stressed. We then evaluate the rules again, and this time we come back to <IDL>{`{ person('Alice') }`}</IDL>. We're back where we started. This process is repeated, and the algorithm never ends!</Par>
       <Par>You might think this procedure is silly, and we should just evaluate rules one at a time. We could do so, but which of the two rules should we then check first? If we check the first rule first, we'll end up with <IDL>{`{ person('Alice'), happy('Alice') }`}</IDL>. If we check the second rule first, we'll wind up with <IDL>{`{ person('Alice'), stressed('Alice') }`}</IDL>. Both these sets won't change further, and are hence valid outcomes of the program. But they're different!</Par>
-      <Par>We define a <Term>model</Term> as a set of facts that makes all rules true. Previously our programs always had a single model, but this program seems to have two! Having multiple models is not desirable. Which output should our program give?</Par>
+      <Par>We define a <Term>model</Term> as a set of facts that makes all rules true. All the programs we've seen before have always had a single model, but this program seems to have two! Having multiple models is definitely a problem: which output should our program give?</Par>
     </Section>
 
     <Section title="The root cause: shrinking result sets – no monotonicity">
@@ -71,8 +71,8 @@ stressed(x) :- working(x).
         <>We evaluate the rules another time and get <IDL>{`{ person('Alice'), working('Alice'), stressed('Alice') }`}</IDL>.</>,
         <>We evaluate the rules again and get exactly the same result. So we're done.</>,
       ]} />
-      <Par>Crucial in this example is that, at one step, the set of facts <Em>decreases</Em>. We remove a fact! Alice used to be happy, but then she started working, wound up stressed, and this removed her happiness. This shows that the above program is <Em>not</Em> monotonic. Luckily this non-monotonic program has a single model. (We'll soon see why: it's "stratified".) But non-monotonic programs don't always have a single model, as the very first example showed.</Par>
-      <Warning>Generally non-monotonic programs are harder to compute, since facts can also disappear again.</Warning>
+      <Par>Crucial in this example is that, at one step, the set of facts <Em>decreases</Em>. We remove a fact! Alice used to be happy, but then she started working, wound up stressed, and this removed her happiness. This shows that the above program is <Em>not</Em> monotonic. Luckily this non-monotonic program does have a unique model. (We'll soon see why: it's "stratified".) But non-monotonic programs don't always have a single model, as the very first example showed.</Par>
+      <Warning>Generally non-monotonic programs are harder to compute than monotonic ones, since facts can also disappear again.</Warning>
     </Section>
 
     <Section title="Different Datalog types: positive, semi-positive and stratified Datalog">
@@ -162,10 +162,10 @@ export function DatalogTypeVennDiagram() {
     <Rectangle style={{ fill: infoColor, fillOpacity: 0.06, stroke: infoColor, strokeWidth: 2 }} dimensions={[[circles[1].x - circles[1].w / 2 - 8, 40], [circles[1].x + circles[1].w / 2 + 12, h - 8]]} cornerRadius={10} />
     <Element position={[circles[1].x - circles[1].w / 2 - 8 + 6, 40 + 2]} anchor={[-1, -1]} style={{ color: infoColor, fontWeight: 'bold', textAlign: 'center' }}>Monotonic programs</Element>
 
-    <Rectangle style={{ fill: warningColor, fillOpacity: 0.1, stroke: warningColor, strokeWidth: 2 }} dimensions={[[circles[2].x - circles[2].w / 2 - 8, 0], [circles[2].x + circles[2].w / 2 + 12, h]]} cornerRadius={10} />
+    <Rectangle style={{ fill: warningColor, fillOpacity: 0.06, stroke: warningColor, strokeWidth: 2 }} dimensions={[[circles[2].x - circles[2].w / 2 - 8, 0], [circles[2].x + circles[2].w / 2 + 12, h]]} cornerRadius={10} />
     <Element position={[circles[2].x - circles[2].w / 2 - 8 + 6, 2]} anchor={[-1, -1]} style={{ color: warningColor, fontWeight: 'bold', textAlign: 'center' }}>Programs with a unique model</Element>
 
-    {circles.map((circle, index) => <Rectangle key={index} dimensions={[[circle.x - circle.w / 2, circle.y - circle.h / 2], [circle.x + circle.w / 2, circle.y + circle.h / 2]]} cornerRadius={circle.w / 2} style={{ fill: themeColor, fillOpacity: 0.04 + 0.03*index, stroke: themeColor, strokeWidth: 2 }} />)}
+    {circles.map((circle, index) => <Rectangle key={index} dimensions={[[circle.x - circle.w / 2, circle.y - circle.h / 2], [circle.x + circle.w / 2, circle.y + circle.h / 2]]} cornerRadius={circle.w / 2} style={{ fill: themeColor, fillOpacity: 0.06, stroke: themeColor, strokeWidth: 2 }} />)}
 
     <Element position={[circles[0].x, circles[0].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Positive<br />Datalog</Element>
     <Element position={[circles[1].x + circles[1].w / 2 - 82, circles[1].y]} style={{ color: themeColor, fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>Semi-Positive<br />Datalog</Element>
