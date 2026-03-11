@@ -414,7 +414,7 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     id: 'dl-check-program-stratification',
     name: 'Check Program Stratification',
     type: 'skill',
-    description: 'How can we determine if a Datalog program is stratified?',
+    description: 'How can we determine if a Datalog program is semi-positive and/or stratified?',
     prerequisites: ['dl-draw-predicate-dependency-graph', 'dl-semi-positive-and-stratified-datalog'],
   },
   {

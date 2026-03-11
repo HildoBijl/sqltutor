@@ -21,7 +21,7 @@ export function Theory() {
     <Section title="Predicates as nodes, dependencies as edges">
       <Par>Let's consider an example database, containing a list of products, a list of user accounts, and a list of transactions made of product sales between users.</Par>
       <SQLValleySchema tables={['products', 'accounts', 'transactions']} singular />
-      <Par>We could set up (as an example) a Datalog script that finds the first and last name of every user that has sold a product and subsequently bought it back, including the product name of said product.</Par>
+      <Par>We could set up (as an example) a Datalog program that finds the first and last name of every user that has sold a product and subsequently bought it back, including the product name of said product.</Par>
       <Info>It doesn't matter if you don't understand the given program just yet. The only thing to look for is which predicate depends on which predicate.</Info>
       <DL>{`
 sold(v, b, p, d) :- transaction(_, v, b, p, d, _, _, _).

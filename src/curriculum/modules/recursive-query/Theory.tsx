@@ -74,12 +74,12 @@ SELECT * FROM vendor_chain;`;
 
     <Section title="Evaluating recursive queries: the fixed-point algorithm">
       <Par>Let's take a look at what happens behind the scenes when a DBMS receives a recursive query. How does it evaluate it to find the result?</Par>
-      <Par>The method that is generally used is the <Term>Fixed-Point Algorithm</Term>. This algorithm keeps two sets in its memory.</Par>
+      <Par>The method that is generally used is the <Term>fixed-point algorithm</Term>. This algorithm keeps two sets in its memory.</Par>
       <List items={[
         <>The <Term>result set</Term> <M>R</M> containing <Em>all</Em> rows we have found so far.</>,
         <>The <Term>delta set</Term> <M>\Delta</M> containing <Em>only</Em> new rows we just found. These are then added to the result set <M>R</M>.</>,
       ]} />
-      <Par>The Fixed-Point Algorithm works through the following steps.</Par>
+      <Par>The fixed-point algorithm works through the following steps.</Par>
       <List items={[
         <>
           <Par><Term>Initialization</Term>: start with the base case(s).</Par>

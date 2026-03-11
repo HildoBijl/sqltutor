@@ -83,11 +83,7 @@ stressed(x) :- working(x).
       <Info>Semi-positive Datalog is also monotonic. After all, we never apply negation to a derived predicate, so it can never happen that a new fact of a derived predicate is negated which then removes a fact somewhere else. Because semi-positive Datalog is monotonic, it benefits from all the advantages of monotonicity: semi-positive Datalog programs are relatively easy to compute.</Info>
       <Par>As it turns out, we can loosen the restrictions a bit further. The problem of multiple models only occurs when we mix negation with recursion. The third option is to not allow any <Em>cycle</Em> with negation. This is called <Term>stratified Datalog</Term>.</Par>
       <Par>This definition may initially sound a bit vague. We can clarify it using the predicate dependency graph. Let's consider the following example program.</Par>
-      <DL>{`
-C(x) :- A(x), not D(x).
-D(x) :- not B(x), E(x).
-E(x) :- C(x).
-`}</DL>
+      <SampleNonStratifiedProgram />
       <Par>We say that a predicate <IDL>X</IDL> <Term>negatively depends</Term> on a predicate <IDL>Y</IDL> if the literal <IDL>not Y</IDL> appears in a rule for <IDL>X</IDL>. So in the above example program, <IDL>C</IDL> negatively depends on <IDL>D</IDL> and <IDL>D</IDL> negatively depends on <IDL>B</IDL>.</Par>
       <DependencyGraph />
       <Par>When drawing the dependency graph (before collapsing cycles) we always indicate negative dependencies. This is done by writing a minus sign next to the arrow. (We can also add a plus sign to all other arrows, but this is rather implicit, so it's often skipped.)</Par>
@@ -104,6 +100,13 @@ E(x) :- C(x).
   </Page>;
 }
 
+export function SampleNonStratifiedProgram() {
+  return <DL>{`
+C(x) :- A(x), not D(x).
+D(x) :- not B(x), E(x).
+E(x) :- C(x).
+`}</DL>
+}
 
 export function DependencyGraph() {
   const themeColor = useThemeColor()

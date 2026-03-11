@@ -28,7 +28,7 @@ export function Theory() {
     JOIN vendor_chain c ON c.buyer = t.vendor
 )
 SELECT * FROM vendor_chain;`} tableWidth={260} />
-      <Par>And that's all there is to it! By seeing that a predicate's rule refers to itself – there is a so-called <Term>cycle</Term> – Datalog will know it has to apply the Fixed-Point Algorithm. It will continue to search until it has found all relevant cases.</Par>
+      <Par>And that's all there is to it! By seeing that a predicate's rule refers to itself – there is a so-called <Term>cycle</Term> – Datalog will know it has to apply the fixed-point algorithm. It will continue to search until it has found all relevant cases.</Par>
       <Warning>Don't forget the base case! If you never defined a base case, then initially <IDL>receivedMoneyFrom</IDL> will be empty, and the iteration never starts up. You'll end up with an empty predicate!</Warning>
       <Info>
         <Par sx={{ mb: 0.5 }}>There are four ways in which people often try to set up the recursion rule, and only two of them are proper. It's important to use the correct one.</Par>

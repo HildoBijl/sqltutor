@@ -15,7 +15,7 @@ export function Summary() {
         </>,
       ]} />
       <Quote>A person v received money from a person b, if v sold something to b.<br />A person v also received money from a person b, if there is some person x such that v received money from x, and x sold something to b.</Quote>
-      <Par>Datalog notices the circular reference in the recursion rule and will apply the Fixed-Point Algorithm to evaluate it.</Par>
+      <Par>Datalog notices the circular reference in the recursion rule and will apply the fixed-point algorithm to evaluate it.</Par>
       <Info>The recursion rule generally uses the original predicate once and the recursive predicate once. Using the recursive predicate twice does work, but it is inefficient.</Info>
       <Par>In case the number of links matters, we can add a <Term>recursion counter</Term> to the predicate.</Par>
       <DL>{`
