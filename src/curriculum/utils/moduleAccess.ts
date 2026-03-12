@@ -38,7 +38,7 @@ const moduleTableAccess: Record<string, TableKey[] | undefined> = {
 
   'aggregate-columns': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses'],
   'use-filtered-aggregation': ['departments', 'employees', 'contracts', 'quarterly_performance', 'expenses', 'transactions'],
-  'write-multi-layered-query': ['departments', 'employees', 'contracts', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
+  'write-multi-layered-query': ['departments', 'employees', 'contracts', 'allocations', 'accounts', 'transactions', 'quarterly_performance', 'expenses', 'products'],
 };
 
 /**
