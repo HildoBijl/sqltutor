@@ -1,21 +1,14 @@
 /**
- * Derived hooks for the app store.
+ * Derived hooks for store hydration.
  */
 
-import { useEffect, useState } from 'react';
+import { useLearningStore } from './learning/store';
+import { useSettingsStore } from './settings/store';
 
-import { useAppStore } from './useAppStore';
-
-export function useIsStoreReady() {
-  const hasHydrated = useAppStore((state) => state._hasHydrated);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    if (hasHydrated) {
-      const timer = setTimeout(() => setIsReady(true), 0);
-      return () => clearTimeout(timer);
-    }
-  }, [hasHydrated]);
-
-  return isReady;
+export function useHasHydrated() {
+  const settingsHydrated = useSettingsStore((state) => state._hasHydrated);
+  const learningHydrated = useLearningStore((state) => state._hasHydrated);
+  return settingsHydrated && learningHydrated;
 }
+
+export const useIsStoreReady = useHasHydrated;

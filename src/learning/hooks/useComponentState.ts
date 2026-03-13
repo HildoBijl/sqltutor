@@ -6,7 +6,7 @@
 import { useCallback } from 'react';
 
 import {
-  useAppStore,
+  useLearningStore,
   createComponentState,
   DEFAULT_COMPONENT_TYPE,
   type ComponentState,
@@ -17,7 +17,7 @@ export function useComponentState<State extends ComponentState = ComponentState>
   componentId: string,
   typeHint?: State['type'],
 ) {
-  const component = useAppStore((state) => {
+  const component = useLearningStore((state) => {
     const existing = state.components[componentId];
     if (existing) {
       return existing as State;
@@ -25,7 +25,7 @@ export function useComponentState<State extends ComponentState = ComponentState>
     const fallbackType = (typeHint ?? DEFAULT_COMPONENT_TYPE) as ComponentType;
     return createComponentState(componentId, fallbackType) as State;
   });
-  const updateComponent = useAppStore((state) => state.updateComponent);
+  const updateComponent = useLearningStore((state) => state.updateComponent);
 
   const setComponentState = useCallback(
     (updater: Partial<State> | State | ((prev: State) => Partial<State> | State)) => {
@@ -33,7 +33,7 @@ export function useComponentState<State extends ComponentState = ComponentState>
         if (!typeHint) {
           return value as Partial<ComponentState>;
         }
-        const existing = useAppStore.getState().components[componentId];
+        const existing = useLearningStore.getState().components[componentId];
         if (existing && existing.type !== typeHint) {
           return {
             ...existing,
@@ -49,7 +49,7 @@ export function useComponentState<State extends ComponentState = ComponentState>
 
       if (typeof updater === 'function') {
         const currentState =
-          (useAppStore.getState().components[componentId] as State | undefined) ??
+          (useLearningStore.getState().components[componentId] as State | undefined) ??
           (createComponentState(
             componentId,
             (typeHint ?? DEFAULT_COMPONENT_TYPE) as ComponentType,

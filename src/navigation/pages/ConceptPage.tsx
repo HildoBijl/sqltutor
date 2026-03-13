@@ -9,7 +9,11 @@ import {
   Bolt,
 } from "@mui/icons-material";
 
-import { useAppStore, type ConceptComponentState } from "@/store";
+import {
+  useLearningStore,
+  useSettingsStore,
+  type ConceptComponentState,
+} from "@/store";
 import { moduleIndex, type ModuleMeta } from "@/curriculum";
 import { useContentTabs } from "@/learning/hooks/useContentTabs";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
@@ -36,8 +40,8 @@ import { getPrerequisites } from "@/learning/skilltree/utils/goalPath";
 export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
-  const hideStories = useAppStore((state) => state.hideStories);
-  const components = useAppStore((state) => state.components);
+  const hideStories = useSettingsStore((state) => state.hideStories);
+  const components = useLearningStore((state) => state.components);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();
@@ -130,7 +134,7 @@ export default function ConceptPage() {
     : undefined;
 
   // Calculate the current goal node ID for this tree (if any)
-  const goalNodeID = useAppStore((state) =>
+  const goalNodeID = useSettingsStore((state) =>
     conceptTree ? (state.goalNodeID[conceptTree.id] ?? null) : null,
   );
 

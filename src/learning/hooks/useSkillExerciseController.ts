@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/utils/types';
-import { useAppStore, type SkillComponentState } from '@/store';
+import { useSettingsStore, type SkillComponentState } from '@/store';
 import { useDatabase } from '@/learning/databases';
 import type { DatasetSize } from '@/mockData';
 import {
@@ -103,8 +103,8 @@ export function useSkillExerciseController({
   componentState,
   setComponentState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
-  const selectedDatasetSize = useAppStore((state) => state.practiceDatasetSize);
-  const setPracticeDatasetSize = useAppStore((state) => state.setPracticeDatasetSize);
+  const selectedDatasetSize = useSettingsStore((state) => state.practiceDatasetSize);
+  const setPracticeDatasetSize = useSettingsStore((state) => state.setPracticeDatasetSize);
   // Display database (user-selected dataset for showing results to user)
   const {
     executeQuery: executeDisplayQuery,

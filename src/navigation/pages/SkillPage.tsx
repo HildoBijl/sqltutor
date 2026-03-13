@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mui/material';
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
-import { useAppStore, type SkillComponentState } from '@/store';
+import { useLearningStore, useSettingsStore, type SkillComponentState } from '@/store';
 import { moduleComponents, moduleIndex } from '@/curriculum';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
@@ -29,8 +29,8 @@ export default function SkillPage() {
   const { skillId } = useParams<{ skillId: string }>();
   const navigate = useNavigate();
 
-  const hideStories = useAppStore((state) => state.hideStories);
-  const components = useAppStore((state) => state.components);
+  const hideStories = useSettingsStore((state) => state.hideStories);
+  const components = useLearningStore((state) => state.components);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();

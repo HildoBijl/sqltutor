@@ -6,12 +6,12 @@ import { router } from './navigation';
 import { getTheme, ColorModeContext } from './theme';
 import { SQLJSProvider, DatabaseProvider } from './components/sql/sqljs';
 import { ErrorBoundary } from './components';
-import { useAppStore, useIsStoreReady } from './store';
+import { useHasHydrated, useSettingsStore } from './store';
 
 export function App() {
-  const mode = useAppStore((s) => s.currentTheme);
-  const setTheme = useAppStore((s) => s.setTheme);
-  const isStoreReady = useIsStoreReady();
+  const mode = useSettingsStore((s) => s.currentTheme);
+  const setTheme = useSettingsStore((s) => s.setTheme);
+  const isStoreReady = useHasHydrated();
 
   const muiTheme = useMemo(() => getTheme(mode), [mode]);
 

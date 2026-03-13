@@ -2,8 +2,9 @@
  * Store package. API for the memory store.
  */
 
-export { useAppStore } from './useAppStore';
-export { useIsStoreReady } from './hooks';
+export { useLearningStore } from './learning/store';
+export { useSettingsStore } from './settings/store';
+export { useHasHydrated, useIsStoreReady } from './hooks';
 
 export {
   createComponentState,

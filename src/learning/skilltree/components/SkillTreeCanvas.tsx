@@ -9,7 +9,7 @@ import { ZoomControls } from "./ZoomControls";
 import { TreeLegend } from "./TreeLegend";
 import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
-import { useAppStore } from "@/store";
+import { useSettingsStore } from "@/store";
 import { PlanningModeIntro } from "./PlanningModeIntro";
 
 /*
@@ -72,13 +72,13 @@ export function SkillTreeCanvas({
     total: 0,
     nextStep: null as string | null,
   });
-  const goalNodeId = useAppStore((state) => state.goalNodeID[treeId] ?? null);
-  const setGoalNodeIdInStore = useAppStore((state) => state.setGoalNodeID);
+  const goalNodeId = useSettingsStore((state) => state.goalNodeID[treeId] ?? null);
+  const setGoalNodeIdInStore = useSettingsStore((state) => state.setGoalNodeID);
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
-  const setHasAccessedPlanningMode = useAppStore(
+  const setHasAccessedPlanningMode = useSettingsStore(
     (state) => state.setHasAccessedPlanningMode,
   );
-  const hasAccessedPlanningMode = useAppStore(
+  const hasAccessedPlanningMode = useSettingsStore(
     (state) => state.hasAccessedPlanningMode,
   );
 

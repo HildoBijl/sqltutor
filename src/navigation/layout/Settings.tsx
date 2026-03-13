@@ -18,7 +18,13 @@ import {
 } from '@mui/icons-material';
 import { ColorModeContext } from '@/theme';
 
-const APP_STORAGE_KEYS = ['sqltutor-storage', 'sqlvalley-storage'] as const;
+const APP_STORAGE_KEYS = [
+  'sqltutor-settings',
+  'sqltutor-learning',
+  'sqltutor-storage',
+  'sqlvalley-storage',
+  'sqltutor-storage-migrated-v1',
+] as const;
 const SKILL_TREE_HISTORY_KEY = 'sqlvalley-skilltree-history';
 const LEGACY_SKILL_TREE_HISTORY_KEY = 'sqltutor-skilltree-history';
 
