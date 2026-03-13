@@ -1,5 +1,6 @@
 import { modulePositions } from '@/learning/skilltree/utils/treeDefinition';
 import { raModulePositions } from '@/learning/skilltree/ra-skilltree/ra-treeDefinition';
+import { datalogModulePositions } from '@/learning/skilltree/datalog-skilltree/datalog-treeDefinitions';
 
 export type SkillTreeId = 'sql' | 'ra' | 'datalog';
 
@@ -33,7 +34,7 @@ const skillTreeDefinitions: SkillTreeDefinition[] = [
     id: 'datalog',
     label: 'Learn Datalog',
     path: '/learn-datalog',
-    moduleIds: new Set<string>(),
+    moduleIds: new Set(Object.keys(datalogModulePositions)),
   },
 ];
 

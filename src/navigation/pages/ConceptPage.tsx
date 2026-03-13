@@ -139,7 +139,10 @@ export default function ConceptPage() {
     ? getPrerequisites(goalNodeID, moduleItems)
     : new Set<string>();
 
-  const allFollowUps = conceptId ? (moduleItems[conceptId]?.followUps ?? []) : [];
+  const treeModuleIds = conceptTree?.moduleIds ?? new Set<string>();
+  const allFollowUps = conceptId
+    ? (moduleItems[conceptId]?.followUps ?? []).filter((id) => treeModuleIds.has(id))
+    : [];
   const nextUp = goalNodeID
     ? allFollowUps.filter((id) => prerequisitesOfGoal.has(id) || id === goalNodeID)
     : allFollowUps;

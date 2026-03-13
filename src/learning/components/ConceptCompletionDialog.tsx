@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, DialogActions, Button, Typography, Box, Stack } from '@mui/material';
-import { ArrowBack, Bolt, EmojiEvents, ArrowForward, Replay } from '@mui/icons-material';
+import { ArrowBack, Bolt, EmojiEvents, ArrowForward} from '@mui/icons-material';
 
 interface ConceptCompletionDialogProps {
   open: boolean;
@@ -62,7 +62,10 @@ export function ConceptCompletionDialog({
 
           {nextId && onNavigateToNext && (
             <Button
-              onClick={() => onNavigateToNext(nextId)}
+              onClick={() => {
+                onNavigateToNext(nextId);
+                onClose();
+              }}
               variant="contained"
               startIcon={<ArrowForward />}
               fullWidth
