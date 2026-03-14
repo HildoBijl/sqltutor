@@ -2,61 +2,51 @@
  * Persisted settings store.
  */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
 import {
   createSettingsActions,
   initialSettingsState,
   type SettingsActions,
   type SettingsState,
 } from './slice';
-import { partializeSettings, type PersistedSettings } from './persist';
+import {
+  partializeSettings,
+  rehydrateSettings,
+  type PersistedSettings,
+} from './persist';
 import {
   migrateSettingsPersistedState,
   SETTINGS_STORE_VERSION,
 } from './version';
 import {
+  LEGACY_SETTINGS_STORAGE_KEY,
   migrateLegacyStorageIfNeeded,
-  SETTINGS_STORAGE_KEY,
 } from '../legacyMigration';
+import { createStore, type HydrationState } from '../utils';
 
-migrateLegacyStorageIfNeeded();
-
-interface SettingsHydrationState {
-  _hasHydrated: boolean;
-  setHasHydrated: (hasHydrated: boolean) => void;
-}
+export const SETTINGS_STORAGE_KEY = 'sqlvalley-settings';
 
 export interface SettingsStoreState
   extends SettingsState,
     SettingsActions,
-    SettingsHydrationState {}
+    HydrationState {}
 
-export const useSettingsStore = create<SettingsStoreState>()(
-  persist(
-    (set) => ({
-      ...initialSettingsState,
-      _hasHydrated: false,
-      ...createSettingsActions(set as Parameters<typeof createSettingsActions>[0]),
-      setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
+export const useSettingsStore = createStore<
+  SettingsState,
+  SettingsActions,
+  PersistedSettings
+>({
+  initialState: initialSettingsState,
+  createActions: (set) => createSettingsActions(set),
+  storageKey: SETTINGS_STORAGE_KEY,
+  version: SETTINGS_STORE_VERSION,
+  migrate: migrateSettingsPersistedState,
+  partialize: partializeSettings,
+  rehydrate: rehydrateSettings,
+  prepare: () =>
+    migrateLegacyStorageIfNeeded({
+      domain: 'settings',
+      targetKey: SETTINGS_STORAGE_KEY,
+      legacySplitKey: LEGACY_SETTINGS_STORAGE_KEY,
+      targetVersion: SETTINGS_STORE_VERSION,
     }),
-    {
-      name: SETTINGS_STORAGE_KEY,
-      version: SETTINGS_STORE_VERSION,
-      migrate: (persistedState, version) =>
-        migrateSettingsPersistedState(persistedState, version),
-      partialize: (state): PersistedSettings => partializeSettings(state),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error('Failed to rehydrate settings store:', error);
-        }
-        if (state) {
-          state.setHasHydrated(true);
-          return;
-        }
-        useSettingsStore.setState({ _hasHydrated: true });
-      },
-    },
-  ),
-);
+});
