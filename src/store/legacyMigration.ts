@@ -2,24 +2,22 @@
  * One-time bridge from the legacy monolithic storage key to split store keys.
  */
 
-import { LEARNING_STORE_VERSION } from './learning/version';
-import { SETTINGS_STORE_VERSION } from './settings/version';
+import { asRecord } from './utils';
 
 export const LEGACY_APP_STORAGE_KEY = 'sqltutor-storage';
-export const SETTINGS_STORAGE_KEY = 'sqltutor-settings';
-export const LEARNING_STORAGE_KEY = 'sqltutor-learning';
-export const SPLIT_STORAGE_MIGRATION_KEY = 'sqltutor-storage-migrated-v1';
+export const LEGACY_SETTINGS_STORAGE_KEY = 'sqltutor-settings';
+export const LEGACY_LEARNING_STORAGE_KEY = 'sqltutor-learning';
+export const LEGACY_SPLIT_STORAGE_MIGRATION_KEY = 'sqltutor-storage-migrated-v1';
+export const SPLIT_STORAGE_MIGRATION_KEY = 'sqlvalley-storage-migrated-v1';
 
 type RecordValue = Record<string, unknown>;
 
-let hasRunLegacyMigration = false;
+type MigrationDomain = 'settings' | 'learning';
 
-function asRecord(value: unknown): RecordValue {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return {};
-  }
-  return value as RecordValue;
-}
+const hasRunLegacyMigrationByDomain: Record<MigrationDomain, boolean> = {
+  settings: false,
+  learning: false,
+};
 
 function readPersistedRoot(raw: string): { state: RecordValue; version?: number } | null {
   try {
@@ -40,7 +38,7 @@ function readPersistedRoot(raw: string): { state: RecordValue; version?: number 
   }
 }
 
-function pickSettingsState(legacyState: RecordValue): RecordValue {
+function pickSettingsStateFromLegacyRoot(legacyState: RecordValue): RecordValue {
   const nested = asRecord(legacyState.settings);
   const source = Object.keys(nested).length > 0 ? nested : legacyState;
 
@@ -72,7 +70,7 @@ function pickSettingsState(legacyState: RecordValue): RecordValue {
   return result;
 }
 
-function pickLearningState(legacyState: RecordValue): RecordValue {
+function pickLearningStateFromLegacyRoot(legacyState: RecordValue): RecordValue {
   const nested = asRecord(legacyState.learning);
   const source = Object.keys(nested).length > 0 ? nested : legacyState;
   const components = asRecord(source.components);
@@ -99,58 +97,84 @@ function writeVersionedState(
   storage.setItem(key, JSON.stringify({ state, version }));
 }
 
-export function migrateLegacyStorageIfNeeded(): void {
-  if (hasRunLegacyMigration || typeof window === 'undefined') {
+function readDomainStateFromSplitStorage(
+  storage: Storage,
+  legacySplitKey: string,
+): RecordValue | null {
+  const splitRaw = storage.getItem(legacySplitKey);
+  if (!splitRaw) {
+    return null;
+  }
+  const parsed = readPersistedRoot(splitRaw);
+  if (!parsed) {
+    return null;
+  }
+  return parsed.state;
+}
+
+function readDomainStateFromLegacyMonolith(
+  storage: Storage,
+  domain: MigrationDomain,
+): RecordValue | null {
+  const legacyRaw = storage.getItem(LEGACY_APP_STORAGE_KEY);
+  if (!legacyRaw) {
+    return null;
+  }
+
+  const parsedLegacy = readPersistedRoot(legacyRaw);
+  if (!parsedLegacy) {
+    return null;
+  }
+
+  const pickedState =
+    domain === 'settings'
+      ? pickSettingsStateFromLegacyRoot(parsedLegacy.state)
+      : pickLearningStateFromLegacyRoot(parsedLegacy.state);
+
+  return Object.keys(pickedState).length > 0 ? pickedState : null;
+}
+
+interface LegacyMigrationOptions {
+  domain: MigrationDomain;
+  targetKey: string;
+  legacySplitKey: string;
+  targetVersion: number;
+}
+
+export function migrateLegacyStorageIfNeeded({
+  domain,
+  targetKey,
+  legacySplitKey,
+  targetVersion,
+}: LegacyMigrationOptions): void {
+  if (hasRunLegacyMigrationByDomain[domain] || typeof window === 'undefined') {
     return;
   }
-  hasRunLegacyMigration = true;
+  hasRunLegacyMigrationByDomain[domain] = true;
 
   try {
     const storage = window.localStorage;
 
-    if (storage.getItem(SPLIT_STORAGE_MIGRATION_KEY)) {
-      return;
-    }
-
-    const hasSettingsStorage = Boolean(storage.getItem(SETTINGS_STORAGE_KEY));
-    const hasLearningStorage = Boolean(storage.getItem(LEARNING_STORAGE_KEY));
-
-    if (hasSettingsStorage && hasLearningStorage) {
+    if (storage.getItem(targetKey)) {
       storage.setItem(SPLIT_STORAGE_MIGRATION_KEY, '1');
       return;
     }
 
-    const legacyRaw = storage.getItem(LEGACY_APP_STORAGE_KEY);
-    if (!legacyRaw) {
+    const migratedFromSplit = readDomainStateFromSplitStorage(storage, legacySplitKey);
+    if (migratedFromSplit) {
+      writeVersionedState(storage, targetKey, migratedFromSplit, targetVersion);
       storage.setItem(SPLIT_STORAGE_MIGRATION_KEY, '1');
       return;
     }
 
-    const parsedLegacy = readPersistedRoot(legacyRaw);
-    if (!parsedLegacy) {
+    const hasLegacyMarker = Boolean(storage.getItem(LEGACY_SPLIT_STORAGE_MIGRATION_KEY));
+    if (hasLegacyMarker) {
       storage.setItem(SPLIT_STORAGE_MIGRATION_KEY, '1');
-      return;
     }
 
-    const migratedSettings = pickSettingsState(parsedLegacy.state);
-    const migratedLearning = pickLearningState(parsedLegacy.state);
-
-    if (!hasSettingsStorage && Object.keys(migratedSettings).length > 0) {
-      writeVersionedState(
-        storage,
-        SETTINGS_STORAGE_KEY,
-        migratedSettings,
-        SETTINGS_STORE_VERSION,
-      );
-    }
-
-    if (!hasLearningStorage && Object.keys(migratedLearning).length > 0) {
-      writeVersionedState(
-        storage,
-        LEARNING_STORAGE_KEY,
-        migratedLearning,
-        LEARNING_STORE_VERSION,
-      );
+    const migratedFromMonolith = readDomainStateFromLegacyMonolith(storage, domain);
+    if (migratedFromMonolith) {
+      writeVersionedState(storage, targetKey, migratedFromMonolith, targetVersion);
     }
 
     storage.setItem(SPLIT_STORAGE_MIGRATION_KEY, '1');

@@ -19,10 +19,13 @@ import {
 import { ColorModeContext } from '@/theme';
 
 const APP_STORAGE_KEYS = [
+  'sqlvalley-settings',
+  'sqlvalley-learning',
+  'sqlvalley-storage-migrated-v1',
+  'sqlvalley-storage',
   'sqltutor-settings',
   'sqltutor-learning',
   'sqltutor-storage',
-  'sqlvalley-storage',
   'sqltutor-storage-migrated-v1',
 ] as const;
 const SKILL_TREE_HISTORY_KEY = 'sqlvalley-skilltree-history';
