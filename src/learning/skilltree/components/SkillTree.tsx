@@ -227,23 +227,17 @@ export function SkillTree({
       isReadyToLearn(moduleItems[connector.to]) && fromCompleted;
 
     if (planningMode) {
-      // TO DO
-      if (bothCompleted && isConnectorInGoalPath(connector)) {
-        return "#4CAF50";
-      } else if (isConnectorInGoalPath(connector)) {
-        return "red";
-      } else {
-        return "#9aa0a6";
-      }
+      if (!isConnectorInGoalPath(connector)) return "#9aa0a6";
+      if (bothCompleted) return "#4CAF50";
+      if (isNextToLearn) return "#FFD700";
+      return "purple";
     }
     // Hover active
     if (isConnectorInHoveredPath(connector)) {
       if (bothCompleted) {
         return "#4CAF50";
       }
-      if (fromCompleted && !toCompleted) {
-        return "#FFD700";
-      }
+      if (isNextToLearn) return "#FFD700";
       return "#E84421";
     }
 
