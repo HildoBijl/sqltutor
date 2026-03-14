@@ -82,7 +82,7 @@ export function ZoomControls({
           variant={planningMode ? "contained" : "outlined"}
           size="small"
           onClick={onTogglePlanningMode}
-          sx={{ minWidth: "40px", fontSize: '15px'}}
+          sx={{ minWidth: "40px", fontSize: '15px', ...(planningMode && { backgroundColor: "purple", borderColor: "purple", "&:hover": { backgroundColor: "#6a0dad" } }) }}
         >
           <OutlinedFlag fontSize="small" sx={{ color: planningMode ? "white" : "primary" }} />
         </Button>

@@ -7,6 +7,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
+import { useState } from "react";
 import PushPinIcon from "@mui/icons-material/PushPin";
 
 
@@ -46,6 +47,7 @@ export function NodeCard({
   onSetGoal,
 }: NodeCardProps) {
   const theme = useTheme();
+  const [isPinHovered, setIsPinHovered] = useState(false);
   const type = item.type;
   const cornerRadius = type === "concept" ? 4 : 12;
 
@@ -90,10 +92,12 @@ export function NodeCard({
       borderColor = "purple";
     } else if (isOnGoalPath && completed) {
       borderColor = "#4CAF50";
-    } else if (isOnGoalPath || !readyToLearn) {
-      borderColor = isOnGoalPath ? "purple" : isHovered ? theme.palette.primary.main : theme.palette.divider;
-    } else {
+    } else if (isOnGoalPath && readyToLearn) {
       borderColor = "#FFD700";
+    } else if (isOnGoalPath) {
+      borderColor = "purple";
+    } else {
+      borderColor = isHovered ? theme.palette.primary.main : theme.palette.divider;
     }
   } else {
     const highlighted = isHovered || isPrerequisite;
@@ -241,11 +245,13 @@ export function NodeCard({
             {planningMode && isHovered && !isGoalNode && (
               <div
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevents trigger the card click
+                  e.stopPropagation();
                   if (onSetGoal) {
                     onSetGoal();
                   }
                 }}
+                onMouseEnter={() => setIsPinHovered(true)}
+                onMouseLeave={() => setIsPinHovered(false)}
                 style={{
                   position: "absolute",
                   top: -15,
@@ -258,12 +264,12 @@ export function NodeCard({
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
-                  border: "1px solid #616161",
+                  border: `1px solid ${isPinHovered ? "purple" : "#616161"}`,
                   pointerEvents: "auto",
                 }}
               >
                 <PushPinIcon
-                  style={{ fontSize: checkmarkSize - 4, color: "#9aa0a6" }}
+                  style={{ fontSize: checkmarkSize - 4, color: isPinHovered ? "purple" : "#9aa0a6" }}
                 />
               </div>
             )}
@@ -277,6 +283,8 @@ export function NodeCard({
                     onSetGoal();
                   }
                 }}
+                onMouseEnter={() => setIsPinHovered(true)}
+                onMouseLeave={() => setIsPinHovered(false)}
                 style={{
                   position: "absolute",
                   top: -15,
@@ -290,11 +298,11 @@ export function NodeCard({
                   justifyContent: "center",
                   cursor: "pointer",
                   pointerEvents: "auto",
-                  border: "1px solid purple",
+                  border: `1px solid ${isPinHovered ? "#616161" : "purple"}`,
                 }}
               >
                 <PushPinIcon
-                  style={{ fontSize: checkmarkSize - 4, color: "purple" }}
+                  style={{ fontSize: checkmarkSize - 4, color: isPinHovered ? "#9aa0a6" : "purple" }}
                 />
               </div>
             )}
