@@ -150,9 +150,19 @@ export default function ConceptPage() {
   const allFollowUps = conceptId
     ? (moduleItems[conceptId]?.followUps ?? []).filter((id) => treeModuleIds.has(id))
     : [];
+  const allPrereqsDone = (id: string) =>
+    moduleItems[id]?.prerequisites?.every((prereqId) => isModuleCompleted(prereqId)) ?? true;
+
   const nextUp = goalNodeID
-    ? allFollowUps.filter((id) => prerequisitesOfGoal.has(id) || id === goalNodeID)
-    : allFollowUps;
+    ? (() => {
+        if (!isModuleCompleted(goalNodeID) && allPrereqsDone(goalNodeID)) {
+          return [goalNodeID];
+        }
+        return allFollowUps.filter(
+          (id) => (prerequisitesOfGoal.has(id) || id === goalNodeID) && allPrereqsDone(id)
+        );
+      })()
+    : allFollowUps.filter(allPrereqsDone);
 
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
