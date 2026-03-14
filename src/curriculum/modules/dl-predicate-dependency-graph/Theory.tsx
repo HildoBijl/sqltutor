@@ -230,21 +230,21 @@ export function CleanedSecondDependencyGraph() {
   const [p9Ref, p9Bounds] = useRefWithBounds(drawingData);
 
   // Render the drawing.
-  return <Drawing ref={drawingRef} width={500} height={280} maxWidth={500}>
-    <Element position={[0, 20]}><strong>Layer 0:</strong></Element>
-    <Element ref={p1Ref} position={[120, 20]}><DPGDL>A</DPGDL></Element>
-    <Element ref={p2Ref} position={[270, 20]}><DPGDL>B</DPGDL></Element>
-    <Element ref={p3Ref} position={[420, 20]}><DPGDL>C</DPGDL></Element>
+  return <Drawing ref={drawingRef} width={500} height={275} maxWidth={500}>
+    <Element position={[0, 25]}><strong>Layer 0:</strong></Element>
+    <Element ref={p1Ref} position={[120, 25]}><DPGDL>A</DPGDL></Element>
+    <Element ref={p2Ref} position={[270, 25]}><DPGDL>B</DPGDL></Element>
+    <Element ref={p3Ref} position={[420, 25]}><DPGDL>C</DPGDL></Element>
 
     <Element position={[0, 100]}><strong>Layer 1:</strong></Element>
     <Element ref={p4Ref} position={[185, 100]}><DPGDL>D</DPGDL></Element>
 
-    <Element position={[0, 180]}><strong>Layer 2:</strong></Element>
-    <Element ref={p8Ref} position={[205, 180]}><DPGDL>H</DPGDL></Element>
-    <Element ref={p567Ref} position={[345, 180]}><DPGDL>(E,F,G)</DPGDL></Element>
+    <Element position={[0, 175]}><strong>Layer 2:</strong></Element>
+    <Element ref={p8Ref} position={[205, 175]}><DPGDL>H</DPGDL></Element>
+    <Element ref={p567Ref} position={[345, 175]}><DPGDL>(E,F,G)</DPGDL></Element>
 
-    <Element position={[0, 260]}><strong>Layer 3:</strong></Element>
-    <Element ref={p9Ref} position={[270, 260]}><DPGDL>I</DPGDL></Element>
+    <Element position={[0, 250]}><strong>Layer 3:</strong></Element>
+    <Element ref={p9Ref} position={[270, 250]}><DPGDL>I</DPGDL></Element>
 
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p567Bounds && p8Bounds && p9Bounds ? <>
       <Curve points={[p4Bounds.topLeft.add([5, -3]), p1Bounds.bottomRight.add([-5, 3])]} endArrow={true} color={themeColor} />

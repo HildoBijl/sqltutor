@@ -16,14 +16,14 @@ export function Theory() {
       <Par>This should give us various small easy-to-use key-based predicates.</Par>
       <Par>In the example case, we want to find which employees have been CIO (there may be multiple) and which products are musical instruments. We extract their IDs.</Par>
       <DL>{`
-cioId(id) :- contract(id, 'CIO', _, _, _, _, _).
-musicalInstrumentId(id) :- product(id, _, 'Musical Instruments', _, _, _).
+cio(id) :- contract(id, 'CIO', _, _, _, _, _).
+musicalInstrument(id) :- product(id, _, 'Musical Instruments', _, _, _).
 `}</DL>
       <Par>Using these predicates, we can find all suspicious transactions. We only take those arguments that we'll need later on.</Par>
       <DL>{`
 suspiciousTransaction(v, b, pid, d) :-
         transaction(v, b, pid, d, _, eid, _),
-        cioId(eid),
+        cio(eid),
         not musicalInstrument(pid).
 `}</DL>
       <Par>This gives us an overview of the vendor and buyer of a given product on a given date, and only for the transactions that are suspicious. It's a really useful starting point!</Par>
@@ -37,7 +37,7 @@ transferredProduct(v, b, p) :-
         transferredProduct(v, x, p),
         suspiciousTransaction(x, b, p, _).
 `}</DL>
-      <Par>This works well, except that in our case we <Em>do</Em> need a counter. After all, we want to know if the product got back to the original owner after <Em>at least five</Em> steps. That requires counting! So we add a counter. We change the above rules to</Par>
+      <Par>This works well, except that in our case we <Em>do</Em> need a counter. After all, we want to know if the product got back to the original owner after <Em>at least five</Em> steps. That requires counting! So we add a counter. We could change the above rules to</Par>
       <DL>{`
 transferredProduct(v, b, p, 1) :- suspiciousTransaction(v, b, p, _).
 transferredProduct(v, b, p, n) :-
@@ -45,10 +45,10 @@ transferredProduct(v, b, p, n) :-
         suspiciousTransaction(x, b, p, _),
         n = m + 1.
 `}</DL>
-      <Par>This fails: our program gets stuck in an infinite loop. After all, if A sold a product to B, and B sold it back to A, then A sold the product to A in two steps, but also in four, six, eight, etcetera. The counter keeps on increasing!</Par>
+      <Par>However, this program fails to run: it gets stuck in an infinite loop. After all, if A sold a product to B, and B sold it back to A, then A sold the product to A in two steps, but also in four, six, eight, etcetera. The counter keeps on increasing!</Par>
       <Warning>When using a counter, always make sure there are no cycles in your data. If there are: find a way to get rid of these cycles, or to prevent in some other way that the counter keeps increasing indefinitely.</Warning>
-      <Par>You might think, "We can't get rid of the cycles. We want to find them!" However, we do have a date argument. If we require every sale in a chain to be <Em>later</Em> than the previous one, then we can never get a cycle. After all, you can't have a cycle of transactions in which <Em>every</Em> transaction is later than the last one.</Par>
-      <Par>To implement this idea into our recursion, we add the date of the last sale to the recursive predicate.</Par>
+      <Par>You might think, "We can't get rid of the cycles. We want to find them!" However, we do have a <Em>date</Em> argument. If we require every sale in a chain to be <Em>later</Em> than the previous one, then we can never get a cycle. After all, you can't have a cycle of transactions in which <Em>every</Em> transaction is later than the last one.</Par>
+      <Par>To implement this idea into our recursion, we add the "date of the last sale" to the recursive predicate.</Par>
       <DL>{`
 transferredProduct(v, b, p, 1, d) :- suspiciousTransaction(v, b, p, d).
 transferredProduct(v, b, p, n, d2) :-
@@ -81,11 +81,11 @@ transferredProduct(v, b, p, n, d2) :-
       <Par>If your program meets all the checks, your program is most likely correct. Or at least it won't get stuck in some infinite loop.</Par>
       <Par>For our example, gathering everything we have written, we can assemble the full Datalog program.</Par>
       <DL>{`
-cioId(id) :- contract(id, 'CIO', _, _, _, _, _).
-musicalInstrumentId(id) :- product(id, _, 'Musical Instruments', _, _, _).
+cio(id) :- contract(id, 'CIO', _, _, _, _, _).
+musicalInstrument(id) :- product(id, _, 'Musical Instruments', _, _, _).
 suspiciousTransaction(v, b, pid, d) :-
         transaction(v, b, pid, d, _, eid, _),
-        cioId(eid),
+        cio(eid),
         not musicalInstrument(pid).
 transferredProduct(v, b, p, 1, d) :- suspiciousTransaction(v, b, p, d).
 transferredProduct(v, b, p, n, d2) :-
@@ -103,8 +103,8 @@ suspiciousProductName(n, u) :- suspiciousProduct(p, u), product(p, n, _, _, _).
         <>Rule 5 contains <IDL>{`d1 < d2`}</IDL> which is arithmetic, but both <IDL>d1</IDL> and <IDL>d2</IDL> are bound by positive non-arithmetic literals.</>,
         <>Rule 6 we have <IDL>{`n >= 5`}</IDL> which may be unsafe, but <IDL>n</IDL> comes directly from <IDL>transferredProduct</IDL>.</>,
       ]} />
-      <Par>Only the literal <IDL>n = m + 1</IDL> from rule 5 causes an unsafe rule: <IDL>n</IDL> does not follow from a non-arithmetic literal. However, this is a recursion counter, and since we have guaranteed that there are no cycles in the recursion, this is considered acceptabel.</Par>
-      <Par>To check for stratification, we can draw a quick dependency diagram. In this case that's a bit overkill though. The only cycle that appears is the one where <IDL>transferredProduct</IDL> refers to itself. This is done through a <Em>positive</Em> dependency, so there is certainly no cycle with a negative dependency in it. Everything is in order: the program is stratified.</Par>
+      <Par>Only the literal <IDL>n = m + 1</IDL> from rule 5 causes an unsafe rule: <IDL>n</IDL> does not follow from a non-arithmetic literal. However, this is a recursion counter, and since we have guaranteed that there are no cycles in the recursion, this is considered acceptable.</Par>
+      <Par>To check for stratification, we can draw a quick dependency diagram. In this case that's a bit overkill though: the only cycle that appears is the one where <IDL>transferredProduct</IDL> refers to itself. This is done through a <Em>positive</Em> dependency, so there is certainly no cycle with a negative dependency in it. Everything is in order: the program is stratified.</Par>
       <Par>And with that we now <Em>are</Em> done. (Yes, really.) We have seen all the steps involved in writing recursive Datalog programs and are ready to put them into practice.</Par>
     </Section>
   </Page>;
