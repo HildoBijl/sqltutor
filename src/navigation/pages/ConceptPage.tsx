@@ -124,10 +124,17 @@ export default function ConceptPage() {
     setShowCompletionDialog(true);
   };
 
-  // Calculate in which skill tree this concept is located
-  const conceptTree = conceptId
-    ? getSkillTreeDefinitions().find((tree) => tree.moduleIds.has(conceptId))
-    : undefined;
+  // Calculate in which skill tree this concept is located, preferring the tree the user came from
+  const conceptTree = useMemo(() => {
+    if (!conceptId) return undefined;
+    for (let i = skillTreeHistory.length - 1; i >= 0; i--) {
+      const tree = getSkillTreeDefinitions().find(
+        (t) => t.id === skillTreeHistory[i] && t.moduleIds.has(conceptId)
+      );
+      if (tree) return tree;
+    }
+    return getSkillTreeDefinitions().find((tree) => tree.moduleIds.has(conceptId));
+  }, [conceptId, skillTreeHistory]);
 
   // Calculate the current goal node ID for this tree (if any)
   const goalNodeID = useAppStore((state) =>
