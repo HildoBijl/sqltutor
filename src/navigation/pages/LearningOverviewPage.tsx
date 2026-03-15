@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
-import { useAppStore } from "@/store";
+import { useLearningStore } from "@/store";
 import { moduleIndex, moduleItems } from "@/curriculum";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
@@ -12,7 +12,7 @@ import { markSkillTreeVisited } from "@/learning/utils/skillTreeTracking";
  * LearningOverviewPage component that displays the skill tree overview page.
  */
 export default function LearningOverviewPage() {
-  const components = useAppStore((state) => state.components);
+  const components = useLearningStore((state) => state.components);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);

@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, DialogActions, Button, Typography, Box, Stack } from '@mui/material';
-import { ArrowBack, Bolt, EmojiEvents, ArrowForward} from '@mui/icons-material';
+import { ArrowBack, Bolt, EmojiEvents, ArrowForward } from '@mui/icons-material';
 
 interface ConceptCompletionDialogProps {
   open: boolean;

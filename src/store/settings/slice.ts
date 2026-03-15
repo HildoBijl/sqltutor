@@ -3,6 +3,7 @@
  */
 
 import type { SettingsState, Theme } from './types';
+import type { SetState } from '../utils';
 
 export type { SettingsState } from './types';
 import type { DatasetSize } from '@/mockData/types';
@@ -12,7 +13,7 @@ export const initialSettingsState: SettingsState = {
   hideStories: true,
   practiceDatasetSize: 'full',
   goalNodeID: {},
-  hasAccessedPlanningMode: false, 
+  hasAccessedPlanningMode: false,
 };
 
 export interface SettingsActions {
@@ -22,8 +23,6 @@ export interface SettingsActions {
   setGoalNodeID: (treeId: string, id: string | null) => void;
   setHasAccessedPlanningMode: (accessed: boolean) => void;
 }
-
-type SetState<T> = (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
 
 export function createSettingsActions(set: SetState<SettingsState>): SettingsActions {
   return {
