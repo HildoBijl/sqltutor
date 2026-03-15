@@ -1,6 +1,10 @@
 import { modulePositions } from '@/learning/skilltree/utils/treeDefinition';
 import { raModulePositions } from '@/learning/skilltree/ra-skilltree/ra-treeDefinition';
 import { datalogModulePositions } from '@/learning/skilltree/datalog-skilltree/datalog-treeDefinitions';
+import {
+  LEGACY_SKILL_TREE_HISTORY_KEY,
+  SKILL_TREE_HISTORY_KEY,
+} from '@/storage/keys';
 
 export type SkillTreeId = 'sql' | 'ra' | 'datalog';
 
@@ -13,8 +17,6 @@ export interface SkillTreeDefinition {
 
 export const SKILL_TREE_CHANGE_EVENT = 'skill-tree-change';
 
-const SKILL_TREE_HISTORY_KEY = 'sqlvalley-skilltree-history';
-const LEGACY_SKILL_TREE_HISTORY_KEY = 'sqltutor-skilltree-history';
 const DEFAULT_SKILL_TREE_HISTORY: SkillTreeId[] = ['sql'];
 
 const skillTreeDefinitions: SkillTreeDefinition[] = [

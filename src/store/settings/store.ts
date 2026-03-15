@@ -17,13 +17,14 @@ import {
   migrateSettingsPersistedState,
   SETTINGS_STORE_VERSION,
 } from './version';
+import { migrateLegacyStorageIfNeeded } from '../legacyMigration';
+import { createStore, type HydrationState } from '../utils';
 import {
   LEGACY_SETTINGS_STORAGE_KEY,
-  migrateLegacyStorageIfNeeded,
-} from '../legacyMigration';
-import { createStore, type HydrationState } from '../utils';
+  SETTINGS_STORAGE_KEY,
+} from '../../storage/keys';
 
-export const SETTINGS_STORAGE_KEY = 'sqlvalley-settings';
+export { SETTINGS_STORAGE_KEY };
 
 export interface SettingsStoreState
   extends SettingsState,
