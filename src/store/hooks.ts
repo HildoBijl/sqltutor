@@ -10,5 +10,3 @@ export function useHasHydrated() {
   const learningHydrated = useLearningStore((state) => state._hasHydrated);
   return settingsHydrated && learningHydrated;
 }
-
-export const useIsStoreReady = useHasHydrated;
