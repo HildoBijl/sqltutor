@@ -27,7 +27,7 @@ import { PlanningModeIntro } from "./PlanningModeIntro";
  * @param containerRef - Ref to the container div for the tree.
  * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
-interface SkillTreeCanvasProps {
+export interface SkillTreeCanvasProps {
   treeId: string;
   moduleItems: Record<string, ModuleMeta>;
   modulePositions: Record<string, ModulePositionMeta>;
