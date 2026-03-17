@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDatabaseContext, type QueryResult } from '@/components/sql/sqljs';
-import { type DatasetSize, type TableKey, buildSchema, getCompletionSchemaForTables, defaultDatasetSize } from '@/mockData';
+import { type DatasetSize, type TableKey, buildSchema, getCompletionSchemaForTables, defaultDatasetSize, allTables } from '@/mockData';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 interface DatabaseOptions {
@@ -73,8 +73,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
     if (tables?.length) {
       return Array.from(new Set(tables)) as TableKey[];
     }
-    const moduleTables = getModuleTables(moduleId);
-    return Array.from(new Set(moduleTables)) as TableKey[];
+    return moduleId ? getModuleTables(moduleId) : allTables;
   }, [tables, moduleId]);
 
   // Build the schema SQL
@@ -238,8 +237,9 @@ export function usePlaygroundDatabase() {
 }
 
 /** Concept pages - small dataset */
-export function useConceptDatabase() {
+export function useConceptDatabase(conceptId: string) {
   return useDatabase({
+		moduleId: conceptId,
     size: 'small',
     resetOnSchemaChange: true,
   });
@@ -257,7 +257,6 @@ export function useSkillDatabase(skillId: string) {
 /** Theory examples - all tables with small dataset */
 export function useTheorySampleDatabase() {
   return useDatabase({
-    moduleId: 'playground',
     size: 'small',
     resetOnSchemaChange: true,
   });

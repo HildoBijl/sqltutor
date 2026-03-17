@@ -9,7 +9,7 @@ type ComponentModule = {
   default?: ComponentType<any>;
 } & Record<string, ComponentType<any> | undefined>;
 
-const moduleComponentModules = import.meta.glob('./modules/*/*.tsx') as Record<
+const moduleComponentModules = import.meta.glob('../modules/*/*.tsx') as Record<
   string,
   () => Promise<Record<string, unknown>>
 >;
@@ -32,7 +32,7 @@ function createLazyComponent(
 export const moduleComponents: Record<string, ModuleComponentMap> = Object.entries(
   moduleComponentModules,
 ).reduce<Record<string, ModuleComponentMap>>((acc, [path, loader]) => {
-  const match = path.match(/\.\/modules\/([^/]+)\/([^/]+)\.tsx$/);
+  const match = path.match(/\.\.\/modules\/([^/]+)\/([^/]+)\.tsx$/);
   if (!match) {
     return acc;
   }
@@ -48,13 +48,13 @@ export const moduleComponents: Record<string, ModuleComponentMap> = Object.entri
   return acc;
 }, {});
 
-const skillExerciseModules = import.meta.glob('./modules/*/exercise.ts');
+const skillExerciseModules = import.meta.glob('../modules/*/exercise.ts');
 
 type SkillExerciseLoader = () => Promise<unknown>;
 
 export const skillExerciseLoaders = Object.fromEntries(
   Object.entries(skillExerciseModules).reduce<[string, SkillExerciseLoader][]>((entries, [path, loader]) => {
-    const match = path.match(/\.\/modules\/([^/]+)\/exercise\.ts$/);
+    const match = path.match(/\.\.\/modules\/([^/]+)\/exercise\.ts$/);
     if (match) {
       entries.push([match[1], loader as SkillExerciseLoader]);
     }

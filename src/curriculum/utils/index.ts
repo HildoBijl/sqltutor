@@ -2,6 +2,7 @@
  * Curriculum utilities.
  */
 
+export * from './loaders';
 export * from './moduleAccess';
 export * from './messages';
 export * from './queryFigures';

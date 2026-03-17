@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { skillExerciseLoaders } from '@/learning/utils/loaders';
-import { moduleList, type Module } from '@/curriculum';
+import { type Module, moduleList } from '@/curriculum';
+import { skillExerciseLoaders } from '@/curriculum/utils/loaders';
 
 import { normalizeSkillExerciseModule } from '../utils/normalizeSkillModule';
 import type { SkillExerciseModuleLike } from '../useSkillExerciseState';

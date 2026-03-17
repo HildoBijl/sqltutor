@@ -4,8 +4,8 @@ import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mu
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
 import { useLearningStore, useSettingsStore, type SkillComponentState } from '@/store';
-import { moduleComponents } from '@/learning/utils/loaders';
 import { moduleList } from '@/curriculum';
+import { moduleComponents } from '@/curriculum/utils/loaders';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
