@@ -1,6 +1,6 @@
 import { type Ref, type RefObject, type RefCallback, useRef, useCallback } from 'react';
 
-import { ensureConsistency } from '../../javascript';
+import { preserveRefs } from '../../javascript';
 
 // Get a ref object whose "current" parameter always equals the given value.
 export function useLatest<T>(value: T, initialValue: T = value) {
@@ -25,7 +25,7 @@ export function useEnsureRef<T>(externalRef?: Ref<T>): [RefCallback<T>, RefObjec
 // Keep references in the given value maintained as much as possible. This is also extended to sub-parameters.
 export function useConsistentValue<T>(value: T): T {
 	const ref = useRef<T | undefined>(undefined);
-	ref.current = ensureConsistency(value, ref.current ?? undefined);
+	ref.current = preserveRefs<T>(value, ref.current);
 	return ref.current;
 }
 
