@@ -13,7 +13,7 @@ export function SQLValleySchema({ tables = [], singular = false }: { tables: Tab
 		products: <><RelationName>product{singular ? '' : 's'}</RelationName> (<PrimaryKey>p_id</PrimaryKey>, name, category, owned_by, est_value, status)</>,
 		transactions: <><RelationName>transaction{singular ? '' : 's'}</RelationName> (<PrimaryKey>t_id</PrimaryKey>, vendor, buyer, prod_id, date_time, price, validated_by, status)</>,
 		expenses: <><RelationName>expense{singular ? '' : 's'}</RelationName> (<PrimaryKey>exp_id</PrimaryKey>, amount, d_id, description, date, requested_by, approved_by)</>,
-		quarterly_performance: <><RelationName>quarterly_performance</RelationName> (<PrimaryKey>quarter</PrimaryKey>, <PrimaryKey>fiscal_year</PrimaryKey>, revenue, operating_expenses, total_transactions, growth_rate, updated_at)</>,
+		quarterlyPerformance: <><RelationName>quarterly_performance</RelationName> (<PrimaryKey>quarter</PrimaryKey>, <PrimaryKey>fiscal_year</PrimaryKey>, revenue, operating_expenses, total_transactions, growth_rate, updated_at)</>,
 	}
 
 	return <List items={tables.map(table => <Fragment key={table}>{entries[table]}</Fragment>)} />
