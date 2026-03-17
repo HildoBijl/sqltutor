@@ -1,5 +1,5 @@
-import fullCsv from './full.csv?raw';
-import smallCsv from './small.csv?raw';
+import fullCsv from './expensesFull.csv?raw';
+import smallCsv from './expensesSmall.csv?raw';
 import { parseCsv, buildRows } from '../../utils';
 import type { TableDefinition, Attributes } from '../../types';
 

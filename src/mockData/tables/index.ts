@@ -12,5 +12,5 @@ export { departmentsTable } from './departments';
 export { employeesTable } from './employees';
 export { expensesTable } from './expenses';
 export { productsTable } from './products';
-export { quarterlyPerformanceTable } from './quarterly_performance';
+export { quarterlyPerformanceTable } from './quarterlyPerformance';
 export { transactionsTable } from './transactions';

@@ -16,10 +16,10 @@ const tableIntroduction: Record<TableKey, ModuleId | ModuleId[]> = {
 
 	// Financials.
 	expenses: 'data-types',
-	quarterly_performance: 'aggregation',
+	quarterlyPerformance: 'aggregation',
 
 	// Sales.
-	accounts: 'database-key',
+	accounts: 'database-keys',
 	products: 'join-and-decomposition',
 	transactions: 'projection-and-filtering',
 } as const;
@@ -29,10 +29,12 @@ const moduleTableIntroduction: Record<ModuleId, TableKey[]> = {};
 allTables.forEach(table => {
 	const moduleOrList = tableIntroduction[table];
 	const moduleList = Array.isArray(moduleOrList) ? moduleOrList : [moduleOrList];
-	moduleList.forEach(module => {
-		if (!moduleTableIntroduction[module])
-			moduleTableIntroduction[module] = [];
-		moduleTableIntroduction[module].push(table);
+	moduleList.forEach(moduleId => {
+		if (!modules[moduleId])
+			throw new Error(`Invalid module ID given in table introductions: module "${moduleId}" is unknown.`)
+		if (!moduleTableIntroduction[moduleId])
+			moduleTableIntroduction[moduleId] = [];
+		moduleTableIntroduction[moduleId].push(table);
 	})
 })
 

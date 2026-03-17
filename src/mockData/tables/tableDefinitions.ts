@@ -9,7 +9,7 @@ import { departmentsTable } from './departments';
 import { employeesTable } from './employees';
 import { expensesTable } from './expenses';
 import { productsTable } from './products';
-import { quarterlyPerformanceTable } from './quarterly_performance';
+import { quarterlyPerformanceTable } from './quarterlyPerformance';
 import { transactionsTable } from './transactions';
 import type { TableDefinition } from '../types';
 
@@ -22,7 +22,7 @@ export const tableDefinitions = {
 
 	// Financials.
   expenses: expensesTable,
-  quarterly_performance: quarterlyPerformanceTable,
+  quarterlyPerformance: quarterlyPerformanceTable,
 	
 	// Sales.
   accounts: accountsTable,
