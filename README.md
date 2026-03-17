@@ -1,12 +1,12 @@
-# SQL Valley
+# SQL Valley - [sqlvalley.com](https://sqlvalley.com/)
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Built with React](https://img.shields.io/badge/built%20with-React-blue)
 ![Powered by Vite](https://img.shields.io/badge/bundler-Vite-purple)
 
-**Try it out: [sqlvalley.com](https://sqlvalley.com/)**
-
 SQL Valley is an interactive SQL tutorial for anyone looking to learn SQL or improve their skills. Developed by instructors at the [Eindhoven University of Technology](https://www.tue.nl/en/), it is completely free and open for everyone to use.
+
+**Try it out: [sqlvalley.com](https://sqlvalley.com/)**
 
 
 ## Features
