@@ -116,7 +116,7 @@ export function preserveRefs<T = unknown>(newValue: T, oldValue?: T): T {
 	if (deepEquals(newValue, oldValue)) return oldValue
 
 	// If both are arrays or both are plain objects, recurse into children.
-	if (Array.isArray(newValue) && Array.isArray(oldValue)) return (applyMapping(newValue as any[], (v, i) => preserveRefs(v, (oldValue as any[])[i])) as unknown) as T
+	if (Array.isArray(newValue) && Array.isArray(oldValue)) return (newValue.map((v, i) => preserveRefs(v, (oldValue as any[])[i])) as unknown) as T
 	if (isPlainObject(newValue) && isPlainObject(oldValue)) return (applyMapping(newValue as Record<string, any>, (v, k) => preserveRefs(v, (oldValue as any)[k])) as unknown) as T
 
 	// Fallback: cannot reconcile deeper; return new value.

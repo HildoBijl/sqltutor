@@ -44,11 +44,10 @@ export function getNodeClientRect(node?: Element | Text | null): DOMRect | undef
 export function useBoundingClientRects(elements: (Element | Text | null | undefined)[]): (DOMRect | undefined)[] {
 	const [rects, setRects] = useState<(DOMRect | undefined)[]>();
 	const stableElements = useConsistentValue(elements);
-	console.log(elements, stableElements)
 	const rafId = useRef<number | null>(null);
 
 	// Compute rects for given elements.
-	const getRects = useCallback(() => (stableElements || []).map((element) => getNodeClientRect(element)), [stableElements]);
+	const getRects = useCallback(() => stableElements.map((element) => getNodeClientRect(element)), [stableElements]);
 
 	// Batch updates (to prevent scroll spam).
 	const scheduleUpdate = useCallback(() => {
