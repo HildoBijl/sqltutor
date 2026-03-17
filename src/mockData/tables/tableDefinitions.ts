@@ -14,15 +14,22 @@ import { transactionsTable } from './transactions';
 import type { TableDefinition } from '../types';
 
 export const tableDefinitions = {
-  accounts: accountsTable,
-  allocations: allocationsTable,
-  contracts: contractsTable,
+	// Company internals.
   departments: departmentsTable,
   employees: employeesTable,
+  contracts: contractsTable,
+  allocations: allocationsTable,
+
+	// Financials.
   expenses: expensesTable,
-  products: productsTable,
   quarterly_performance: quarterlyPerformanceTable,
+	
+	// Sales.
+  accounts: accountsTable,
+  products: productsTable,
   transactions: transactionsTable,
 } satisfies Record<string, TableDefinition>;
 
 export type TableKey = keyof typeof tableDefinitions;
+
+export const allTables = Object.keys(tableDefinitions) as TableKey[];

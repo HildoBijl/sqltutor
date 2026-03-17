@@ -1,4 +1,4 @@
-import type { ModuleMeta } from '@/curriculum';
+import type { Module } from '@/curriculum';
 import type { ComponentState } from '@/store';
 import { EXERCISES_TO_COMPLETE } from '@/constants';
 
@@ -9,11 +9,11 @@ interface ProcessedProgress {
 }
 
 export function processProgress(
-  moduleItems: ModuleMeta[],
+  moduleItems: Module[],
   components: Record<string, ComponentState>,
   requiredCount: number = EXERCISES_TO_COMPLETE,
 ): ProcessedProgress {
-  const moduleById: Record<string, ModuleMeta> = {};
+  const moduleById: Record<string, Module> = {};
   for (const item of moduleItems) {
     moduleById[item.id] = item;
   }

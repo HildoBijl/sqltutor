@@ -2,9 +2,9 @@
  * Re-export all table definitions.
  */
 
-export { tableDefinitions, type TableKey } from './tableDefinitions';
+export * from './tableDefinitions';
 
-// Individual table exports (for direct access if needed)
+// Individual table exports (for direct access if needed).
 export { accountsTable } from './accounts';
 export { allocationsTable } from './allocations';
 export { contractsTable } from './contracts';

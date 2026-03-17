@@ -2,7 +2,7 @@ import { RefObject, useEffect, useState, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
-import { ModuleMeta } from "@/curriculum";
+import { Module } from "@/curriculum";
 import { ModulePositionMeta } from "../utils/treeDefinition";
 import { SkillTree } from "./SkillTree";
 import { ZoomControls } from "./ZoomControls";
@@ -29,7 +29,7 @@ import { PlanningModeIntro } from "./PlanningModeIntro";
  */
 interface SkillTreeCanvasProps {
   treeId: string;
-  moduleItems: Record<string, ModuleMeta>;
+  moduleItems: Record<string, Module>;
   modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
     minX: number;

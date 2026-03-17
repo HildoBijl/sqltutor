@@ -5,8 +5,8 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDatabaseContext, type QueryResult } from '@/components/sql/sqljs';
-import { buildSchema, getCompletionSchemaForTables, type DatasetSize, type TableKey } from '@/mockData';
-import { getModuleTables, getModuleSize } from '@/curriculum/utils/moduleAccess';
+import { type DatasetSize, type TableKey, buildSchema, getCompletionSchemaForTables, defaultDatasetSize } from '@/mockData';
+import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 interface DatabaseOptions {
   /** Module ID (skill or concept) to determine tables and size */
@@ -64,7 +64,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
 
   // Resolve the dataset size
   const resolvedSize = useMemo(
-    () => size ?? getModuleSize(moduleId),
+    () => size ?? defaultDatasetSize,
     [size, moduleId],
   );
 

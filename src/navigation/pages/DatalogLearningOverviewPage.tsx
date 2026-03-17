@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "@mui/material";
 import { useLearningStore } from "@/store";
-import { moduleIndex, moduleItems } from "@/curriculum";
+import { moduleList, modules } from "@/curriculum";
 import { SkillTreeCanvas } from "@/learning/skilltree/components/SkillTreeCanvas";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
@@ -23,7 +23,7 @@ export default function DatalogLearningOverviewPage() {
   }, []);
 
   const { isCompleted, getProgress } = useModuleProgress(
-    moduleIndex,
+    moduleList,
     components
   );
 
@@ -33,7 +33,7 @@ export default function DatalogLearningOverviewPage() {
     <Container maxWidth={false} sx={{ py: 4, maxWidth: "1400px" }}>
       <SkillTreeCanvas
         treeId="datalog"
-        moduleItems={moduleItems}
+        moduleItems={modules}
         modulePositions={datalogModulePositions}
         treeBounds={treeBounds}
         visiblePaths={datalogConnectors}

@@ -5,7 +5,7 @@ import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from 
 
 import { useLearningStore, useSettingsStore, type SkillComponentState } from '@/store';
 import { moduleComponents } from '@/learning/utils/loaders';
-import { moduleIndex } from '@/curriculum';
+import { moduleList } from '@/curriculum';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
@@ -42,7 +42,7 @@ export default function SkillPage() {
 
 	// Check what practice mode this skill uses
 	const hasStaticPractice = Boolean(skillId && moduleComponents[skillId]?.Practice);
-	const hasTables = getModuleTables(skillId) !== undefined;
+	const hasTables = skillId && getModuleTables(skillId).length > 0;
 
 	const allTabs: TabConfig[] = [
 		{ key: 'story', label: 'Story', icon: <MenuBook /> },
@@ -88,7 +88,7 @@ export default function SkillPage() {
 		setComponentState,
 	});
 
-	const { isCompleted } = useModuleProgress(moduleIndex, components);
+	const { isCompleted } = useModuleProgress(moduleList, components);
 	const isSkillMastered = skillId ? isCompleted(skillId) : false;
 	const summaryUnlocked = isSkillMastered || isAdmin;
 

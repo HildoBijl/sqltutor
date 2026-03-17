@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { ModuleMeta } from "@/curriculum";
+import type { Module } from "@/curriculum";
 import type { ComponentState } from "@/store";
 import { processProgress } from "@/learning/utils/processProgress";
 
@@ -12,7 +12,7 @@ import { processProgress } from "@/learning/utils/processProgress";
 * @returns An object with concepts, skills, isCompleted, getProgress, completedConcepts, and completedSkills.
 */
 export function useModuleProgress(
-  moduleItems: ModuleMeta[],
+  moduleItems: Module[],
   components: Record<string, ComponentState>,
 ) {
   const concepts = useMemo(

@@ -1,7 +1,7 @@
 import { type RefObject, type ReactNode, useState, useEffect, useMemo } from "react";
 import type { Vector } from "@/utils/geometry";
 import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
-import { ModuleMeta } from "@/curriculum";
+import { Module } from "@/curriculum";
 import { NodeCard } from "./NodeCard";
 import { ModulePositionMeta } from "../utils/treeDefinition";
 import { useTheme } from "@mui/material/";
@@ -25,7 +25,7 @@ import { getPrerequisites } from "../utils/goalPath";
  * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 interface SkillTreeProps {
-  moduleItems: Record<string, ModuleMeta>;
+  moduleItems: Record<string, Module>;
   modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
     minX: number;
@@ -146,14 +146,14 @@ export function SkillTree({
   };
 
   // Handler for click events on nodes
-  const handleNodeClick = (item: ModuleMeta) => {
+  const handleNodeClick = (item: Module) => {
     const path =
       item.type === "skill" ? `/skill/${item.id}` : `/concept/${item.id}`;
     window.location.href = path;
   };
 
   // Determine if a node is ready to learn
-  const isReadyToLearn = (item: ModuleMeta): boolean => {
+  const isReadyToLearn = (item: Module): boolean => {
     const allPrequisitesCompleted =
       item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
     return !isCompleted(item.id) && allPrequisitesCompleted;

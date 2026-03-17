@@ -2,7 +2,7 @@
  * Curriculum utilities.
  */
 
-export { getModuleTables, getModuleSize } from './moduleAccess';
+export * from './moduleAccess';
 export * from './messages';
 export * from './queryFigures';
 export * from './raQueryFigures';

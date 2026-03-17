@@ -3,11 +3,11 @@
  * This file contains all skill tree modules (concepts and skills).
  */
 
-import { keysToObject } from '@/utils';
+// Define types. The raw ones are for initial definitions, which are then processed afterwards to contain bidirectional references.
 
 export type ModuleType = 'concept' | 'skill';
 
-export interface ModuleMetaRaw {
+interface ModuleRaw {
   id: string;
   name: string;
   type: ModuleType;
@@ -15,8 +15,14 @@ export interface ModuleMetaRaw {
   prerequisites: string[];
 }
 
+export interface Module extends ModuleRaw {
+	id: ModuleId,
+  prerequisites: ModuleId[];
+  followUps: ModuleId[];
+}
+
 // The moduleIndexRaw contains all definitions of modules, before being processed into more derived objects.
-const moduleIndexRaw: ModuleMetaRaw[] = [
+const moduleIndexRaw: ModuleRaw[] = [
   /*
    * Database concepts
    */
@@ -424,33 +430,27 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
   },
 ] as const;
 
-export type moduleId = typeof moduleIndexRaw[number]['id'];
+export type ModuleId = typeof moduleIndexRaw[number]['id'];
 
-// The moduleItemsRaw contains all unprocessed modules, as an object.
-export const moduleItemsRaw: Record<string, ModuleMetaRaw> = keysToObject(moduleIndexRaw.map(item => item.id), (_: string, index: number) => moduleIndexRaw[index]);
+// Prepare the moduleList list and modules object to contain processed modules.
+export const moduleList: Module[] = [];
+export const modules: Record<ModuleId, Module> = {};
 
-// Set up a new type for processed modules.
-export interface ModuleMeta extends ModuleMetaRaw {
-  followUps: string[];
-}
-
-// Prepare the moduleIndex and moduleItems for processed modules.
-export const moduleIndex: ModuleMeta[] = [];
-export const moduleItems: Record<string, ModuleMeta> = {};
+// Fill up the list and object with the initial modules.
 moduleIndexRaw.forEach(item => {
-  const processedItem: ModuleMeta = {
-    ...item,
+  const processedItem: Module = {
+		...item,
     followUps: [],
   };
-  moduleIndex.push(processedItem);
-  moduleItems[item.id] = processedItem;
+  moduleList.push(processedItem);
+  modules[item.id] = processedItem;
 });
 
-// Fill up the moduleIndex and moduleItems.
+// Fill up the followUps property of each module.
 moduleIndexRaw.forEach(itemRaw => {
-  const item: ModuleMeta = moduleItems[itemRaw.id];
-  (itemRaw.prerequisites || []).forEach(prerequisiteId => {
-    const prerequisite: ModuleMeta = moduleItems[prerequisiteId];
+  const item = modules[itemRaw.id];
+  itemRaw.prerequisites.forEach(prerequisiteId => {
+    const prerequisite = modules[prerequisiteId];
     if (!prerequisite)
       throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at module "${item.id}".`);
     prerequisite.followUps.push(item.id);

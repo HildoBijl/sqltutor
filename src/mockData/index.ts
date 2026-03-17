@@ -7,6 +7,7 @@
  * - types.ts : Type definitions
  */
 
+export * from './tables';
 import { tableDefinitions, type TableKey } from './tables';
 import { buildInsertStatement } from './utils';
 import type { DatasetSize, SqlCell, TableDefinition, Attributes, AttributeType } from './types';
@@ -14,11 +15,10 @@ import type { DatasetSize, SqlCell, TableDefinition, Attributes, AttributeType }
 // Re-export types
 export type { DatasetSize, SqlCell, TableDefinition, TableKey, Attributes, AttributeType };
 
-// Re-export table definitions
-export { tableDefinitions };
-
 // Re-export utilities (for external use if needed)
 export { parseCsv, buildRows, formatSqlValue, buildInsertStatement } from './utils';
+
+export const defaultDatasetSize: DatasetSize = 'small';
 
 /**
  * Options for building a database schema.
