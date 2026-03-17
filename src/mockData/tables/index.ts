@@ -1,7 +1,3 @@
-/**
- * Re-export all table definitions.
- */
-
 export * from './tableDefinitions';
 
 // Individual table exports (for direct access if needed).

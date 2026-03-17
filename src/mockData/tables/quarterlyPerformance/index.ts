@@ -1,7 +1,8 @@
+import type { TableDefinition, Attributes } from '../../types';
+import { parseCsv, buildRows } from '../../utils';
+
 import fullCsv from './quarterlyPerformanceFull.csv?raw';
 import smallCsv from './quarterlyPerformanceSmall.csv?raw';
-import { parseCsv, buildRows } from '../../utils';
-import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   quarter: 'number',

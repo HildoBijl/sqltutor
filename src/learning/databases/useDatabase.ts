@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDatabaseContext, type QueryResult } from '@/components/sql/sqljs';
-import { type DatasetSize, type TableKey, buildSchema, getCompletionSchemaForTables, defaultDatasetSize, allTables } from '@/mockData';
+import { type DatasetSize, type TableKey, buildSchema, getCompletionSchema, defaultDatasetSize, allTables } from '@/mockData';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
 
 interface DatabaseOptions {
@@ -84,7 +84,7 @@ export function useDatabase(options: DatabaseOptions = {}): UseDatabaseReturn {
 
   // Build completion schema for SQL editor
   const completionSchema = useMemo(
-    () => getCompletionSchemaForTables(resolvedTables),
+    () => getCompletionSchema(resolvedTables),
     [resolvedTables],
   );
 

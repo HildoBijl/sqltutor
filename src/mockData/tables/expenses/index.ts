@@ -1,7 +1,8 @@
+import type { TableDefinition, Attributes } from '../../types';
+import { parseCsv, buildRows } from '../../utils';
+
 import fullCsv from './expensesFull.csv?raw';
 import smallCsv from './expensesSmall.csv?raw';
-import { parseCsv, buildRows } from '../../utils';
-import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   exp_id: 'id',

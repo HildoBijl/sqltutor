@@ -11,7 +11,7 @@ import { expensesTable } from './expenses';
 import { productsTable } from './products';
 import { quarterlyPerformanceTable } from './quarterlyPerformance';
 import { transactionsTable } from './transactions';
-import type { TableDefinition } from '../types';
+import type { TableDefinition, DatasetSize } from '../types';
 
 export const tableDefinitions = {
 	// Company internals.
@@ -33,3 +33,5 @@ export const tableDefinitions = {
 export type TableKey = keyof typeof tableDefinitions;
 
 export const allTables = Object.keys(tableDefinitions) as TableKey[];
+
+export const defaultDatasetSize: DatasetSize = 'small';

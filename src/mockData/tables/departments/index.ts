@@ -1,7 +1,8 @@
+import type { TableDefinition, Attributes } from '../../types';
+import { parseCsv, buildRows } from '../../utils';
+
 import fullCsv from './departmentsFull.csv?raw';
 import smallCsv from './departmentsSmall.csv?raw';
-import { parseCsv, buildRows } from '../../utils';
-import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   d_id: 'id',

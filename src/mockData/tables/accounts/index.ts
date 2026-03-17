@@ -1,7 +1,8 @@
+import type { TableDefinition, Attributes } from '../../types';
+import { parseCsv, buildRows } from '../../utils';
+
 import fullCsv from './accountsFull.csv?raw';
 import smallCsv from './accountsSmall.csv?raw';
-import { parseCsv, buildRows } from '../../utils';
-import type { TableDefinition, Attributes } from '../../types';
 
 const attributes = {
   username: 'string',
