@@ -51,8 +51,8 @@ All components are bundled into pages and rendered.
 
 ## Where to start
 
-If you're new to the codebase:
+If you're new to the codebase, we recommend exploring bottom-up:
 - Familiarity with React is recommended.
 - Start with [main.tsx](./main.tsx) and [App.tsx](./App.tsx) to understand how the app is initialized.
 - Then explore [navigation/](./navigation/) to see how pages are structured.
-- From there, dive into [learning/](./learning/) and [curriculum/](./curriculum/) for the core educational content.
+- From there, dive into [learning/](./learning/) and [curriculum/](./curriculum/) to learn more about how the respective educational tools are built up.
