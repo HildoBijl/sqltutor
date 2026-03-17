@@ -1,15 +1,14 @@
-import { Vector } from "@/utils/geometry";
-import { Rectangle, Element } from "@/components";
-import { Module } from "@/curriculum";
-import { cardWidth, cardHeight } from "../utils/settings";
-import { ModulePositionMeta } from "../utils/treeDefinition";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import School from "@mui/icons-material/School";
-import { useTheme, ButtonBase } from "@mui/material/";
-import { useState } from "react";
-import PushPinIcon from "@mui/icons-material/PushPin";
-
+import { Vector } from '@/utils/geometry';
+import { Rectangle, Element } from '@/components';
+import { Module } from '@/curriculum';
+import { cardWidth, cardHeight } from '../utils/settings';
+import { ModulePositionMeta } from '../utils/treeDefinition';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import School from '@mui/icons-material/School';
+import { useTheme, ButtonBase } from '@mui/material/';
+import { useState } from 'react';
+import PushPinIcon from '@mui/icons-material/PushPin';
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.

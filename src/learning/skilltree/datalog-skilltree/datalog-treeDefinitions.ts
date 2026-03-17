@@ -1,8 +1,8 @@
-import { modules } from "@/curriculum";
+import { modules } from '@/curriculum';
 import { applyMapping } from '@/utils/javascript';
-import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
-import { cardWidth, cardHeight } from "../utils/settings";
-import { computeConnectorPath } from "../utils/pathCalculations";
+import { type VectorInput, Vector, ensureVector } from '@/utils/geometry';
+import { cardWidth, cardHeight } from '../utils/settings';
+import { computeConnectorPath } from '../utils/pathCalculations';
 
 export interface ModulePositionMetaRaw {
     position: VectorInput;
