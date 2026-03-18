@@ -46,14 +46,14 @@ SELECT * FROM vendor_chain;`} tableWidth={260} />
 						<DL>receivedMoneyFrom(v, b) :- transaction(_, v, x, _, _, _, _, _), receivedMoneyFrom(x, b).</DL>
 					</>,
 					<>
-						<Par>Use the <Em>new predicate twice</Em>. This technically does work, but it's <Em>not</Em> recommended. Note that, because the new recursive <IDL>receivedMoneyFrom</IDL> predicate is likely to be far larger than the original <IDL>transaction</IDL> predicate, the rule now has to check a lot more cases. This may lead to a significantly slower query evaluation.</Par>
+						<Par>Use the <Em>new predicate twice</Em>. This technically does work, but it's <Em>not</Em> recommended. Because the new recursive <IDL>receivedMoneyFrom</IDL> predicate is likely to become far larger than the original <IDL>transaction</IDL> predicate, the rule now has to check a lot more cases. This may lead to a significantly slower query evaluation.</Par>
 						<DL>receivedMoneyFrom(v, b) :- receivedMoneyFrom(v, x), receivedMoneyFrom(x, b).</DL>
 					</>,
 				]} />
 			</Info>
 		</Section>
 
-		<Section title="Use a recursion counter">
+		<Section title="Step 3: add a recursion counter when necessary">
 			<Par>So far we have tracked who received money from who, in any number of steps. But now let's say we're interested in this <Em>number</Em> of steps. Let's find a way to track this number.</Par>
 			<Par>To do so, we add a counter to the recursive predicate through <IDL>receivedMoneyInSteps(v, b, n)</IDL>. This counter <IDL>n</IDL> tracks the number of steps we have taken to get from one user to another. We have to implement this counter in our rules accordingly.</Par>
 			<Par>Adding the counter to the base case is relatively straightforward. If a vendor directly received money from a buyer, the number of steps is 1.</Par>
@@ -67,9 +67,9 @@ SELECT * FROM vendor_chain;`} tableWidth={260} />
 			<Par>To see why, consider in how many steps we can reach person B from person A. We can do so in one step (A sold to B) so <IDL>receivedMoneyInSteps(a, b, 1)</IDL> holds true. But we can also reach person B in three steps (A sold to B, who sold to A, who sold to B) so <IDL>receivedMoneyInSteps(a, b, 3)</IDL> is also present. And identically, we have <IDL>receivedMoneyInSteps(a, b, 5)</IDL>, <IDL>receivedMoneyInSteps(a, b, 7)</IDL>, and so forth. The result is an infinite amount of ways to reach person B from person A. And that's just due to <Em>one</Em> cycle. Imagine if there's more!</Par>
 			<Warning>
 				<Par sx={{ mb: 0.5 }}>You may have already learned about Datalog rule safety. The literal <IDL>n = m + 1</IDL> causes the rule to be unsafe: <IDL>n</IDL> does not originate from any existing predicate. That explains the infinitely large outcomes.</Par>
-				<Par>Even though we usually say that all rules should be safe, recursion counters form an exception to this. They can be very useful after all. However, if you ever use recursion counters, do ensure that there are no cycles! Or you will still run into infinity issues.</Par>
+				<Par>Even though we usually say that all rules should be safe, recursion counters form an exception to this. We allow them because they can be very useful. However, this means that if you ever use recursion counters, you have to manually ensure that there are no infinity problems. Always check that there are no cycles!</Par>
 			</Warning>
-			<Info>Some more strict Datalog engines don't allow literals like <IDL>n = m + 1</IDL>. Instead, they use a <Term>successor predicate</Term> <IDL>succ(m, n)</IDL> which defines <IDL>n</IDL> to be one larger than (i.e., the successor of) <IDL>m</IDL>. So instead of <IDL>n = m + 1</IDL> we'd then have to use <IDL>succ(m, n)</IDL>.</Info>
+			<Info>Some more strict Datalog engines don't allow literals like <IDL>n = m + 1</IDL>. Instead, they use a built-in <Term>successor predicate</Term> <IDL>succ(m, n)</IDL> which defines <IDL>n</IDL> to be one larger than (i.e., the successor of) <IDL>m</IDL>. So instead of <IDL>n = m + 1</IDL> we'd then have to use <IDL>succ(m, n)</IDL>.</Info>
 			<Par>Tackling the problem of cycles is really tricky. There's a few approaches that can do so, and that will give the <Em>least</Em> amount of steps for which B can be reached from A. However, these approaches require techniques we haven't discussed so far: think of tracking which links we already visited, or using recursive aggregation within Datalog. Because it's a bit too advanced, we won't discuss those methods further for now. Whenever we add a counter, we'll simply have to ensure that there <Em>are</Em> no cycles.</Par>
 		</Section>
 	</Page>;
