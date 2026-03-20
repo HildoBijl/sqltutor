@@ -19,14 +19,21 @@ const exercises = [
 		problem: <Par>Find, for every employee (first and last name), which positions they have held throughout their career.</Par>,
 		solution: <>
 			<Par>The employee's first and last name come from the <IDL>employee</IDL> predicate, while the <IDL>contract</IDL> predicate lists the positions they held. We hence have to join those predicates through the employee ID.</Par>
-			<DL>employeePosition(fn, ln, pos) :- employee(id, fn, ln, _, _, _, _, _, _), contract(id, pos, _, _, _, _, _).</DL>
+			<DL>{`
+employeePosition(fn, ln, pos) :-
+        employee(id, fn, ln, _, _, _, _, _, _),
+        contract(id, pos, _, _, _, _, _).`}</DL>
 		</>,
 	},
 	{
 		problem: <Par>Find, for every department (its name) with less than 20 employees, in which city the manager is living in.</Par>,
 		solution: <>
 			<Par>We join the <IDL>department</IDL> predicate with the <IDL>employee</IDL> predicate by setting the manager ID equal to the employee ID. If we also add the respective condition, we wind up with the following rule.</Par>
-			<DL>smallDepartmentManagerCity(n, c) :- department(_, n, mid, _, ne), employee(mid, _, _, _, _, _, c, _, _), ne &lt; 20.</DL>
+			<DL>{`
+smallDepartmentManagerCity(n, c) :-
+        department(_, n, mid, _, ne),
+        employee(mid, _, _, _, _, _, c, _, _),
+        ne < 20.`}</DL>
 			<Par>The order of the literals in the rule formally does not matter, although it is customary to first join (write all predicates) and then filter (add in the conditions).</Par>
 		</>,
 	},
@@ -34,7 +41,11 @@ const exercises = [
 		problem: <Par>Find, for every employee (first and last name), the name of the department they are allocated to.</Par>,
 		solution: <>
 			<Par>We need a three-way join for this: we join <IDL>employee</IDL> to <IDL>allocation</IDL> and then again to <IDL>department</IDL>. It is customary to combine both joins into one rule.</Par>
-			<DL>employeeDepartment(fn, ln, dn) :- employee(eid, fn, ln, _, _, _, _, _, _), allocation(eid, did), department(did, dn, _, _ , _).</DL>
+			<DL>{`
+employeeDepartment(fn, ln, dn) :-
+        employee(eid, fn, ln, _, _, _, _, _, _),
+        allocation(eid, did),
+        department(did, dn, _, _ , _).`}</DL>
 			<Par>It is important to consciously choose variable names to make sure that equal variable names indeed ought to have equal values.</Par>
 		</>,
 	},
