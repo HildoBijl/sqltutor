@@ -21,7 +21,7 @@ const exercises = [
 			<Par>We first find all Fine Art products. Then we find the people validating their transactions. Finally we add in the first and last name and query this result.</Par>
 			<DL>{`
 fineArtProduct(pid) :- product(pid, _, 'Fine Art', _, _, _).
-validatedFineArtSale(eid) :- tranaction(_, _, _, pid, _, _, eid, _), fineArtProduct(pid).
+validatedFineArtSale(eid) :- transaction(_, _, _, pid, _, _, eid, _), fineArtProduct(pid).
 validatedFineArtSaleName(fn, ln) :- employee(eid, fn, ln, _, _, _, _, _, _), validatedFineArtSale(eid).
 ?- validatedFineArtSaleName(firstName, lastName).
 `}</DL>
@@ -33,13 +33,13 @@ validatedFineArtSaleName(fn, ln) :- employee(eid, fn, ln, _, _, _, _, _, _), val
 			<Par>We have two somewhat random separate conditions. To deal with this, we define separate predicates for the employees that have validated a fine art sale and for those that have been on sick leave. Then we combine these lists.</Par>
 			<DL>{`
 fineArtProduct(pid) :- product(pid, _, 'Fine Art', _, _, _).
-validatedFineArtSale(eid) :- tranaction(_, _, _, pid, _, _, eid, _), fineArtProduct(pid).
+validatedFineArtSale(eid) :- transaction(_, _, _, pid, _, _, eid, _), fineArtProduct(pid).
 beenOnSickLeave(eid) :- contract(eid, _, _, _, _, _, 'sick leave').
-requestedNames(fn, ln) :-
-        employee(eid, fn, ln, _, _, _, _, _, _),
+requestedEmailAddress(e) :-
+        employee(eid, _, _, _, e, _, _, _, _),
         not validatedFineArtSale(eid),
         beenOnSickLeave(eid).
-?- requestedNames(firstName, lastName).
+?- requestedEmailAddress(email).
 `}</DL>
 			<Par>Note that we could have also merged the conditions together in a separate predicate <IDL>meetsAllConditions(eid)</IDL> first, before combining it with the <IDL>employee</IDL> predicate. Some would find it clearer, while others would not. It's a personal preference.</Par>
 		</>,
