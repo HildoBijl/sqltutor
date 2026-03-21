@@ -3,13 +3,11 @@
  * This file contains all skill tree modules (concepts and skills).
  */
 
-import { lazy } from 'react';
-import type { ComponentType, LazyExoticComponent } from 'react';
-import { keysToObject } from '@/utils';
+// Define types. The raw ones are for initial definitions, which are then processed afterwards to contain bidirectional references.
 
 export type ModuleType = 'concept' | 'skill';
 
-export interface ModuleMetaRaw {
+interface ModuleRaw {
   id: string;
   name: string;
   type: ModuleType;
@@ -17,8 +15,14 @@ export interface ModuleMetaRaw {
   prerequisites: string[];
 }
 
+export interface Module extends ModuleRaw {
+	id: ModuleId,
+  prerequisites: ModuleId[];
+  followUps: ModuleId[];
+}
+
 // The moduleIndexRaw contains all definitions of modules, before being processed into more derived objects.
-const moduleIndexRaw: ModuleMetaRaw[] = [
+const moduleIndexRaw: ModuleRaw[] = [
   /*
    * Database concepts
    */
@@ -424,97 +428,31 @@ const moduleIndexRaw: ModuleMetaRaw[] = [
     description: 'How can we safely combine recursion and negation in Datalog programs to guarantee well-defined behavior?',
     prerequisites: ['dl-write-multi-predicate-program', 'dl-define-recursive-predicate', 'dl-check-program-stratification'],
   },
-];
+] as const;
 
-// The moduleItemsRaw contains all unprocessed modules, as an object.
-export const moduleItemsRaw: Record<string, ModuleMetaRaw> = keysToObject(moduleIndexRaw.map(item => item.id), (_: string, index: number) => moduleIndexRaw[index]);
+export type ModuleId = typeof moduleIndexRaw[number]['id'];
 
-// Set up a new type for processed modules.
-export interface ModuleMeta extends ModuleMetaRaw {
-  followUps: string[];
-}
+// Prepare the moduleList list and modules object to contain processed modules.
+export const moduleList: Module[] = [];
+export const modules: Record<ModuleId, Module> = {};
 
-// Prepare the moduleIndex and moduleItems for processed modules.
-export const moduleIndex: ModuleMeta[] = [];
-export const moduleItems: Record<string, ModuleMeta> = {};
+// Fill up the list and object with the initial modules.
 moduleIndexRaw.forEach(item => {
-  const processedItem: ModuleMeta = {
-    ...item,
+  const processedItem: Module = {
+		...item,
     followUps: [],
   };
-  moduleIndex.push(processedItem);
-  moduleItems[item.id] = processedItem;
+  moduleList.push(processedItem);
+  modules[item.id] = processedItem;
 });
 
-// Fill up the moduleIndex and moduleItems.
+// Fill up the followUps property of each module.
 moduleIndexRaw.forEach(itemRaw => {
-  const item: ModuleMeta = moduleItems[itemRaw.id];
-  (itemRaw.prerequisites || []).forEach(prerequisiteId => {
-    const prerequisite: ModuleMeta = moduleItems[prerequisiteId];
+  const item = modules[itemRaw.id];
+  itemRaw.prerequisites.forEach(prerequisiteId => {
+    const prerequisite = modules[prerequisiteId];
     if (!prerequisite)
       throw new Error(`Unknown prerequisite "${prerequisiteId}" encountered at module "${item.id}".`);
     prerequisite.followUps.push(item.id);
   });
 });
-
-
-export type ModuleComponentMap = Record<string, LazyExoticComponent<ComponentType<any>>>;
-
-const ALLOWED_MODULE_SECTIONS = new Set(['Theory', 'Summary', 'Story', 'Video', 'Practice']);
-
-type ComponentModule = {
-  default?: ComponentType<any>;
-} & Record<string, ComponentType<any> | undefined>;
-
-const moduleComponentModules = import.meta.glob('./modules/*/*.tsx') as Record<
-  string,
-  () => Promise<Record<string, unknown>>
->;
-
-function createLazyComponent(
-  loader: () => Promise<Record<string, unknown>>,
-  exportName: string,
-  modulePath: string,
-): LazyExoticComponent<ComponentType<any>> {
-  return lazy(async () => {
-    const module = (await loader()) as ComponentModule;
-    const component = module[exportName] ?? module.default;
-    if (!component) {
-      throw new Error(`Component "${exportName}" not found in module "${modulePath}".`);
-    }
-    return { default: component };
-  });
-}
-
-export const moduleComponents: Record<string, ModuleComponentMap> = Object.entries(
-  moduleComponentModules,
-).reduce<Record<string, ModuleComponentMap>>((acc, [path, loader]) => {
-  const match = path.match(/\.\/modules\/([^/]+)\/([^/]+)\.tsx$/);
-  if (!match) {
-    return acc;
-  }
-
-  const [, moduleId, section] = match;
-  if (!ALLOWED_MODULE_SECTIONS.has(section)) {
-    return acc;
-  }
-
-  const entry = acc[moduleId] ?? (acc[moduleId] = {} as ModuleComponentMap);
-  entry[section] = createLazyComponent(loader, section, path);
-
-  return acc;
-}, {});
-
-const skillExerciseModules = import.meta.glob('./modules/*/exercise.ts');
-
-type SkillExerciseLoader = () => Promise<unknown>;
-
-export const skillExerciseLoaders = Object.fromEntries(
-  Object.entries(skillExerciseModules).reduce<[string, SkillExerciseLoader][]>((entries, [path, loader]) => {
-    const match = path.match(/\.\/modules\/([^/]+)\/exercise\.ts$/);
-    if (match) {
-      entries.push([match[1], loader as SkillExerciseLoader]);
-    }
-    return entries;
-  }, []),
-) as Record<string, SkillExerciseLoader>;

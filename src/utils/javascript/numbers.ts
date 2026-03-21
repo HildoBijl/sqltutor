@@ -27,7 +27,7 @@ export function ensureInt(value: number, requirePositive = false, preventZero = 
 	return requirePositive ? ensurePositive(value, preventZero) : value;
 }
 
-// Extend the Javascript modulus function to guarantee a result between 0 (inclusive) and n (exclusive).
+// Extend the JavaScript modulus function to guarantee a result between 0 (inclusive) and n (exclusive).
 export function mod(a: number, n: number): number {
 	return ((a % n) + n) % n;
 }

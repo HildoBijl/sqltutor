@@ -62,13 +62,14 @@ withNames(fn, ln, pn) :-
       <SampleDatalogScriptForDependencyGraph />
       <Par>We could draw a predicate dependency graph for this script. The first version (without layers) looks like this.</Par>
       <SecondDependencyGraph />
-      <Par>Note that there is a <Term>cycle</Term> in the dependency graph! Specifically, <IDL>E</IDL> depends on <IDL>F</IDL>, <IDL>F</IDL> depends on <IDL>G</IDL>, and <IDL>G</IDL> depends on <IDL>E</IDL>. When there is a cycle in the dependency graph, it is impossible to create layers. After all, each of these three predicates should be lower than the other one.</Par>
-      <Par>To solve this, we first have to get rid of the cycles. The goal is to find a <Term>Strongly Connected Component</Term> (SCC) in our graph: a set of nodes in which <Em>every</Em> node in this component can be reached (directly or indirectly) from <Em>every</Em> other node of the component. Here we see that <IDL>(E,F,G)</IDL> is a SCC.</Par>
+      <Par>Note that there is a <Term>cycle</Term> in the dependency graph! Specifically, <IDL>E</IDL> depends on <IDL>F</IDL>, <IDL>F</IDL> depends on <IDL>G</IDL>, and <IDL>G</IDL> depends on <IDL>E</IDL>. When there is a cycle in the dependency graph, it is impossible to create layers. After all, each of these three predicates should be lower than the other ones.</Par>
+      <Par>To solve this, we first have to get rid of the cycles. The trick is to find a <Term>Strongly Connected Component</Term> (SCC) in our graph: a set of nodes in which <Em>every</Em> node in this component can be reached (directly or indirectly) from <Em>every</Em> other node of the component. Here we see that <IDL>(E,F,G)</IDL> is a SCC.</Par>
       <Par>When we find a SCC within our dependency graph, we <Term>collapse</Term> it into a single node. We draw this node in our graph in the place of the original nodes.</Par>
       <SecondDependencyGraph collapsed />
       <Par>We continue doing this until there are no cycles left, and we are once more left with a DAG. (Luckily our example only had one cycle.) Since we now have a DAG, we can divide the graph into layers as usual. The result is a dependency graph with layers, where some predicates are grouped together into a single node.</Par>
       <CleanedSecondDependencyGraph />
-      <Info>Whenever Datalog encounters multiple predicates in a single node, it knows it has to apply the fixed-point algorithm to evaluate these predicates.</Info>
+			<Par>Now it's once more possible to compute all the predicates layer by layer.</Par>
+      <Info>Whenever Datalog encounters multiple predicates in a single node, it knows it has to apply the fixed-point algorithm to compute the predicates within this node.</Info>
     </Section>
   </Page>;
 }

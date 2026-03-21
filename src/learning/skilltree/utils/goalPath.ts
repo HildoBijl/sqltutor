@@ -1,9 +1,9 @@
-import { ModuleMeta } from "@/curriculum";
+import { Module, ModuleId } from "@/curriculum";
 
 /*
  * Recursively collects all prerequisite IDs for a given concept or skill.
  */
-export function getPrerequisites(itemId: string, moduleItems: Record<string, ModuleMeta>): Set<string> {
+export function getPrerequisites(itemId: ModuleId, moduleItems: Record<ModuleId, Module>): Set<ModuleId> {
   const prerequisites = new Set<string>();
   const item = moduleItems[itemId];
 

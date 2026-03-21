@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@/utils/dom';
 import { useThemeColor } from '@/theme';
-import { Page, Section, Par, List, Warning, Info, Term, Link, Glyph } from '@/components';
+import { Page, Section, Par, List, Warning, Info, Term, Em, Link, Glyph } from '@/components';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@/components';
 import { useTheorySampleDatabase } from '@/learning/databases';
 import { useQueryResult } from '@/components/sql/sqljs';
@@ -36,7 +36,7 @@ export function Theory() {
     <Section title="The database management system">
       <Par>The "database" is the collection of all the data that's stored somewhere. To get this data stored in the desired way, we use a specialized program called a <Term>Database Management System</Term> (DBMS). Examples of DBMSs that use tables are <Link to="https://www.postgresql.org/">PostgreSQL</Link>, <Link to="https://www.mysql.com/">MySQL</Link>, <Link to="https://www.oracle.com/database/">Oracle</Link>, <Link to="https://sqlite.org/">SQLite</Link> and dozens more. The DBMS handles all functionalities around the database, allowing users to read and write data.</Par>
       <FigureDatabaseUsage />
-      <Par>Every DBMS has its own specific way of how exactly it stores its data. As a result, a DBMS and a database are inextricably linked. You cannot just take a database and couple it to a different DBMS. It is possible (and common) that a single DBMS has multiple different databases on the same machine, for instance for different applications.</Par>
+      <Par>Every DBMS has its own specific way of how exactly it stores its data. As a result, a DBMS and a database are inextricably linked. You cannot just take a database and couple it to a different DBMS. It <Em>is</Em> possible (and common) that a single DBMS has multiple different databases on the same machine, for instance for different applications.</Par>
       <Warning>Because a database and its DBMS are so linked, people often use the word "database" when they actually mean DBMS. "Hey, which database are you using at SQL Valley? Oh, we're using SQLite!"</Warning>
     </Section>
   </Page>;
@@ -98,6 +98,6 @@ export function FigureDatabaseUsage() {
     <Element position={[(xServer + xDatabase) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>Give all requested records</p></Element>
 
     <Curve points={[[xServer - 35, y + 20], [(xUser + xServer) / 2, y + 70], [xUser + 50, y + 20]]} endArrow={true} color={themeColor} />
-    <Element position={[(xUser + xServer) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>["Security", "Tech Support"]</p></Element>
+    <Element position={[(xUser + xServer) / 2, y + 52]} anchor={[0, -1]}><p style={{ fontSize: '0.8em', lineHeight: '1.2em', fontWeight: 500, margin: 0, textAlign: 'center' }}>["Finance & Legal", "Operations"]</p></Element>
   </Drawing>;
 }

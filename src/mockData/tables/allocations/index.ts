@@ -1,7 +1,8 @@
-import fullCsv from './full.csv?raw';
-import smallCsv from './small.csv?raw';
-import { parseCsv, buildRows } from '../../utils';
 import type { TableDefinition, Attributes } from '../../types';
+import { parseCsv, buildRows } from '../../utils';
+
+import fullCsv from './allocationsFull.csv?raw';
+import smallCsv from './allocationsSmall.csv?raw';
 
 const attributes = {
   e_id: 'id',

@@ -13,7 +13,7 @@ function DPGDL({ children }: { children: ReactNode }) {
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know that negation in Datalog can be tricky: we need safe queries, or we could get infinitely large outputs. Similarly recursion in Datalog is tricky: we can only evaluate it through the fixed-point algorithm. When combining negation with recursion, there are even more pitfalls. We'll study some of the problems that occur, and then see what is required to avoid them.</Par>
+      <Par>We know that negation in Datalog can be tricky: we need safe queries, or we could get infinitely large outputs. Similarly recursion in Datalog is tricky: we need the fixed-point algorithm to compute predicates. When combining negation with recursion, there are even more pitfalls. We'll study some of the problems that occur, and then see what is required to avoid them.</Par>
     </Section>
 
     <Section title="The problem: non-unique results – multiple models">
@@ -71,18 +71,18 @@ stressed(x) :- working(x).
         <>We evaluate the rules another time and get <IDL>{`{ person('Alice'), working('Alice'), stressed('Alice') }`}</IDL>.</>,
         <>We evaluate the rules again and get exactly the same result. So we're done.</>,
       ]} />
-      <Par>Crucial in this example is that, at one step, the set of facts <Em>decreases</Em>. We remove a fact! Alice used to be happy, but then she started working, wound up stressed, and this removed her happiness. This shows that the above program is <Em>not</Em> monotonic. Luckily this non-monotonic program does have a unique model. (We'll soon see why: it's "stratified".) But non-monotonic programs don't always have a single model, as the very first example showed.</Par>
+      <Par>Crucial in this example is that, at the fourth step, the set of facts <Em>decreases</Em>. We remove a fact! Alice used to be happy, but then she started working, wound up stressed, and this removed her happiness. This shows that the above program is <Em>not</Em> monotonic. Luckily this non-monotonic program does have a unique model. (We'll soon see why: it's "stratified".) But non-monotonic programs don't always have a single model, as the very first example showed.</Par>
       <Warning>Generally non-monotonic programs are harder to compute than monotonic ones, since facts can also disappear again.</Warning>
     </Section>
 
     <Section title="Different Datalog types: positive, semi-positive and stratified Datalog">
-      <Par>The problem of having multiple models originates from the <IDL>not</IDL> keyword. To fix those problems, we must restrict ourselves from using it. Let's study three ways in which we can do so.</Par>
+      <Par>The problem of having multiple models originates from the <IDL>not</IDL> keyword. It causes us to lose monotonicity. To fix those problems, we must apply some restrictions to when/how <IDL>not</IDL> can be used. Let's study three such possible restrictions, going from "very strict" to "less strict".</Par>
       <Par>Option one is to ban <Em>all</Em> negation. This is called <Term>positive Datalog</Term>. The <IDL>not</IDL> keyword is simply not allowed.</Par>
       <Info>Positive Datalog is monotonic. Because of this, we always have a single model that we are guaranteed to find.</Info>
       <Par>Obviously, the <IDL>not</IDL> keyword is pretty useful, so this is not an ideal solution. Let's loosen the restrictions.</Par>
       <Par>Option two is to allow the <IDL>not</IDL> keyword, but <Em>only</Em> at the original tables of our database: the EDBs. This is called <Term>semi-positive Datalog</Term>. We may use <IDL>not originalFact(x)</IDL> but we can't write <IDL>not derivedPredicate(x)</IDL>.</Par>
-      <Info>Semi-positive Datalog is also monotonic. After all, we never apply negation to a derived predicate, so it can never happen that a new fact of a derived predicate is negated which then removes a fact somewhere else. Because semi-positive Datalog is monotonic, it benefits from all the advantages of monotonicity: semi-positive Datalog programs are relatively easy to compute.</Info>
-      <Par>As it turns out, we can loosen the restrictions a bit further. The problem of multiple models only occurs when we mix negation with recursion. The third option is to not allow any <Em>cycle</Em> with negation. This is called <Term>stratified Datalog</Term>.</Par>
+      <Info>Semi-positive Datalog is also monotonic. After all, we never apply negation to a derived predicate, so it can never happen that a new fact of a derived predicate is negated which then removes a fact somewhere else. Because semi-positive Datalog is monotonic, it benefits from all the advantages of monotonicity: semi-positive Datalog programs are also relatively easy to compute.</Info>
+      <Par>As it turns out, we can loosen the restrictions a bit further. The problem of multiple models only occurs when we <Em>mix</Em> negation with recursion. The third option is to not allow any <Em>cycle</Em> with negation. This is called <Term>stratified Datalog</Term>.</Par>
       <Par>This definition may initially sound a bit vague. We can clarify it using the predicate dependency graph. Let's consider the following example program.</Par>
       <SampleNonStratifiedProgram />
       <Par>We say that a predicate <IDL>X</IDL> <Term>negatively depends</Term> on a predicate <IDL>Y</IDL> if the literal <IDL>not Y</IDL> appears in a rule for <IDL>X</IDL>. So in the above example program, <IDL>C</IDL> negatively depends on <IDL>D</IDL> and <IDL>D</IDL> negatively depends on <IDL>B</IDL>.</Par>
@@ -94,9 +94,9 @@ stressed(x) :- working(x).
       <List items={[
         <><Term>Positive Datalog</Term>: You can't use negation at all.</>,
         <><Term>Semi-positive Datalog</Term>: You can negate original predicates, but not new predicates you defined yourself.</>,
-        <><Term>Stratified Datalog</Term>: You can negate any predicate you like, as long as we can finish computing it beforehand.</>,
+        <><Term>Stratified Datalog</Term>: You can negate any predicate you like, as long as we can finish computing that predicate beforehand.</>,
       ]} />
-      <Par>Any positive Datalog program is also semi-positive and stratified, and similarly any semi-positive Datalog program is also stratisfied. The opposite doesn't always hold. This is also shown by the following Venn diagram. It shows the hierarchy of types of Datalog programs, including which type of program is guaranteed to have which property.</Par>
+      <Par>Any positive Datalog program is also semi-positive and stratified, and similarly any semi-positive Datalog program is also stratified. The opposite doesn't always hold. This is also shown by the following Venn diagram. It shows the hierarchy of types of Datalog programs, including which type of program is guaranteed to have which property.</Par>
       <DatalogTypeVennDiagram />
     </Section>
   </Page>;

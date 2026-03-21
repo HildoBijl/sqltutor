@@ -11,7 +11,7 @@ export function Theory() {
       <Par>Let's bring up a familiar example: suppose that we want to find the IDs of all employees that are not the manager of a department. How would we do so?</Par>
       <Par>We have seen several incorrect ways of doing this. We can't just use a negation.</Par>
       <DL>nonManagerId(id) :- not department(did, dn, id, b, ne).</DL>
-      <Par>Here <IDL>mid</IDL> is unbound since it's not part of any positive literal. It would result in an infinitely large output. We should hence <Em>always</Em> include a positive literal. An attempt to fix it is through</Par>
+      <Par>Here <IDL>id</IDL> is unbound since it's not part of any positive literal. It would result in an infinitely large output. We should hence <Em>always</Em> include a positive literal. An attempt to fix it is through</Par>
       <DL>nonManagerId(id) :- employee(id, fn, ln, p, e, a, c, hd, cs), not department(did, dn, id, b, ne).</DL>
       <Par>This is once more an unsafe query, since the variables <IDL>did</IDL>, <IDL>dn</IDL>, <IDL>b</IDL> and <IDL>ne</IDL> are unbound. It causes the negative literal to be ineffective.</Par>
       <Par>The main challenge in using negation therefore is to get rid of the unbound variables. We'll study two ways of doing so.</Par>

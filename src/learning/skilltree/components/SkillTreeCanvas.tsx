@@ -1,16 +1,16 @@
-import { RefObject, useEffect, useState, useCallback } from "react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import type { Vector } from "@/utils/geometry";
-import { useDebouncedFunction } from "@/utils/dom";
-import { ModuleMeta } from "@/curriculum";
-import { ModulePositionMeta } from "../utils/treeDefinition";
-import { SkillTree } from "./SkillTree";
-import { ZoomControls } from "./ZoomControls";
-import { TreeLegend } from "./TreeLegend";
-import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
-import { useTheme } from "@mui/material/";
-import { useSettingsStore } from "@/store";
-import { PlanningModeIntro } from "./PlanningModeIntro";
+import { RefObject, useEffect, useState, useCallback } from 'react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import type { Vector } from '@/utils/geometry';
+import { useDebouncedFunction } from '@/utils/dom';
+import { Module } from '@/curriculum';
+import { ModulePositionMeta } from '../utils/treeDefinition';
+import { SkillTree } from './SkillTree';
+import { ZoomControls } from './ZoomControls';
+import { TreeLegend } from './TreeLegend';
+import { PlanningProgressIndicator } from './PlanningProgressIndicator';
+import { useTheme } from '@mui/material/';
+import { useSettingsStore } from '@/store';
+import { PlanningModeIntro } from './PlanningModeIntro';
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -29,7 +29,7 @@ import { PlanningModeIntro } from "./PlanningModeIntro";
  */
 export interface SkillTreeCanvasProps {
   treeId: string;
-  moduleItems: Record<string, ModuleMeta>;
+  moduleItems: Record<string, Module>;
   modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
     minX: number;

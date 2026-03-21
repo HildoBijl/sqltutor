@@ -9,20 +9,29 @@ import { departmentsTable } from './departments';
 import { employeesTable } from './employees';
 import { expensesTable } from './expenses';
 import { productsTable } from './products';
-import { quarterlyPerformanceTable } from './quarterly_performance';
+import { quarterlyPerformanceTable } from './quarterlyPerformance';
 import { transactionsTable } from './transactions';
-import type { TableDefinition } from '../types';
+import type { TableDefinition, DatasetSize } from '../types';
 
 export const tableDefinitions = {
-  accounts: accountsTable,
-  allocations: allocationsTable,
-  contracts: contractsTable,
+	// Company internals.
   departments: departmentsTable,
   employees: employeesTable,
+  contracts: contractsTable,
+  allocations: allocationsTable,
+
+	// Financials.
   expenses: expensesTable,
+  quarterlyPerformance: quarterlyPerformanceTable,
+	
+	// Sales.
+  accounts: accountsTable,
   products: productsTable,
-  quarterly_performance: quarterlyPerformanceTable,
   transactions: transactionsTable,
 } satisfies Record<string, TableDefinition>;
 
 export type TableKey = keyof typeof tableDefinitions;
+
+export const allTables = Object.keys(tableDefinitions) as TableKey[];
+
+export const defaultDatasetSize: DatasetSize = 'small';

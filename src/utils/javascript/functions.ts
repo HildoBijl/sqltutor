@@ -1,5 +1,5 @@
 import { ensureInt } from './numbers';
-import { isPlainObject, applyMapping, ensureConsistency } from './objects';
+import { isPlainObject, applyMapping, preserveRefs } from './objects';
 
 // noop is literally a function that does nothing (no-operation).
 export function noop(): void { }
@@ -34,5 +34,5 @@ export function resolveFunctions<T, Args extends any[] = any[]>(param: T, ...arg
       return applyMapping(value, resolve);
     return value;
   };
-  return ensureConsistency(resolve(param), param);
+  return preserveRefs(resolve(param), param);
 }

@@ -1,8 +1,8 @@
-import { moduleItems } from "@/curriculum";
+import { modules } from '@/curriculum';
 import { applyMapping } from '@/utils/javascript';
-import { type VectorInput, Vector, ensureVector } from "@/utils/geometry";
-import { cardWidth, cardHeight } from "../utils/settings";
-import { computeConnectorPath } from "../utils/pathCalculations";
+import { type VectorInput, Vector, ensureVector } from '@/utils/geometry';
+import { cardWidth, cardHeight } from '../utils/settings';
+import { computeConnectorPath } from '../utils/pathCalculations';
 
 export interface ModulePositionMetaRaw {
 	position: VectorInput;
@@ -70,7 +70,7 @@ export interface ModulePositionMeta extends Omit<ModulePositionMetaRaw, 'positio
 // Prepare the moduleWithPosition mapping object with empty lists.
 export const raModulePositions: Record<string, ModulePositionMeta> = applyMapping(modulePositionsRaw, (positionDataRaw: ModulePositionMetaRaw, id: string) => {
 	// Verify that all skills for which positions are defined exist.
-	if (!moduleItems[id])
+	if (!modules[id])
 		throw new Error(`Invalid module ID "${id}" encountered when defining module positions for the RA Skill Tree.`);
 
 	// Set up the empty shell for the skill.
@@ -89,7 +89,7 @@ Object.values(raModulePositions).forEach(positionData => {
 
 	// Determine an order for the prerequisites.
 	const prerequisiteRefPoint = position.add([0, -cardHeight / 2]);
-	positionData.prerequisitesPathOrder = moduleItems[positionData.id].prerequisites
+	positionData.prerequisitesPathOrder = modules[positionData.id].prerequisites
 		.filter(id => !!modulePositionsRaw[id]) // The prerequisite is in the tree.
 		.map(id => {
 			const { position } = raModulePositions[id]
@@ -103,7 +103,7 @@ Object.values(raModulePositions).forEach(positionData => {
 
 	// Determine an order for the follow-ups.
 	const followUpRefPoint = position.add([0, cardHeight / 2]);
-	positionData.followUpsPathOrder = moduleItems[positionData.id].followUps
+	positionData.followUpsPathOrder = modules[positionData.id].followUps
 		.filter(id => !!modulePositionsRaw[id]) // The follow-up is in the tree.
 		.map(id => {
 			const { position } = raModulePositions[id]

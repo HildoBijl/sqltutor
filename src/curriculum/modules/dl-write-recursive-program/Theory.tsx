@@ -68,7 +68,7 @@ transferredProduct(v, b, p, n, d2) :-
       <Par>Actually we're not done. We had to find the <Em>username</Em> of the user (we have that) and the <Em>name</Em> of the product (we don't have that one). We only have the product ID, so we still have to join in the product name. That's easy enough, but we shouldn't forget it.</Par>
       <DL>{`suspiciousProductName(n, u) :- suspiciousProduct(p, u), product(p, n, _, _, _).`}</DL>
       <Par>Finally, we have to make sure this predicate is generated and given as output. We set up the final query with sensible argument names.</Par>
-      <DL>{`?- suspiciousProductName(product_name, user_name).`}</DL>
+      <DL>{`?- suspiciousProductName(productName, userName).`}</DL>
       <Par>And with that we are done! Well, almost...</Par>
     </Section>
 
@@ -95,7 +95,7 @@ transferredProduct(v, b, p, n, d2) :-
         d1 < d2.
 suspiciousProduct(p, u) :- transferredProduct(u, u, p, n, _), n >= 5.
 suspiciousProductName(n, u) :- suspiciousProduct(p, u), product(p, n, _, _, _).
-?- suspiciousProductName(product_name, user_name).
+?- suspiciousProductName(productName, userName).
 `}</DL>
       <Par>To check for safety, we walk through all the rules and check if there are any potential causes that a rule may not be safe.</Par>
       <List items={[

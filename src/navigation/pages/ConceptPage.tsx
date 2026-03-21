@@ -14,7 +14,7 @@ import {
   useSettingsStore,
   type ConceptComponentState,
 } from "@/store";
-import { moduleIndex, type ModuleMeta } from "@/curriculum";
+import { moduleList, type Module } from "@/curriculum";
 import { useContentTabs } from "@/learning/hooks/useContentTabs";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useAdminMode } from "@/learning/hooks/useAdminMode";
@@ -34,7 +34,7 @@ import {
   getSkillTreeDefinitions,
 } from "@/learning/utils/skillTreeTracking";
 
-import { moduleItems } from "@/curriculum";
+import { modules } from "@/curriculum";
 import { getPrerequisites } from "@/learning/skilltree/utils/goalPath";
 
 export default function ConceptPage() {
@@ -50,9 +50,9 @@ export default function ConceptPage() {
     [skillTreeHistory, conceptId],
   );
 
-  const conceptMeta = useMemo<ModuleMeta | undefined>(() => {
+  const conceptMeta = useMemo<Module | undefined>(() => {
     if (!conceptId) return undefined;
-    return moduleIndex.find(
+    return moduleList.find(
       (item) => item.type === "concept" && item.id === conceptId,
     );
   }, [conceptId]);
@@ -85,7 +85,7 @@ export default function ConceptPage() {
   );
 
   const { isCompleted: isModuleCompleted } = useModuleProgress(
-    moduleIndex,
+    moduleList,
     components,
   );
   const isCompleted = conceptId
@@ -147,15 +147,15 @@ export default function ConceptPage() {
 
   // Get all prerequisites for the current goal node
   const prerequisitesOfGoal = goalNodeID
-    ? getPrerequisites(goalNodeID, moduleItems)
+    ? getPrerequisites(goalNodeID, modules)
     : new Set<string>();
 
   const treeModuleIds = conceptTree?.moduleIds ?? new Set<string>();
   const allFollowUps = conceptId
-    ? (moduleItems[conceptId]?.followUps ?? []).filter((id) => treeModuleIds.has(id))
+    ? (modules[conceptId]?.followUps ?? []).filter((id) => treeModuleIds.has(id))
     : [];
   const allPrereqsDone = (id: string) =>
-    moduleItems[id]?.prerequisites?.every((prereqId) => isModuleCompleted(prereqId)) ?? true;
+    modules[id]?.prerequisites?.every((prereqId) => isModuleCompleted(prereqId)) ?? true;
 
   const nextUp = goalNodeID
     ? (() => {
@@ -214,7 +214,7 @@ export default function ConceptPage() {
         conceptName={conceptMeta.name}
         nextUp={nextUp}
         onNavigateToNext={(id) => {
-          const type = moduleItems[id]?.type;
+          const type = modules[id]?.type;
           navigate(type === "skill" ? `/skill/${id}` : `/concept/${id}`);
         }}
         onClose={() => setShowCompletionDialog(false)}
