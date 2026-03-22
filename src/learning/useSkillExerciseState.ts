@@ -14,10 +14,10 @@ import {
   type VerificationResult,
   type ValidateInputArgs,
 } from './engine';
-import { useComponentState } from '@/learning/hooks/useComponentState';
+import { useModuleState } from '@/learning/hooks/useModuleState';
 import {
   type ExerciseInstanceId,
-  type SkillComponentState,
+  type SkillModuleState,
   type StoredExerciseEvent,
   type StoredExerciseInstance,
   type StoredExerciseState,
@@ -111,15 +111,15 @@ function defaultInvalidMessage(messages?: SkillExerciseModuleLike['messages']) {
   return messages?.invalid || 'Please enter a valid SQL SELECT query so we can check it.';
 }
 
-export function useSkillExerciseState(componentId: string, moduleLike: SkillExerciseModuleLike | null) {
-  const [componentState, setComponentState] = useComponentState<SkillComponentState>(componentId, 'skill');
-  const queueComponentStateUpdate = useCallback(
-    (updater: Parameters<typeof setComponentState>[0]) => {
+export function useSkillExerciseState(moduleId: string, moduleLike: SkillExerciseModuleLike | null) {
+  const [moduleState, setModuleState] = useModuleState<SkillModuleState>(moduleId, 'skill');
+  const queueModuleStateUpdate = useCallback(
+    (updater: Parameters<typeof setModuleState>[0]) => {
       Promise.resolve().then(() => {
-        setComponentState(updater);
+        setModuleState(updater);
       });
     },
-    [setComponentState],
+    [setModuleState],
   );
 
   const helpers = useMemo<ExerciseHelpers>(
@@ -242,8 +242,8 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
   );
 
   useEffect(() => {
-    if (componentState.currentInstanceId) return;
-    const instances = Object.values(componentState.instances || {});
+    if (moduleState.currentInstanceId) return;
+    const instances = Object.values(moduleState.instances || {});
     if (instances.length === 0) return;
 
     let latest: StoredExerciseInstance | undefined;
@@ -253,9 +253,9 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
       }
     }
     if (latest) {
-      setComponentState({ currentInstanceId: latest.id });
+      setModuleState({ currentInstanceId: latest.id });
     }
-  }, [componentState.currentInstanceId, componentState.instances, setComponentState]);
+  }, [moduleState.currentInstanceId, moduleState.instances, setModuleState]);
 
   const appendEvent = useCallback(
     (instanceId: ExerciseInstanceId, action: ExerciseAction<string, unknown>, storedState: SkillStoredExerciseState) => {
@@ -266,10 +266,10 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         resultingState: storedState,
       };
 
-      queueComponentStateUpdate((prev) => {
+      queueModuleStateUpdate((prev) => {
         const current = prev.instances[instanceId] ?? {
           id: instanceId,
-          skillId: componentId,
+          skillId: moduleId,
           createdAt: timestamp,
           finalStatus: storedState.status,
           events: [],
@@ -291,7 +291,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         };
       });
     },
-    [componentId, queueComponentStateUpdate],
+    [moduleId, queueModuleStateUpdate],
   );
 
   const dispatch: Dispatch = useCallback(
@@ -316,14 +316,14 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
           };
           const instance: StoredExerciseInstance = {
             id: instanceId,
-            skillId: componentId,
+            skillId: moduleId,
             createdAt: timestamp,
             finalStatus: storedState.status,
             completedAt: storedState.status === 'correct' ? timestamp : undefined,
             events: [event],
           };
 
-          queueComponentStateUpdate((prevState) => ({
+          queueModuleStateUpdate((prevState) => ({
             ...prevState,
             currentInstanceId: instanceId,
             instances: {
@@ -332,11 +332,11 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
             },
           }));
         } else if (action.type !== 'hydrate') {
-          const currentInstanceId = componentState.currentInstanceId;
+          const currentInstanceId = moduleState.currentInstanceId;
           if (!currentInstanceId) {
             // No active instance - start a new one implicitly
             const fallbackId = generateInstanceId();
-            queueComponentStateUpdate((prevState) => ({
+            queueModuleStateUpdate((prevState) => ({
               ...prevState,
               currentInstanceId: fallbackId,
             }));
@@ -349,17 +349,17 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
         return next;
       });
     },
-    [appendEvent, componentId, componentState.currentInstanceId, queueComponentStateUpdate, reducer, toPersistedExercise],
+    [appendEvent, moduleId, moduleState.currentInstanceId, queueModuleStateUpdate, reducer, toPersistedExercise],
   );
 
   useEffect(() => {
-    const instanceId = componentState.currentInstanceId;
+    const instanceId = moduleState.currentInstanceId;
     if (!instanceId) {
       setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
       return;
     }
 
-    const instance = componentState.instances[instanceId];
+    const instance = moduleState.instances[instanceId];
     if (!instance || instance.events.length === 0) {
       setProgress(createInitialProgress());
       return;
@@ -390,7 +390,7 @@ export function useSkillExerciseState(componentId: string, moduleLike: SkillExer
       }
       return rehydrateExerciseState(resolvedState, exerciseConfig);
     });
-  }, [componentState.currentInstanceId, componentState.instances, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
+  }, [moduleState.currentInstanceId, moduleState.instances, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
 
   const previewValidation: ValidationPreview = useCallback(
     (input: string) => {

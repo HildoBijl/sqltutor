@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import type { Module } from "@/curriculum";
-import type { ComponentState } from "@/store";
+import type { ModuleState } from "@/store";
 import { processProgress } from "@/learning/utils/processProgress";
 
 
@@ -8,12 +8,12 @@ import { processProgress } from "@/learning/utils/processProgress";
 * Hook to determine completion status and progress of modules.
 *
 * @param moduleItems - Array of modules (concepts and skills).
-* @param components - Object mapping module IDs to their progress data.
+* @param modules - Object mapping module IDs to their progress data.
 * @returns An object with concepts, skills, isCompleted, getProgress, completedConcepts, and completedSkills.
 */
 export function useModuleProgress(
   moduleItems: Module[],
-  components: Record<string, ComponentState>,
+  modules: Record<string, ModuleState>,
 ) {
   const concepts = useMemo(
     () => moduleItems.filter((item) => item.type === "concept"),
@@ -26,8 +26,8 @@ export function useModuleProgress(
   );
 
   const processed = useMemo(
-    () => processProgress(moduleItems, components),
-    [moduleItems, components],
+    () => processProgress(moduleItems, modules),
+    [moduleItems, modules],
   );
 
   const isCompleted = useCallback(

@@ -1,16 +1,16 @@
 export { useLearningStore, LEARNING_STORAGE_KEY } from './store';
-export { createComponentState, DEFAULT_COMPONENT_TYPE } from './support';
+export { createModuleState, DEFAULT_MODULE_TYPE } from './support';
 
 export type { LearningStoreState } from './store';
 export type {
-  ComponentState,
-  ComponentType,
-  ConceptComponentState,
+  ModuleState,
+  ModuleType,
+  ConceptModuleState,
   ExerciseInstanceId,
-  PlaygroundComponentState,
+  PlaygroundModuleState,
   QueryHistory,
   SavedQuery,
-  SkillComponentState,
+  SkillModuleState,
   StoredAttempt,
   StoredExerciseEvent,
   StoredExerciseInstance,

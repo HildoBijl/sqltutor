@@ -72,10 +72,13 @@ function pickSettingsStateFromLegacyRoot(legacyState: RecordValue): RecordValue 
 function pickLearningStateFromLegacyRoot(legacyState: RecordValue): RecordValue {
   const nested = asRecord(legacyState.learning);
   const source = Object.keys(nested).length > 0 ? nested : legacyState;
-  const components = asRecord(source.components);
+  const modulesSource = asRecord(source.modules);
+  const componentsSource = asRecord(source.components);
+  const modulesCandidate =
+    Object.keys(modulesSource).length > 0 ? modulesSource : componentsSource;
 
-  const safeComponents = Object.fromEntries(
-    Object.entries(components).filter(
+  const safeModules = Object.fromEntries(
+    Object.entries(modulesCandidate).filter(
       ([id, component]) =>
         id.length > 0 &&
         Boolean(component) &&
@@ -84,7 +87,7 @@ function pickLearningStateFromLegacyRoot(legacyState: RecordValue): RecordValue 
     ),
   );
 
-  return Object.keys(safeComponents).length > 0 ? { components: safeComponents } : {};
+  return Object.keys(safeModules).length > 0 ? { modules: safeModules } : {};
 }
 
 function writeVersionedState(

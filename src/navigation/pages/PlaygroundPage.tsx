@@ -20,9 +20,9 @@ import {
 } from '@mui/icons-material';
 import { SQLEditor, DataTable } from '@/components';
 import { usePlaygroundDatabase } from '@/learning/databases';
-import { useComponentState } from '@/learning/hooks/useComponentState';
+import { useModuleState } from '@/learning/hooks/useModuleState';
 import {
-  type PlaygroundComponentState,
+  type PlaygroundModuleState,
   type QueryHistory,
   type SavedQuery,
 } from '@/store';
@@ -45,7 +45,7 @@ export default function PlaygroundPage() {
     isReady
   } = usePlaygroundDatabase();
 
-  const [playgroundState, setPlaygroundState] = useComponentState<PlaygroundComponentState>('playground', 'playground');
+  const [playgroundState, setPlaygroundState] = useModuleState<PlaygroundModuleState>('playground', 'playground');
   const savedQueries = (playgroundState.savedQueries as SavedQuery[] | undefined) ?? [];
   const history = (playgroundState.history as QueryHistory[] | undefined) ?? [];
 

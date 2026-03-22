@@ -12,7 +12,7 @@ import {
 import {
   useLearningStore,
   useSettingsStore,
-  type ConceptComponentState,
+  type ConceptModuleState,
 } from "@/store";
 import { moduleList, type Module } from "@/curriculum";
 import { useContentTabs } from "@/learning/hooks/useContentTabs";
@@ -41,7 +41,7 @@ export default function ConceptPage() {
   const { conceptId } = useParams<{ conceptId: string }>();
   const navigate = useNavigate();
   const hideStories = useSettingsStore((state) => state.hideStories);
-  const components = useLearningStore((state) => state.components);
+  const learningModules = useLearningStore((state) => state.modules);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();
@@ -73,9 +73,9 @@ export default function ConceptPage() {
     handleTabChange,
     selectTab,
     tabs,
-    componentState,
-    setComponentState,
-  } = useContentTabs<ConceptComponentState>(
+    moduleState,
+    setModuleState,
+  } = useContentTabs<ConceptModuleState>(
     conceptId,
     "concept",
     availableTabs,
@@ -86,11 +86,11 @@ export default function ConceptPage() {
 
   const { isCompleted: isModuleCompleted } = useModuleProgress(
     moduleList,
-    components,
+    learningModules,
   );
   const isCompleted = conceptId
     ? isModuleCompleted(conceptId)
-    : (componentState.understood ?? false);
+    : (moduleState.understood ?? false);
   const summaryUnlocked = isCompleted || isAdmin;
 
   const visibleTabs = useMemo(
@@ -123,7 +123,7 @@ export default function ConceptPage() {
   }
 
   const handleComplete = () => {
-    setComponentState({ understood: true });
+    setModuleState({ understood: true });
 
     setShowCompletionDialog(true);
   };

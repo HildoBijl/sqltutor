@@ -1,5 +1,5 @@
 import type { Module } from '@/curriculum';
-import type { ComponentState } from '@/store';
+import type { ModuleState } from '@/store';
 import { EXERCISES_TO_COMPLETE } from '@/constants';
 
 interface ProcessedProgress {
@@ -10,7 +10,7 @@ interface ProcessedProgress {
 
 export function processProgress(
   moduleItems: Module[],
-  components: Record<string, ComponentState>,
+  modules: Record<string, ModuleState>,
   requiredCount: number = EXERCISES_TO_COMPLETE,
 ): ProcessedProgress {
   const moduleById: Record<string, Module> = {};
@@ -22,17 +22,17 @@ export function processProgress(
   const skillProgress: Record<string, number> = {};
 
   for (const item of moduleItems) {
-    const component = components[item.id];
+    const module = modules[item.id];
 
     if (item.type === 'concept') {
-      if (component?.type === 'concept' && component.understood === true) {
+      if (module?.type === 'concept' && module.understood === true) {
         baseCompleted.push(item.id);
       }
       continue;
     }
 
     if (item.type === 'skill') {
-      const solved = component?.type === 'skill' ? component.numSolved ?? 0 : 0;
+      const solved = module?.type === 'skill' ? module.numSolved ?? 0 : 0;
       if (solved > 0) {
         skillProgress[item.id] = solved;
       }

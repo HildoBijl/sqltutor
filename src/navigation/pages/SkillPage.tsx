@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Alert, CircularProgress, Button, Box } from '@mui/material';
 import { MenuBook, Lightbulb, Bolt, EditNote, Storage, Edit, CheckCircle } from '@mui/icons-material';
 
-import { useLearningStore, useSettingsStore, type SkillComponentState } from '@/store';
+import { useLearningStore, useSettingsStore, type SkillModuleState } from '@/store';
 import { moduleList } from '@/curriculum';
 import { moduleComponents } from '@/curriculum/utils/loaders';
 import { getModuleTables } from '@/curriculum/utils/moduleAccess';
@@ -31,7 +31,7 @@ export default function SkillPage() {
 	const navigate = useNavigate();
 
 	const hideStories = useSettingsStore((state) => state.hideStories);
-	const components = useLearningStore((state) => state.components);
+	const modules = useLearningStore((state) => state.modules);
 	const isAdmin = useAdminMode();
 	const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 	const skillTreeHistory = useSkillTreeHistory();
@@ -65,9 +65,9 @@ export default function SkillPage() {
 		handleTabChange,
 		selectTab,
 		tabs,
-		componentState,
-		setComponentState,
-	} = useContentTabs<SkillComponentState>(skillId, 'skill', availableTabs, {
+		moduleState,
+		setModuleState,
+	} = useContentTabs<SkillModuleState>(skillId, 'skill', availableTabs, {
 		defaultTab: 'theory',
 	});
 
@@ -84,11 +84,11 @@ export default function SkillPage() {
 		skillId: skillId ?? '',
 		skillModule: hasInteractivePractice ? skillModule : null,
 		requiredCount: REQUIRED_EXERCISE_COUNT,
-		componentState,
-		setComponentState,
+		moduleState,
+		setModuleState,
 	});
 
-	const { isCompleted } = useModuleProgress(moduleList, components);
+	const { isCompleted } = useModuleProgress(moduleList, modules);
 	const isSkillMastered = skillId ? isCompleted(skillId) : false;
 	const summaryUnlocked = isSkillMastered || isAdmin;
 
@@ -106,7 +106,7 @@ export default function SkillPage() {
 
 	// Handle static practice completion
 	const handleStaticComplete = () => {
-		setComponentState({ numSolved: REQUIRED_EXERCISE_COUNT });
+		setModuleState({ numSolved: REQUIRED_EXERCISE_COUNT });
 		setShowCompletionDialog(true);
 	};
 
@@ -143,7 +143,7 @@ export default function SkillPage() {
 	const progressInfo =
 		hasInteractivePractice && currentTab === 'practice'
 			? {
-				current: componentState.numSolved ?? 0,
+				current: moduleState.numSolved ?? 0,
 				required: REQUIRED_EXERCISE_COUNT,
 			}
 			: undefined;

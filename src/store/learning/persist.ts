@@ -2,16 +2,16 @@
  * Persistence helpers for the learning slice.
  */
 
-import type { ComponentState, LearningState } from './types';
-import { normalizeComponentState } from './support';
+import type { ModuleState, LearningState } from './types';
+import { normalizeModuleState } from './support';
 
 export interface PersistedLearning {
-  components?: Record<string, Partial<ComponentState> | ComponentState>;
+  modules?: Record<string, Partial<ModuleState> | ModuleState>;
 }
 
 export function partializeLearning(state: LearningState): PersistedLearning {
   return {
-    components: state.components,
+    modules: state.modules,
   };
 }
 
@@ -19,16 +19,15 @@ export function rehydrateLearning(
   state: LearningState,
   persisted: PersistedLearning | undefined,
 ): void {
-  const rawComponents = persisted?.components;
-  if (!rawComponents) {
+  const rawModules = persisted?.modules;
+  if (!rawModules) {
     return;
   }
 
-  state.components = Object.fromEntries(
-    Object.entries(rawComponents).map(([id, value]) => [
+  state.modules = Object.fromEntries(
+    Object.entries(rawModules).map(([id, value]) => [
       id,
-      normalizeComponentState(id, value as Partial<ComponentState> | undefined),
+      normalizeModuleState(id, value as Partial<ModuleState> | undefined),
     ]),
   );
 }
-

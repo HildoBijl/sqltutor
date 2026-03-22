@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ExecutionResult as SqlExecutionResult } from '@/curriculum/utils/types';
-import { useSettingsStore, type SkillComponentState } from '@/store';
+import { useSettingsStore, type SkillModuleState } from '@/store';
 import { useDatabase } from '@/learning/databases';
 import type { DatasetSize } from '@/mockData';
 import {
@@ -31,12 +31,12 @@ interface UseSkillExerciseControllerParams {
   skillId: string;
   skillModule: SkillExerciseModuleLike | null;
   requiredCount: number;
-  componentState: SkillComponentState;
-  setComponentState: (
+  moduleState: SkillModuleState;
+  setModuleState: (
     updater:
-      | Partial<SkillComponentState>
-      | SkillComponentState
-      | ((prev: SkillComponentState) => Partial<SkillComponentState> | SkillComponentState)
+      | Partial<SkillModuleState>
+      | SkillModuleState
+      | ((prev: SkillModuleState) => Partial<SkillModuleState> | SkillModuleState)
   ) => void;
 }
 
@@ -100,8 +100,8 @@ export function useSkillExerciseController({
   skillId,
   skillModule,
   requiredCount,
-  componentState,
-  setComponentState,
+  moduleState,
+  setModuleState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
   const selectedDatasetSize = useSettingsStore((state) => state.practiceDatasetSize);
   const setPracticeDatasetSize = useSettingsStore((state) => state.setPracticeDatasetSize);
@@ -176,13 +176,13 @@ export function useSkillExerciseController({
     [],
   );
 
-  const queueComponentStateUpdate = useCallback(
-    (updater: Parameters<typeof setComponentState>[0]) => {
+  const queueModuleStateUpdate = useCallback(
+    (updater: Parameters<typeof setModuleState>[0]) => {
       Promise.resolve().then(() => {
-        setComponentState(updater);
+        setModuleState(updater);
       });
     },
-    [setComponentState],
+    [setModuleState],
   );
 
   const exerciseCompleted = exerciseStatus === 'correct';
@@ -552,12 +552,12 @@ export function useSkillExerciseController({
         });
 
         if (verification.correct) {
-          const previousSolvedCount = componentState.numSolved || 0;
+          const previousSolvedCount = moduleState.numSolved || 0;
           const alreadyCounted = exerciseCompleted;
           const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
 
           if (!alreadyCounted) {
-            queueComponentStateUpdate((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
+            queueModuleStateUpdate((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
           }
 
           const reachedMasteryNow =
@@ -605,9 +605,9 @@ export function useSkillExerciseController({
       skillId,
       executeDisplayQuery,
       recordAttempt,
-      componentState.numSolved,
+      moduleState.numSolved,
       requiredCount,
-      queueComponentStateUpdate,
+      queueModuleStateUpdate,
       hasGivenUp,
       updateFeedback,
       evaluateSmallDatasetWarning,
@@ -710,8 +710,8 @@ export function useSkillExerciseController({
   );
 
   const practiceExerciseTitle = useMemo(
-    () => ((componentState.numSolved || 0) >= requiredCount ? 'Practice Exercise' : 'Exercise'),
-    [componentState.numSolved, requiredCount],
+    () => ((moduleState.numSolved || 0) >= requiredCount ? 'Practice Exercise' : 'Exercise'),
+    [moduleState.numSolved, requiredCount],
   );
 
   const practiceUnavailableMessage = skillModule

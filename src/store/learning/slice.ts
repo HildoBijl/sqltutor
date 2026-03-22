@@ -3,30 +3,30 @@
  */
 
 import type {
-  ComponentState,
-  ComponentType,
-  ConceptComponentState,
+  ModuleState,
+  ModuleType,
+  ConceptModuleState,
   LearningState,
-  PlaygroundComponentState,
-  SkillComponentState,
+  PlaygroundModuleState,
+  SkillModuleState,
   StoredExerciseEvent,
   StoredExerciseInstance,
 } from './types';
 import {
-  createComponentState,
-  DEFAULT_COMPONENT_TYPE,
-  normalizeComponentState,
+  createModuleState,
+  DEFAULT_MODULE_TYPE,
+  normalizeModuleState,
 } from './support';
 import type { SetState, GetState } from '../utils';
 
 export const initialLearningState: LearningState = {
-  components: {} as Record<string, ComponentState>,
+  modules: {} as Record<string, ModuleState>,
 };
 
 export interface LearningActions {
-  updateComponent: (id: string, data: Partial<ComponentState>) => void;
-  getComponent: (id: string) => ComponentState;
-  resetComponent: (id: string, type?: ComponentType) => void;
+  updateModule: (id: string, data: Partial<ModuleState>) => void;
+  getModule: (id: string) => ModuleState;
+  resetModule: (id: string, type?: ModuleType) => void;
   getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
   getAllExerciseInstances: (skillId: string) => StoredExerciseInstance[];
   getExerciseHistory: (skillId: string, instanceId: string) => StoredExerciseEvent[];
@@ -37,19 +37,19 @@ export function createLearningActions(
   get: GetState<LearningState>,
 ): LearningActions {
   return {
-    updateComponent: (id, data) =>
+    updateModule: (id, data) =>
       set((state) => {
-        const prev = state.components[id];
-        const nextType = (data.type ?? prev?.type ?? DEFAULT_COMPONENT_TYPE) as ComponentType;
-        let nextState: ComponentState;
+        const prev = state.modules[id];
+        const nextType = (data.type ?? prev?.type ?? DEFAULT_MODULE_TYPE) as ModuleType;
+        let nextState: ModuleState;
 
         switch (nextType) {
           case 'concept': {
             const previous = prev?.type === 'concept' ? prev : undefined;
             nextState = {
-              ...createComponentState(id, 'concept'),
+              ...createModuleState(id, 'concept'),
               ...(previous ?? {}),
-              ...(data as Partial<ConceptComponentState>),
+              ...(data as Partial<ConceptModuleState>),
               id,
               type: 'concept',
               lastAccessed: Date.now(),
@@ -59,9 +59,9 @@ export function createLearningActions(
           case 'playground': {
             const previous = prev?.type === 'playground' ? prev : undefined;
             nextState = {
-              ...createComponentState(id, 'playground'),
+              ...createModuleState(id, 'playground'),
               ...(previous ?? {}),
-              ...(data as Partial<PlaygroundComponentState>),
+              ...(data as Partial<PlaygroundModuleState>),
               id,
               type: 'playground',
               lastAccessed: Date.now(),
@@ -71,9 +71,9 @@ export function createLearningActions(
           case 'skill':
           default: {
             const previous = prev?.type === 'skill' ? prev : undefined;
-            const incoming = data as Partial<SkillComponentState>;
-            const baseSkill = createComponentState(id, 'skill') as SkillComponentState;
-            const nextSkill: SkillComponentState = {
+            const incoming = data as Partial<SkillModuleState>;
+            const baseSkill = createModuleState(id, 'skill') as SkillModuleState;
+            const nextSkill: SkillModuleState = {
               ...baseSkill,
               ...(previous ?? {}),
               ...incoming,
@@ -90,35 +90,35 @@ export function createLearningActions(
           }
         }
         return {
-          components: {
-            ...state.components,
+          modules: {
+            ...state.modules,
             [id]: nextState,
           },
         };
       }),
 
-    getComponent: (id) => {
-      const existing = get().components[id];
-      return existing ?? createComponentState(id);
+    getModule: (id) => {
+      const existing = get().modules[id];
+      return existing ?? createModuleState(id);
     },
 
-    resetComponent: (id, type) =>
+    resetModule: (id, type) =>
       set((state) => {
-        const targetType = (type ?? state.components[id]?.type ?? DEFAULT_COMPONENT_TYPE) as ComponentType;
+        const targetType = (type ?? state.modules[id]?.type ?? DEFAULT_MODULE_TYPE) as ModuleType;
         return {
-          components: {
-            ...state.components,
-            [id]: createComponentState(id, targetType),
+          modules: {
+            ...state.modules,
+            [id]: createModuleState(id, targetType),
           },
         };
       }),
 
     getCurrentExerciseInstance: (skillId) => {
-      const component = get().components[skillId];
-      if (!component || component.type !== 'skill') {
+      const module = get().modules[skillId];
+      if (!module || module.type !== 'skill') {
         return null;
       }
-      const { currentInstanceId, instances } = component;
+      const { currentInstanceId, instances } = module;
       if (!currentInstanceId) {
         return null;
       }
@@ -126,21 +126,21 @@ export function createLearningActions(
     },
 
     getAllExerciseInstances: (skillId) => {
-      const component = get().components[skillId];
-      if (!component || component.type !== 'skill') {
+      const module = get().modules[skillId];
+      if (!module || module.type !== 'skill') {
         return [];
       }
-      return Object.values(component.instances);
+      return Object.values(module.instances);
     },
 
     getExerciseHistory: (skillId, instanceId) => {
-      const component = get().components[skillId];
-      if (!component || component.type !== 'skill') {
+      const module = get().modules[skillId];
+      if (!module || module.type !== 'skill') {
         return [];
       }
-      return component.instances[instanceId]?.events ?? [];
+      return module.instances[instanceId]?.events ?? [];
     },
   };
 }
 
-export { normalizeComponentState };
+export { normalizeModuleState };

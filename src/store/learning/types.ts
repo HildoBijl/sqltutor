@@ -48,37 +48,37 @@ export interface SavedQuery {
   query: string;
 }
 
-interface BaseComponentState {
+interface BaseModuleState {
   id: string;
   tab?: string;
   lastAccessed?: number;
 }
 
-export interface ConceptComponentState extends BaseComponentState {
+export interface ConceptModuleState extends BaseModuleState {
   type: 'concept';
   understood?: boolean;
 }
 
-export interface SkillComponentState extends BaseComponentState {
+export interface SkillModuleState extends BaseModuleState {
   type: 'skill';
   numSolved: number;
   instances: Record<ExerciseInstanceId, StoredExerciseInstance>;
   currentInstanceId?: ExerciseInstanceId;
 }
 
-export interface PlaygroundComponentState extends BaseComponentState {
+export interface PlaygroundModuleState extends BaseModuleState {
   type: 'playground';
   savedQueries?: SavedQuery[];
   history?: QueryHistory[];
 }
 
-export type ComponentState =
-  | ConceptComponentState
-  | SkillComponentState
-  | PlaygroundComponentState;
+export type ModuleState =
+  | ConceptModuleState
+  | SkillModuleState
+  | PlaygroundModuleState;
 
-export type ComponentType = ComponentState['type'];
+export type ModuleType = ModuleState['type'];
 
 export interface LearningState {
-  components: Record<string, ComponentState>;
+  modules: Record<string, ModuleState>;
 }

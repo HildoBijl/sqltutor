@@ -3,18 +3,18 @@
  */
 
 import type {
-  ComponentState,
-  ConceptComponentState,
-  PlaygroundComponentState,
-  SkillComponentState,
+  ModuleState,
+  ConceptModuleState,
+  PlaygroundModuleState,
+  SkillModuleState,
 } from './types';
 
-export const DEFAULT_COMPONENT_TYPE: ComponentState['type'] = 'skill';
+export const DEFAULT_MODULE_TYPE: ModuleState['type'] = 'skill';
 
-export function createComponentState(
+export function createModuleState(
   id: string,
-  type: ComponentState['type'] = DEFAULT_COMPONENT_TYPE,
-): ComponentState {
+  type: ModuleState['type'] = DEFAULT_MODULE_TYPE,
+): ModuleState {
   switch (type) {
     case 'concept':
       return {
@@ -58,21 +58,21 @@ export function coerceTimestamp(value: unknown): number | undefined {
   return Number.isNaN(asNumber) ? undefined : asNumber;
 }
 
-export function normalizeComponentState(
+export function normalizeModuleState(
   id: string,
-  state: Partial<ComponentState> | undefined,
-): ComponentState {
+  state: Partial<ModuleState> | undefined,
+): ModuleState {
   if (!state || !('type' in state) || !state.type) {
-    return createComponentState(id);
+    return createModuleState(id);
   }
   const desiredType = state.type;
   const lastAccessed = coerceTimestamp(state.lastAccessed);
 
   switch (desiredType) {
     case 'concept': {
-      const normalized: ConceptComponentState = {
-        ...createComponentState(id, 'concept'),
-        ...(state as Partial<ConceptComponentState>),
+      const normalized: ConceptModuleState = {
+        ...createModuleState(id, 'concept'),
+        ...(state as Partial<ConceptModuleState>),
         id,
         type: 'concept',
         lastAccessed,
@@ -80,9 +80,9 @@ export function normalizeComponentState(
       return normalized;
     }
     case 'playground': {
-      const normalized: PlaygroundComponentState = {
-        ...createComponentState(id, 'playground'),
-        ...(state as Partial<PlaygroundComponentState>),
+      const normalized: PlaygroundModuleState = {
+        ...createModuleState(id, 'playground'),
+        ...(state as Partial<PlaygroundModuleState>),
         id,
         type: 'playground',
         lastAccessed,
@@ -91,9 +91,9 @@ export function normalizeComponentState(
     }
     case 'skill':
     default: {
-      const partialSkill = state as Partial<SkillComponentState>;
-      const normalized: SkillComponentState = {
-        ...createComponentState(id, 'skill'),
+      const partialSkill = state as Partial<SkillModuleState>;
+      const normalized: SkillModuleState = {
+        ...createModuleState(id, 'skill'),
         ...partialSkill,
         id,
         type: 'skill',
