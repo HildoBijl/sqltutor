@@ -7,7 +7,6 @@ import type {
   ModuleType,
   ConceptModuleState,
   LearningState,
-  PlaygroundModuleState,
   SkillModuleState,
   StoredExerciseEvent,
   StoredExerciseInstance,
@@ -56,18 +55,6 @@ export function createLearningActions(
             };
             break;
           }
-          case 'playground': {
-            const previous = prev?.type === 'playground' ? prev : undefined;
-            nextState = {
-              ...createModuleState(id, 'playground'),
-              ...(previous ?? {}),
-              ...(data as Partial<PlaygroundModuleState>),
-              id,
-              type: 'playground',
-              lastAccessed: Date.now(),
-            };
-            break;
-          }
           case 'skill':
           default: {
             const previous = prev?.type === 'skill' ? prev : undefined;
@@ -80,10 +67,11 @@ export function createLearningActions(
               id,
               type: 'skill',
               lastAccessed: Date.now(),
-              instances: incoming.instances ?? previous?.instances ?? baseSkill.instances,
+              exercises:
+                incoming.exercises ?? previous?.exercises ?? baseSkill.exercises,
               numSolved: incoming.numSolved ?? previous?.numSolved ?? baseSkill.numSolved,
-              currentInstanceId:
-                incoming.currentInstanceId ?? previous?.currentInstanceId ?? baseSkill.currentInstanceId,
+              understood:
+                incoming.understood ?? previous?.understood ?? baseSkill.understood,
             };
             nextState = nextSkill;
             break;
@@ -118,11 +106,7 @@ export function createLearningActions(
       if (!module || module.type !== 'skill') {
         return null;
       }
-      const { currentInstanceId, instances } = module;
-      if (!currentInstanceId) {
-        return null;
-      }
-      return instances[currentInstanceId] ?? null;
+      return module.exercises[module.exercises.length - 1] ?? null;
     },
 
     getAllExerciseInstances: (skillId) => {
@@ -130,7 +114,7 @@ export function createLearningActions(
       if (!module || module.type !== 'skill') {
         return [];
       }
-      return Object.values(module.instances);
+      return [...module.exercises];
     },
 
     getExerciseHistory: (skillId, instanceId) => {
@@ -138,7 +122,8 @@ export function createLearningActions(
       if (!module || module.type !== 'skill') {
         return [];
       }
-      return module.instances[instanceId]?.events ?? [];
+      const instance = module.exercises.find((exercise) => exercise.id === instanceId);
+      return instance?.events ?? [];
     },
   };
 }

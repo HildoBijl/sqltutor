@@ -20,17 +20,25 @@ import {
 } from '@mui/icons-material';
 import { SQLEditor, DataTable } from '@/components';
 import { usePlaygroundDatabase } from '@/learning/databases';
-import { useModuleState } from '@/learning/hooks/useModuleState';
-import {
-  type PlaygroundModuleState,
-  type QueryHistory,
-  type SavedQuery,
-} from '@/store';
+
+interface QueryHistory {
+  query: string;
+  timestamp: number;
+  success: boolean;
+  rowCount?: number;
+}
+
+interface SavedQuery {
+  name: string;
+  query: string;
+}
 
 export default function PlaygroundPage() {
   const [query, setQuery] = useState('SELECT * FROM employees LIMIT 10;');
   const [currentTab, setCurrentTab] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
+  const [savedQueries, setSavedQueries] = useState<SavedQuery[]>([]);
+  const [history, setHistory] = useState<QueryHistory[]>([]);
 
   // Use the playground database hook
   const {
@@ -44,10 +52,6 @@ export default function PlaygroundPage() {
     clearQueryState,
     isReady
   } = usePlaygroundDatabase();
-
-  const [playgroundState, setPlaygroundState] = useModuleState<PlaygroundModuleState>('playground', 'playground');
-  const savedQueries = (playgroundState.savedQueries as SavedQuery[] | undefined) ?? [];
-  const history = (playgroundState.history as QueryHistory[] | undefined) ?? [];
 
   // Handle live query execution (for preview results)
   const handleLiveExecute = useCallback(async (liveQuery: string) => {
@@ -82,9 +86,7 @@ export default function PlaygroundPage() {
         rowCount: result?.[0]?.values?.length || 0,
       };
 
-      setPlaygroundState((prev) => ({
-        history: [newHistoryEntry, ...(prev.history ?? []).slice(0, 49)],
-      }));
+      setHistory((prev) => [newHistoryEntry, ...prev.slice(0, 49)]);
 
       setMessage(`Query executed successfully (${result?.[0]?.values?.length || 0} rows)`);
     } catch (error) {
@@ -94,9 +96,7 @@ export default function PlaygroundPage() {
         success: false,
       };
 
-      setPlaygroundState((prev) => ({
-        history: [newHistoryEntry, ...(prev.history ?? []).slice(0, 49)],
-      }));
+      setHistory((prev) => [newHistoryEntry, ...prev.slice(0, 49)]);
 
       setMessage(`Query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -106,7 +106,7 @@ export default function PlaygroundPage() {
     const name = prompt('Enter a name for this query:');
     if (name) {
       const newSavedQueries: SavedQuery[] = [...savedQueries, { name, query }];
-      setPlaygroundState({ savedQueries: newSavedQueries });
+      setSavedQueries(newSavedQueries);
       setMessage('Query saved successfully');
     }
   };
@@ -159,7 +159,7 @@ export default function PlaygroundPage() {
 
   const handleDeleteSavedQuery = (index: number) => {
     const newSavedQueries = savedQueries.filter((_, i) => i !== index);
-    setPlaygroundState({ savedQueries: newSavedQueries });
+    setSavedQueries(newSavedQueries);
     setMessage('Query deleted');
   };
 
@@ -171,7 +171,7 @@ export default function PlaygroundPage() {
           SQL Playground
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Experiment with SQL queries on sample databases. Your changes persist until you reset.
+          Experiment with SQL queries on sample databases.
         </Typography>
       </Box>
 

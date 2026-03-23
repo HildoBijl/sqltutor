@@ -5,7 +5,6 @@
 import type {
   ModuleState,
   ConceptModuleState,
-  PlaygroundModuleState,
   SkillModuleState,
 } from './types';
 
@@ -24,15 +23,6 @@ export function createModuleState(
         tab: undefined,
         lastAccessed: undefined,
       };
-    case 'playground':
-      return {
-        type: 'playground',
-        id,
-        savedQueries: [],
-        history: [],
-        tab: undefined,
-        lastAccessed: undefined,
-      };
     case 'skill':
     default:
       return {
@@ -40,8 +30,8 @@ export function createModuleState(
         id,
         tab: undefined,
         numSolved: 0,
-        instances: {},
-        currentInstanceId: undefined,
+        understood: undefined,
+        exercises: [],
         lastAccessed: undefined,
       };
   }
@@ -79,16 +69,6 @@ export function normalizeModuleState(
       };
       return normalized;
     }
-    case 'playground': {
-      const normalized: PlaygroundModuleState = {
-        ...createModuleState(id, 'playground'),
-        ...(state as Partial<PlaygroundModuleState>),
-        id,
-        type: 'playground',
-        lastAccessed,
-      };
-      return normalized;
-    }
     case 'skill':
     default: {
       const partialSkill = state as Partial<SkillModuleState>;
@@ -98,9 +78,9 @@ export function normalizeModuleState(
         id,
         type: 'skill',
         lastAccessed,
-        instances: partialSkill.instances ?? {},
+        exercises: Array.isArray(partialSkill.exercises) ? partialSkill.exercises : [],
         numSolved: partialSkill.numSolved ?? 0,
-        currentInstanceId: partialSkill.currentInstanceId ?? undefined,
+        understood: partialSkill.understood === true ? true : undefined,
       };
       return normalized;
     }

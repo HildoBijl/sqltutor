@@ -33,10 +33,11 @@ export function processProgress(
 
     if (item.type === 'skill') {
       const solved = module?.type === 'skill' ? module.numSolved ?? 0 : 0;
+      const understood = module?.type === 'skill' ? module.understood === true : false;
       if (solved > 0) {
         skillProgress[item.id] = solved;
       }
-      if (solved >= requiredCount) {
+      if (understood || solved >= requiredCount) {
         baseCompleted.push(item.id);
       }
     }
