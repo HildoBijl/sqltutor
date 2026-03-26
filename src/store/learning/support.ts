@@ -4,29 +4,28 @@
 
 import type {
   ModuleState,
+  ModuleType,
   ConceptModuleState,
   SkillModuleState,
 } from './types';
 
-export const DEFAULT_MODULE_TYPE: ModuleState['type'] = 'skill';
+export const DEFAULT_MODULE_TYPE: ModuleType = 'skill';
 
 export function createModuleState(
   id: string,
-  type: ModuleState['type'] = DEFAULT_MODULE_TYPE,
+  type: ModuleType = DEFAULT_MODULE_TYPE,
 ): ModuleState {
   switch (type) {
     case 'concept':
       return {
-        type: 'concept',
         id,
-        understood: false,
+        understood: undefined,
         tab: undefined,
         lastAccessed: undefined,
       };
     case 'skill':
     default:
       return {
-        type: 'skill',
         id,
         tab: undefined,
         numSolved: 0,
@@ -52,37 +51,41 @@ export function normalizeModuleState(
   id: string,
   state: Partial<ModuleState> | undefined,
 ): ModuleState {
-  if (!state || !('type' in state) || !state.type) {
+  if (!state) {
     return createModuleState(id);
   }
-  const desiredType = state.type;
-  const lastAccessed = coerceTimestamp(state.lastAccessed);
+  const stateRecord = state as Partial<ModuleState> & { type?: unknown };
+  const {
+    type: _legacyType,
+    ...withoutLegacyType
+  } = stateRecord;
+  const lastAccessed = coerceTimestamp(stateRecord.lastAccessed);
+  const isSkill =
+    stateRecord.type === 'skill' ||
+    typeof (stateRecord as Partial<SkillModuleState>).numSolved === 'number' ||
+    Array.isArray((stateRecord as Partial<SkillModuleState>).exercises);
 
-  switch (desiredType) {
-    case 'concept': {
-      const normalized: ConceptModuleState = {
-        ...createModuleState(id, 'concept'),
-        ...(state as Partial<ConceptModuleState>),
-        id,
-        type: 'concept',
-        lastAccessed,
-      };
-      return normalized;
-    }
-    case 'skill':
-    default: {
-      const partialSkill = state as Partial<SkillModuleState>;
-      const normalized: SkillModuleState = {
-        ...createModuleState(id, 'skill'),
-        ...partialSkill,
-        id,
-        type: 'skill',
-        lastAccessed,
-        exercises: Array.isArray(partialSkill.exercises) ? partialSkill.exercises : [],
-        numSolved: partialSkill.numSolved ?? 0,
-        understood: partialSkill.understood === true ? true : undefined,
-      };
-      return normalized;
-    }
+  if (isSkill) {
+    const partialSkill = withoutLegacyType as Partial<SkillModuleState>;
+    const normalized: SkillModuleState = {
+      ...createModuleState(id, 'skill'),
+      ...partialSkill,
+      id,
+      lastAccessed,
+      exercises: Array.isArray(partialSkill.exercises) ? partialSkill.exercises : [],
+      numSolved: typeof partialSkill.numSolved === 'number' ? partialSkill.numSolved : 0,
+      understood: partialSkill.understood === true ? true : undefined,
+    };
+    return normalized;
   }
+
+  const partialConcept = withoutLegacyType as Partial<ConceptModuleState>;
+  const normalized: ConceptModuleState = {
+    ...createModuleState(id, 'concept'),
+    ...partialConcept,
+    id,
+    lastAccessed,
+    understood: partialConcept.understood === true ? true : undefined,
+  };
+  return normalized;
 }

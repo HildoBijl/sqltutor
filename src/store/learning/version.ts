@@ -5,7 +5,7 @@
 import type { PersistedLearning } from './persist';
 import { asRecord, runMigrations } from '../utils';
 
-export const LEARNING_STORE_VERSION = 3;
+export const LEARNING_STORE_VERSION = 4;
 
 /** Migrations: index i transforms payload from version i to i+1. */
 const MIGRATIONS: Array<(state: PersistedLearning) => PersistedLearning> = [
@@ -75,6 +75,65 @@ const MIGRATIONS: Array<(state: PersistedLearning) => PersistedLearning> = [
         }
 
         return [[moduleId, module]];
+      }),
+    );
+
+    return {
+      ...state,
+      modules: migratedModules as PersistedLearning['modules'],
+    };
+  },
+  // v3 -> v4: remove legacy persisted module "type" and normalize understood to true|undefined.
+  (state) => {
+    const safeState = asRecord(state) as PersistedLearning;
+    const modules = asRecord(safeState.modules);
+    if (Object.keys(modules).length === 0) {
+      return {
+        ...state,
+        modules: {},
+      };
+    }
+
+    const migratedModules = Object.fromEntries(
+      Object.entries(modules).map(([moduleId, moduleValue]) => {
+        const module = asRecord(moduleValue);
+        const { type: legacyType, understood: legacyUnderstood, ...withoutLegacyType } = module;
+        const understood = legacyUnderstood === true ? true : undefined;
+        const isSkill =
+          legacyType === 'skill' ||
+          typeof module.numSolved === 'number' ||
+          Array.isArray(module.exercises) ||
+          'instances' in module ||
+          'currentInstanceId' in module;
+
+        if (isSkill) {
+          const {
+            instances: _instances,
+            currentInstanceId: _currentInstanceId,
+            ...withoutLegacySkillShape
+          } = withoutLegacyType;
+          const numSolved = typeof module.numSolved === 'number' ? module.numSolved : 0;
+          const exercises = Array.isArray(module.exercises) ? module.exercises : [];
+          return [
+            moduleId,
+            {
+              ...withoutLegacySkillShape,
+              id: typeof module.id === 'string' ? module.id : moduleId,
+              numSolved,
+              exercises,
+              understood,
+            },
+          ];
+        }
+
+        return [
+          moduleId,
+          {
+            ...withoutLegacyType,
+            id: typeof module.id === 'string' ? module.id : moduleId,
+            understood,
+          },
+        ];
       }),
     );
 

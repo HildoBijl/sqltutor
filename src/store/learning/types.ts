@@ -40,23 +40,19 @@ interface BaseModuleState {
   id: string;
   tab?: string;
   lastAccessed?: number;
+  understood?: true;
 }
 
-export interface ConceptModuleState extends BaseModuleState {
-  type: 'concept';
-  understood?: boolean;
-}
+export interface ConceptModuleState extends BaseModuleState {}
 
 export interface SkillModuleState extends BaseModuleState {
-  type: 'skill';
   numSolved: number;
-  understood?: boolean;
   exercises: StoredExerciseInstance[];
 }
 
 export type ModuleState = ConceptModuleState | SkillModuleState;
 
-export type ModuleType = ModuleState['type'];
+export type ModuleType = 'concept' | 'skill';
 
 export interface LearningState {
   modules: Record<string, ModuleState>;

@@ -15,7 +15,7 @@ import type { ModuleType } from '@/store';
 
 export function useModuleState<State extends ModuleState = ModuleState>(
   moduleId: string,
-  typeHint?: State['type'],
+  typeHint?: ModuleType,
 ) {
   const module = useLearningStore((state) => {
     const existing = state.modules[moduleId];
@@ -29,24 +29,6 @@ export function useModuleState<State extends ModuleState = ModuleState>(
 
   const setModuleState = useCallback(
     (updater: Partial<State> | State | ((prev: State) => Partial<State> | State)) => {
-      const attachType = (value: Partial<State> | State) => {
-        if (!typeHint) {
-          return value as Partial<ModuleState>;
-        }
-        const existing = useLearningStore.getState().modules[moduleId];
-        if (existing && existing.type !== typeHint) {
-          return {
-            ...existing,
-            ...value,
-            type: typeHint,
-          } as Partial<ModuleState>;
-        }
-        return {
-          ...value,
-          type: typeHint,
-        } as Partial<ModuleState>;
-      };
-
       if (typeof updater === 'function') {
         const currentState =
           (useLearningStore.getState().modules[moduleId] as State | undefined) ??
@@ -55,9 +37,9 @@ export function useModuleState<State extends ModuleState = ModuleState>(
             (typeHint ?? DEFAULT_MODULE_TYPE) as ModuleType,
           ) as State);
         const result = updater(currentState);
-        updateModule(moduleId, attachType(result));
+        updateModule(moduleId, result as Partial<ModuleState>, typeHint);
       } else {
-        updateModule(moduleId, attachType(updater));
+        updateModule(moduleId, updater as Partial<ModuleState>, typeHint);
       }
     },
     [moduleId, typeHint, updateModule],
