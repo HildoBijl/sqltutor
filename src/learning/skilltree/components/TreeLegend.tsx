@@ -52,7 +52,7 @@ export function TreeLegend() {
               justifyContent: "center",
             }}
           >
-            <EditNote fontSize="small" color="primary" />
+            <EditNote fontSize="small" color="action" />
           </Box>
           <Typography variant="body2">Skill</Typography>
         </Box>

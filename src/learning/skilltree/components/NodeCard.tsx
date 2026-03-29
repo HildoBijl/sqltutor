@@ -213,7 +213,7 @@ export function NodeCard({
                 <EditNoteIcon
                   style={{
                     fontSize: iconSize,
-                    color: completed ? "#757575" : "#ff0000",
+                    color: "primary",
                   }}
                 />
               )}
