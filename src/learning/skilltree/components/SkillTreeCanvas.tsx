@@ -145,11 +145,12 @@ export function SkillTreeCanvas({
               }}
               planningMode={planningMode}
             />
-            {planningMode && goalNodeId && (
+            {planningMode && (
               <PlanningProgressIndicator
                 nextStepName={goalProgress.nextStep || "All completed!"}
                 completedCount={goalProgress.completed}
                 totalCount={goalProgress.total}
+                hasGoal =  {!!goalNodeId}
               />
             )}
             <TreeLegend />
