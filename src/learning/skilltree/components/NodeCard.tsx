@@ -241,7 +241,7 @@ export function NodeCard({
             )}
 
             {/* Show pin icon when hovering over an item in planning mode, if the item is not set as a goal */}
-            {planningMode && !isGoalNode && !hasGoal && (
+            {planningMode && !isGoalNode && (!hasGoal || isHovered) && (
               <div
                 onClick={(e) => {
                   e.stopPropagation();
