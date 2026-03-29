@@ -1,14 +1,14 @@
 import { Box, Typography, IconButton } from "@mui/material";
 import { EditNote, School, Close } from "@mui/icons-material";
-import { useSettingsStore } from "@/store";
+import { useSkillTreeSettingsStore } from "@/store";
 
 /*
  * TreeLegend component that displays a legend for the skill tree nodes.
  */
 export function TreeLegend() {
-  const hideLegend = useSettingsStore((state) => state.hideLegend);
-  const setHideLegend = useSettingsStore((state) => state.setHideLegend);
-  const hasAcessedSkillTree = useSettingsStore(
+  const hideLegend = useSkillTreeSettingsStore((state) => state.hideLegend);
+  const setHideLegend = useSkillTreeSettingsStore((state) => state.setHideLegend);
+  const hasAcessedSkillTree = useSkillTreeSettingsStore(
     (state) => state.hasAcessedSkillTree,
   );
 

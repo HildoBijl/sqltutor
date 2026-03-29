@@ -10,8 +10,4 @@ export interface SettingsState {
   currentTheme: Theme;
   hideStories: boolean;
   practiceDatasetSize: DatasetSize;
-  goalNodeID: Record<string, string | null>;
-  hasAccessedPlanningMode: boolean; 
-  hasAcessedSkillTree: boolean;
-  hideLegend: boolean;
 }
