@@ -14,6 +14,7 @@ export const initialSettingsState: SettingsState = {
   practiceDatasetSize: 'full',
   goalNodeID: {},
   hasAccessedPlanningMode: false,
+  hasAcessedSkillTree: false,
 };
 
 export interface SettingsActions {
@@ -22,6 +23,7 @@ export interface SettingsActions {
   setPracticeDatasetSize: (size: DatasetSize) => void;
   setGoalNodeID: (treeId: string, id: string | null) => void;
   setHasAccessedPlanningMode: (accessed: boolean) => void;
+  setHasAcessedSkillTree: (accessed: boolean) => void;
 }
 
 export function createSettingsActions(set: SetState<SettingsState>): SettingsActions {
@@ -33,5 +35,8 @@ export function createSettingsActions(set: SetState<SettingsState>): SettingsAct
       goalNodeID: { ...state.goalNodeID, [treeId]: id },
     })),
     setHasAccessedPlanningMode: (accessed) => set({ hasAccessedPlanningMode: accessed }),
+    setHasAcessedSkillTree(accessed) {
+      set({ hasAcessedSkillTree: accessed }); 
+    },
   };
 }

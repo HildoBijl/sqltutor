@@ -12,4 +12,5 @@ export interface SettingsState {
   practiceDatasetSize: DatasetSize;
   goalNodeID: Record<string, string | null>;
   hasAccessedPlanningMode: boolean; 
+  hasAcessedSkillTree: boolean;
 }

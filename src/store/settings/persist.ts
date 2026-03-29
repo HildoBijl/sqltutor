@@ -11,6 +11,7 @@ export interface PersistedSettings {
   practiceDatasetSize?: DatasetSize;
   goalNodeID?: Record<string, string | null>;
   hasAccessedPlanningMode?: boolean;
+  hasAcessedSkillTree?: boolean;
 }
 
 export function partializeSettings(state: SettingsState): PersistedSettings {
@@ -20,6 +21,7 @@ export function partializeSettings(state: SettingsState): PersistedSettings {
     practiceDatasetSize: state.practiceDatasetSize,
     goalNodeID: state.goalNodeID,
     hasAccessedPlanningMode: state.hasAccessedPlanningMode,
+    hasAcessedSkillTree: state.hasAcessedSkillTree, 
   };
 }
 
@@ -43,6 +45,9 @@ export function rehydrateSettings(
   }
   if (typeof persisted.hasAccessedPlanningMode === 'boolean') {
     state.hasAccessedPlanningMode = persisted.hasAccessedPlanningMode;
+  }
+  if (typeof persisted.hasAcessedSkillTree === 'boolean') {
+    state.hasAcessedSkillTree = persisted.hasAcessedSkillTree;
   }
 }
 
