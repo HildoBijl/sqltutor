@@ -15,6 +15,7 @@ export const initialSettingsState: SettingsState = {
   goalNodeID: {},
   hasAccessedPlanningMode: false,
   hasAcessedSkillTree: false,
+  hideLegend: false,
 };
 
 export interface SettingsActions {
@@ -24,6 +25,7 @@ export interface SettingsActions {
   setGoalNodeID: (treeId: string, id: string | null) => void;
   setHasAccessedPlanningMode: (accessed: boolean) => void;
   setHasAcessedSkillTree: (accessed: boolean) => void;
+  setHideLegend: (hide: boolean) => void;
 }
 
 export function createSettingsActions(set: SetState<SettingsState>): SettingsActions {
@@ -36,7 +38,8 @@ export function createSettingsActions(set: SetState<SettingsState>): SettingsAct
     })),
     setHasAccessedPlanningMode: (accessed) => set({ hasAccessedPlanningMode: accessed }),
     setHasAcessedSkillTree(accessed) {
-      set({ hasAcessedSkillTree: accessed }); 
+      set({ hasAcessedSkillTree: accessed });
     },
+    setHideLegend: (hide) => set({ hideLegend: hide }),
   };
 }

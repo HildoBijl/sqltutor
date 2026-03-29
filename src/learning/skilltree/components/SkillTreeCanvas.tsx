@@ -85,10 +85,7 @@ export function SkillTreeCanvas({
   const setHasAccessedSkillTree = useSettingsStore(
     (state) => state.setHasAcessedSkillTree,
   );
-  const hasAccessedSkillTree = useSettingsStore(
-    (state) => state.hasAcessedSkillTree,
-  );
-  
+
 
   const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 

@@ -13,4 +13,5 @@ export interface SettingsState {
   goalNodeID: Record<string, string | null>;
   hasAccessedPlanningMode: boolean; 
   hasAcessedSkillTree: boolean;
+  hideLegend: boolean;
 }

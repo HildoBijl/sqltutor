@@ -1,10 +1,19 @@
-import { Box, Typography } from "@mui/material";
-import { EditNote, School } from "@mui/icons-material";
+import { Box, Typography, IconButton } from "@mui/material";
+import { EditNote, School, Close } from "@mui/icons-material";
+import { useSettingsStore } from "@/store";
 
 /*
  * TreeLegend component that displays a legend for the skill tree nodes.
  */
 export function TreeLegend() {
+  const hideLegend = useSettingsStore((state) => state.hideLegend);
+  const setHideLegend = useSettingsStore((state) => state.setHideLegend);
+  const hasAcessedSkillTree = useSettingsStore(
+    (state) => state.hasAcessedSkillTree,
+  );
+
+  if (hideLegend) return null;
+
   return (
     <Box
       sx={{
@@ -25,9 +34,34 @@ export function TreeLegend() {
           borderRadius: 2,
         }}
       >
-        <Typography variant="subtitle2" fontWeight={600}>
-          Legend
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="subtitle2" fontWeight={600}>
+            Legend
+          </Typography>
+          {hasAcessedSkillTree && (
+            <IconButton
+              size="small"
+              onClick={() => setHideLegend(true)}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                opacity: 0.6,
+                "&:hover": { opacity: 1, color: "red" },
+                ml: 1,
+                p: 0.25,
+              }}
+            >
+              <Close fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box
             sx={{
