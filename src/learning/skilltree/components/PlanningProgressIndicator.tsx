@@ -43,7 +43,7 @@ export function PlanningProgressIndicator({
               mb: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
+              whiteSpace: "wrap",
             }}
           >
             Next Step: <strong style={{ color: "red" }}>{nextStepName}</strong>

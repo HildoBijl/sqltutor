@@ -42,7 +42,7 @@ export function getNodeStyle({
     let borderColor: string;
     if (isGoalNode) {
       borderColor = 'purple';
-    } else if (isOnGoalPath && completed) {
+    } else if (completed) {
       borderColor = '#4CAF50';
     } else if (isOnGoalPath && readyToLearn) {
       borderColor = '#FFD700';
