@@ -1,13 +1,19 @@
-import { type RefObject, type ReactNode, useState, useEffect, useMemo } from 'react';
-import type { Vector } from '@/utils/geometry';
-import { Drawing, Element, Curve, useDrawingMousePosition } from '@/components';
-import { Module } from '@/curriculum';
-import { NodeCard } from './NodeCard';
-import { ModulePositionMeta } from '../utils/treeDefinition';
-import { useTheme } from '@mui/material/';
-import { useTransformContext } from 'react-zoom-pan-pinch';
-import { useDebouncedFunction } from '@/utils';
-import { getPrerequisites } from '../utils/goalPath';
+import {
+  type RefObject,
+  type ReactNode,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
+import type { Vector } from "@/utils/geometry";
+import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
+import { Module } from "@/curriculum";
+import { NodeCard } from "./NodeCard";
+import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import { useTheme } from "@mui/material/";
+import { useTransformContext } from "react-zoom-pan-pinch";
+import { useDebouncedFunction } from "@/utils";
+import { getPrerequisites } from "../utils/goalPath";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -97,9 +103,7 @@ export function SkillTree({
     if (onGoalProgressChange && goalNodeId) {
       const nodesOnPath = [...Array.from(goalPrerequisites), goalNodeId];
       const totalCount = nodesOnPath.length;
-      const completedCount = nodesOnPath.filter((id) =>
-        isCompleted(id),
-      ).length;
+      const completedCount = nodesOnPath.filter((id) => isCompleted(id)).length;
 
       const nextStep = nodesOnPath.find((id) => {
         if (isCompleted(id)) return false;

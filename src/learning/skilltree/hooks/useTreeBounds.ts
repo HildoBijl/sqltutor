@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ModulePositionMeta, treeHeight, treeWidth } from '../utils/treeDefinition';
+import { ModulePositionMeta, treeHeight, treeWidth } from '../definitions/sql-treeDefinition';
 
 /*
 * Calculate the bounding box of a set of modules in a tree layout.

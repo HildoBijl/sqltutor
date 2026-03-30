@@ -1,6 +1,6 @@
-import { modulePositions } from '@/learning/skilltree/utils/treeDefinition';
-import { raModulePositions } from '@/learning/skilltree/ra-skilltree/ra-treeDefinition';
-import { datalogModulePositions } from '@/learning/skilltree/datalog-skilltree/datalog-treeDefinitions';
+import { modulePositions } from '@/learning/skilltree/definitions/sql-treeDefinition';
+import { raModulePositions } from '@/learning/skilltree/definitions/ra-treeDefinition';
+import { datalogModulePositions } from '@/learning/skilltree/definitions/datalog-treeDefinitions';
 import {
   LEGACY_SKILL_TREE_HISTORY_KEY,
   SKILL_TREE_HISTORY_KEY,

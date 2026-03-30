@@ -1,16 +1,16 @@
-import { RefObject, useEffect, useState, useCallback } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import type { Vector } from '@/utils/geometry';
-import { useDebouncedFunction } from '@/utils/dom';
-import { Module } from '@/curriculum';
-import { ModulePositionMeta } from '../utils/treeDefinition';
-import { SkillTree } from './SkillTree';
-import { ZoomControls } from './ZoomControls';
-import { TreeLegend } from './TreeLegend';
-import { PlanningProgressIndicator } from './PlanningProgressIndicator';
-import { useTheme } from '@mui/material/';
-import { useSkillTreeSettingsStore } from '@/store';
-import { PlanningModeIntro } from './PlanningModeIntro';
+import { RefObject, useEffect, useState, useCallback } from "react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import type { Vector } from "@/utils/geometry";
+import { useDebouncedFunction } from "@/utils/dom";
+import { Module } from "@/curriculum";
+import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import { SkillTree } from "./SkillTree";
+import { ZoomControls } from "./ZoomControls";
+import { TreeLegend } from "./TreeLegend";
+import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
+import { useTheme } from "@mui/material/";
+import { useSkillTreeSettingsStore } from "@/store";
+import { PlanningModeIntro } from "./PlanningModeIntro";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -72,8 +72,12 @@ export function SkillTreeCanvas({
     total: 0,
     nextStep: null as string | null,
   });
-  const goalNodeId = useSkillTreeSettingsStore((state) => state.goalNodeID[treeId] ?? null);
-  const setGoalNodeIdInStore = useSkillTreeSettingsStore((state) => state.setGoalNodeID);
+  const goalNodeId = useSkillTreeSettingsStore(
+    (state) => state.goalNodeID[treeId] ?? null,
+  );
+  const setGoalNodeIdInStore = useSkillTreeSettingsStore(
+    (state) => state.setGoalNodeID,
+  );
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
   const setHasAccessedPlanningMode = useSkillTreeSettingsStore(
     (state) => state.setHasAccessedPlanningMode,
@@ -85,7 +89,6 @@ export function SkillTreeCanvas({
   const setHasAccessedSkillTree = useSkillTreeSettingsStore(
     (state) => state.setHasAcessedSkillTree,
   );
-
 
   const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 
@@ -155,7 +158,7 @@ export function SkillTreeCanvas({
                 nextStepName={goalProgress.nextStep || "All completed!"}
                 completedCount={goalProgress.completed}
                 totalCount={goalProgress.total}
-                hasGoal =  {!!goalNodeId}
+                hasGoal={!!goalNodeId}
               />
             )}
             <TreeLegend />

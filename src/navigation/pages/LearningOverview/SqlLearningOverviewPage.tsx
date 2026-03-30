@@ -1,4 +1,7 @@
-import { modulePositions, connectors } from "@/learning/skilltree/utils/treeDefinition";
+import {
+  modulePositions,
+  connectors,
+} from "@/learning/skilltree/definitions/sql-treeDefinition";
 import { SkillTreeOverviewPage } from "./SkillTreeOverviewPage";
 
 /*

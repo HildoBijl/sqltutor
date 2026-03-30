@@ -1,4 +1,7 @@
-import { raModulePositions, raConnectors } from "@/learning/skilltree/ra-skilltree/ra-treeDefinition";
+import {
+  raModulePositions,
+  raConnectors,
+} from "@/learning/skilltree/definitions/ra-treeDefinition";
 import { SkillTreeOverviewPage } from "./SkillTreeOverviewPage";
 
 /*
