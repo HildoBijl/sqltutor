@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState, useCallback } from "react";
+import { RefObject, useState, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
@@ -65,13 +65,16 @@ export function SkillTreeCanvas({
   );
   const [isPanning, setIsPanning] = useState(false);
 
-  // Added for planning mode
-  const [planningMode, setPlanningMode] = useState(false);
+const planningMode = useSkillTreeSettingsStore((state) => state.planningMode[treeId] ?? false);
+const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMode);
+
   const [goalProgress, setGoalProgress] = useState({
     completed: 0,
     total: 0,
     nextStep: null as string | null,
   });
+
+// Set a goal node ID
   const goalNodeId = useSkillTreeSettingsStore(
     (state) => state.goalNodeID[treeId] ?? null,
   );
@@ -88,12 +91,8 @@ export function SkillTreeCanvas({
 
 
   const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
+  
 
-  useEffect(() => {
-    if (goalNodeId) {
-      setPlanningMode(true);
-    }
-  }, [goalNodeId]);
 
   const theme = useTheme();
 
@@ -146,7 +145,7 @@ export function SkillTreeCanvas({
                   setShowPlanningModeModal(true);
                   setHasAccessedPlanningMode(true);
                 }
-                setPlanningMode(!planningMode);
+                setPlanningMode(treeId, !planningMode);
               }}
               planningMode={planningMode}
             />

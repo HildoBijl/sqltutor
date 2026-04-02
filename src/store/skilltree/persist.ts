@@ -8,6 +8,7 @@ export interface PersistedSkillTreeSettings {
   goalNodeID?: Record<string, string | null>;
   hideLegend?: boolean;
   hasAccessedPlanningMode?: boolean;
+  planningMode?: Record<string, boolean>;
 }
 
 export function partializeSkillTreeSettings(state: SkillTreeSettingsState): PersistedSkillTreeSettings {
@@ -15,6 +16,7 @@ export function partializeSkillTreeSettings(state: SkillTreeSettingsState): Pers
     goalNodeID: state.goalNodeID,
     hideLegend: state.hideLegend,
     hasAccessedPlanningMode: state.hasAccessedPlanningMode,
+    planningMode: state.planningMode
   };
 }
 
@@ -32,5 +34,9 @@ export function rehydrateSkillTreeSettings(
   }
   if (typeof persisted.hasAccessedPlanningMode === 'boolean') {
     state.hasAccessedPlanningMode = persisted.hasAccessedPlanningMode;
+  }
+
+  if (persisted.planningMode && typeof persisted.planningMode === 'object') {
+    state.planningMode = persisted.planningMode;
   }
 }

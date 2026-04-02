@@ -11,12 +11,14 @@ export const initialSkillTreeSettingsState: SkillTreeSettingsState = {
   goalNodeID: {},
   hideLegend: false,
   hasAccessedPlanningMode: false,
+  planningMode: {}, 
 };
 
 export interface SkillTreeSettingsActions {
   setGoalNodeID: (treeId: string, id: string | null) => void;
   setHideLegend: (hide: boolean) => void;
   setHasAccessedPlanningMode: (accessed: boolean) => void;
+  setPlanningMode: (treeId: string, planningMode: boolean) => void; 
 }
 
 export function createSkillTreeSettingsActions(set: SetState<SkillTreeSettingsState>): SkillTreeSettingsActions {
@@ -26,5 +28,8 @@ export function createSkillTreeSettingsActions(set: SetState<SkillTreeSettingsSt
     })),
     setHideLegend: (hide) => set({ hideLegend: hide }),
     setHasAccessedPlanningMode: (accessed) => set({ hasAccessedPlanningMode: accessed }),
+    setPlanningMode: (treeId, planningMode) => set((state) => ({
+      planningMode: { ...state.planningMode, [treeId]: planningMode },
+    })),
   };
 }

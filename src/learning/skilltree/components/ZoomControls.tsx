@@ -31,6 +31,8 @@ export function ZoomControls({
   // onCenter,
   zoomStep = 0.15,
 }: ZoomControlsProps) {
+
+
   return (
     <Box
       sx={{
