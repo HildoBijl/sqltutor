@@ -9,7 +9,6 @@ import {
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
 import { useTreeBounds } from "@/learning/skilltree/hooks/useTreeBounds";
 import { markSkillTreeVisited, type SkillTreeId } from "@/learning/utils/skillTreeTracking";
-import { useSkillTreeSettingsStore } from "@/store";
 
 interface SkillTreeOverviewPageProps {
   treeId: SkillTreeId;
@@ -28,11 +27,8 @@ export function SkillTreeOverviewPage({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
-  const setHasAcessedSkillTree = useSkillTreeSettingsStore((state) => state.setHasAcessedSkillTree);
-
   useEffect(() => {
     markSkillTreeVisited(treeId);
-    setHasAcessedSkillTree(true);
   }, [treeId]);
 
   const { isCompleted, getProgress } = useModuleProgress(

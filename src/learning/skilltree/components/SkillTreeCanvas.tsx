@@ -77,7 +77,7 @@ export function SkillTreeCanvas({
   );
   const setGoalNodeIdInStore = useSkillTreeSettingsStore(
     (state) => state.setGoalNodeID,
-  );
+  ); 
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
   const setHasAccessedPlanningMode = useSkillTreeSettingsStore(
     (state) => state.setHasAccessedPlanningMode,
@@ -86,9 +86,6 @@ export function SkillTreeCanvas({
     (state) => state.hasAccessedPlanningMode,
   );
 
-  const setHasAccessedSkillTree = useSkillTreeSettingsStore(
-    (state) => state.setHasAcessedSkillTree,
-  );
 
   const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 

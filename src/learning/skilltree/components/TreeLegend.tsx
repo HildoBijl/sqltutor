@@ -8,9 +8,7 @@ import { useSkillTreeSettingsStore } from "@/store";
 export function TreeLegend() {
   const hideLegend = useSkillTreeSettingsStore((state) => state.hideLegend);
   const setHideLegend = useSkillTreeSettingsStore((state) => state.setHideLegend);
-  const hasAcessedSkillTree = useSkillTreeSettingsStore(
-    (state) => state.hasAcessedSkillTree,
-  );
+
 
   if (hideLegend) return null;
 
@@ -44,7 +42,6 @@ export function TreeLegend() {
           <Typography variant="subtitle2" fontWeight={600}>
             Legend
           </Typography>
-          {hasAcessedSkillTree && (
             <IconButton
               size="small"
               onClick={() => setHideLegend(true)}
@@ -60,7 +57,6 @@ export function TreeLegend() {
             >
               <Close fontSize="small" />
             </IconButton>
-          )}
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box
