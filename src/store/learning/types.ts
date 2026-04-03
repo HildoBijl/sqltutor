@@ -36,48 +36,23 @@ export interface StoredExerciseInstance {
   events: StoredExerciseEvent[];
 }
 
-export interface QueryHistory {
-  query: string;
-  timestamp: number;
-  success: boolean;
-  rowCount?: number;
-}
-
-export interface SavedQuery {
-  name: string;
-  query: string;
-}
-
 interface BaseModuleState {
   id: string;
   tab?: string;
   lastAccessed?: number;
+  understood?: true;
 }
 
-export interface ConceptModuleState extends BaseModuleState {
-  type: 'concept';
-  understood?: boolean;
-}
+export interface ConceptModuleState extends BaseModuleState {}
 
 export interface SkillModuleState extends BaseModuleState {
-  type: 'skill';
   numSolved: number;
-  instances: Record<ExerciseInstanceId, StoredExerciseInstance>;
-  currentInstanceId?: ExerciseInstanceId;
+  exercises: StoredExerciseInstance[];
 }
 
-export interface PlaygroundModuleState extends BaseModuleState {
-  type: 'playground';
-  savedQueries?: SavedQuery[];
-  history?: QueryHistory[];
-}
+export type ModuleState = ConceptModuleState | SkillModuleState;
 
-export type ModuleState =
-  | ConceptModuleState
-  | SkillModuleState
-  | PlaygroundModuleState;
-
-export type ModuleType = ModuleState['type'];
+export type ModuleType = 'concept' | 'skill';
 
 export interface LearningState {
   modules: Record<string, ModuleState>;

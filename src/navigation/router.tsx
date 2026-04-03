@@ -3,9 +3,9 @@ import { Suspense, useEffect } from 'react';
 import { LoadingScreen, ErrorBoundary } from '@/components';
 
 import HomePage from './pages/HomePage';
-import LearningOverviewPage from './pages/LearningOverviewPage';
-import RALearningOverviewPage from './pages/RALearningOverviewPage';
-import DatalogLearningOverviewPage from './pages/DatalogLearningOverviewPage';
+import LearningOverviewPage from './pages/LearningOverview/SqlLearningOverviewPage';
+import RALearningOverviewPage from './pages/LearningOverview/RALearningOverviewPage';
+import DatalogLearningOverviewPage from './pages/LearningOverview/DatalogLearningOverviewPage';
 import ConceptPage from './pages/ConceptPage';
 import SkillPage from './pages/SkillPage';
 import PlaygroundPage from './pages/PlaygroundPage';

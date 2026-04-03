@@ -1,14 +1,15 @@
-import { Vector } from '@/utils/geometry';
-import { Rectangle, Element } from '@/components';
-import { Module } from '@/curriculum';
-import { cardWidth, cardHeight } from '../utils/settings';
-import { ModulePositionMeta } from '../utils/treeDefinition';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import School from '@mui/icons-material/School';
-import { useTheme, ButtonBase } from '@mui/material/';
-import { useState } from 'react';
-import PushPinIcon from '@mui/icons-material/PushPin';
+import { Vector } from "@/utils/geometry";
+import { Rectangle, Element } from "@/components";
+import { Module } from "@/curriculum";
+import { cardWidth, cardHeight } from "../utils/settings";
+import { getNodeStyle } from "../utils/nodeStyle";
+import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import School from "@mui/icons-material/School";
+import { useTheme, ButtonBase } from "@mui/material/";
+import { useState } from "react";
+import PushPinIcon from "@mui/icons-material/PushPin";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -39,7 +40,7 @@ export function NodeCard({
   isPrerequisite = false,
   isSomethingHovered = false,
   onClick,
-  planningMode,
+  planningMode = false,
   hasGoal = false,
   isGoalNode = false,
   isOnGoalPath = false,
@@ -76,50 +77,18 @@ export function NodeCard({
   // Calculate position for the checkmark
   const checkmarkSize = 18;
 
-  let nodeOpacity: number;
-  let borderColor: string;
-  let strokeWidth: number;
-  let fillColor: string = theme.palette.background.paper;
-
-  if (planningMode) {
-    const prominent = isGoalNode || isOnGoalPath || isHovered;
-    nodeOpacity = prominent || !hasGoal ? 1.0 : 0.15;
-    strokeWidth = isGoalNode || isHovered ? 2 : 1;
-
-    if (isGoalNode) {
-      fillColor = "purple";
-      borderColor = "purple";
-    } else if (isOnGoalPath && completed) {
-      borderColor = "#4CAF50";
-    } else if (isOnGoalPath && readyToLearn) {
-      borderColor = "#FFD700";
-    } else if (isOnGoalPath) {
-      borderColor = "purple";
-    } else {
-      borderColor = isHovered ? theme.palette.primary.main : theme.palette.divider;
-    }
-  } else {
-    const highlighted = isHovered || isPrerequisite;
-    const dimmed = isSomethingHovered && !highlighted;
-
-    if (highlighted) {
-      nodeOpacity = 1.0;
-      strokeWidth = 2;
-      borderColor = completed ? "rgba(76, 175, 80, 1.0)" : readyToLearn ? "#FFD700" : "#E84421";
-    } else if (completed) {
-      nodeOpacity = dimmed ? 0.4 : 1.0;
-      strokeWidth = 1;
-      borderColor = dimmed ? "rgba(76, 175, 80, 0.4)" : "#4CAF50";
-    } else if (readyToLearn) {
-      nodeOpacity = dimmed ? 0.15 : 1.0;
-      strokeWidth = 1;
-      borderColor = dimmed ? "#e0e0e0" : "#FFD700";
-    } else {
-      nodeOpacity = 0.15;
-      strokeWidth = 1;
-      borderColor = "#e0e0e0";
-    }
-  }
+  const { borderColor, fillColor, nodeOpacity, strokeWidth } = getNodeStyle({
+    planningMode,
+    isGoalNode,
+    isOnGoalPath,
+    isHovered,
+    hasGoal,
+    completed,
+    readyToLearn,
+    isSomethingHovered,
+    isPrerequisite,
+    theme,
+  });
 
   return (
     <>
@@ -213,7 +182,7 @@ export function NodeCard({
                 <EditNoteIcon
                   style={{
                     fontSize: iconSize,
-                    color: completed ? "#757575" : "#ff0000",
+                    color: "primary",
                   }}
                 />
               )}
@@ -241,7 +210,7 @@ export function NodeCard({
             )}
 
             {/* Show pin icon when hovering over an item in planning mode, if the item is not set as a goal */}
-            {planningMode && isHovered && !isGoalNode && (
+            {planningMode && !isGoalNode && !completed && (!hasGoal || isHovered) && (
               <div
                 onClick={(e) => {
                   e.stopPropagation();
@@ -268,7 +237,10 @@ export function NodeCard({
                 }}
               >
                 <PushPinIcon
-                  style={{ fontSize: checkmarkSize - 4, color: isPinHovered ? "purple" : "#9aa0a6" }}
+                  style={{
+                    fontSize: checkmarkSize - 4,
+                    color: isPinHovered ? "purple" : "#9aa0a6",
+                  }}
                 />
               </div>
             )}
@@ -301,7 +273,10 @@ export function NodeCard({
                 }}
               >
                 <PushPinIcon
-                  style={{ fontSize: checkmarkSize - 4, color: isPinHovered ? "#9aa0a6" : "purple" }}
+                  style={{
+                    fontSize: checkmarkSize - 4,
+                    color: isPinHovered ? "#9aa0a6" : "purple",
+                  }}
                 />
               </div>
             )}
@@ -312,10 +287,7 @@ export function NodeCard({
                 textAlign: "center",
                 fontWeight: 500,
                 fontSize: "17px",
-                color:
-                  planningMode && (isGoalNode)
-                    ? "#ffffff"
-                    : "#000000",
+                color: planningMode && isGoalNode ? "#ffffff" : "#000000",
               }}
             >
               {item.name}

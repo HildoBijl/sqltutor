@@ -8,11 +8,9 @@ import {
 import { useSearchParams } from 'react-router-dom';
 
 import { useModuleState } from '@/learning/hooks/useModuleState';
-import type { ModuleState } from '@/store';
+import type { ModuleState, ModuleType } from '@/store';
 
 import type { TabConfig } from '../types';
-
-type ModuleType = ModuleState['type'];
 
 interface UseContentTabsOptions {
   defaultTab?: string;

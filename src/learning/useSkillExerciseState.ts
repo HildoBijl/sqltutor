@@ -241,22 +241,6 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
     [moduleLike],
   );
 
-  useEffect(() => {
-    if (moduleState.currentInstanceId) return;
-    const instances = Object.values(moduleState.instances || {});
-    if (instances.length === 0) return;
-
-    let latest: StoredExerciseInstance | undefined;
-    for (const instance of instances) {
-      if (!latest || instance.createdAt > latest.createdAt) {
-        latest = instance;
-      }
-    }
-    if (latest) {
-      setModuleState({ currentInstanceId: latest.id });
-    }
-  }, [moduleState.currentInstanceId, moduleState.instances, setModuleState]);
-
   const appendEvent = useCallback(
     (instanceId: ExerciseInstanceId, action: ExerciseAction<string, unknown>, storedState: SkillStoredExerciseState) => {
       const timestamp = Date.now();
@@ -267,7 +251,8 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
       };
 
       queueModuleStateUpdate((prev) => {
-        const current = prev.instances[instanceId] ?? {
+        const existingIndex = prev.exercises.findIndex((exercise) => exercise.id === instanceId);
+        const current = existingIndex >= 0 ? prev.exercises[existingIndex] : {
           id: instanceId,
           skillId: moduleId,
           createdAt: timestamp,
@@ -282,12 +267,14 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
           events: [...current.events, event],
         };
 
+        const exercises =
+          existingIndex >= 0
+            ? prev.exercises.map((exercise, index) => (index === existingIndex ? updated : exercise))
+            : [...prev.exercises, updated];
+
         return {
           ...prev,
-          instances: {
-            ...prev.instances,
-            [instanceId]: updated,
-          },
+          exercises,
         };
       });
     },
@@ -325,42 +312,33 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
 
           queueModuleStateUpdate((prevState) => ({
             ...prevState,
-            currentInstanceId: instanceId,
-            instances: {
-              ...prevState.instances,
-              [instanceId]: instance,
-            },
+            exercises: [...prevState.exercises, instance],
           }));
         } else if (action.type !== 'hydrate') {
-          const currentInstanceId = moduleState.currentInstanceId;
-          if (!currentInstanceId) {
+          const currentInstance = moduleState.exercises[moduleState.exercises.length - 1];
+          if (!currentInstance) {
             // No active instance - start a new one implicitly
             const fallbackId = generateInstanceId();
-            queueModuleStateUpdate((prevState) => ({
-              ...prevState,
-              currentInstanceId: fallbackId,
-            }));
             appendEvent(fallbackId, action, storedState);
           } else {
-            appendEvent(currentInstanceId, action, storedState);
+            appendEvent(currentInstance.id, action, storedState);
           }
         }
 
         return next;
       });
     },
-    [appendEvent, moduleId, moduleState.currentInstanceId, queueModuleStateUpdate, reducer, toPersistedExercise],
+    [appendEvent, moduleId, moduleState.exercises, queueModuleStateUpdate, reducer, toPersistedExercise],
   );
 
   useEffect(() => {
-    const instanceId = moduleState.currentInstanceId;
-    if (!instanceId) {
+    const instance = moduleState.exercises[moduleState.exercises.length - 1];
+    if (!instance) {
       setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
       return;
     }
 
-    const instance = moduleState.instances[instanceId];
-    if (!instance || instance.events.length === 0) {
+    if (instance.events.length === 0) {
       setProgress(createInitialProgress());
       return;
     }
@@ -390,7 +368,7 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
       }
       return rehydrateExerciseState(resolvedState, exerciseConfig);
     });
-  }, [moduleState.currentInstanceId, moduleState.instances, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
+  }, [moduleState.exercises, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
 
   const previewValidation: ValidationPreview = useCallback(
     (input: string) => {

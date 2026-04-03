@@ -12,6 +12,7 @@ import {
 import {
   useLearningStore,
   useSettingsStore,
+  useSkillTreeSettingsStore,
   type ConceptModuleState,
 } from "@/store";
 import { moduleList, type Module } from "@/curriculum";
@@ -141,7 +142,7 @@ export default function ConceptPage() {
   }, [conceptId, skillTreeHistory]);
 
   // Calculate the current goal node ID for this tree (if any)
-  const goalNodeID = useSettingsStore((state) =>
+  const goalNodeID = useSkillTreeSettingsStore((state) =>
     conceptTree ? (state.goalNodeID[conceptTree.id] ?? null) : null,
   );
 

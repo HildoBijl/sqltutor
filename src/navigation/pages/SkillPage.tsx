@@ -106,7 +106,7 @@ export default function SkillPage() {
 
 	// Handle static practice completion
 	const handleStaticComplete = () => {
-		setModuleState({ numSolved: REQUIRED_EXERCISE_COUNT });
+		setModuleState({ understood: true });
 		setShowCompletionDialog(true);
 	};
 

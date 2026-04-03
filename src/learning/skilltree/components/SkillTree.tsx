@@ -1,13 +1,20 @@
-import { type RefObject, type ReactNode, useState, useEffect, useMemo } from 'react';
-import type { Vector } from '@/utils/geometry';
-import { Drawing, Element, Curve, useDrawingMousePosition } from '@/components';
-import { Module } from '@/curriculum';
-import { NodeCard } from './NodeCard';
-import { ModulePositionMeta } from '../utils/treeDefinition';
-import { useTheme } from '@mui/material/';
-import { useTransformContext } from 'react-zoom-pan-pinch';
-import { useDebouncedFunction } from '@/utils';
-import { getPrerequisites } from '../utils/goalPath';
+import {
+  type RefObject,
+  type ReactNode,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
+import type { Vector } from "@/utils/geometry";
+import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
+import { Module } from "@/curriculum";
+import { NodeCard } from "./NodeCard";
+import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import { useTheme } from "@mui/material/";
+import { useTransformContext } from "react-zoom-pan-pinch";
+import { useDebouncedFunction } from "@/utils";
+import { getPrerequisites } from "../utils/goalPath";
+import { getConnectorStyle } from "../utils/connectorStyle";
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -47,7 +54,8 @@ interface SkillTreeProps {
   onGoalProgressChange?: (
     completedCount: number,
     totalCount: number,
-    nextStepNode: string | null,
+    nextStepName: string | null,
+    nextStepId: string | null,
   ) => void;
 }
 
@@ -97,9 +105,7 @@ export function SkillTree({
     if (onGoalProgressChange && goalNodeId) {
       const nodesOnPath = [...Array.from(goalPrerequisites), goalNodeId];
       const totalCount = nodesOnPath.length;
-      const completedCount = nodesOnPath.filter((id) =>
-        isCompleted(id),
-      ).length;
+      const completedCount = nodesOnPath.filter((id) => isCompleted(id)).length;
 
       const nextStep = nodesOnPath.find((id) => {
         if (isCompleted(id)) return false;
@@ -111,7 +117,7 @@ export function SkillTree({
       });
 
       const nextStepName = nextStep ? moduleItems[nextStep]?.name : null;
-      onGoalProgressChange(completedCount, totalCount, nextStepName);
+      onGoalProgressChange(completedCount, totalCount, nextStepName, nextStep ?? null);
     }
   }, [
     goalNodeId,
@@ -188,67 +194,18 @@ export function SkillTree({
     return fromInPath && toInPath;
   };
 
-  // Determine the style for connectors based on different cases
-  const getConnectorStyle = (connector: { from: string; to: string }) => {
-    // TO DO
-    if (planningMode) {
-      if (!goalNodeId) return { opacity: 0.7 };
-      return { opacity: isConnectorInGoalPath(connector) ? 1 : 0.15 };
-    }
-    // Full opacity for connectors in the hovered path
-    if (isConnectorInHoveredPath(connector)) {
-      return { opacity: 0.7 };
-    }
-    // If hovering over some node, fade all other connectors
-    if (localHoveredId) {
-      return { opacity: 0.2 };
-    }
-
-    // When no hover, opacity is based on completion status
-    const bothCompleted =
-      isCompleted(connector.from) && isCompleted(connector.to);
-    const isNextToLearn =
-      isReadyToLearn(moduleItems[connector.to]) && isCompleted(connector.from);
-
-    if (bothCompleted) {
-      return { opacity: 0.7 };
-    }
-    if (isNextToLearn) {
-      return { opacity: 0.5 };
-    }
-    return { opacity: 0.2 };
-  };
-
-  const getConnectorColor = (connector: { from: string; to: string }) => {
+  const resolveConnectorStyle = (connector: { from: string; to: string }) => {
     const fromCompleted = isCompleted(connector.from);
-    const toCompleted = isCompleted(connector.to);
-    const bothCompleted = fromCompleted && toCompleted;
-    const isNextToLearn =
-      isReadyToLearn(moduleItems[connector.to]) && fromCompleted;
-
-    if (planningMode) {
-      if (!isConnectorInGoalPath(connector)) return "#9aa0a6";
-      if (bothCompleted) return "#4CAF50";
-      if (isNextToLearn) return "#FFD700";
-      return "purple";
-    }
-    // Hover active
-    if (isConnectorInHoveredPath(connector)) {
-      if (bothCompleted) {
-        return "#4CAF50";
-      }
-      if (isNextToLearn) return "#FFD700";
-      return "#E84421";
-    }
-
-    // No hover active
-    if (bothCompleted) {
-      return "#4CAF50";
-    }
-    if (isNextToLearn) {
-      return "#FFD700";
-    }
-    return "#9aa0a6";
+    return getConnectorStyle({
+      planningMode,
+      goalNodeId,
+      isInGoalPath: isConnectorInGoalPath(connector),
+      isInHoveredPath: isConnectorInHoveredPath(connector),
+      isSomethingHovered: !!localHoveredId,
+      fromCompleted,
+      toCompleted: isCompleted(connector.to),
+      isNextToLearn: isReadyToLearn(moduleItems[connector.to]) && fromCompleted,
+    });
   };
 
   return (
@@ -272,16 +229,19 @@ export function SkillTree({
         autoScale={false} // Scaling manually controlled by transformer.
       >
         {/* The lines between skills and concepts */}
-        {visiblePaths.map((connector, i) => (
-          <Curve
-            key={i}
-            points={connector.points}
-            color={getConnectorColor(connector)}
-            size={1.5}
-            curveDistance={20}
-            style={getConnectorStyle(connector)}
-          />
-        ))}
+        {visiblePaths.map((connector, i) => {
+          const { strokeColor, strokeWidth, opacity } = resolveConnectorStyle(connector);
+          return (
+            <Curve
+              key={i}
+              points={connector.points}
+              color={strokeColor}
+              size={strokeWidth}
+              curveDistance={20}
+              style={{ opacity }}
+            />
+          );
+        })}
 
         {/* Rectangles in the SVG layer, and only those whose position is defined */}
         {Object.values(modulePositions).map((positionData) => {
@@ -312,6 +272,7 @@ export function SkillTree({
                     setGoalNodeId(goalNodeId === item.id ? null : item.id);
                   }
                 }}
+
               />
             </g>
           );

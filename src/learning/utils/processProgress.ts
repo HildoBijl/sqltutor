@@ -1,11 +1,19 @@
 import type { Module } from '@/curriculum';
-import type { ModuleState } from '@/store';
+import type { ModuleState, SkillModuleState } from '@/store';
 import { EXERCISES_TO_COMPLETE } from '@/constants';
 
 interface ProcessedProgress {
   completed: Set<string>;
   skillProgress: Record<string, number>;
   requiredCount: number;
+}
+
+function isSkillModuleState(module: ModuleState | undefined): module is SkillModuleState {
+  if (!module) return false;
+  return (
+    typeof (module as { numSolved?: unknown }).numSolved === 'number' ||
+    Array.isArray((module as { exercises?: unknown }).exercises)
+  );
 }
 
 export function processProgress(
@@ -25,18 +33,19 @@ export function processProgress(
     const module = modules[item.id];
 
     if (item.type === 'concept') {
-      if (module?.type === 'concept' && module.understood === true) {
+      if (module && !isSkillModuleState(module) && module.understood === true) {
         baseCompleted.push(item.id);
       }
       continue;
     }
 
     if (item.type === 'skill') {
-      const solved = module?.type === 'skill' ? module.numSolved ?? 0 : 0;
+      const solved = isSkillModuleState(module) ? module.numSolved ?? 0 : 0;
+      const understood = isSkillModuleState(module) ? module.understood === true : false;
       if (solved > 0) {
         skillProgress[item.id] = solved;
       }
-      if (solved >= requiredCount) {
+      if (understood || solved >= requiredCount) {
         baseCompleted.push(item.id);
       }
     }

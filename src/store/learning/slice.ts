@@ -7,7 +7,6 @@ import type {
   ModuleType,
   ConceptModuleState,
   LearningState,
-  PlaygroundModuleState,
   SkillModuleState,
   StoredExerciseEvent,
   StoredExerciseInstance,
@@ -23,8 +22,18 @@ export const initialLearningState: LearningState = {
   modules: {} as Record<string, ModuleState>,
 };
 
+function isSkillModule(
+  module: ModuleState | Partial<ModuleState> | undefined,
+): module is SkillModuleState {
+  if (!module) return false;
+  return (
+    typeof (module as Partial<SkillModuleState>).numSolved === 'number' ||
+    Array.isArray((module as Partial<SkillModuleState>).exercises)
+  );
+}
+
 export interface LearningActions {
-  updateModule: (id: string, data: Partial<ModuleState>) => void;
+  updateModule: (id: string, data: Partial<ModuleState>, typeHint?: ModuleType) => void;
   getModule: (id: string) => ModuleState;
   resetModule: (id: string, type?: ModuleType) => void;
   getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
@@ -37,40 +46,33 @@ export function createLearningActions(
   get: GetState<LearningState>,
 ): LearningActions {
   return {
-    updateModule: (id, data) =>
+    updateModule: (id, data, typeHint) =>
       set((state) => {
         const prev = state.modules[id];
-        const nextType = (data.type ?? prev?.type ?? DEFAULT_MODULE_TYPE) as ModuleType;
+        const inferredPrevType: ModuleType | undefined = prev
+          ? (isSkillModule(prev) ? 'skill' : 'concept')
+          : undefined;
+        const nextType = (typeHint ?? inferredPrevType ?? DEFAULT_MODULE_TYPE) as ModuleType;
         let nextState: ModuleState;
 
         switch (nextType) {
           case 'concept': {
-            const previous = prev?.type === 'concept' ? prev : undefined;
-            nextState = {
+            const previous = prev && !isSkillModule(prev) ? (prev as ConceptModuleState) : undefined;
+            const incoming = data as Partial<ConceptModuleState>;
+            const nextConcept: ConceptModuleState = {
               ...createModuleState(id, 'concept'),
               ...(previous ?? {}),
-              ...(data as Partial<ConceptModuleState>),
+              ...incoming,
               id,
-              type: 'concept',
               lastAccessed: Date.now(),
+              understood: incoming.understood === true ? true : previous?.understood,
             };
-            break;
-          }
-          case 'playground': {
-            const previous = prev?.type === 'playground' ? prev : undefined;
-            nextState = {
-              ...createModuleState(id, 'playground'),
-              ...(previous ?? {}),
-              ...(data as Partial<PlaygroundModuleState>),
-              id,
-              type: 'playground',
-              lastAccessed: Date.now(),
-            };
+            nextState = nextConcept;
             break;
           }
           case 'skill':
           default: {
-            const previous = prev?.type === 'skill' ? prev : undefined;
+            const previous = isSkillModule(prev) ? prev : undefined;
             const incoming = data as Partial<SkillModuleState>;
             const baseSkill = createModuleState(id, 'skill') as SkillModuleState;
             const nextSkill: SkillModuleState = {
@@ -78,12 +80,11 @@ export function createLearningActions(
               ...(previous ?? {}),
               ...incoming,
               id,
-              type: 'skill',
               lastAccessed: Date.now(),
-              instances: incoming.instances ?? previous?.instances ?? baseSkill.instances,
+              exercises:
+                incoming.exercises ?? previous?.exercises ?? baseSkill.exercises,
               numSolved: incoming.numSolved ?? previous?.numSolved ?? baseSkill.numSolved,
-              currentInstanceId:
-                incoming.currentInstanceId ?? previous?.currentInstanceId ?? baseSkill.currentInstanceId,
+              understood: incoming.understood === true ? true : previous?.understood,
             };
             nextState = nextSkill;
             break;
@@ -104,7 +105,12 @@ export function createLearningActions(
 
     resetModule: (id, type) =>
       set((state) => {
-        const targetType = (type ?? state.modules[id]?.type ?? DEFAULT_MODULE_TYPE) as ModuleType;
+        const existing = state.modules[id];
+        const targetType = (
+          type ??
+          (existing ? (isSkillModule(existing) ? 'skill' : 'concept') : undefined) ??
+          DEFAULT_MODULE_TYPE
+        ) as ModuleType;
         return {
           modules: {
             ...state.modules,
@@ -115,30 +121,27 @@ export function createLearningActions(
 
     getCurrentExerciseInstance: (skillId) => {
       const module = get().modules[skillId];
-      if (!module || module.type !== 'skill') {
+      if (!isSkillModule(module)) {
         return null;
       }
-      const { currentInstanceId, instances } = module;
-      if (!currentInstanceId) {
-        return null;
-      }
-      return instances[currentInstanceId] ?? null;
+      return module.exercises[module.exercises.length - 1] ?? null;
     },
 
     getAllExerciseInstances: (skillId) => {
       const module = get().modules[skillId];
-      if (!module || module.type !== 'skill') {
+      if (!isSkillModule(module)) {
         return [];
       }
-      return Object.values(module.instances);
+      return [...module.exercises];
     },
 
     getExerciseHistory: (skillId, instanceId) => {
       const module = get().modules[skillId];
-      if (!module || module.type !== 'skill') {
+      if (!isSkillModule(module)) {
         return [];
       }
-      return module.instances[instanceId]?.events ?? [];
+      const instance = module.exercises.find((exercise) => exercise.id === instanceId);
+      return instance?.events ?? [];
     },
   };
 }

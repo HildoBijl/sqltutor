@@ -1,16 +1,16 @@
-import { RefObject, useEffect, useState, useCallback } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import type { Vector } from '@/utils/geometry';
-import { useDebouncedFunction } from '@/utils/dom';
-import { Module } from '@/curriculum';
-import { ModulePositionMeta } from '../utils/treeDefinition';
-import { SkillTree } from './SkillTree';
-import { ZoomControls } from './ZoomControls';
-import { TreeLegend } from './TreeLegend';
-import { PlanningProgressIndicator } from './PlanningProgressIndicator';
-import { useTheme } from '@mui/material/';
-import { useSettingsStore } from '@/store';
-import { PlanningModeIntro } from './PlanningModeIntro';
+import { RefObject, useState, useCallback } from "react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import type { Vector } from "@/utils/geometry";
+import { useDebouncedFunction } from "@/utils/dom";
+import { Module } from "@/curriculum";
+import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import { SkillTree } from "./SkillTree";
+import { ZoomControls } from "./ZoomControls";
+import { TreeLegend } from "./TreeLegend";
+import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
+import { useTheme } from "@mui/material/";
+import { useSkillTreeSettingsStore } from "@/store";
+import { PlanningModeIntro } from "./PlanningModeIntro";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -65,36 +65,41 @@ export function SkillTreeCanvas({
   );
   const [isPanning, setIsPanning] = useState(false);
 
-  // Added for planning mode
-  const [planningMode, setPlanningMode] = useState(false);
+const planningMode = useSkillTreeSettingsStore((state) => state.planningMode[treeId] ?? false);
+const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMode);
+
   const [goalProgress, setGoalProgress] = useState({
     completed: 0,
     total: 0,
     nextStep: null as string | null,
+    nextStepId: null as string | null,
   });
-  const goalNodeId = useSettingsStore((state) => state.goalNodeID[treeId] ?? null);
-  const setGoalNodeIdInStore = useSettingsStore((state) => state.setGoalNodeID);
+
+// Set a goal node ID
+  const goalNodeId = useSkillTreeSettingsStore(
+    (state) => state.goalNodeID[treeId] ?? null,
+  );
+  const setGoalNodeIdInStore = useSkillTreeSettingsStore(
+    (state) => state.setGoalNodeID,
+  ); 
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
-  const setHasAccessedPlanningMode = useSettingsStore(
+  const setHasAccessedPlanningMode = useSkillTreeSettingsStore(
     (state) => state.setHasAccessedPlanningMode,
   );
-  const hasAccessedPlanningMode = useSettingsStore(
+  const hasAccessedPlanningMode = useSkillTreeSettingsStore(
     (state) => state.hasAccessedPlanningMode,
   );
 
-  const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 
-  useEffect(() => {
-    if (goalNodeId) {
-      setPlanningMode(true);
-    }
-  }, [goalNodeId]);
+  const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
+  
+
 
   const theme = useTheme();
 
   const handleGoalProgressChange = useCallback(
-    (completed: number, total: number, nextStep: string | null) => {
-      setGoalProgress({ completed, total, nextStep });
+    (completed: number, total: number, nextStep: string | null, nextStepId: string | null) => {
+      setGoalProgress({ completed, total, nextStep, nextStepId });
     },
     [],
   );
@@ -141,15 +146,18 @@ export function SkillTreeCanvas({
                   setShowPlanningModeModal(true);
                   setHasAccessedPlanningMode(true);
                 }
-                setPlanningMode(!planningMode);
+                setPlanningMode(treeId, !planningMode);
               }}
               planningMode={planningMode}
             />
-            {planningMode && goalNodeId && (
+            {planningMode && (
               <PlanningProgressIndicator
                 nextStepName={goalProgress.nextStep || "All completed!"}
+                nextStepId={goalProgress.nextStepId}
+                treeId={treeId}
                 completedCount={goalProgress.completed}
                 totalCount={goalProgress.total}
+                hasGoal={!!goalNodeId}
               />
             )}
             <TreeLegend />
