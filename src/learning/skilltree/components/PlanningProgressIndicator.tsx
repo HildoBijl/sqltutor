@@ -36,7 +36,7 @@ export function PlanningProgressIndicator({
         backgroundColor: "background.paper",
         borderRadius: 2,
         p: 2,
-        width: 200,
+        width: 220,
         border: `1px solid ${theme.palette.divider}`,
       }}
     >

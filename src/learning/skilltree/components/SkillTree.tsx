@@ -272,6 +272,7 @@ export function SkillTree({
                     setGoalNodeId(goalNodeId === item.id ? null : item.id);
                   }
                 }}
+
               />
             </g>
           );
