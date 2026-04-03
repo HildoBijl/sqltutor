@@ -72,6 +72,7 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
     completed: 0,
     total: 0,
     nextStep: null as string | null,
+    nextStepId: null as string | null,
   });
 
 // Set a goal node ID
@@ -97,8 +98,8 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
   const theme = useTheme();
 
   const handleGoalProgressChange = useCallback(
-    (completed: number, total: number, nextStep: string | null) => {
-      setGoalProgress({ completed, total, nextStep });
+    (completed: number, total: number, nextStep: string | null, nextStepId: string | null) => {
+      setGoalProgress({ completed, total, nextStep, nextStepId });
     },
     [],
   );
@@ -152,6 +153,8 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
             {planningMode && (
               <PlanningProgressIndicator
                 nextStepName={goalProgress.nextStep || "All completed!"}
+                nextStepId={goalProgress.nextStepId}
+                treeId={treeId}
                 completedCount={goalProgress.completed}
                 totalCount={goalProgress.total}
                 hasGoal={!!goalNodeId}

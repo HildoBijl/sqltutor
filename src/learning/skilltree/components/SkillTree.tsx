@@ -54,7 +54,8 @@ interface SkillTreeProps {
   onGoalProgressChange?: (
     completedCount: number,
     totalCount: number,
-    nextStepNode: string | null,
+    nextStepName: string | null,
+    nextStepId: string | null,
   ) => void;
 }
 
@@ -116,7 +117,7 @@ export function SkillTree({
       });
 
       const nextStepName = nextStep ? moduleItems[nextStep]?.name : null;
-      onGoalProgressChange(completedCount, totalCount, nextStepName);
+      onGoalProgressChange(completedCount, totalCount, nextStepName, nextStep ?? null);
     }
   }, [
     goalNodeId,

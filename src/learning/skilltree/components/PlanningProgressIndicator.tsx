@@ -1,19 +1,28 @@
 import { Box, Typography, LinearProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { Link } from "@/components";
+import { modules } from "@/curriculum";
 
 interface PlanningProgressIndicatorProps {
   nextStepName: string;
   completedCount: number;
   totalCount: number;
   hasGoal: boolean;
+  treeId?: string;
+  nextStepId?: string | null;
 }
 
 export function PlanningProgressIndicator({
   nextStepName,
+  nextStepId,
   completedCount,
   totalCount,
   hasGoal,
 }: PlanningProgressIndicatorProps) {
+  const nextStepModule = nextStepId ? modules[nextStepId as keyof typeof modules] : null;
+  const nextStepHref = nextStepModule
+    ? `/${nextStepModule.type}/${nextStepId}`
+    : null;
   const theme = useTheme();
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
@@ -46,7 +55,14 @@ export function PlanningProgressIndicator({
               whiteSpace: "wrap",
             }}
           >
-            Next Step: <strong style={{ color: "red" }}>{nextStepName}</strong>
+            Next Step:{" "}
+            {nextStepHref ? (
+              <Link to={nextStepHref} style={{ color: "red", fontWeight: 700, textDecoration: "underline" }}>
+                {nextStepName}
+              </Link>
+            ) : (
+              <strong style={{ color: "red" }}>{nextStepName}</strong>
+            )}
           </Typography>
 
           <LinearProgress
