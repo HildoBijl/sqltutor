@@ -57,6 +57,7 @@ interface SkillTreeProps {
     nextStepName: string | null,
     nextStepId: string | null,
   ) => void;
+  nextStepId?: string | null;
 }
 
 export function SkillTree({
@@ -71,6 +72,7 @@ export function SkillTree({
   goalNodeId,
   setGoalNodeId,
   onGoalProgressChange,
+  nextStepId,
 }: SkillTreeProps) {
   const theme = useTheme();
 
@@ -272,7 +274,7 @@ export function SkillTree({
                     setGoalNodeId(goalNodeId === item.id ? null : item.id);
                   }
                 }}
-
+                nextStepId={nextStepId}
               />
             </g>
           );

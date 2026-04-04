@@ -57,7 +57,7 @@ export function PlanningProgressIndicator({
           >
             Next Step:{" "}
             {nextStepHref ? (
-              <Link to={nextStepHref} style={{ color: "red", fontWeight: 700, textDecoration: "underline" }}>
+              <Link to={nextStepHref} style={{ color: "red", fontWeight: 700}}>
                 {nextStepName}
               </Link>
             ) : (

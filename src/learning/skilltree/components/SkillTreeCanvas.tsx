@@ -191,6 +191,7 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
                 goalNodeId={goalNodeId}
                 setGoalNodeId={setGoalNodeId}
                 onGoalProgressChange={handleGoalProgressChange}
+                nextStepId={goalProgress.nextStepId}
               />
             </TransformComponent>
           </div>

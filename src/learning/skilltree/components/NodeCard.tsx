@@ -10,6 +10,8 @@ import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
 import { useState } from "react";
 import PushPinIcon from "@mui/icons-material/PushPin";
+import { PlayArrow } from "@mui/icons-material";
+import { yellow } from "@mui/material/colors";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -29,6 +31,7 @@ interface NodeCardProps {
   isGoalNode?: boolean;
   isOnGoalPath?: boolean;
   onSetGoal?: () => void;
+  nextStepId?: string | null;
 }
 
 export function NodeCard({
@@ -45,6 +48,7 @@ export function NodeCard({
   isGoalNode = false,
   isOnGoalPath = false,
   onSetGoal,
+  nextStepId,
 }: NodeCardProps) {
   const theme = useTheme();
   const [isPinHovered, setIsPinHovered] = useState(false);
@@ -240,6 +244,34 @@ export function NodeCard({
                   style={{
                     fontSize: checkmarkSize - 4,
                     color: isPinHovered ? "purple" : "#9aa0a6",
+                  }}
+                />
+              </div>
+            )}
+
+            {planningMode && nextStepId === item.id && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: -15,
+                  right: -15,
+                  width: 2 * checkmarkSize,
+                  height: 2 * checkmarkSize,
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: `1px solid`,
+                  color: "red",
+                  pointerEvents: "auto",
+                }}
+              >
+                <PlayArrow
+                  style={{
+                    fontSize: checkmarkSize - 4,
+                    color: "red",
                   }}
                 />
               </div>
