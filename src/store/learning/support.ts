@@ -7,6 +7,8 @@ import type {
   ModuleType,
   ConceptModuleState,
   SkillModuleState,
+  StoredExerciseEvent,
+  StoredExerciseInstance,
 } from './types';
 
 export const DEFAULT_MODULE_TYPE: ModuleType = 'skill';
@@ -47,6 +49,59 @@ export function coerceTimestamp(value: unknown): number | undefined {
   return Number.isNaN(asNumber) ? undefined : asNumber;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function normalizeStoredExerciseEvent(value: unknown): StoredExerciseEvent | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const timestamp = coerceTimestamp(value.timestamp);
+  if (timestamp === undefined) {
+    return null;
+  }
+
+  return {
+    timestamp,
+    action: isRecord(value.action) ? { ...value.action } : {},
+    resultingState: isRecord(value.resultingState) ? { ...value.resultingState } : {},
+  };
+}
+
+function normalizeStoredExerciseInstance(value: unknown): StoredExerciseInstance | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const exerciseIdRaw = value.exerciseId;
+  const exerciseId = typeof exerciseIdRaw === 'string' ? exerciseIdRaw.trim() : '';
+  if (!exerciseId) {
+    return null;
+  }
+
+  const version = typeof value.version === 'number' && Number.isFinite(value.version)
+    ? value.version
+    : 1;
+  const createdAt = coerceTimestamp(value.createdAt) ?? Date.now();
+  const parameters = isRecord(value.parameters) ? { ...value.parameters } : {};
+  const events = Array.isArray(value.events)
+    ? value.events
+      .map((entry) => normalizeStoredExerciseEvent(entry))
+      .filter((entry): entry is StoredExerciseEvent => entry !== null)
+    : [];
+
+  return {
+    exerciseId,
+    version,
+    parameters,
+    createdAt,
+    events,
+    draftInput: value.draftInput,
+  };
+}
+
 export function normalizeModuleState(
   id: string,
   state: Partial<ModuleState> | undefined,
@@ -72,7 +127,11 @@ export function normalizeModuleState(
       ...partialSkill,
       id,
       lastAccessed,
-      exercises: Array.isArray(partialSkill.exercises) ? partialSkill.exercises : [],
+      exercises: Array.isArray(partialSkill.exercises)
+        ? partialSkill.exercises
+          .map((exercise) => normalizeStoredExerciseInstance(exercise))
+          .filter((exercise): exercise is StoredExerciseInstance => exercise !== null)
+        : [],
       numSolved: typeof partialSkill.numSolved === 'number' ? partialSkill.numSolved : 0,
       understood: partialSkill.understood === true ? true : undefined,
     };

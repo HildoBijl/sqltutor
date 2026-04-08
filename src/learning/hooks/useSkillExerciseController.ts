@@ -32,12 +32,6 @@ interface UseSkillExerciseControllerParams {
   skillModule: SkillExerciseModuleLike | null;
   requiredCount: number;
   moduleState: SkillModuleState;
-  setModuleState: (
-    updater:
-      | Partial<SkillModuleState>
-      | SkillModuleState
-      | ((prev: SkillModuleState) => Partial<SkillModuleState> | SkillModuleState)
-  ) => void;
 }
 
 interface SkillExerciseControllerState {
@@ -101,7 +95,6 @@ export function useSkillExerciseController({
   skillModule,
   requiredCount,
   moduleState,
-  setModuleState,
 }: UseSkillExerciseControllerParams): SkillExerciseControllerState {
   const selectedDatasetSize = useSettingsStore((state) => state.practiceDatasetSize);
   const setPracticeDatasetSize = useSettingsStore((state) => state.setPracticeDatasetSize);
@@ -144,13 +137,16 @@ export function useSkillExerciseController({
     dispatch: exerciseDispatch,
     solution: exerciseSolution,
     recordAttempt,
+    recordGiveUp,
+    setDraftInput,
+    draftInput: persistedDraftInput,
+    isGivenUp,
   } = useSkillExerciseState(skillId, skillModule);
 
   const [query, setQuery] = useState('');
   const [feedback, setFeedbackState] = useState<PracticeFeedback | null>(null);
   const [feedbackSubmissionKey, setFeedbackSubmissionKey] = useState<string | null>(null);
   const [feedbackHidden, setFeedbackHidden] = useState(false);
-  const [hasGivenUp, setHasGivenUp] = useState(false);
   const [showGiveUpDialog, setShowGiveUpDialog] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
@@ -159,6 +155,7 @@ export function useSkillExerciseController({
   const latestQueryKeyRef = useRef('');
   const datasetSizeRef = useRef<DatasetSize>(selectedDatasetSize);
   const lastExecutedQueryRef = useRef('');
+  const hydratedExerciseKeyRef = useRef<string | null>(null);
   const [revealedSolution, setRevealedSolution] = useState<PracticeSolution | null>(null);
 
   const updateFeedback = useCallback(
@@ -176,16 +173,8 @@ export function useSkillExerciseController({
     [],
   );
 
-  const queueModuleStateUpdate = useCallback(
-    (updater: Parameters<typeof setModuleState>[0]) => {
-      Promise.resolve().then(() => {
-        setModuleState(updater);
-      });
-    },
-    [setModuleState],
-  );
-
   const exerciseCompleted = exerciseStatus === 'correct';
+  const hasGivenUp = isGivenUp;
 
   useEffect(() => {
     const normalizedQuery = normalizeForHistory(query);
@@ -205,14 +194,27 @@ export function useSkillExerciseController({
   }, [selectedDatasetSize, clearQueryState]);
 
   useEffect(() => {
-    setHasGivenUp(false);
+    const exerciseRecord =
+      currentExercise && typeof currentExercise === 'object'
+        ? (currentExercise as Record<string, unknown>)
+        : null;
+    const currentExerciseKey = currentExercise
+      ? `${String(exerciseRecord?.id ?? '')}:${String(exerciseRecord?.version ?? '')}`
+      : '__none__';
+
+    if (hydratedExerciseKeyRef.current === currentExerciseKey) {
+      return;
+    }
+
+    hydratedExerciseKeyRef.current = currentExerciseKey;
+    setQuery(typeof persistedDraftInput === 'string' ? persistedDraftInput : '');
     setRevealedSolution(null);
     updateFeedback(null);
     setHasExecutedQuery(false);
     setDatasetWarning(null);
     setPendingDatasetRefresh(false);
     lastExecutedQueryRef.current = '';
-  }, [currentExercise, setHasExecutedQuery, setRevealedSolution, updateFeedback]);
+  }, [currentExercise, persistedDraftInput, updateFeedback]);
 
   useEffect(() => {
     return () => {
@@ -223,10 +225,10 @@ export function useSkillExerciseController({
 
   useEffect(() => {
     if (!dbReady || !skillModule) return;
-    if (!exerciseProgress.exercise) {
+    if (!exerciseProgress.exercise && moduleState.exercises.length === 0) {
       exerciseDispatch({ type: 'generate' });
     }
-  }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch]);
+  }, [dbReady, skillModule, exerciseProgress.exercise, exerciseDispatch, moduleState.exercises.length]);
 
   const handleDatasetSizeChange = useCallback(
     (size: DatasetSize) => {
@@ -556,10 +558,6 @@ export function useSkillExerciseController({
           const alreadyCounted = exerciseCompleted;
           const updatedSolvedCount = alreadyCounted ? previousSolvedCount : previousSolvedCount + 1;
 
-          if (!alreadyCounted) {
-            queueModuleStateUpdate((prev) => ({ ...prev, numSolved: updatedSolvedCount }));
-          }
-
           const reachedMasteryNow =
             !alreadyCounted && updatedSolvedCount >= requiredCount && previousSolvedCount < requiredCount;
 
@@ -607,7 +605,6 @@ export function useSkillExerciseController({
       recordAttempt,
       moduleState.numSolved,
       requiredCount,
-      queueModuleStateUpdate,
       hasGivenUp,
       updateFeedback,
       evaluateSmallDatasetWarning,
@@ -650,9 +647,10 @@ export function useSkillExerciseController({
 
     if (shouldInsertIntoEditor) {
       setQuery(solution.query);
+      setDraftInput(solution.query);
     }
     setRevealedSolution(solution);
-  }, [currentExercise, exerciseSolution, setQuery, setRevealedSolution, skillModule, updateFeedback]);
+  }, [currentExercise, exerciseSolution, setDraftInput, setQuery, setRevealedSolution, skillModule, updateFeedback]);
 
   const handleNewExercise = useCallback(() => {
     if (!exerciseCompleted && !hasGivenUp) {
@@ -662,7 +660,6 @@ export function useSkillExerciseController({
     exerciseDispatch({ type: 'generate' });
     setQuery('');
     updateFeedback(null);
-    setHasGivenUp(false);
     setHasExecutedQuery(false);
     setRevealedSolution(null);
   }, [exerciseCompleted, exerciseDispatch, hasGivenUp, setRevealedSolution, updateFeedback]);
@@ -677,14 +674,15 @@ export function useSkillExerciseController({
 
   const handleGiveUpConfirm = useCallback(() => {
     setShowGiveUpDialog(false);
-    setHasGivenUp(true);
+    recordGiveUp();
     updateFeedback(null);
     void handleAutoComplete({ insertIntoEditor: false });
-  }, [handleAutoComplete, updateFeedback]);
+  }, [handleAutoComplete, recordGiveUp, updateFeedback]);
 
   const handleSetQuery = useCallback(
     (value: string) => {
       setQuery(value);
+      setDraftInput(value);
 
       if (!feedback) {
         setFeedbackHidden(false);
@@ -706,7 +704,7 @@ export function useSkillExerciseController({
         setFeedbackHidden(false);
       }
     },
-    [clearQueryState, feedback, feedbackSubmissionKey, setFeedbackHidden, setQuery, updateFeedback],
+    [clearQueryState, feedback, feedbackSubmissionKey, setDraftInput, setFeedbackHidden, setQuery, updateFeedback],
   );
 
   const practiceExerciseTitle = useMemo(
@@ -750,7 +748,6 @@ export function useSkillExerciseController({
       exerciseDispatch({ type: 'generate', exercise: selectedExercise });
       setQuery('');
       updateFeedback(null);
-      setHasGivenUp(false);
       setHasExecutedQuery(false);
       setRevealedSolution(null);
     },
@@ -758,7 +755,6 @@ export function useSkillExerciseController({
       exerciseDispatch,
       selectedExerciseId,
       setHasExecutedQuery,
-      setHasGivenUp,
       setQuery,
       setRevealedSolution,
       skillModule,

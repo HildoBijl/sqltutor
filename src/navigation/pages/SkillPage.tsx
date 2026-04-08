@@ -85,7 +85,6 @@ export default function SkillPage() {
 		skillModule: hasInteractivePractice ? skillModule : null,
 		requiredCount: REQUIRED_EXERCISE_COUNT,
 		moduleState,
-		setModuleState,
 	});
 
 	const { isCompleted } = useModuleProgress(moduleList, modules);

@@ -5,7 +5,7 @@
 import type { PersistedLearning } from './persist';
 import { asRecord, runMigrations } from '../utils';
 
-export const LEARNING_STORE_VERSION = 4;
+export const LEARNING_STORE_VERSION = 5;
 
 /** Migrations: index i transforms payload from version i to i+1. */
 const MIGRATIONS: Array<(state: PersistedLearning) => PersistedLearning> = [
@@ -132,6 +132,60 @@ const MIGRATIONS: Array<(state: PersistedLearning) => PersistedLearning> = [
             ...withoutLegacyType,
             id: typeof module.id === 'string' ? module.id : moduleId,
             understood,
+          },
+        ];
+      }),
+    );
+
+    return {
+      ...state,
+      modules: migratedModules as PersistedLearning['modules'],
+    };
+  },
+  // v4 -> v5: reset persisted skill exercises to the minimal v5 shape.
+  (state) => {
+    const safeState = asRecord(state) as PersistedLearning;
+    const modules = asRecord(safeState.modules);
+    if (Object.keys(modules).length === 0) {
+      return {
+        ...state,
+        modules: {},
+      };
+    }
+
+    const migratedModules = Object.fromEntries(
+      Object.entries(modules).map(([moduleId, moduleValue]) => {
+        const module = asRecord(moduleValue);
+        const {
+          type: _legacyType,
+          instances: _instances,
+          currentInstanceId: _currentInstanceId,
+          ...withoutLegacyShape
+        } = module;
+
+        const isSkill =
+          typeof module.numSolved === 'number' ||
+          Array.isArray(module.exercises);
+
+        if (isSkill) {
+          return [
+            moduleId,
+            {
+              ...withoutLegacyShape,
+              id: typeof module.id === 'string' ? module.id : moduleId,
+              numSolved: typeof module.numSolved === 'number' ? module.numSolved : 0,
+              understood: module.understood === true ? true : undefined,
+              exercises: [],
+            },
+          ];
+        }
+
+        return [
+          moduleId,
+          {
+            ...withoutLegacyShape,
+            id: typeof module.id === 'string' ? module.id : moduleId,
+            understood: module.understood === true ? true : undefined,
           },
         ];
       }),
