@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   createInitialProgress,
@@ -153,7 +153,7 @@ function defaultInvalidMessage(messages?: SkillExerciseModuleLike['messages']) {
 }
 
 export function useSkillExerciseState(moduleId: string, moduleLike: SkillExerciseModuleLike | null) {
-  const [moduleState] = useModuleState<SkillModuleState>(moduleId, 'skill');
+  const moduleState = useModuleState<SkillModuleState>(moduleId, 'skill');
   const startNewExercise = useLearningStore((state) => state.startNewExercise);
   const submitExerciseAction = useLearningStore((state) => state.submitExerciseAction);
   const setExerciseDraftInput = useLearningStore((state) => state.setExerciseDraftInput);
@@ -244,6 +244,16 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
   const deriveSolution = exerciseConfig.deriveSolution!;
 
   const [progress, setProgress] = useState<SkillExerciseProgress>(() => createInitialProgress());
+  const progressRef = useRef(progress);
+  const moduleStateRef = useRef(moduleState);
+
+  useEffect(() => {
+    progressRef.current = progress;
+  }, [progress]);
+
+  useEffect(() => {
+    moduleStateRef.current = moduleState;
+  }, [moduleState]);
 
   const currentStoredInstance = useMemo(
     () => getCurrentInstance(moduleState),
@@ -268,48 +278,54 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
 
   const dispatch: Dispatch = useCallback(
     (action) => {
-      setProgress((prev) => {
-        const next = reducer(prev, action);
-        if (next === prev) return prev;
+      const prev = progressRef.current;
+      const next = reducer(prev, action);
+      if (next === prev) return;
 
-        if (action.type === 'generate') {
-          const nextExercise = next.exercise;
-          const exerciseId = getExerciseId(nextExercise) ?? 'exercise';
-          const version = getExerciseVersion(nextExercise);
-          const parameters = getExerciseParameters(nextExercise);
-          startNewExercise(moduleId, exerciseId, version, parameters);
-        } else if (action.type === 'input') {
-          const currentInstance = getCurrentInstance(moduleState);
-          if (currentInstance) {
-            const solvedNow = next.status === 'correct';
-            const solvedBefore =
-              prev.status === 'correct' ||
-              currentInstance.events.some((event) => hasSolvedState(event.resultingState));
-            const storedAction: StoredExerciseAction = {
-              type: 'input',
-              input: action.input,
-            };
-            const storedResultingState: StoredExerciseState = solvedNow ? { solved: true } : {};
-            submitExerciseAction(
-              moduleId,
-              storedAction,
-              storedResultingState,
-              solvedNow,
-              solvedNow && !solvedBefore,
-            );
-          }
+      if (action.type === 'generate') {
+        const nextExercise = next.exercise;
+        const exerciseId = getExerciseId(nextExercise) ?? 'exercise';
+        const version = getExerciseVersion(nextExercise);
+        const parameters = getExerciseParameters(nextExercise);
+        startNewExercise(moduleId, exerciseId, version, parameters);
+      } else if (action.type === 'input') {
+        const currentInstance = getCurrentInstance(moduleStateRef.current);
+        if (currentInstance) {
+          const solvedNow = next.status === 'correct';
+          const solvedBefore =
+            prev.status === 'correct' ||
+            currentInstance.events.some((event) => hasSolvedState(event.resultingState));
+          const storedAction: StoredExerciseAction = {
+            type: 'input',
+            input: action.input,
+          };
+          const storedResultingState: StoredExerciseState = solvedNow ? { solved: true } : {};
+          submitExerciseAction(
+            moduleId,
+            storedAction,
+            storedResultingState,
+            solvedNow,
+            solvedNow && !solvedBefore,
+          );
         }
+      }
 
-        return next;
-      });
+      progressRef.current = next;
+      setProgress(next);
     },
-    [moduleId, moduleState, reducer, startNewExercise, submitExerciseAction],
+    [moduleId, reducer, startNewExercise, submitExerciseAction],
   );
 
   useEffect(() => {
     const instance = currentStoredInstance;
     if (!instance) {
-      setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
+      const current = progressRef.current;
+      if (current.status === 'idle' && current.attempts.length === 0) {
+        return;
+      }
+      const resetProgress = createInitialProgress<any, string, unknown, unknown>();
+      progressRef.current = resetProgress;
+      setProgress(resetProgress);
       return;
     }
 
@@ -338,28 +354,29 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
     const givenUp = !solved && instance.events.some((event) => hasGivenUpState(event.resultingState));
     const status: ExerciseStatus = solved ? 'correct' : givenUp ? 'incorrect' : 'ready';
 
-    setProgress((prev) => {
-      const prevExerciseId = getExerciseId(prev.exercise);
-      const sameExercise =
-        prevExerciseId === instance.exerciseId &&
-        getExerciseVersion(prev.exercise) === instance.version;
-      const sameStatus = prev.status === status;
-      const sameAttempts = prev.attempts.length === attempts.length;
-      const sameGeneratedAt = prev.generatedAt === instance.createdAt;
+    const current = progressRef.current;
+    const prevExerciseId = getExerciseId(current.exercise);
+    const sameExercise =
+      prevExerciseId === instance.exerciseId &&
+      getExerciseVersion(current.exercise) === instance.version;
+    const sameStatus = current.status === status;
+    const sameAttempts = current.attempts.length === attempts.length;
+    const sameGeneratedAt = current.generatedAt === instance.createdAt;
 
-      if (sameExercise && sameStatus && sameAttempts && sameGeneratedAt) {
-        return prev;
-      }
+    if (sameExercise && sameStatus && sameAttempts && sameGeneratedAt) {
+      return;
+    }
 
-      return {
-        ...createInitialProgress(),
-        exercise: latestExercise,
-        status,
-        attempts,
-        generatedAt: instance.createdAt,
-        feedback: attempts[attempts.length - 1]?.feedback ?? null,
-      };
-    });
+    const nextProgress: SkillExerciseProgress = {
+      ...createInitialProgress(),
+      exercise: latestExercise,
+      status,
+      attempts,
+      generatedAt: instance.createdAt,
+      feedback: attempts[attempts.length - 1]?.feedback ?? null,
+    };
+    progressRef.current = nextProgress;
+    setProgress(nextProgress);
   }, [currentStoredInstance, dispatch, moduleLike, resolveStoredExercise]);
 
   const previewValidation: ValidationPreview = useCallback(
@@ -403,7 +420,7 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
   );
 
   const recordGiveUp = useCallback(() => {
-    const currentInstance = getCurrentInstance(moduleState);
+    const currentInstance = getCurrentInstance(moduleStateRef.current);
     if (!currentInstance) {
       return;
     }
@@ -414,8 +431,17 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
     }
 
     submitExerciseAction(moduleId, { type: 'give-up' }, { givenUp: true }, true, false);
-    setProgress((prev) => (prev.status === 'correct' ? prev : { ...prev, status: 'incorrect' }));
-  }, [moduleId, moduleState, submitExerciseAction]);
+    const current = progressRef.current;
+    if (current.status === 'correct') {
+      return;
+    }
+    const nextProgress: SkillExerciseProgress = {
+      ...current,
+      status: 'incorrect',
+    };
+    progressRef.current = nextProgress;
+    setProgress(nextProgress);
+  }, [moduleId, submitExerciseAction]);
 
   const persistDraftInput = useCallback(
     (draftInput: unknown) => {
