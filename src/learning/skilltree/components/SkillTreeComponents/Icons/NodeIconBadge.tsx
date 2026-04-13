@@ -4,11 +4,10 @@ import { useTheme } from "@mui/material/";
 
 interface NodeIconBadgeProps {
   type: "concept" | "skill";
-  completed: boolean;
   iconSize: number;
 }
 
-export function NodeIconBadge({ type, completed, iconSize }: NodeIconBadgeProps) {
+export function NodeIconBadge({ type, iconSize }: NodeIconBadgeProps) {
   const theme = useTheme();
 
   return (
@@ -30,7 +29,7 @@ export function NodeIconBadge({ type, completed, iconSize }: NodeIconBadgeProps)
         <School
           style={{
             fontSize: iconSize,
-            color: completed ? "#757575" : "#616161",
+            color: "#616161",
           }}
         />
       ) : (

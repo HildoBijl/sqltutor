@@ -4,10 +4,10 @@ import { Module } from "@/curriculum";
 import { cardWidth, cardHeight } from "../../utils/settings";
 import { getNodeStyle } from "../../utils/nodeStyle";
 import { ModulePositionMeta } from "../../definitions/sql-treeDefinition";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTheme, ButtonBase } from "@mui/material/";
-import { NodeIconBadge } from "./NodeIconBadge";
-import { NodeGoalPin } from "./NodeGoalPin";
+import { NodeIconBadge } from "./Icons/NodeIconBadge";
+import { NodeGoalPin } from "./Icons/NodeGoalPin";
+import { NodeCompletedMark } from "./Icons/NodeCompletedMark";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -155,29 +155,11 @@ export function NodeCard({
           >
             <NodeIconBadge
               type={type}
-              completed={completed}
               iconSize={iconSize}
             />
 
             {completed && !isGoalNode && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: -10,
-                  right: -5,
-                  width: checkmarkSize,
-                  height: checkmarkSize,
-                  backgroundColor: theme.palette.background.paper,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <CheckCircleIcon
-                  style={{ fontSize: checkmarkSize, color: "#4CAF50" }}
-                />
-              </div>
+              <NodeCompletedMark iconSize={checkmarkSize} />
             )}
 
             {/* Show pin icon when hovering over an item in planning mode, if the item is not set as a goal */}
