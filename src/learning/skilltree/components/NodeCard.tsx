@@ -11,7 +11,6 @@ import { useTheme, ButtonBase } from "@mui/material/";
 import { useState } from "react";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import { PlayArrow } from "@mui/icons-material";
-import { yellow } from "@mui/material/colors";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -249,7 +248,7 @@ export function NodeCard({
               </div>
             )}
 
-            {planningMode && nextStepId === item.id && (
+            {planningMode && hasGoal && nextStepId === item.id && (
               <div
                 style={{
                   position: "absolute",
@@ -264,14 +263,14 @@ export function NodeCard({
                   justifyContent: "center",
                   cursor: "pointer",
                   border: `1px solid`,
-                  color: "red",
+                  color: "#FFD700",
                   pointerEvents: "auto",
                 }}
               >
                 <PlayArrow
                   style={{
                     fontSize: checkmarkSize - 4,
-                    color: "red",
+                    color: "#FFD700",
                   }}
                 />
               </div>
