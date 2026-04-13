@@ -1,16 +1,13 @@
 import { Vector } from "@/utils/geometry";
 import { Rectangle, Element } from "@/components";
 import { Module } from "@/curriculum";
-import { cardWidth, cardHeight } from "../utils/settings";
-import { getNodeStyle } from "../utils/nodeStyle";
-import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
+import { cardWidth, cardHeight } from "../../utils/settings";
+import { getNodeStyle } from "../../utils/nodeStyle";
+import { ModulePositionMeta } from "../../definitions/sql-treeDefinition";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import School from "@mui/icons-material/School";
 import { useTheme, ButtonBase } from "@mui/material/";
-import { useState } from "react";
-import PushPinIcon from "@mui/icons-material/PushPin";
-import { PlayArrow } from "@mui/icons-material";
+import { NodeIconBadge } from "./NodeIconBadge";
+import { NodeGoalPin } from "./NodeGoalPin";
 
 /*
  * NodeCard component representing a concept or skill in the learning tree.
@@ -50,7 +47,6 @@ export function NodeCard({
   nextStepId,
 }: NodeCardProps) {
   const theme = useTheme();
-  const [isPinHovered, setIsPinHovered] = useState(false);
   const type = item.type;
   const cornerRadius = type === "concept" ? 4 : 12;
 
@@ -74,10 +70,7 @@ export function NodeCard({
     positionData.position.y + cardHeight / 2,
   );
 
-  // Calculate position for the icon
   const iconSize = 20;
-
-  // Calculate position for the checkmark
   const checkmarkSize = 18;
 
   const { borderColor, fillColor, nodeOpacity, strokeWidth } = getNodeStyle({
@@ -160,36 +153,11 @@ export function NodeCard({
               pointerEvents: "none",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: -10,
-                left: -5,
-                width: iconSize,
-                height: iconSize,
-                backgroundColor: theme.palette.background.paper,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {type === "concept" ? (
-                <School
-                  style={{
-                    fontSize: iconSize,
-                    color: completed ? "#757575" : "#616161",
-                  }}
-                />
-              ) : (
-                <EditNoteIcon
-                  style={{
-                    fontSize: iconSize,
-                    color: "primary",
-                  }}
-                />
-              )}
-            </div>
+            <NodeIconBadge
+              type={type}
+              completed={completed}
+              iconSize={iconSize}
+            />
 
             {completed && !isGoalNode && (
               <div
@@ -213,103 +181,28 @@ export function NodeCard({
             )}
 
             {/* Show pin icon when hovering over an item in planning mode, if the item is not set as a goal */}
-            {planningMode && !isGoalNode && !completed && (!hasGoal || isHovered) && (
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onSetGoal) {
-                    onSetGoal();
-                  }
-                }}
-                onMouseEnter={() => setIsPinHovered(true)}
-                onMouseLeave={() => setIsPinHovered(false)}
-                style={{
-                  position: "absolute",
-                  top: -15,
-                  right: -15,
-                  width: 2 * checkmarkSize,
-                  height: 2 * checkmarkSize,
-                  backgroundColor: theme.palette.background.paper,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  border: `1px solid ${isPinHovered ? "purple" : "#616161"}`,
-                  pointerEvents: "auto",
-                }}
-              >
-                <PushPinIcon
-                  style={{
-                    fontSize: checkmarkSize - 4,
-                    color: isPinHovered ? "purple" : "#9aa0a6",
-                  }}
+            {planningMode &&
+              !isGoalNode &&
+              !completed &&
+              (!hasGoal || isHovered) && (
+                <NodeGoalPin
+                  variant="set"
+                  checkmarkSize={checkmarkSize}
+                  onSetGoal={onSetGoal}
                 />
-              </div>
-            )}
+              )}
 
             {planningMode && hasGoal && nextStepId === item.id && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: -15,
-                  right: -15,
-                  width: 2 * checkmarkSize,
-                  height: 2 * checkmarkSize,
-                  backgroundColor: theme.palette.background.paper,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  border: `1px solid`,
-                  color: "#FFD700",
-                  pointerEvents: "auto",
-                }}
-              >
-                <PlayArrow
-                  style={{
-                    fontSize: checkmarkSize - 4,
-                    color: "#FFD700",
-                  }}
-                />
-              </div>
+              <NodeGoalPin variant="next-step" checkmarkSize={checkmarkSize} />
             )}
 
             {/* Show filled pin icon if the item is set as a goal */}
             {planningMode && isGoalNode && (
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onSetGoal) {
-                    onSetGoal();
-                  }
-                }}
-                onMouseEnter={() => setIsPinHovered(true)}
-                onMouseLeave={() => setIsPinHovered(false)}
-                style={{
-                  position: "absolute",
-                  top: -15,
-                  right: -15,
-                  width: 2 * checkmarkSize,
-                  height: 2 * checkmarkSize,
-                  backgroundColor: theme.palette.background.paper,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  pointerEvents: "auto",
-                  border: `1px solid ${isPinHovered ? "#616161" : "purple"}`,
-                }}
-              >
-                <PushPinIcon
-                  style={{
-                    fontSize: checkmarkSize - 4,
-                    color: isPinHovered ? "#9aa0a6" : "purple",
-                  }}
-                />
-              </div>
+              <NodeGoalPin
+                variant="active"
+                checkmarkSize={checkmarkSize}
+                onSetGoal={onSetGoal}
+              />
             )}
 
             <div

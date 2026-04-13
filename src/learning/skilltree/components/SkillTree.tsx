@@ -8,7 +8,7 @@ import {
 import type { Vector } from "@/utils/geometry";
 import { Drawing, Element, Curve, useDrawingMousePosition } from "@/components";
 import { Module } from "@/curriculum";
-import { NodeCard } from "./NodeCard";
+import { NodeCard } from "./SkillTreeComponents/NodeCard";
 import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
 import { useTheme } from "@mui/material/";
 import { useTransformContext } from "react-zoom-pan-pinch";
@@ -119,7 +119,12 @@ export function SkillTree({
       });
 
       const nextStepName = nextStep ? moduleItems[nextStep]?.name : null;
-      onGoalProgressChange(completedCount, totalCount, nextStepName, nextStep ?? null);
+      onGoalProgressChange(
+        completedCount,
+        totalCount,
+        nextStepName,
+        nextStep ?? null,
+      );
     }
   }, [
     goalNodeId,
@@ -232,7 +237,8 @@ export function SkillTree({
       >
         {/* The lines between skills and concepts */}
         {visiblePaths.map((connector, i) => {
-          const { strokeColor, strokeWidth, opacity } = resolveConnectorStyle(connector);
+          const { strokeColor, strokeWidth, opacity } =
+            resolveConnectorStyle(connector);
           return (
             <Curve
               key={i}

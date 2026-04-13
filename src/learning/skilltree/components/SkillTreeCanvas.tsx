@@ -5,12 +5,12 @@ import { useDebouncedFunction } from "@/utils/dom";
 import { Module } from "@/curriculum";
 import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
 import { SkillTree } from "./SkillTree";
-import { ZoomControls } from "./ZoomControls";
-import { TreeLegend } from "./TreeLegend";
-import { PlanningProgressIndicator } from "./PlanningProgressIndicator";
+import { ZoomControls } from "./SkillTreeComponents/ZoomControls";
+import { TreeLegend } from "./SkillTreeComponents/TreeLegend";
+import { PlanningProgressIndicator } from "./SkillTreeComponents/PlanningProgressIndicator";
 import { useTheme } from "@mui/material/";
 import { useSkillTreeSettingsStore } from "@/store";
-import { PlanningModeIntro } from "./PlanningModeIntro";
+import { PlanningModeIntro } from "./SkillTreeComponents/PlanningModeIntro";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
