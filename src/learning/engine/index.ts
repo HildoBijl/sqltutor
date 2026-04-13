@@ -1,4 +1,3 @@
-import type { StoredAttempt, StoredExerciseState } from '@/store';
 import type { PracticeSolution, PracticeSolutionLike } from '../types';
 
 export * from './grading';
@@ -12,6 +11,21 @@ export type ExerciseStatus =
   | 'validation-error'
   | 'incorrect'
   | 'correct';
+
+export interface StoredAttempt<Input = string> {
+  index: number;
+  input: Input;
+  normalizedInput: string;
+  status: 'invalid' | 'incorrect' | 'correct';
+  timestamp: number;
+}
+
+export interface StorableExerciseState<Exercise = unknown, Input = unknown> {
+  exercise: Exercise;
+  status: ExerciseStatus;
+  attempts: StoredAttempt<Input>[];
+  generatedAt?: number;
+}
 
 export interface ValidationResult {
   ok: boolean;
@@ -44,9 +58,6 @@ export interface ExerciseHistoryEntry<Input, Result = unknown> {
 }
 
 export type StorableExerciseAttempt<Input = unknown> = StoredAttempt<Input>;
-
-export type StorableExerciseState<Exercise = unknown, Input = unknown> =
-  StoredExerciseState<Exercise, Input>;
 
 export interface ExerciseProgress<Exercise, Input, Demo = unknown, Result = unknown>
   extends StorableExerciseState<Exercise | null, Input> {

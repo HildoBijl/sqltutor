@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { useLearningStore } from '@/store';
 import { useModuleState } from '@/learning/hooks/useModuleState';
 import type { ModuleState, ModuleType } from '@/store';
 
@@ -22,12 +23,6 @@ export interface ContentTabsState<State> {
   selectTab: (value: string) => void;
   tabs: TabConfig[];
   moduleState: State;
-  setModuleState: (
-    updater:
-      | Partial<State>
-      | State
-      | ((prev: State) => Partial<State> | State)
-  ) => void;
 }
 
 export function useContentTabs<State extends ModuleState & { tab?: string }>(
@@ -37,10 +32,8 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
   options?: UseContentTabsOptions,
 ): ContentTabsState<State> {
   const normalizedId = moduleId ?? '';
-  const [moduleState, setModuleState] = useModuleState<State>(
-    normalizedId,
-    moduleType,
-  );
+  const moduleState = useModuleState<State>(normalizedId, moduleType);
+  const setModuleTab = useLearningStore((state) => state.setModuleTab);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const tabKeys = useMemo(() => tabs.map((tab) => tab.key), [tabs]);
@@ -80,7 +73,7 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
     }
 
     if (nextTab && moduleState.tab !== nextTab) {
-      setModuleState({ tab: nextTab } as Partial<State>);
+      setModuleTab(normalizedId, moduleType, nextTab);
     }
 
     if (nextTab && normalizedTabParam !== nextTab) {
@@ -91,10 +84,12 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
   }, [
     moduleState.tab,
     currentTab,
+    moduleType,
+    normalizedId,
     normalizedTabParam,
     resolveInitialTab,
     searchParamsString,
-    setModuleState,
+    setModuleTab,
     setSearchParams,
   ]);
 
@@ -107,7 +102,7 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
       setCurrentTab(value);
 
       if (moduleState.tab !== value) {
-        setModuleState({ tab: value } as Partial<State>);
+        setModuleTab(normalizedId, moduleType, value);
       }
 
       if (normalizedTabParam !== value) {
@@ -116,7 +111,16 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
         setSearchParams(params, { replace: true });
       }
     },
-    [moduleState.tab, normalizedTabParam, searchParamsString, setModuleState, setSearchParams, tabKeys],
+    [
+      moduleState.tab,
+      moduleType,
+      normalizedId,
+      normalizedTabParam,
+      searchParamsString,
+      setModuleTab,
+      setSearchParams,
+      tabKeys,
+    ],
   );
 
   const handleTabChange = useCallback(
@@ -132,6 +136,5 @@ export function useContentTabs<State extends ModuleState & { tab?: string }>(
     selectTab,
     tabs,
     moduleState,
-    setModuleState,
   };
 }

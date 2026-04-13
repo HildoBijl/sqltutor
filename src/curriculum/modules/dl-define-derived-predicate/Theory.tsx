@@ -4,7 +4,7 @@ import { FigureExampleDLQuery } from '../../utils';
 export function Theory() {
   return <Page>
     <Section>
-      <Par>We know how to apply projection and filtering within Datalog. We can use them together to find specific data from a table. It essentially allows us to an existing predicate into a <Term>derived predicate</Term>.</Par>
+      <Par>We know how to apply projection and filtering within Datalog. We can use them together to find specific data from a table. It essentially allows us to turn an existing predicate into a <Term>derived predicate</Term>.</Par>
     </Section>
 
     <Section title="The long way: first filter, then project">

@@ -2,38 +2,22 @@
  * Learning store types.
  */
 
-import type { ExerciseAction, ExerciseStatus } from '@/learning/engine';
-
-export type ExerciseInstanceId = string;
-
-export interface StoredAttempt<Input = string> {
-  index: number;
-  input: Input;
-  normalizedInput: string;
-  status: 'invalid' | 'incorrect' | 'correct';
-  timestamp: number;
-}
-
-export interface StoredExerciseState<Exercise = unknown, Input = string> {
-  exercise: Exercise;
-  status: ExerciseStatus;
-  attempts: StoredAttempt<Input>[];
-  generatedAt?: number;
-}
+export type StoredExerciseAction = Record<string, unknown>;
+export type StoredExerciseState = Record<string, unknown>;
 
 export interface StoredExerciseEvent {
   timestamp: number;
-  action: ExerciseAction<unknown, unknown>;
+  action: StoredExerciseAction;
   resultingState: StoredExerciseState;
 }
 
 export interface StoredExerciseInstance {
-  id: ExerciseInstanceId;
-  skillId: string;
+  exerciseId: string;
+  version: number;
+  parameters: Record<string, unknown>;
   createdAt: number;
-  completedAt?: number;
-  finalStatus: ExerciseStatus;
   events: StoredExerciseEvent[];
+  draftInput: unknown;
 }
 
 interface BaseModuleState {

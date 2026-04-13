@@ -32,6 +32,7 @@ export default function SkillPage() {
 
 	const hideStories = useSettingsStore((state) => state.hideStories);
 	const modules = useLearningStore((state) => state.modules);
+	const completeSkill = useLearningStore((state) => state.completeSkill);
 	const isAdmin = useAdminMode();
 	const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 	const skillTreeHistory = useSkillTreeHistory();
@@ -66,7 +67,6 @@ export default function SkillPage() {
 		selectTab,
 		tabs,
 		moduleState,
-		setModuleState,
 	} = useContentTabs<SkillModuleState>(skillId, 'skill', availableTabs, {
 		defaultTab: 'theory',
 	});
@@ -85,7 +85,6 @@ export default function SkillPage() {
 		skillModule: hasInteractivePractice ? skillModule : null,
 		requiredCount: REQUIRED_EXERCISE_COUNT,
 		moduleState,
-		setModuleState,
 	});
 
 	const { isCompleted } = useModuleProgress(moduleList, modules);
@@ -106,7 +105,8 @@ export default function SkillPage() {
 
 	// Handle static practice completion
 	const handleStaticComplete = () => {
-		setModuleState({ understood: true });
+		if (!skillId) return;
+		completeSkill(skillId);
 		setShowCompletionDialog(true);
 	};
 

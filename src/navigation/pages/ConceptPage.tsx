@@ -43,6 +43,7 @@ export default function ConceptPage() {
   const navigate = useNavigate();
   const hideStories = useSettingsStore((state) => state.hideStories);
   const learningModules = useLearningStore((state) => state.modules);
+  const completeConcept = useLearningStore((state) => state.completeConcept);
   const isAdmin = useAdminMode();
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const skillTreeHistory = useSkillTreeHistory();
@@ -75,7 +76,6 @@ export default function ConceptPage() {
     selectTab,
     tabs,
     moduleState,
-    setModuleState,
   } = useContentTabs<ConceptModuleState>(
     conceptId,
     "concept",
@@ -124,7 +124,10 @@ export default function ConceptPage() {
   }
 
   const handleComplete = () => {
-    setModuleState({ understood: true });
+    if (!conceptId) {
+      return;
+    }
+    completeConcept(conceptId);
 
     setShowCompletionDialog(true);
   };

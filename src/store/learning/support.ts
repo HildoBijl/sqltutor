@@ -7,13 +7,13 @@ import type {
   ModuleType,
   ConceptModuleState,
   SkillModuleState,
+  StoredExerciseEvent,
+  StoredExerciseInstance,
 } from './types';
-
-export const DEFAULT_MODULE_TYPE: ModuleType = 'skill';
 
 export function createModuleState(
   id: string,
-  type: ModuleType = DEFAULT_MODULE_TYPE,
+  type: ModuleType,
 ): ModuleState {
   switch (type) {
     case 'concept':
@@ -47,45 +47,130 @@ export function coerceTimestamp(value: unknown): number | undefined {
   return Number.isNaN(asNumber) ? undefined : asNumber;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function normalizeStoredExerciseEvent(value: unknown): StoredExerciseEvent | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const timestamp = coerceTimestamp(value.timestamp);
+  if (timestamp === undefined) {
+    return null;
+  }
+
+  return {
+    timestamp,
+    action: isRecord(value.action) ? { ...value.action } : {},
+    resultingState: isRecord(value.resultingState) ? { ...value.resultingState } : {},
+  };
+}
+
+function normalizeStoredExerciseInstance(value: unknown): StoredExerciseInstance | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const exerciseIdRaw = value.exerciseId;
+  const exerciseId = typeof exerciseIdRaw === 'string' ? exerciseIdRaw.trim() : '';
+  if (!exerciseId) {
+    return null;
+  }
+
+  const version = typeof value.version === 'number' && Number.isFinite(value.version)
+    ? value.version
+    : 1;
+  const createdAt = coerceTimestamp(value.createdAt) ?? Date.now();
+  const parameters = isRecord(value.parameters) ? { ...value.parameters } : {};
+  const events = Array.isArray(value.events)
+    ? value.events
+      .map((entry) => normalizeStoredExerciseEvent(entry))
+      .filter((entry): entry is StoredExerciseEvent => entry !== null)
+    : [];
+
+  return {
+    exerciseId,
+    version,
+    parameters,
+    createdAt,
+    events,
+    draftInput: value.draftInput,
+  };
+}
+
+interface LegacyModuleShape {
+  tab?: unknown;
+  lastAccessed?: unknown;
+  understood?: unknown;
+  numSolved?: unknown;
+  exercises?: unknown;
+}
+
+function normalizeCommonModuleFields(
+  id: string,
+  state: LegacyModuleShape | undefined,
+): Pick<ModuleState, 'id' | 'tab' | 'lastAccessed' | 'understood'> {
+  return {
+    id,
+    tab: typeof state?.tab === 'string' ? state.tab : undefined,
+    lastAccessed: coerceTimestamp(state?.lastAccessed),
+    understood: state?.understood === true ? true : undefined,
+  };
+}
+
+export function normalizeConceptModuleState(
+  id: string,
+  state: Partial<ModuleState> | undefined,
+): ConceptModuleState {
+  const base = createModuleState(id, 'concept') as ConceptModuleState;
+  const common = normalizeCommonModuleFields(id, state as LegacyModuleShape | undefined);
+  return {
+    ...base,
+    ...common,
+  };
+}
+
+export function normalizeSkillModuleState(
+  id: string,
+  state: Partial<ModuleState> | undefined,
+): SkillModuleState {
+  const base = createModuleState(id, 'skill') as SkillModuleState;
+  const partialSkill = state as Partial<SkillModuleState> | undefined;
+  const common = normalizeCommonModuleFields(id, state as LegacyModuleShape | undefined);
+
+  const normalized: SkillModuleState = {
+    ...base,
+    ...common,
+    numSolved: typeof partialSkill?.numSolved === 'number' ? partialSkill.numSolved : 0,
+    exercises: Array.isArray(partialSkill?.exercises)
+      ? partialSkill.exercises
+        .map((exercise) => normalizeStoredExerciseInstance(exercise))
+        .filter((exercise): exercise is StoredExerciseInstance => exercise !== null)
+      : [],
+  };
+  return normalized;
+}
+
+function looksLikeSkillModule(state: Partial<ModuleState> & { type?: unknown }): boolean {
+  return (
+    state.type === 'skill' ||
+    typeof (state as Partial<SkillModuleState>).numSolved === 'number' ||
+    Array.isArray((state as Partial<SkillModuleState>).exercises)
+  );
+}
+
 export function normalizeModuleState(
   id: string,
   state: Partial<ModuleState> | undefined,
 ): ModuleState {
   if (!state) {
-    return createModuleState(id);
+    return createModuleState(id, 'skill');
   }
   const stateRecord = state as Partial<ModuleState> & { type?: unknown };
-  const {
-    type: _legacyType,
-    ...withoutLegacyType
-  } = stateRecord;
-  const lastAccessed = coerceTimestamp(stateRecord.lastAccessed);
-  const isSkill =
-    stateRecord.type === 'skill' ||
-    typeof (stateRecord as Partial<SkillModuleState>).numSolved === 'number' ||
-    Array.isArray((stateRecord as Partial<SkillModuleState>).exercises);
-
-  if (isSkill) {
-    const partialSkill = withoutLegacyType as Partial<SkillModuleState>;
-    const normalized: SkillModuleState = {
-      ...createModuleState(id, 'skill'),
-      ...partialSkill,
-      id,
-      lastAccessed,
-      exercises: Array.isArray(partialSkill.exercises) ? partialSkill.exercises : [],
-      numSolved: typeof partialSkill.numSolved === 'number' ? partialSkill.numSolved : 0,
-      understood: partialSkill.understood === true ? true : undefined,
-    };
-    return normalized;
+  if (looksLikeSkillModule(stateRecord)) {
+    return normalizeSkillModuleState(id, stateRecord);
   }
-
-  const partialConcept = withoutLegacyType as Partial<ConceptModuleState>;
-  const normalized: ConceptModuleState = {
-    ...createModuleState(id, 'concept'),
-    ...partialConcept,
-    id,
-    lastAccessed,
-    understood: partialConcept.understood === true ? true : undefined,
-  };
-  return normalized;
+  return normalizeConceptModuleState(id, stateRecord);
 }

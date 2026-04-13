@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   createInitialProgress,
   createSimpleExerciseReducer,
-  extractStorableState,
-  rehydrateExerciseState,
   type ExerciseAction,
+  type ExerciseAttempt,
   type ExerciseHelpers,
   type ExerciseProgress,
   type ExerciseStatus,
@@ -16,9 +15,9 @@ import {
 } from './engine';
 import { useModuleState } from '@/learning/hooks/useModuleState';
 import {
-  type ExerciseInstanceId,
+  useLearningStore,
   type SkillModuleState,
-  type StoredExerciseEvent,
+  type StoredExerciseAction,
   type StoredExerciseInstance,
   type StoredExerciseState,
 } from '@/store';
@@ -28,6 +27,10 @@ import { normalizePracticeSolution } from './utils/normalizePracticeSolution';
 const normalizeSql = (value: string) =>
   value.toLowerCase().replace(/\s+/g, ' ').trim().replace(/;$/, '');
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
 function applyTemplate(template: string, context: Record<string, unknown>): string {
   return template.replace(/{{(.*?)}}/g, (_match, token) => {
     const key = String(token).trim();
@@ -36,43 +39,82 @@ function applyTemplate(template: string, context: Record<string, unknown>): stri
   });
 }
 
-function generateInstanceId(): ExerciseInstanceId {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
 function getExerciseId(exercise: unknown): string | null {
   if (!exercise || typeof exercise !== 'object') return null;
   const id = (exercise as Record<string, unknown>).id;
   return typeof id === 'string' && id.trim().length > 0 ? id : null;
 }
 
-function getExerciseFingerprint(exercise: unknown): string {
-  const seen = new WeakSet<object>();
+function getExerciseVersion(exercise: unknown): number {
+  if (!exercise || typeof exercise !== 'object') return 1;
+  const version = (exercise as Record<string, unknown>).version;
+  return typeof version === 'number' && Number.isFinite(version) ? version : 1;
+}
 
-  const serialize = (value: unknown): string => {
-    if (value === null) return 'null';
-    if (value === undefined) return 'undefined';
-    if (Array.isArray(value)) {
-      return `[${value.map((item) => serialize(item)).join(',')}]`;
-    }
-    if (typeof value === 'object') {
-      const objectValue = value as Record<string, unknown>;
-      if (seen.has(objectValue)) {
-        return '[Circular]';
-      }
-      seen.add(objectValue);
-      const entries = Object.entries(value as Record<string, unknown>)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, nested]) => `${JSON.stringify(key)}:${serialize(nested)}`);
-      return `{${entries.join(',')}}`;
-    }
-    if (typeof value === 'string') {
-      return JSON.stringify(value);
-    }
-    return String(value);
+function getExerciseParameters(exercise: unknown): Record<string, unknown> {
+  if (!exercise || typeof exercise !== 'object') return {};
+  const parameters = (exercise as Record<string, unknown>).parameters;
+  return isRecord(parameters) ? { ...parameters } : {};
+}
+
+function hasSolvedState(state: StoredExerciseState | undefined): boolean {
+  return state?.solved === true;
+}
+
+function hasGivenUpState(state: StoredExerciseState | undefined): boolean {
+  return state?.givenUp === true;
+}
+
+function getCurrentInstance(moduleState: SkillModuleState): StoredExerciseInstance | null {
+  return moduleState.exercises[moduleState.exercises.length - 1] ?? null;
+}
+
+function applyStoredParameters(
+  exercise: unknown,
+  parameters: Record<string, unknown>,
+): unknown {
+  if (!isRecord(exercise)) {
+    return exercise;
+  }
+
+  return {
+    ...exercise,
+    ...parameters,
+    parameters: { ...parameters },
   };
+}
 
-  return serialize(exercise);
+function buildAttemptsFromEvents(instance: StoredExerciseInstance): ExerciseAttempt<string>[] {
+  const attempts: ExerciseAttempt<string>[] = [];
+
+  instance.events.forEach((event) => {
+    if (!isRecord(event.action)) {
+      return;
+    }
+
+    if (event.action.type !== 'input') {
+      return;
+    }
+
+    const input = event.action.input;
+    if (typeof input !== 'string') {
+      return;
+    }
+
+    const solved = hasSolvedState(event.resultingState);
+    attempts.push({
+      index: attempts.length,
+      input,
+      normalizedInput: normalizeSql(input),
+      status: solved ? 'correct' : 'incorrect',
+      feedback: solved
+        ? 'Great job! That answer is correct.'
+        : 'Not quite there yet. Check the requirements and try again.',
+      timestamp: event.timestamp,
+    });
+  });
+
+  return attempts;
 }
 
 export interface SkillExerciseOption {
@@ -101,7 +143,6 @@ export interface SkillExerciseModuleLike {
 }
 
 export type SkillExerciseProgress = ExerciseProgress<any, string, unknown, unknown>;
-type SkillStoredExerciseState = StoredExerciseState<any | null, string>;
 
 type Dispatch = (action: ExerciseAction<string, unknown>) => void;
 
@@ -112,15 +153,10 @@ function defaultInvalidMessage(messages?: SkillExerciseModuleLike['messages']) {
 }
 
 export function useSkillExerciseState(moduleId: string, moduleLike: SkillExerciseModuleLike | null) {
-  const [moduleState, setModuleState] = useModuleState<SkillModuleState>(moduleId, 'skill');
-  const queueModuleStateUpdate = useCallback(
-    (updater: Parameters<typeof setModuleState>[0]) => {
-      Promise.resolve().then(() => {
-        setModuleState(updater);
-      });
-    },
-    [setModuleState],
-  );
+  const moduleState = useModuleState<SkillModuleState>(moduleId, 'skill');
+  const startNewExercise = useLearningStore((state) => state.startNewExercise);
+  const submitExerciseAction = useLearningStore((state) => state.submitExerciseAction);
+  const setExerciseDraftInput = useLearningStore((state) => state.setExerciseDraftInput);
 
   const helpers = useMemo<ExerciseHelpers>(
     () => ({
@@ -208,167 +244,140 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
   const deriveSolution = exerciseConfig.deriveSolution!;
 
   const [progress, setProgress] = useState<SkillExerciseProgress>(() => createInitialProgress());
+  const progressRef = useRef(progress);
+  const moduleStateRef = useRef(moduleState);
 
-  const resolveCurrentExercise = useCallback(
-    (exercise: unknown) => {
+  useEffect(() => {
+    progressRef.current = progress;
+  }, [progress]);
+
+  useEffect(() => {
+    moduleStateRef.current = moduleState;
+  }, [moduleState]);
+
+  const currentStoredInstance = useMemo(
+    () => getCurrentInstance(moduleState),
+    [moduleState],
+  );
+
+  const resolveStoredExercise = useCallback(
+    (instance: StoredExerciseInstance): unknown => {
       if (!moduleLike?.getExerciseById) {
-        return exercise;
-      }
-
-      const exerciseId = getExerciseId(exercise);
-      if (!exerciseId) {
         return null;
       }
 
-      return moduleLike.getExerciseById(exerciseId);
-    },
-    [moduleLike],
-  );
-
-  const toPersistedExercise = useCallback(
-    (exercise: unknown) => {
-      if (!moduleLike?.getExerciseById) {
-        return exercise;
+      const baseExercise = moduleLike.getExerciseById(instance.exerciseId);
+      if (!baseExercise) {
+        return null;
       }
 
-      const exerciseId = getExerciseId(exercise);
-      if (!exerciseId) {
-        return exercise;
-      }
-
-      return { id: exerciseId };
+      return applyStoredParameters(baseExercise, instance.parameters);
     },
     [moduleLike],
-  );
-
-  const appendEvent = useCallback(
-    (instanceId: ExerciseInstanceId, action: ExerciseAction<string, unknown>, storedState: SkillStoredExerciseState) => {
-      const timestamp = Date.now();
-      const event: StoredExerciseEvent = {
-        timestamp,
-        action,
-        resultingState: storedState,
-      };
-
-      queueModuleStateUpdate((prev) => {
-        const existingIndex = prev.exercises.findIndex((exercise) => exercise.id === instanceId);
-        const current = existingIndex >= 0 ? prev.exercises[existingIndex] : {
-          id: instanceId,
-          skillId: moduleId,
-          createdAt: timestamp,
-          finalStatus: storedState.status,
-          events: [],
-        };
-
-        const updated: StoredExerciseInstance = {
-          ...current,
-          finalStatus: storedState.status === 'correct' ? 'correct' : storedState.status,
-          completedAt: storedState.status === 'correct' ? timestamp : current.completedAt,
-          events: [...current.events, event],
-        };
-
-        const exercises =
-          existingIndex >= 0
-            ? prev.exercises.map((exercise, index) => (index === existingIndex ? updated : exercise))
-            : [...prev.exercises, updated];
-
-        return {
-          ...prev,
-          exercises,
-        };
-      });
-    },
-    [moduleId, queueModuleStateUpdate],
   );
 
   const dispatch: Dispatch = useCallback(
     (action) => {
-      setProgress((prev) => {
-        const next = reducer(prev, action);
-        if (next === prev) return prev;
+      const prev = progressRef.current;
+      const next = reducer(prev, action);
+      if (next === prev) return;
 
-        const extractedState = extractStorableState<any, string, unknown, unknown>(next);
-        const storedState: SkillStoredExerciseState = {
-          ...extractedState,
-          exercise: toPersistedExercise(extractedState.exercise),
-        };
-
-        if (action.type === 'generate') {
-          const instanceId = generateInstanceId();
-          const timestamp = Date.now();
-          const event: StoredExerciseEvent = {
-            timestamp,
-            action,
-            resultingState: storedState,
+      if (action.type === 'generate') {
+        const nextExercise = next.exercise;
+        const exerciseId = getExerciseId(nextExercise) ?? 'exercise';
+        const version = getExerciseVersion(nextExercise);
+        const parameters = getExerciseParameters(nextExercise);
+        startNewExercise(moduleId, exerciseId, version, parameters);
+      } else if (action.type === 'input') {
+        const currentInstance = getCurrentInstance(moduleStateRef.current);
+        if (currentInstance) {
+          const solvedNow = next.status === 'correct';
+          const solvedBefore =
+            prev.status === 'correct' ||
+            currentInstance.events.some((event) => hasSolvedState(event.resultingState));
+          const storedAction: StoredExerciseAction = {
+            type: 'input',
+            input: action.input,
           };
-          const instance: StoredExerciseInstance = {
-            id: instanceId,
-            skillId: moduleId,
-            createdAt: timestamp,
-            finalStatus: storedState.status,
-            completedAt: storedState.status === 'correct' ? timestamp : undefined,
-            events: [event],
-          };
-
-          queueModuleStateUpdate((prevState) => ({
-            ...prevState,
-            exercises: [...prevState.exercises, instance],
-          }));
-        } else if (action.type !== 'hydrate') {
-          const currentInstance = moduleState.exercises[moduleState.exercises.length - 1];
-          if (!currentInstance) {
-            // No active instance - start a new one implicitly
-            const fallbackId = generateInstanceId();
-            appendEvent(fallbackId, action, storedState);
-          } else {
-            appendEvent(currentInstance.id, action, storedState);
-          }
+          const storedResultingState: StoredExerciseState = solvedNow ? { solved: true } : {};
+          submitExerciseAction(
+            moduleId,
+            storedAction,
+            storedResultingState,
+            solvedNow,
+            solvedNow && !solvedBefore,
+          );
         }
+      }
 
-        return next;
-      });
+      progressRef.current = next;
+      setProgress(next);
     },
-    [appendEvent, moduleId, moduleState.exercises, queueModuleStateUpdate, reducer, toPersistedExercise],
+    [moduleId, reducer, startNewExercise, submitExerciseAction],
   );
 
   useEffect(() => {
-    const instance = moduleState.exercises[moduleState.exercises.length - 1];
+    const instance = currentStoredInstance;
     if (!instance) {
-      setProgress((prev) => (prev.status === 'idle' && prev.attempts.length === 0 ? prev : createInitialProgress()));
+      const current = progressRef.current;
+      if (current.status === 'idle' && current.attempts.length === 0) {
+        return;
+      }
+      const resetProgress = createInitialProgress<any, string, unknown, unknown>();
+      progressRef.current = resetProgress;
+      setProgress(resetProgress);
       return;
     }
 
-    if (instance.events.length === 0) {
-      setProgress(createInitialProgress());
+    if (!moduleLike?.getExerciseById) {
       return;
     }
 
-    const lastEvent = instance.events[instance.events.length - 1];
-    const storedExercise = lastEvent.resultingState.exercise;
-    const latestExercise = resolveCurrentExercise(storedExercise);
-
-    if (latestExercise && moduleLike?.isExerciseValid && !moduleLike.isExerciseValid(latestExercise)) {
+    const latestExercise = resolveStoredExercise(instance);
+    if (!latestExercise) {
       dispatch({ type: 'generate' });
       return;
     }
 
-    const resolvedState = {
-      ...lastEvent.resultingState,
-      exercise: latestExercise,
-    };
+    const staleByVersion = getExerciseVersion(latestExercise) !== instance.version;
+    const staleByCustomValidator = moduleLike?.isExerciseValid
+      ? !moduleLike.isExerciseValid(latestExercise)
+      : false;
 
-    setProgress((prev) => {
-      if (
-        prev.generatedAt === resolvedState.generatedAt &&
-        prev.status === resolvedState.status &&
-        prev.attempts.length === resolvedState.attempts.length &&
-        getExerciseFingerprint(prev.exercise) === getExerciseFingerprint(resolvedState.exercise)
-      ) {
-        return prev;
-      }
-      return rehydrateExerciseState(resolvedState, exerciseConfig);
-    });
-  }, [moduleState.exercises, dispatch, exerciseConfig, moduleLike, resolveCurrentExercise]);
+    if (staleByVersion || staleByCustomValidator) {
+      dispatch({ type: 'generate' });
+      return;
+    }
+
+    const attempts = buildAttemptsFromEvents(instance);
+    const solved = instance.events.some((event) => hasSolvedState(event.resultingState));
+    const givenUp = !solved && instance.events.some((event) => hasGivenUpState(event.resultingState));
+    const status: ExerciseStatus = solved ? 'correct' : givenUp ? 'incorrect' : 'ready';
+
+    const current = progressRef.current;
+    const prevExerciseId = getExerciseId(current.exercise);
+    const sameExercise =
+      prevExerciseId === instance.exerciseId &&
+      getExerciseVersion(current.exercise) === instance.version;
+    const sameStatus = current.status === status;
+    const sameAttempts = current.attempts.length === attempts.length;
+    const sameGeneratedAt = current.generatedAt === instance.createdAt;
+
+    if (sameExercise && sameStatus && sameAttempts && sameGeneratedAt) {
+      return;
+    }
+
+    const nextProgress: SkillExerciseProgress = {
+      ...createInitialProgress(),
+      exercise: latestExercise,
+      status,
+      attempts,
+      generatedAt: instance.createdAt,
+      feedback: attempts[attempts.length - 1]?.feedback ?? null,
+    };
+    progressRef.current = nextProgress;
+    setProgress(nextProgress);
+  }, [currentStoredInstance, dispatch, moduleLike, resolveStoredExercise]);
 
   const previewValidation: ValidationPreview = useCallback(
     (input: string) => {
@@ -410,6 +419,50 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
     [dispatch],
   );
 
+  const recordGiveUp = useCallback(() => {
+    const currentInstance = getCurrentInstance(moduleStateRef.current);
+    if (!currentInstance) {
+      return;
+    }
+
+    const alreadyGivenUp = currentInstance.events.some((event) => hasGivenUpState(event.resultingState));
+    if (alreadyGivenUp) {
+      return;
+    }
+
+    submitExerciseAction(moduleId, { type: 'give-up' }, { givenUp: true }, true, false);
+    const current = progressRef.current;
+    if (current.status === 'correct') {
+      return;
+    }
+    const nextProgress: SkillExerciseProgress = {
+      ...current,
+      status: 'incorrect',
+    };
+    progressRef.current = nextProgress;
+    setProgress(nextProgress);
+  }, [moduleId, submitExerciseAction]);
+
+  const persistDraftInput = useCallback(
+    (draftInput: unknown) => {
+      if (!currentStoredInstance) {
+        return;
+      }
+      setExerciseDraftInput(moduleId, draftInput);
+    },
+    [currentStoredInstance, moduleId, setExerciseDraftInput],
+  );
+
+  const isGivenUp = useMemo(() => {
+    const currentInstance = currentStoredInstance;
+    if (!currentInstance) {
+      return false;
+    }
+
+    const lastState = currentInstance.events[currentInstance.events.length - 1]?.resultingState;
+    return hasGivenUpState(lastState) && !hasSolvedState(lastState);
+  }, [currentStoredInstance]);
+
   return {
     progress,
     status,
@@ -421,6 +474,10 @@ export function useSkillExerciseState(moduleId: string, moduleLike: SkillExercis
     dispatch,
     previewValidation,
     recordAttempt,
+    recordGiveUp,
+    setDraftInput: persistDraftInput,
+    draftInput: currentStoredInstance?.draftInput,
+    isGivenUp,
     moduleLike,
   } as const;
 }

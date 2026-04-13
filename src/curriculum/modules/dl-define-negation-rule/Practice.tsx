@@ -41,7 +41,7 @@ const exercises = [
 		problem: <Par>Find the email addresses of all users that have never bought or sold any product.</Par>,
 		solution: <>
 			<Par>We can set up two supporting predicates for users that at some point <Em>did</Em> buy or sell a product.</Par>
-			<DL>boughtSomething(b) :- transaction(_, _, b, _, _, _, _, _).<br />soldSomething(v) :- transaction(_, v, _, _, _, _, _, _, _).</DL>
+			<DL>boughtSomething(b) :- transaction(_, _, b, _, _, _, _, _).<br />soldSomething(v) :- transaction(_, v, _, _, _, _, _, _).</DL>
 			<Par>The corresponding email addresses are now found through</Par>
 			<DL>inactiveUserEmails(e) :-<br/>        account(id, _, e, _, _, _, _, _, _, _),<br/>        not boughtSomething(id),<br/>        not soldSomething(id).</DL>
 			<Par>Note that this gives all the users that both never bought something <Em>and</Em> never sold something, which is what we want.</Par>
