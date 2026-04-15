@@ -1,3 +1,53 @@
+import { Module } from "@/curriculum";
+
+export function isReadyToLearn(
+  item: Module,
+  isCompleted: (id: string) => boolean,
+): boolean {
+  const allPrerequisitesCompleted =
+    item.prerequisites?.every((preId) => isCompleted(preId)) ?? true;
+  return !isCompleted(item.id) && allPrerequisitesCompleted;
+}
+
+export function isConnectorInGoalPath(
+  connector: { from: string; to: string },
+  planningMode: boolean,
+  goalNodeId: string | null | undefined,
+  goalPrerequisites: Set<string>,
+): boolean {
+  if (!planningMode || !goalNodeId) return false;
+
+  const fromInPath =
+    goalPrerequisites.has(connector.from) || connector.from === goalNodeId;
+  const toInPath =
+    goalPrerequisites.has(connector.to) || connector.to === goalNodeId;
+
+  return fromInPath && toInPath;
+}
+
+export function resolveConnectorStyle(
+  connector: { from: string; to: string },
+  planningMode: boolean,
+  goalNodeId: string | null | undefined,
+  goalPrerequisites: Set<string>,
+  localHoveredId: string | null,
+  isCompletedFn: (id: string) => boolean,
+  moduleItems: Record<string, Module>,
+  isConnectorInHoveredPath: (connector: { from: string; to: string }) => boolean,
+) {
+  const fromCompleted = isCompletedFn(connector.from);
+  return getConnectorStyle({
+    planningMode,
+    goalNodeId,
+    isInGoalPath: isConnectorInGoalPath(connector, planningMode, goalNodeId, goalPrerequisites),
+    isInHoveredPath: isConnectorInHoveredPath(connector),
+    isSomethingHovered: !!localHoveredId,
+    fromCompleted,
+    toCompleted: isCompletedFn(connector.to),
+    isNextToLearn: isReadyToLearn(moduleItems[connector.to], isCompletedFn) && fromCompleted,
+  });
+}
+
 interface ConnectorStyleInput {
   planningMode: boolean;
   goalNodeId: string | null | undefined;

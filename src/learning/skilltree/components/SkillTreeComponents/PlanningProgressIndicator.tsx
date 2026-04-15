@@ -19,7 +19,9 @@ export function PlanningProgressIndicator({
   totalCount,
   hasGoal,
 }: PlanningProgressIndicatorProps) {
-  const nextStepModule = nextStepId ? modules[nextStepId as keyof typeof modules] : null;
+  const nextStepModule = nextStepId
+    ? modules[nextStepId as keyof typeof modules]
+    : null;
   const nextStepHref = nextStepModule
     ? `/${nextStepModule.type}/${nextStepId}`
     : null;
@@ -57,7 +59,7 @@ export function PlanningProgressIndicator({
           >
             Next Step:{" "}
             {nextStepHref ? (
-              <Link to={nextStepHref} style={{ color: "red", fontWeight: 700}}>
+              <Link to={nextStepHref} style={{ color: "red", fontWeight: 700 }}>
                 {nextStepName}
               </Link>
             ) : (

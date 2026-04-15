@@ -2,8 +2,8 @@ import { Box, Button, Tooltip } from "@mui/material";
 import { Add, Remove, Refresh, OutlinedFlag } from "@mui/icons-material";
 
 /*
-* ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
-*/
+ * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
+ */
 interface ZoomControlsProps {
   onZoomIn: (step?: number, animationTime?: number) => void;
   onZoomOut: (step?: number, animationTime?: number) => void;
@@ -15,13 +15,13 @@ interface ZoomControlsProps {
 }
 
 /*
-* ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
-*
-* @param onZoomIn - Callback function to zoom in.
-* @param onZoomOut - Callback function to zoom out.
-* @param onReset - Callback function to reset the view.
-* @param onCenter - Callback function to center the view.
-*/
+ * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
+ *
+ * @param onZoomIn - Callback function to zoom in.
+ * @param onZoomOut - Callback function to zoom out.
+ * @param onReset - Callback function to reset the view.
+ * @param onCenter - Callback function to center the view.
+ */
 export function ZoomControls({
   onZoomIn,
   onZoomOut,
@@ -31,8 +31,6 @@ export function ZoomControls({
   // onCenter,
   zoomStep = 0.15,
 }: ZoomControlsProps) {
-
-
   return (
     <Box
       sx={{
@@ -74,7 +72,7 @@ export function ZoomControls({
           variant="outlined"
           size="small"
           onClick={() => onReset()}
-          sx={{ minWidth: "40px", fontSize: '15px' }}
+          sx={{ minWidth: "40px", fontSize: "15px" }}
         >
           <Refresh fontSize="small" color="primary" />
         </Button>
@@ -84,9 +82,20 @@ export function ZoomControls({
           variant={planningMode ? "contained" : "outlined"}
           size="small"
           onClick={onTogglePlanningMode}
-          sx={{ minWidth: "40px", fontSize: '15px', ...(planningMode && { backgroundColor: "purple", borderColor: "purple", "&:hover": { backgroundColor: "#6a0dad" } }) }}
+          sx={{
+            minWidth: "40px",
+            fontSize: "15px",
+            ...(planningMode && {
+              backgroundColor: "purple",
+              borderColor: "purple",
+              "&:hover": { backgroundColor: "#6a0dad" },
+            }),
+          }}
         >
-          <OutlinedFlag fontSize="small" sx={{ color: planningMode ? "white" : "primary" }} />
+          <OutlinedFlag
+            fontSize="small"
+            sx={{ color: planningMode ? "white" : "primary" }}
+          />
         </Button>
       </Tooltip>
     </Box>
