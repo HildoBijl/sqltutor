@@ -135,7 +135,7 @@ export default function ConceptPage() {
   // Calculate in which skill tree this concept is located, preferring the tree the user came from
   const conceptTree = useMemo(() => {
     if (!conceptId) return undefined;
-    for (let i = skillTreeHistory.length - 1; i >= 0; i--) {
+    for (let i = 0; i < skillTreeHistory.length; i++) {
       const tree = getSkillTreeDefinitions().find(
         (t) => t.id === skillTreeHistory[i] && t.moduleIds.has(conceptId)
       );
