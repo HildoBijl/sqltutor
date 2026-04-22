@@ -12,7 +12,7 @@ import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useSkillContent } from '@/learning/hooks/useSkillContent';
 import { useSkillExerciseController } from '@/learning/hooks/useSkillExerciseController';
 import { useModuleProgress } from '@/learning/hooks/useModuleProgress';
-import { useAdminMode } from '@/learning/hooks/useAdminMode';
+import { useAdminMode } from '@/store/adminMode';
 import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { getBackToLearningPathFromHistory } from '@/learning/utils/skillTreeTracking';
 

@@ -4,7 +4,7 @@ import {
   // PlayArrow as PlaygroundIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAdminMode } from '@/learning/hooks/useAdminMode';
+import { useAdminMode } from '@/store/adminMode';
 import { useSkillTreeHistory } from '@/learning/hooks/useSkillTreeHistory';
 import { getSkillTreeDefinitions } from '@/learning/utils/skillTreeTracking';
 import { SettingsMenu } from './Settings';

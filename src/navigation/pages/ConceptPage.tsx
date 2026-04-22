@@ -15,10 +15,10 @@ import {
   useSkillTreeSettingsStore,
   type ConceptModuleState,
 } from "@/store";
+import { useAdminMode } from "@/store/adminMode";
 import { moduleList, type Module } from "@/curriculum";
 import { useContentTabs } from "@/learning/hooks/useContentTabs";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
-import { useAdminMode } from "@/learning/hooks/useAdminMode";
 import { useSkillTreeHistory } from "@/learning/hooks/useSkillTreeHistory";
 import { ContentHeader } from "@/learning/components/ContentHeader";
 import { ContentTabs } from "@/learning/components/ContentTabs";
