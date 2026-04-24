@@ -17,12 +17,19 @@ import {
   AdminPanelSettings,
 } from '@mui/icons-material';
 import { ColorModeContext } from '@/theme';
-import {
-  LEGACY_SKILL_TREE_HISTORY_KEY,
-  RESETTABLE_APP_STORAGE_KEYS,
-  SKILL_TREE_HISTORY_KEY,
-} from '@/storage/keys';
 import { setAdminModeEnabled, useAdminMode } from '@/store/adminMode';
+
+const RESETTABLE_STORAGE_PREFIXES = ['sqlvalley-', 'sqltutor-'] as const;
+const RESETTABLE_STORAGE_KEY_PREFIXES = ['component-'] as const;
+const RESETTABLE_STORAGE_KEYS = new Set(['admin']);
+
+function isResettableStorageKey(key: string): boolean {
+  return (
+    RESETTABLE_STORAGE_KEYS.has(key) ||
+    RESETTABLE_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix)) ||
+    RESETTABLE_STORAGE_KEY_PREFIXES.some((prefix) => key.startsWith(prefix))
+  );
+}
 
 export function SettingsMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -63,24 +70,18 @@ export function SettingsMenu() {
       for (let i = 0; i < window.localStorage.length; i++) {
         const key = window.localStorage.key(i);
         if (!key) continue;
-        if (
-          RESETTABLE_APP_STORAGE_KEYS.some((appKey) => appKey === key) ||
-          key === SKILL_TREE_HISTORY_KEY ||
-          key === LEGACY_SKILL_TREE_HISTORY_KEY ||
-          key.startsWith('component-') ||
-          key === 'admin'
-        ) {
+        if (isResettableStorageKey(key)) {
           keysToRemove.push(key);
         }
       }
       keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+      setAdminModeEnabled(false);
 
       window.location.reload();
     } catch (err) {
       console.error('Failed to reset data:', err);
       alert('Sorry, something went wrong resetting your data.');
     }
-    setAdminModeEnabled(false);
     handleClose();
   };
 

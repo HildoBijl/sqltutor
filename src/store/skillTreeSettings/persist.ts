@@ -6,7 +6,7 @@ import type { SkillTreeSettingsState } from './types';
 import {
   LEGACY_SKILL_TREE_HISTORY_KEY,
   SKILL_TREE_HISTORY_KEY,
-} from '@/storage/keys';
+} from './constants';
 
 const DEFAULT_SKILL_TREE_HISTORY = ['sql'];
 

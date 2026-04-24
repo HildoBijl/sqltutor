@@ -22,9 +22,7 @@ import { createStore, type HydrationState } from '../utils';
 import {
   LEGACY_SETTINGS_STORAGE_KEY,
   SETTINGS_STORAGE_KEY,
-} from '../../storage/keys';
-
-export { SETTINGS_STORAGE_KEY };
+} from './constants';
 
 export interface SettingsStoreState
   extends SettingsState,
