@@ -2,12 +2,11 @@
  * One-time bridge from the legacy monolithic storage key to split store keys.
  */
 
-import {
-  LEGACY_APP_STORAGE_KEY,
-  LEGACY_SPLIT_STORAGE_MIGRATION_KEY,
-  SPLIT_STORAGE_MIGRATION_KEY,
-} from '../storage/keys';
 import { asRecord } from './utils';
+
+const LEGACY_APP_STORAGE_KEY = 'sqltutor-storage';
+const LEGACY_SPLIT_STORAGE_MIGRATION_KEY = 'sqltutor-storage-migrated-v1';
+const SPLIT_STORAGE_MIGRATION_KEY = 'sqlvalley-storage-migrated-v1';
 
 type RecordValue = Record<string, unknown>;
 

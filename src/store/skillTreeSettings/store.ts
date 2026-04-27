@@ -18,9 +18,7 @@ import {
   SKILL_TREE_SETTINGS_STORE_VERSION,
 } from './version';
 import { createStore, type HydrationState } from '../utils';
-import { SKILL_TREE_STORAGE_KEY } from '../../storage/keys';
-
-export { SKILL_TREE_STORAGE_KEY };
+import { SKILL_TREE_STORAGE_KEY } from './constants';
 
 export interface SkillTreeSettingsStoreState
   extends SkillTreeSettingsState,

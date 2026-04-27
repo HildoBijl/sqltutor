@@ -15,10 +15,10 @@ import {
   useSkillTreeSettingsStore,
   type ConceptModuleState,
 } from "@/store";
+import { useAdminMode } from "@/store/adminMode";
 import { moduleList, type Module } from "@/curriculum";
 import { useContentTabs } from "@/learning/hooks/useContentTabs";
 import { useModuleProgress } from "@/learning/hooks/useModuleProgress";
-import { useAdminMode } from "@/learning/hooks/useAdminMode";
 import { useSkillTreeHistory } from "@/learning/hooks/useSkillTreeHistory";
 import { ContentHeader } from "@/learning/components/ContentHeader";
 import { ContentTabs } from "@/learning/components/ContentTabs";
@@ -135,7 +135,7 @@ export default function ConceptPage() {
   // Calculate in which skill tree this concept is located, preferring the tree the user came from
   const conceptTree = useMemo(() => {
     if (!conceptId) return undefined;
-    for (let i = skillTreeHistory.length - 1; i >= 0; i--) {
+    for (let i = 0; i < skillTreeHistory.length; i++) {
       const tree = getSkillTreeDefinitions().find(
         (t) => t.id === skillTreeHistory[i] && t.moduleIds.has(conceptId)
       );

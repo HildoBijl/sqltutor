@@ -1,10 +1,7 @@
 import { modulePositions } from '@/learning/skilltree/definitions/sql-treeDefinition';
 import { raModulePositions } from '@/learning/skilltree/definitions/ra-treeDefinition';
 import { datalogModulePositions } from '@/learning/skilltree/definitions/datalog-treeDefinitions';
-import {
-  LEGACY_SKILL_TREE_HISTORY_KEY,
-  SKILL_TREE_HISTORY_KEY,
-} from '@/storage/keys';
+import { useSkillTreeSettingsStore } from '@/store';
 
 export type SkillTreeId = 'sql' | 'ra' | 'datalog';
 
@@ -14,8 +11,6 @@ export interface SkillTreeDefinition {
   path: string;
   moduleIds: ReadonlySet<string>;
 }
-
-export const SKILL_TREE_CHANGE_EVENT = 'skill-tree-change';
 
 const DEFAULT_SKILL_TREE_HISTORY: SkillTreeId[] = ['sql'];
 
@@ -47,7 +42,7 @@ const skillTreeById = new Map<SkillTreeId, SkillTreeDefinition>(
 const isSkillTreeId = (value: unknown): value is SkillTreeId =>
   value === 'sql' || value === 'ra' || value === 'datalog';
 
-const normalizeHistory = (raw: unknown): SkillTreeId[] => {
+export const normalizeSkillTreeHistory = (raw: unknown): SkillTreeId[] => {
   const result: SkillTreeId[] = [];
   const seen = new Set<SkillTreeId>();
 
@@ -69,65 +64,25 @@ const normalizeHistory = (raw: unknown): SkillTreeId[] => {
 
 export const getSkillTreeDefinitions = () => skillTreeDefinitions;
 
-const readSkillTreeHistoryFromStorage = (): string | null => {
-  const current = window.localStorage.getItem(SKILL_TREE_HISTORY_KEY);
-  if (current !== null) {
-    return current;
-  }
-
-  const legacy = window.localStorage.getItem(LEGACY_SKILL_TREE_HISTORY_KEY);
-  if (legacy !== null) {
-    window.localStorage.setItem(SKILL_TREE_HISTORY_KEY, legacy);
-    return legacy;
-  }
-
-  return null;
-};
-
 export const getSkillTreeHistory = (): SkillTreeId[] => {
-  if (typeof window === 'undefined') {
-    return [...DEFAULT_SKILL_TREE_HISTORY];
-  }
-
-  try {
-    const stored = readSkillTreeHistoryFromStorage();
-    const parsed = stored ? JSON.parse(stored) : null;
-    return normalizeHistory(parsed);
-  } catch (error) {
-    console.warn('Failed to read skill tree history from storage.', error);
-    return [...DEFAULT_SKILL_TREE_HISTORY];
-  }
+  const history = useSkillTreeSettingsStore.getState().lastVisitedSkillTrees;
+  return normalizeSkillTreeHistory(history);
 };
 
 export const markSkillTreeVisited = (treeId: SkillTreeId): SkillTreeId[] => {
-  const history = getSkillTreeHistory();
-  const next = history.filter((id) => id !== treeId);
-  next.push(treeId);
-  const normalized = normalizeHistory(next);
-
-  if (typeof window === 'undefined') {
-    return normalized;
-  }
-
-  try {
-    window.localStorage.setItem(SKILL_TREE_HISTORY_KEY, JSON.stringify(normalized));
-    window.dispatchEvent(new Event(SKILL_TREE_CHANGE_EVENT));
-  } catch (error) {
-    console.warn('Failed to update skill tree history in storage.', error);
-  }
-
-  return normalized;
+  useSkillTreeSettingsStore.getState().markSkillTreeVisited(treeId);
+  return getSkillTreeHistory();
 };
 
 export const getBackToLearningPathFromHistory = (
   history: SkillTreeId[],
   moduleId?: string,
 ): string => {
-  const normalized = normalizeHistory(history);
-  const fallbackId = normalized[normalized.length - 1] ?? DEFAULT_SKILL_TREE_HISTORY[0];
+  const normalized = normalizeSkillTreeHistory(history);
+  const fallbackId = normalized[0] ?? DEFAULT_SKILL_TREE_HISTORY[0];
 
   if (moduleId) {
-    for (let index = normalized.length - 1; index >= 0; index -= 1) {
+    for (let index = 0; index < normalized.length; index += 1) {
       const tree = skillTreeById.get(normalized[index]);
       if (tree?.moduleIds.has(moduleId)) {
         return tree.path;

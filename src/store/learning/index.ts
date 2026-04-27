@@ -1,4 +1,4 @@
-export { useLearningStore, LEARNING_STORAGE_KEY } from './store';
+export { useLearningStore } from './store';
 export { createModuleState } from './support';
 
 export type { LearningStoreState } from './store';

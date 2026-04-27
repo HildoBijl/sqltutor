@@ -18,9 +18,7 @@ import { createStore, type HydrationState } from '../utils';
 import {
   LEGACY_LEARNING_STORAGE_KEY,
   LEARNING_STORAGE_KEY,
-} from '../../storage/keys';
-
-export { LEARNING_STORAGE_KEY };
+} from './constants';
 
 export interface LearningStoreState
   extends LearningState,
