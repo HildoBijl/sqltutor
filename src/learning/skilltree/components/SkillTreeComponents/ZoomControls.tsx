@@ -5,13 +5,12 @@ import { Add, Remove, Refresh, OutlinedFlag } from "@mui/icons-material";
  * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
  */
 interface ZoomControlsProps {
-  onZoomIn: (step?: number, animationTime?: number) => void;
-  onZoomOut: (step?: number, animationTime?: number) => void;
-  onReset: (animationTime?: number) => void;
-  onCenter: (scale?: number, animationTime?: number) => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onReset: () => void;
+  onCenter: () => void;
   planningMode?: boolean;
   onTogglePlanningMode?: () => void;
-  zoomStep?: number;
 }
 
 /*
@@ -28,8 +27,6 @@ export function ZoomControls({
   onReset,
   onTogglePlanningMode,
   planningMode,
-  // onCenter,
-  zoomStep = 0.15,
 }: ZoomControlsProps) {
   return (
     <Box
@@ -43,7 +40,6 @@ export function ZoomControls({
         gap: 1,
         backgroundColor: "background.paper",
         borderRadius: 2,
-        // boxShadow: 2,
         p: 1,
       }}
     >
@@ -51,7 +47,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={() => onZoomIn(zoomStep)}
+          onClick={() => onZoomIn()}
           sx={{ minWidth: "40px" }}
         >
           <Add fontSize="small" color="primary" />
@@ -61,7 +57,7 @@ export function ZoomControls({
         <Button
           variant="outlined"
           size="small"
-          onClick={() => onZoomOut(zoomStep)}
+          onClick={() => onZoomOut()}
           sx={{ minWidth: "40px" }}
         >
           <Remove fontSize="small" color="primary" />

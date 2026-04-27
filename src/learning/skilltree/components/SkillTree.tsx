@@ -9,8 +9,6 @@ import { NodeCard } from "./SkillTreeComponents/NodeCard";
 import { Tooltip } from "./SkillTreeComponents/Tooltip";
 import { ModulePositionMeta } from "../definitions/sql-treeDefinition";
 import { useTheme } from "@mui/material/";
-import { useTransformContext } from "react-zoom-pan-pinch";
-import { useDebouncedFunction } from "@/utils";
 import { useGoalProgress } from "../utils/calculatePrerequisites";
 import { useHoverState } from "../utils/mouseEvents";
 import { isReadyToLearn, resolveConnectorStyle } from "../utils/connectorStyle";
@@ -84,16 +82,7 @@ export function SkillTree({
     isConnectorInHoveredPath,
   } = useHoverState(moduleItems, setHoveredId);
 
-  // On changes in the zoom-pan-pinch transform state, dispatch a scroll event to update rects.
-  const { transformState } = useTransformContext();
-  const dispatchScrollEvent = useDebouncedFunction(() =>
-    window.dispatchEvent(new Event("scroll")),
-  );
-  useEffect(dispatchScrollEvent, [
-    transformState.scale,
-    transformState.positionX,
-    transformState.positionY,
-  ]);
+
 
   // Calculate prerequisites for goal node in planning mode
   const goalPrerequisites = useGoalProgress(
