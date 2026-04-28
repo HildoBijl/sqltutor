@@ -13,7 +13,7 @@ export function Tooltip({ children }: TooltipProps) {
   if (!children || !mousePosition) return null;
 
   return (
-    <Element anchor={[-1, -1]} position={mousePosition.add([20, 10])}>
+    <Element anchor={[-1, -1]} position={mousePosition.add([0, 0])}>
       <div
         style={{
           border: `1px solid ${theme.palette.divider}`,

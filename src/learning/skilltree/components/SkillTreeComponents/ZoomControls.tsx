@@ -8,7 +8,6 @@ interface ZoomControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onReset: () => void;
-  onCenter: () => void;
   planningMode?: boolean;
   onTogglePlanningMode?: () => void;
 }

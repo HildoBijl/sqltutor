@@ -146,6 +146,7 @@ export function SkillTree({
               onMouseEnter={() => handleHoverStart(item.id)}
               onMouseLeave={handleHoverEnd}
             >
+              
               <NodeCard
                 item={item}
                 positionData={modulePositions[item.id]}
@@ -166,12 +167,13 @@ export function SkillTree({
                 }}
                 nextStepId={nextStepId}
               />
+              
             </g>
           );
         })}
 
         {/* The tooltip. */}
-        <Tooltip>{tooltip}</Tooltip>
+        {/* <Tooltip>{tooltip}</Tooltip> */}
       </Drawing>
     </div>
   );

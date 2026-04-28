@@ -1,4 +1,4 @@
-import { RefObject, useState, useCallback, useRef} from "react";
+import { RefObject, useState, useCallback, useRef, useEffect } from "react";
 import { useGesture } from "@use-gesture/react";
 import type { Vector } from "@/utils/geometry";
 import { useDebouncedFunction } from "@/utils/dom";
@@ -11,8 +11,7 @@ import { PlanningProgressIndicator } from "./SkillTreeComponents/PlanningProgres
 import { useTheme } from "@mui/material/";
 import { useSkillTreeSettingsStore } from "@/store";
 import { PlanningModeIntro } from "./SkillTreeComponents/PlanningModeIntro";
-import { set } from "zod";
-import { defaultArrowHeadPullIn } from "@/components/figures/Drawing/components/svgComponents/paths/ArrowHead";
+import { useSpring, animated } from "@react-spring/web";
 
 /*
  * SkillTreeCanvas component that wraps the skill tree with zoom and pan capabilities.
@@ -62,13 +61,14 @@ export function SkillTreeCanvas({
   containerRef,
   nodeRefs,
 }: SkillTreeCanvasProps) {
-  const dispatchScrollEvent = useDebouncedFunction(() =>
-    window.dispatchEvent(new Event("scroll")),
-  );
   const [isPanning, setIsPanning] = useState(false);
 
-const planningMode = useSkillTreeSettingsStore((state) => state.planningMode[treeId] ?? false);
-const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMode);
+  const planningMode = useSkillTreeSettingsStore(
+    (state) => state.planningMode[treeId] ?? false,
+  );
+  const setPlanningMode = useSkillTreeSettingsStore(
+    (state) => state.setPlanningMode,
+  );
 
   const [goalProgress, setGoalProgress] = useState({
     completed: 0,
@@ -77,14 +77,13 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
     nextStepId: null as string | null,
   });
 
-
-// Set a goal node ID
+  // Set a goal node ID
   const goalNodeId = useSkillTreeSettingsStore(
     (state) => state.goalNodeID[treeId] ?? null,
   );
   const setGoalNodeIdInStore = useSkillTreeSettingsStore(
     (state) => state.setGoalNodeID,
-  ); 
+  );
   const setGoalNodeId = (id: string | null) => setGoalNodeIdInStore(treeId, id);
   const setHasAccessedPlanningMode = useSkillTreeSettingsStore(
     (state) => state.setHasAccessedPlanningMode,
@@ -93,170 +92,235 @@ const setPlanningMode = useSkillTreeSettingsStore((state) => state.setPlanningMo
     (state) => state.hasAccessedPlanningMode,
   );
 
-
   const [showPlanningModeModal, setShowPlanningModeModal] = useState(false);
 
   const theme = useTheme();
 
   const handleGoalProgressChange = useCallback(
-    (completed: number, total: number, nextStep: string | null, nextStepId: string | null) => {
+    (
+      completed: number,
+      total: number,
+      nextStep: string | null,
+      nextStepId: string | null,
+    ) => {
       setGoalProgress({ completed, total, nextStep, nextStepId });
     },
     [],
   );
 
-  // Implementation of the useGesture library
-  const [transform, setTransform] = useState({
+  const [style, api] = useSpring(() => ({
     x: 0,
     y: 0,
-    scale: 1
-  });
-  const transformRef = useRef(transform);
+    scale: 1,
+    config: { tension: 200, friction: 30 },
+  }));
+  const transformRef = useRef({ x: 0, y: 0, scale: 1 });
 
   const minScale = 0.3;
   const maxScale = 2;
 
+  const isOutOfBounds = (x: number, y: number, scale: number) => {
+    const containerWidth =
+      containerRef.current?.clientWidth ?? window.innerWidth;
+    const containerHeight =
+      containerRef.current?.clientHeight ?? window.innerHeight;
+    const scaledWidth = treeBounds.width * scale;
+    const scaledHeight = treeBounds.height * scale;
+
+    const minVisible = 500;
+
+    return (
+      x + scaledWidth < minVisible || // too far left
+      x > containerWidth - minVisible || // too far right
+      y + scaledHeight < minVisible || // too far up
+      y > containerHeight - minVisible // too far down
+    );
+  };
+
+  const fixTransform = (x: number, y: number, scale: number) => {
+    const containerHeight = containerRef.current?.clientHeight ?? 0;
+    const cotainerWidth = containerRef.current?.clientWidth ?? 0;
+
+    const scaledWidth = treeBounds.width * scale;
+    const scaledHeight = treeBounds.height * scale;
+
+    const margin = 1000;
+
+    const minX = -(scaledWidth - margin);
+    const maxX = cotainerWidth - margin;
+    const minY = -(scaledHeight - margin);
+    const maxY = containerHeight - margin;
+
+    return {
+      x: Math.min(maxX, Math.max(minX, x)),
+      y: Math.min(maxY, Math.max(minY, y)),
+      scale,
+    };
+  };
 
   const bind = useGesture(
     {
       onDrag: ({ offset: [x, y] }) => {
-        event?.preventDefault();
-        const next = { ...transformRef.current, x, y };
-        setTransform(next);
-        transformRef.current = next;
+        setIsPanning(true);
+        transformRef.current = { ...transformRef.current, x, y };
+        api.set({ x, y });
       },
-      onPinch: ({origin: [ox, oy], offset: [d],  event}) => {
-        event.preventDefault();
-        const fixedScale = Math.min(maxScale, Math.max(minScale, d));
-        const next = {
-          ...transformRef.current,
-          scale: fixedScale, };
-        setTransform(next);
-        transformRef.current = next;
-      }, 
-      onWheel: ({ delta : [, dy], event }) => {
+      onDragEnd: () => {
+        setIsPanning(false);
+        const { x, y, scale } = transformRef.current;
+        if (isOutOfBounds(x, y, scale)) {
+          // bounce back to center
+          const containerWidth =
+            containerRef.current?.clientWidth ?? window.innerWidth;
+          const containerHeight =
+            containerRef.current?.clientHeight ?? window.innerHeight;
+          const cx = (containerWidth - treeBounds.width) / 2;
+          const cy = (containerHeight - treeBounds.height) / 2;
+          transformRef.current = { x: cx, y: cy, scale };
+          api.start({ x: cx, y: cy }); // animated bounce
+        }
+      },
+      onPinch: ({ offset: [d] }) => {
+        event?.preventDefault();
+        const clamped = Math.min(maxScale, Math.max(minScale, d));
+        transformRef.current = { ...transformRef.current, scale: clamped };
+        api.set({ scale: clamped });
+      },
+      onWheel: ({ delta: [, dy], event }) => {
         event.preventDefault();
         const factor = dy > 0 ? 0.95 : 1.05;
-        const next = {
-          ...transformRef.current,
-          scale: Math.min(maxScale, Math.max(minScale, transformRef.current.scale * factor)),
-        };
-        setTransform(next);
-        transformRef.current = next;
+        const newScale = Math.min(
+          maxScale,
+          Math.max(minScale, transformRef.current.scale * factor),
+        );
+        transformRef.current = { ...transformRef.current, scale: newScale };
+        api.set({ scale: newScale });
       },
-    }, 
+    },
     {
       drag: {
         from: () => [transformRef.current.x, transformRef.current.y],
         filterTaps: true,
         pointer: { touch: true },
-      }, 
+      },
       pinch: {
         scaleBounds: { min: minScale, max: maxScale },
         from: () => [transformRef.current.scale, 0],
         pointer: { touch: true },
-      }, 
+      },
       wheel: {
         eventOptions: { passive: false },
-    }
-  }
-  ); 
+      },
+    },
+  );
 
   // Functions that replace zoomIn, zoomOut, resetTransform, centerView from TransformWrapper
- const zoomBy = (factor: number) => {
-  setTransform((prev) => {
-    const next = { ...prev, scale: Math.min(maxScale, Math.max(minScale, prev.scale * factor)) };
+  const zoomBy = (factor: number) => {
+    const newScale = Math.min(
+      maxScale,
+      Math.max(minScale, transformRef.current.scale * factor),
+    );
+    const next = fixTransform(
+      transformRef.current.x,
+      transformRef.current.y,
+      newScale,
+    );
     transformRef.current = next;
-    return next;
-  })
- };
+    api.start(next);
+  };
 
- const reset = () => {
-  const next = { x: 0, y: 0, scale: 1 };
-  setTransform(next);
-  transformRef.current = next;
- }
-
+  const reset = () => {
+    const containerWidth =
+      containerRef.current?.clientWidth ?? window.innerWidth;
+    const containerHeight =
+      containerRef.current?.clientHeight ?? window.innerHeight;
+    const cx = (containerWidth - treeBounds.width) / 2;
+    const cy = (containerHeight - treeBounds.height) / 2;
+    const next = { x: cx, y: cy, scale: 1 };
+    transformRef.current = next;
+    api.start(next);
+  };
 
   return (
-  <div
-    style={{
-      width: "100%",
-      height: "calc(100vh - 120px)",
-      minHeight: "600px",
-      border: `1px solid ${theme.palette.divider}`,
-      overflow: "hidden",
-      backgroundColor: theme.palette.background.paper,
-      position: "relative",
-    }}
-  >
-    {/* Zoom controls outside of the pannable area */}
-    <ZoomControls
-      onZoomIn={() => zoomBy(1.2)}
-      onZoomOut={() => zoomBy(1 / 1.2)}
-      onReset={reset}
-      onCenter={reset}
-      onTogglePlanningMode={() => {
-        if (!planningMode && !hasAccessedPlanningMode) {
-          setShowPlanningModeModal(true);
-          setHasAccessedPlanningMode(true);
-        }
-        setPlanningMode(treeId, !planningMode);
-      }}
-      planningMode={planningMode}
-    />
-    {planningMode && (
-      <PlanningProgressIndicator
-        nextStepName={goalProgress.nextStep || "All completed!"}
-        nextStepId={goalProgress.nextStepId}
-        treeId={treeId}
-        completedCount={goalProgress.completed}
-        totalCount={goalProgress.total}
-        hasGoal={!!goalNodeId}
-      />
-    )}
-    <TreeLegend />
-
-    {/* The pannable/zoomable area */}
     <div
-      {...bind()}
       style={{
         width: "100%",
-        height: "100%",
-        cursor: isPanning ? "grabbing" : "grab",
-        touchAction: "none", // critical for mobile
+        height: "calc(100vh - 120px)",
+        minHeight: "600px",
+        border: `1px solid ${theme.palette.divider}`,
+        overflow: "hidden",
+        backgroundColor: theme.palette.background.paper,
+        position: "relative",
       }}
     >
+      {/* Zoom controls outside of the pannable area */}
+      <ZoomControls
+        onZoomIn={() => zoomBy(1.2)}
+        onZoomOut={() => zoomBy(1 / 1.2)}
+        onReset={reset}
+        onTogglePlanningMode={() => {
+          if (!planningMode && !hasAccessedPlanningMode) {
+            setShowPlanningModeModal(true);
+            setHasAccessedPlanningMode(true);
+          }
+          setPlanningMode(treeId, !planningMode);
+        }}
+        planningMode={planningMode}
+      />
+      {planningMode && (
+        <PlanningProgressIndicator
+          nextStepName={goalProgress.nextStep || "All completed!"}
+          nextStepId={goalProgress.nextStepId}
+          treeId={treeId}
+          completedCount={goalProgress.completed}
+          totalCount={goalProgress.total}
+          hasGoal={!!goalNodeId}
+        />
+      )}
+      <TreeLegend />
+
+      {/* The pannable/zoomable area */}
       <div
+        {...bind()}
         style={{
-          transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
-          transformOrigin: "0 0",
-          willChange: "transform",
+          width: "100%",
+          height: "100%",
+          cursor: isPanning ? "grabbing" : "grab",
+          touchAction: "none", // critical for mobile
         }}
       >
-        <SkillTree
-          moduleItems={moduleItems}
-          modulePositions={modulePositions}
-          treeBounds={treeBounds}
-          visiblePaths={visiblePaths}
-          isCompleted={isCompleted}
-          getProgress={getProgress}
-          setHoveredId={setHoveredId}
-          containerRef={containerRef}
-          nodeRefs={nodeRefs}
-          planningMode={planningMode}
-          goalNodeId={goalNodeId}
-          setGoalNodeId={setGoalNodeId}
-          onGoalProgressChange={handleGoalProgressChange}
-          nextStepId={goalProgress.nextStepId}
-        />
+        <animated.div
+          style={{
+            x: style.x,
+            y: style.y,
+            scale: style.scale,
+            transformOrigin: "0 0",
+            willChange: "transform",
+          }}
+        >
+          <SkillTree
+            moduleItems={moduleItems}
+            modulePositions={modulePositions}
+            treeBounds={treeBounds}
+            visiblePaths={visiblePaths}
+            isCompleted={isCompleted}
+            getProgress={getProgress}
+            setHoveredId={setHoveredId}
+            containerRef={containerRef}
+            nodeRefs={nodeRefs}
+            planningMode={planningMode}
+            goalNodeId={goalNodeId}
+            setGoalNodeId={setGoalNodeId}
+            onGoalProgressChange={handleGoalProgressChange}
+            nextStepId={goalProgress.nextStepId}
+          />
+        </animated.div>
       </div>
-    </div>
 
-    <PlanningModeIntro
-      open={showPlanningModeModal}
-      onClose={() => setShowPlanningModeModal(false)}
-    />
-  </div>
-);
+      <PlanningModeIntro
+        open={showPlanningModeModal}
+        onClose={() => setShowPlanningModeModal(false)}
+      />
+    </div>
+  );
 }
