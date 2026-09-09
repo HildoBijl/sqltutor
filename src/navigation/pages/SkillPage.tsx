@@ -26,13 +26,11 @@ import { SkillCompletionDialog } from '@/learning/components/SkillCompletionDial
 import { StoryTab, SummaryTab, TheoryTab, VideoTab } from '@/learning/components/TabContent/ContentTab';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
 import { useSkillContent } from '@/curriculum/hooks/useSkillContent';
-import { useModuleProgress } from '@/learning/progress';
+import { DEFAULT_EXERCISES_TO_COMPLETE, useModuleProgress } from '@sqlvalley/progress';
 import { ExerciseManager } from '@sqlvalley/exercise-engine';
 import { useAdminMode } from '@/store/adminMode';
 
 import type { TabConfig } from '@/learning/types';
-
-const REQUIRED_EXERCISE_COUNT = 3;
 
 export default function SkillPage() {
   const { skillId } = useParams<{ skillId: string }>();
@@ -92,7 +90,9 @@ export default function SkillPage() {
   const hasInteractivePractice = Boolean(exerciseDefinitions?.length);
   const hasPractice = hasStaticPractice || hasInteractivePractice;
 
-  const { isCompleted } = useModuleProgress(skillTree);
+  const moduleStates = useLearningStore((state) => state.modules);
+
+  const { isCompleted } = useModuleProgress(skillTree, moduleStates);
   const isSkillMastered = skillId ? isCompleted(skillId) : false;
   const summaryUnlocked = isSkillMastered || isAdmin;
 
@@ -117,8 +117,8 @@ export default function SkillPage() {
   const prevSolvedRef = useRef(moduleState.numSolved ?? 0);
   useEffect(() => {
     const solved = moduleState.numSolved ?? 0;
-    const crossed = prevSolvedRef.current < REQUIRED_EXERCISE_COUNT &&
-      solved >= REQUIRED_EXERCISE_COUNT;
+    const crossed = prevSolvedRef.current < DEFAULT_EXERCISES_TO_COMPLETE &&
+      solved >= DEFAULT_EXERCISES_TO_COMPLETE;
     prevSolvedRef.current = solved;
     if (crossed) setShowCompletionDialog(true);
   }, [moduleState.numSolved]);
@@ -156,7 +156,7 @@ export default function SkillPage() {
     hasInteractivePractice && currentTab === 'practice'
       ? {
           current: moduleState.numSolved ?? 0,
-          required: REQUIRED_EXERCISE_COUNT,
+          required: DEFAULT_EXERCISES_TO_COMPLETE,
         }
       : undefined;
 

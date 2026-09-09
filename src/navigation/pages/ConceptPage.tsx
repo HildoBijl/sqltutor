@@ -34,8 +34,12 @@ import {
   VideoTab,
 } from '@/learning/components/TabContent/ContentTab';
 import { useContentTabs } from '@/learning/hooks/useContentTabs';
-import { useModuleProgress } from '@/learning/progress';
-import { getPrerequisites } from '@sqlvalley/skill-tree-definition';
+import { useModuleProgress } from '@sqlvalley/progress';
+import {
+  arePrerequisitesCompleted,
+  getGoalPath,
+  isReadyToLearn,
+} from '@sqlvalley/skill-tree-definition';
 import type { TabConfig } from '@/learning/types';
 
 export default function ConceptPage() {
@@ -90,7 +94,9 @@ export default function ConceptPage() {
     },
   );
 
-  const { isCompleted: isModuleCompleted } = useModuleProgress(skillTree);
+  const moduleStates = useLearningStore((state) => state.modules);
+
+  const { isCompleted: isModuleCompleted } = useModuleProgress(skillTree, moduleStates);
   const isCompleted = conceptId
     ? isModuleCompleted(conceptId)
     : (moduleState.understood ?? false);
@@ -127,8 +133,8 @@ export default function ConceptPage() {
     conceptTree ? (state.goalNodeID[conceptTree.id] ?? null) : null,
   );
 
-  const prerequisitesOfGoal = useMemo(
-    () => (goalNodeID ? getPrerequisites(skillTree, goalNodeID) : new Set<string>()),
+  const goalPath = useMemo(
+    () => (goalNodeID ? getGoalPath(skillTree, goalNodeID) : new Set<string>()),
     [goalNodeID],
   );
 
@@ -137,18 +143,14 @@ export default function ConceptPage() {
     ? (skillTree[conceptId]?.followUps ?? []).filter((id) => treeModuleIds.has(id))
     : [];
   const allPrereqsDone = (id: string) =>
-    skillTree[id]?.prerequisites?.every((prereqId) => isModuleCompleted(prereqId)) ?? true;
+    arePrerequisitesCompleted(skillTree, id, isModuleCompleted);
 
   const nextUp = goalNodeID
     ? (() => {
-        if (!isModuleCompleted(goalNodeID) && allPrereqsDone(goalNodeID)) {
+        if (isReadyToLearn(skillTree, goalNodeID, isModuleCompleted)) {
           return [goalNodeID];
         }
-        return allFollowUps.filter(
-          (id) =>
-            (prerequisitesOfGoal.has(id) || id === goalNodeID) &&
-            allPrereqsDone(id),
-        );
+        return allFollowUps.filter((id) => goalPath.has(id) && allPrereqsDone(id));
       })()
     : allFollowUps.filter(allPrereqsDone);
 

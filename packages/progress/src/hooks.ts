@@ -1,18 +1,17 @@
 import { useCallback, useMemo } from 'react';
 
 import { getModules, type SkillTree } from '@sqlvalley/skill-tree-definition';
-import { useLearningStore } from '@/store';
 
 import {
   getRawModuleCompletion,
   processModuleCompletion,
 } from './logic';
+import type { ModuleProgressState } from './types';
 
 function useRawModuleCompletion<Id extends string>(
   skillTree: SkillTree<Id>,
+  moduleStates: Record<string, ModuleProgressState>,
 ) {
-  const moduleStates = useLearningStore((state) => state.modules);
-
   return useMemo(
     () => getRawModuleCompletion(skillTree, moduleStates),
     [skillTree, moduleStates],
@@ -21,8 +20,9 @@ function useRawModuleCompletion<Id extends string>(
 
 export function useModuleCompletion<Id extends string>(
   skillTree: SkillTree<Id>,
+  moduleStates: Record<string, ModuleProgressState>,
 ) {
-  const rawCompletion = useRawModuleCompletion(skillTree);
+  const rawCompletion = useRawModuleCompletion(skillTree, moduleStates);
 
   return useMemo(
     () => processModuleCompletion(skillTree, rawCompletion),
@@ -32,6 +32,7 @@ export function useModuleCompletion<Id extends string>(
 
 export function useModuleProgress<Id extends string>(
   skillTree: SkillTree<Id>,
+  moduleStates: Record<string, ModuleProgressState>,
 ) {
   const modules = useMemo(() => getModules(skillTree), [skillTree]);
   const concepts = useMemo(
@@ -42,7 +43,7 @@ export function useModuleProgress<Id extends string>(
     () => modules.filter((module) => module.type === 'skill'),
     [modules],
   );
-  const processed = useModuleCompletion(skillTree);
+  const processed = useModuleCompletion(skillTree, moduleStates);
 
   const isCompleted = useCallback(
     (id: Id) => processed.completed.has(id),

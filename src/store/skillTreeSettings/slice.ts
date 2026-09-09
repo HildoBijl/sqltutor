@@ -13,6 +13,7 @@ export const initialSkillTreeSettingsState: SkillTreeSettingsState = {
   hasAccessedPlanningMode: false,
   planningMode: {},
   lastVisitedSkillTrees: [],
+  hasSeenSkillTreeIntro: false,
 };
 
 export interface SkillTreeSettingsActions {
@@ -21,6 +22,7 @@ export interface SkillTreeSettingsActions {
   setHasAccessedPlanningMode: (accessed: boolean) => void;
   setPlanningMode: (treeId: string, planningMode: boolean) => void;
   markSkillTreeVisited: (treeId: string) => void;
+  setHasSeenSkillTreeIntro: (seen: boolean) => void;
 }
 
 export function createSkillTreeSettingsActions(set: SetState<SkillTreeSettingsState>): SkillTreeSettingsActions {
@@ -46,5 +48,6 @@ export function createSkillTreeSettingsActions(set: SetState<SkillTreeSettingsSt
         ],
       }));
     },
+    setHasSeenSkillTreeIntro: (seen) => set({ hasSeenSkillTreeIntro: seen }),
   };
 }

@@ -1,28 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { Container } from '@mui/material';
 import { skillTree } from '@/curriculum';
-import {
-  datalogTreeHeight,
-  datalogTreeWidth,
-  raTreeHeight,
-  raTreeWidth,
-  sqlTreeHeight,
-  sqlTreeWidth,
-  type SkillTreeVisualizationId,
-} from '@/curriculum/skillTreeVisualizations';
-import { useModuleProgress } from '@/learning/progress';
+import type { SkillTreeVisualizationId } from '@/curriculum/skillTreeVisualizations';
+import { useModuleProgress } from '@sqlvalley/progress';
 import {
   SkillTreeCanvas,
   useTreeBounds,
   type SkillTreeCanvasProps,
 } from '@sqlvalley/skill-tree';
-import { useSkillTreeSettingsStore } from '@/store';
-
-const treeDimensions: Record<SkillTreeVisualizationId, { width: number; height: number }> = {
-  sql: { width: sqlTreeWidth, height: sqlTreeHeight },
-  ra: { width: raTreeWidth, height: raTreeHeight },
-  datalog: { width: datalogTreeWidth, height: datalogTreeHeight },
-};
+import { useSkillTreeSettingsStore, useLearningStore } from '@/store';
 
 interface SkillTreeOverviewPageProps {
   treeId: SkillTreeVisualizationId;
@@ -35,10 +21,6 @@ export function SkillTreeOverviewPage({
   modulePositions,
   visiblePaths,
 }: SkillTreeOverviewPageProps) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const markSkillTreeVisited = useSkillTreeSettingsStore(
     (state) => state.markSkillTreeVisited,
   );
@@ -47,9 +29,10 @@ export function SkillTreeOverviewPage({
     markSkillTreeVisited(treeId);
   }, [markSkillTreeVisited, treeId]);
 
-  const { isCompleted, getProgress } = useModuleProgress(skillTree);
-  const { width, height } = treeDimensions[treeId];
-  const treeBounds = useTreeBounds(width, height);
+  const moduleStates = useLearningStore((state) => state.modules);
+
+  const { isCompleted } = useModuleProgress(skillTree, moduleStates);
+  const treeBounds = useTreeBounds(modulePositions);
 
   const planningMode = useSkillTreeSettingsStore(
     (s) => s.planningMode[treeId] ?? false,
@@ -68,19 +51,25 @@ export function SkillTreeOverviewPage({
     (s) => s.setHasAccessedPlanningMode,
   );
 
+  const hasSeenSkillTreeIntro = useSkillTreeSettingsStore(
+    (s) => s.hasSeenSkillTreeIntro,
+  );
+  const setHasSeenSkillTreeIntro = useSkillTreeSettingsStore(
+    (s) => s.setHasSeenSkillTreeIntro,
+  );
+
   const hideLegend = useSkillTreeSettingsStore((s) => s.hideLegend);
   const setHideLegend = useSkillTreeSettingsStore((s) => s.setHideLegend);
+  const hasHydrated = useSkillTreeSettingsStore((s) => s._hasHydrated);
 
   return (
     <Container maxWidth={false} sx={{ py: 4, maxWidth: '1400px' }}>
       <SkillTreeCanvas
-        treeId={treeId}
         skillTree={skillTree}
         modulePositions={modulePositions}
         treeBounds={treeBounds}
         visiblePaths={visiblePaths}
         isCompleted={isCompleted}
-        getProgress={getProgress}
         memoryStoreAPI={{
           planningMode,
           setPlanningMode: (value) => setPlanningMode(treeId, value),
@@ -88,13 +77,12 @@ export function SkillTreeOverviewPage({
           setGoalNodeId: (id) => setGoalNodeId(treeId, id),
           hasAccessedPlanningMode,
           setHasAccessedPlanningMode,
+          hasSeenSkillTreeIntro,
+          setHasSeenSkillTreeIntro,
           hideLegend,
           setHideLegend,
+          hasHydrated,
         }}
-        hoveredId={hoveredId}
-        setHoveredId={setHoveredId}
-        containerRef={containerRef}
-        nodeRefs={nodeRefs}
         settings={{
           allowZoom: true,
           initialZoom: 1,

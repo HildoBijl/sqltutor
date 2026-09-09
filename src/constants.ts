@@ -9,6 +9,3 @@ export const THEME_COLORS = {
   success: '#98bc37',
   error: '#e73636',
 } as const;
-
-// Required exercises to complete a skill
-export const EXERCISES_TO_COMPLETE = 3;

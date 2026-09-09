@@ -1,5 +1,6 @@
 import { Box, Button, Tooltip } from "@mui/material";
-import { Add, Remove, Refresh, OutlinedFlag } from "@mui/icons-material";
+import { Add, Remove, Refresh, OutlinedFlag, HelpOutline} from "@mui/icons-material";
+import { treeColors } from "../../utils/graphics/treeColors";
 
 /*
  * ZoomControls component that provides buttons for zooming in, zooming out, resetting the view, and centering the view.
@@ -12,6 +13,7 @@ interface ZoomControlsProps {
   planningMode?: boolean;
   onTogglePlanningMode?: () => void;
   allowZoom?: boolean;
+  onHelp?: () => void;
 }
 
 /*
@@ -21,16 +23,18 @@ interface ZoomControlsProps {
  * @param onZoomOut - Callback function to zoom out.
  * @param onReset - Callback function to reset the view.
  * @param onCenter - Callback function to center the view.
+ * @param onHelp - Callback function to show instructions.
  */
 export function ZoomControls({
   onZoomIn,
   onZoomOut,
   onReset,
   onTogglePlanningMode,
+  onHelp,
   planningMode,
   allowZoom = true,
 }: ZoomControlsProps) {
-  if (!allowZoom && !onTogglePlanningMode) return null;
+  if (!allowZoom && !onTogglePlanningMode && !onHelp) return null;
 
   return (
     <Box
@@ -91,9 +95,9 @@ export function ZoomControls({
               minWidth: "40px",
               fontSize: "15px",
               ...(planningMode && {
-                backgroundColor: "purple",
-                borderColor: "purple",
-                "&:hover": { backgroundColor: "#6a0dad" },
+                backgroundColor: treeColors.goal,
+                borderColor: treeColors.goal,
+                "&:hover": { backgroundColor: treeColors.goalHover },
               }),
             }}
           >
@@ -101,6 +105,18 @@ export function ZoomControls({
               fontSize="small"
               sx={{ color: planningMode ? "white" : "primary" }}
             />
+          </Button>
+        </Tooltip>
+      )}
+      {onHelp && (
+        <Tooltip title="Help" placement="left">
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={onHelp}
+            sx={{ minWidth: "40px", fontSize: "15px" }}
+          >
+            <HelpOutline fontSize="small" color="primary" />
           </Button>
         </Tooltip>
       )}

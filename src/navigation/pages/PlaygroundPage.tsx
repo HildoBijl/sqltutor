@@ -18,8 +18,8 @@ import {
   Download,
   Refresh,
 } from '@mui/icons-material';
-import { SQLEditor, DataTable } from '@sqlvalley/ui';
-import { usePlaygroundDatabase } from '@/learning/databases';
+import { SQLEditor, DataTable } from '@sqlvalley/sql';
+import { usePlaygroundDatabase } from '@sqlvalley/sql/databases';
 
 interface QueryHistory {
   query: string;

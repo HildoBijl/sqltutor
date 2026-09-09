@@ -6,7 +6,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { EditorView } from '@codemirror/view';
 
-import { ExerciseSection } from '@/learning/components/ExerciseSection';
+import { ExerciseSection } from '@sqlvalley/ui';
 
 interface PracticeSolution {
   query: string;

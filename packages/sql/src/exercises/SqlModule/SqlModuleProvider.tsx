@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { ModuleContextProvider } from '@sqlvalley/exercise-engine';
-import { useDatabase } from '@/learning/databases';
-import { useSettingsStore } from '@/store';
-import type { DatasetSize, TableKey } from '@/mockData';
+import { useDatabase } from '../../databases';
+import type { DatasetSize, TableKey } from '@sqlvalley/mock-data';
 
 import {
   normalizeSqlInput,
@@ -22,6 +21,8 @@ const SMALL_DATASET_WARNING =
 interface SqlModuleProviderProps {
   skillId: string;
   tables: TableKey[];
+  datasetSize: DatasetSize;
+  setDatasetSize: (size: DatasetSize) => void;
   children: ReactNode;
 }
 
@@ -30,9 +31,9 @@ interface SqlModuleProviderProps {
  * query runtime, provided to the exercises as their moduleContext. Persists across
  * exercise variants so the databases are not rebuilt on every "next".
  */
-export function SqlModuleProvider({ skillId, tables, children }: SqlModuleProviderProps) {
-  const datasetSize = useSettingsStore((state) => state.practiceDatasetSize);
-  const setPracticeDatasetSize = useSettingsStore((state) => state.setPracticeDatasetSize);
+export function SqlModuleProvider({
+  skillId, tables, datasetSize, setDatasetSize, children,
+}: SqlModuleProviderProps) {
   const displayDatabase = useDatabase({
     tables, size: datasetSize, cacheKey: `${skillId}:display`, resetOnSchemaChange: true,
   });
@@ -182,7 +183,7 @@ export function SqlModuleProvider({ skillId, tables, children }: SqlModuleProvid
     datasetSize,
     datasetWarning,
     executeLiveQuery,
-    setDatasetSize: setPracticeDatasetSize,
+    setDatasetSize,
     grade,
   }), [
     dbReady,
@@ -194,7 +195,7 @@ export function SqlModuleProvider({ skillId, tables, children }: SqlModuleProvid
     datasetSize,
     datasetWarning,
     executeLiveQuery,
-    setPracticeDatasetSize,
+    setDatasetSize,
     grade,
   ]);
 

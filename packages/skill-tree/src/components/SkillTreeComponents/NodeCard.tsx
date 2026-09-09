@@ -1,4 +1,3 @@
-import type { MouseEvent } from 'react';
 import { ButtonBase, useTheme } from '@mui/material/';
 import { Element, Rectangle } from '@sqlvalley/ui';
 import type { Module } from '@sqlvalley/skill-tree-definition';
@@ -7,6 +6,7 @@ import { NodeCompletedMark } from './Icons/NodeCompletedMark';
 import { NodeGoalPin } from './Icons/NodeGoalPin';
 import { NodeIconBadge } from './Icons/NodeIconBadge';
 import { getNodeStyle } from '../../utils/graphics/nodeStyle';
+import { treeColors } from '../../utils/graphics/treeColors';
 import type { ModulePositionMeta } from '../../utils/positionProcessing';
 import { cardHeight, cardWidth } from '../../utils/settings';
 
@@ -22,7 +22,6 @@ interface NodeCardProps {
   readyToLearn?: boolean;
   isPrerequisite?: boolean;
   isSomethingHovered?: boolean;
-  onClick?: () => void;
   planningMode?: boolean;
   hasGoal?: boolean;
   isGoalNode?: boolean;
@@ -30,6 +29,7 @@ interface NodeCardProps {
   onSetGoal?: () => void;
   nextStepId?: string | null;
   staticMode?: boolean;
+  isSelected?: boolean;
 }
 
 export function NodeCard({
@@ -40,7 +40,6 @@ export function NodeCard({
   readyToLearn = false,
   isPrerequisite = false,
   isSomethingHovered = false,
-  onClick,
   planningMode = false,
   hasGoal = false,
   isGoalNode = false,
@@ -48,17 +47,13 @@ export function NodeCard({
   onSetGoal,
   nextStepId,
   staticMode = false,
+  isSelected = false,
 }: NodeCardProps) {
   const theme = useTheme();
   const type = item.type;
   const cornerRadius = type === 'concept' ? 4 : 12;
 
-  const handleClick = (event: MouseEvent) => {
-    event.preventDefault();
-    setTimeout(() => {
-      onClick?.();
-    }, 200);
-  };
+ 
 
   const rectStart = new Vector(
     positionData.position.x - cardWidth / 2,
@@ -84,6 +79,7 @@ export function NodeCard({
     isPrerequisite,
     theme,
     staticMode,
+    isSelected,
   });
 
   return (
@@ -117,7 +113,6 @@ export function NodeCard({
         style={{ opacity: nodeOpacity }}
       >
         <ButtonBase
-          onClick={handleClick}
           focusRipple
           centerRipple
           sx={{
@@ -131,7 +126,7 @@ export function NodeCard({
             cursor: 'pointer',
             borderRadius: `${cornerRadius}px`,
             '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              backgroundColor: 'action.hover',
             },
           }}
           TouchRippleProps={{
@@ -186,7 +181,10 @@ export function NodeCard({
                 textAlign: 'center',
                 fontWeight: 500,
                 fontSize: '17px',
-                color: planningMode && isGoalNode ? '#ffffff' : '#000000',
+                color:
+                  planningMode && isGoalNode
+                    ? treeColors.goalContrastText
+                    : theme.palette.text.primary,
               }}
             >
               {item.name}

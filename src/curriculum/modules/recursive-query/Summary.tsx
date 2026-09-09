@@ -1,7 +1,7 @@
 import { Page, Section, Par, Quote, List, Info, Term, Em, M } from '@sqlvalley/ui';
 
-import { useQueryResult } from '@sqlvalley/ui/sql/sqljs';
-import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@sqlvalley/sql/sqljs';
+import { useTheorySampleDatabase } from '@sqlvalley/sql/databases';
 
 export function Summary() {
   const db = useTheorySampleDatabase();

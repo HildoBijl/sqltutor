@@ -1,22 +1,18 @@
-import type { TouchEvent } from 'react';
-import { useRef, useState } from 'react';
-import { useLongPress } from 'react-use';
+import { useState } from 'react';
 import type { Module } from '@sqlvalley/skill-tree-definition';
 import { getPrerequisites } from '@sqlvalley/skill-tree-definition';
 
 export function useHoverState(
   skillTree: Record<string, Module>,
-  setHoveredId: (id: string | null) => void,
+  onNavigate: (id: string) => void,
 ) {
   const [localHoveredId, setLocalHoveredId] = useState<string | null>(null);
   const [prerequisites, setPrerequisites] = useState<Set<string>>(new Set());
   const [tooltip, setTooltip] = useState<string | null>(null);
-  const [isLongPressing, setIsLongPressing] = useState(false);
-  const longPressTargetId = useRef<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const handleHoverStart = (id: string) => {
     setLocalHoveredId(id);
-    setHoveredId(id);
     const chain = getPrerequisites(skillTree, id);
     setPrerequisites(chain);
 
@@ -25,41 +21,30 @@ export function useHoverState(
   };
 
   const handleHoverEnd = () => {
-    if (isLongPressing) return;
     setLocalHoveredId(null);
-    setHoveredId(null);
     setPrerequisites(new Set());
     setTooltip(null);
-    longPressTargetId.current = null;
   };
 
-  const handleLongPressEnd = () => {
-    if (!isLongPressing) return;
-    setIsLongPressing(false);
-    setLocalHoveredId(null);
-    setHoveredId(null);
-    setPrerequisites(new Set());
-    setTooltip(null);
-    longPressTargetId.current = null;
+  const handlePointerDown = (id: string, e: React.PointerEvent, skipToNavigate = false) => {
+    if (e.pointerType === 'mouse' || skipToNavigate) {
+      onNavigate(id);
+      return;
+    }
+    if (selectedId === id) {
+      onNavigate(id);
+      setSelectedId(null);
+      handleHoverEnd();
+    } else {
+      setSelectedId(id);
+      handleHoverStart(id);
+    }
+  }
+
+  const handlePointerOutside = () => {
+    setSelectedId(null);
+    handleHoverEnd();
   };
-
-  const longPressHandlers = useLongPress(
-    () => {
-      if (longPressTargetId.current !== null) {
-        setIsLongPressing(true);
-        handleHoverStart(longPressTargetId.current);
-      }
-    },
-    { isPreventDefault: false, delay: 500 },
-  );
-
-  const getLongPressProps = (id: string) => ({
-    ...longPressHandlers,
-    onTouchStart: (event: TouchEvent) => {
-      longPressTargetId.current = id;
-      longPressHandlers.onTouchStart(event);
-    },
-  });
 
   const isConnectorInHoveredPath = (connector: {
     from: string;
@@ -78,11 +63,11 @@ export function useHoverState(
     localHoveredId,
     prerequisites,
     tooltip,
-    isLongPressing,
+    selectedId,
     handleHoverStart,
     handleHoverEnd,
-    handleLongPressEnd,
-    getLongPressProps,
     isConnectorInHoveredPath,
+    handlePointerDown,
+    handlePointerOutside,
   };
 }

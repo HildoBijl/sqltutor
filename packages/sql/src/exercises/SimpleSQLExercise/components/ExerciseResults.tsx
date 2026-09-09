@@ -3,9 +3,10 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Box, Button, Collapse, Divider, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
-import { DataTable, Warning } from '@sqlvalley/ui';
-import { ExerciseSection } from '@/learning/components/ExerciseSection';
-import type { DatasetSize } from '@/mockData';
+import { Warning } from '@sqlvalley/ui';
+import { DataTable } from '../../../components';
+import { ExerciseSection } from '@sqlvalley/ui';
+import type { DatasetSize } from '@sqlvalley/mock-data';
 import type { SqlQueryResult } from '@sqlvalley/sql-grading';
 
 interface ExerciseResultsProps {

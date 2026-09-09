@@ -1,4 +1,5 @@
-import { Page, Par, Section, Warning, Term, Em, ISQL } from '@sqlvalley/ui';
+import { Page, Par, Section, Warning, Term, Em } from '@sqlvalley/ui';
+import { ISQL } from '@sqlvalley/sql';
 
 import { FigureSingleTable, FigureExampleQuery } from '@/curriculum/utils/queryFigures';
 

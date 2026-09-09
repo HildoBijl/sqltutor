@@ -1,7 +1,7 @@
-import { useThemeColor } from '@/theme';
+import { useThemeColor } from '@sqlvalley/ui';
 import { Page, Section, Par, Info } from '@sqlvalley/ui';
 import { Drawing, Element } from '@sqlvalley/ui';
-import { ISQL } from '@sqlvalley/ui';
+import { ISQL } from '@sqlvalley/sql';
 
 import { FigureExampleQuery } from '@/curriculum/utils/queryFigures';
 

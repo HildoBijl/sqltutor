@@ -1,4 +1,5 @@
 import type { Theme } from '@mui/material/styles';
+import { treeColors } from './treeColors';
 
 interface NodeStyleInput {
   planningMode: boolean;
@@ -12,6 +13,7 @@ interface NodeStyleInput {
   isPrerequisite: boolean;
   theme: Theme;
   staticMode?: boolean;
+  isSelected?: boolean;
 }
 
 interface NodeStyle {
@@ -32,9 +34,10 @@ export function getNodeStyle({
   isSomethingHovered,
   isPrerequisite,
   theme,
-  staticMode = false
+  staticMode = false,
+  isSelected = false
 }: NodeStyleInput): NodeStyle {
-  const fillColor = isGoalNode ? 'purple' : theme.palette.background.paper;
+  const fillColor = isGoalNode ? treeColors.goal : theme.palette.background.paper;
 
   if (staticMode) {
     return {
@@ -46,32 +49,37 @@ export function getNodeStyle({
   }
 
   if (planningMode) {
-    const prominent = isGoalNode || isOnGoalPath || isHovered;
-    const nodeOpacity = prominent || !hasGoal ? 1.0 : 0.15;
-    const strokeWidth = isGoalNode || isHovered ? 2 : 1;
+    const highlighted = isHovered || isPrerequisite || isSelected;
+    const dimmedByHover = isSomethingHovered && !highlighted && !isGoalNode;
+
+    const prominent = isGoalNode || isOnGoalPath || highlighted || !hasGoal;
+    const nodeOpacity = dimmedByHover || !prominent ? 0.15 : 1.0;
+    const strokeWidth = isGoalNode || highlighted ? 2 : 1;
 
     let borderColor: string;
     if (isGoalNode) {
-      borderColor = 'purple';
+      borderColor = treeColors.goal;
+    } else if (highlighted) {
+      borderColor = completed ? treeColors.completed : readyToLearn ? treeColors.ready : treeColors.locked;
     } else if (completed) {
-      borderColor = '#4CAF50';
+      borderColor = treeColors.completed;
     } else if (isOnGoalPath && readyToLearn) {
-      borderColor = '#FFD700';
+      borderColor = treeColors.ready;
     } else if (isOnGoalPath) {
-      borderColor = 'purple';
+      borderColor = treeColors.goal;
     } else {
-      borderColor = isHovered ? theme.palette.primary.main : theme.palette.divider;
+      borderColor = theme.palette.divider;
     }
 
     return { borderColor, fillColor, nodeOpacity, strokeWidth };
   }
 
-  const highlighted = isHovered || isPrerequisite;
+  const highlighted = isHovered || isPrerequisite || isSelected;
   const dimmed = isSomethingHovered && !highlighted;
 
   if (highlighted) {
     return {
-      borderColor: completed ? 'rgba(76, 175, 80, 1.0)' : readyToLearn ? '#FFD700' : '#E84421',
+      borderColor: completed ? treeColors.completed : readyToLearn ? treeColors.ready : treeColors.locked,
       fillColor,
       nodeOpacity: 1.0,
       strokeWidth: 2,
@@ -79,7 +87,7 @@ export function getNodeStyle({
   }
   if (completed) {
     return {
-      borderColor: dimmed ? 'rgba(76, 175, 80, 0.4)' : '#4CAF50',
+      borderColor: dimmed ? treeColors.completedFaded : treeColors.completed,
       fillColor,
       nodeOpacity: dimmed ? 0.4 : 1.0,
       strokeWidth: 1,
@@ -87,14 +95,14 @@ export function getNodeStyle({
   }
   if (readyToLearn) {
     return {
-      borderColor: dimmed ? '#e0e0e0' : '#FFD700',
+      borderColor: dimmed ? treeColors.faded : treeColors.ready,
       fillColor,
       nodeOpacity: dimmed ? 0.15 : 1.0,
       strokeWidth: 1,
     };
   }
   return {
-    borderColor: '#e0e0e0',
+    borderColor: treeColors.faded,
     fillColor,
     nodeOpacity: 0.15,
     strokeWidth: 1,

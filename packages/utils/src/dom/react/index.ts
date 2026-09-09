@@ -6,3 +6,4 @@ export * from './sizing';
 export * from './mouse';
 export * from './animation';
 export * from './style';
+export * from './device';

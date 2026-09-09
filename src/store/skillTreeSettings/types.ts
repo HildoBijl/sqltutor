@@ -8,4 +8,5 @@ export interface SkillTreeSettingsState {
   hasAccessedPlanningMode: boolean;
   planningMode: Record<string, boolean>;
   lastVisitedSkillTrees: string[];
+  hasSeenSkillTreeIntro: boolean;
 }

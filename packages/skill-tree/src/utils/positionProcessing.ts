@@ -5,7 +5,7 @@ export interface ModulePositionMetaRaw {
   position: VectorInput;
 }
 
-export interface ModulePositionMeta extends Omit<ModulePositionMetaRaw, 'position'> {
+export interface ModulePositionMeta {
   id: string;
   position: Vector;
   prerequisitesPathOrder: string[];

@@ -6,22 +6,16 @@ export {
   connectors,
   modulePositionList,
   modulePositions,
-  treeHeight as sqlTreeHeight,
-  treeWidth as sqlTreeWidth,
 } from './sql-treeDefinition';
 export {
   raConnectors,
   raModulePositionList,
   raModulePositions,
-  treeHeight as raTreeHeight,
-  treeWidth as raTreeWidth,
 } from './ra-treeDefinition';
 export {
   datalogConnectors,
   datalogModulePositionList,
   datalogModulePositions,
-  treeHeight as datalogTreeHeight,
-  treeWidth as datalogTreeWidth,
 } from './datalog-treeDefinitions';
 export type { ModulePositionMeta, ModulePositionMetaRaw } from './sql-treeDefinition';
 

@@ -1,17 +1,14 @@
-import type { RefObject } from 'react';
 import { Curve, Drawing } from '@sqlvalley/ui';
 import type { Module } from '@sqlvalley/skill-tree-definition';
+import { isReadyToLearn } from '@sqlvalley/skill-tree-definition';
 import type { Vector } from '@sqlvalley/utils/geometry';
 import { useTheme } from '@mui/material/';
 import { NodeCard } from './SkillTreeComponents/NodeCard';
 import { Tooltip } from './SkillTreeComponents/Tooltip';
 import type { ModulePositionMeta } from '../utils/positionProcessing';
-import {
-  isReadyToLearn,
-  resolveConnectorStyle,
-} from '../utils/graphics/connectorStyle';
+import { resolveConnectorStyle } from '../utils/graphics/connectorStyle';
 import { useHoverState } from '../utils/graphics/mouseEvents';
-import { useGoalProgress } from '../utils/logic/calculatePrerequisites';
+import { useGoalProgress } from '../utils/logic/useGoalProgress';
 
 /*
  * SkillTree component that renders the tree structure with nodes and connectors.
@@ -23,10 +20,6 @@ import { useGoalProgress } from '../utils/logic/calculatePrerequisites';
  * @param treeBounds - The bounding box of the tree layout.
  * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
  * @param isCompleted - Function to check if a module is completed.
- * @param getProgress - Function to get progress string for a module.
- * @param setHoveredId - Function to set the hovered node ID.
- * @param containerRef - Ref to the container div for the tree.
- * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 interface SkillTreeProps {
   skillTree: Record<string, Module>;
@@ -41,10 +34,6 @@ interface SkillTreeProps {
   };
   visiblePaths: { points: Vector[]; from: string; to: string }[];
   isCompleted: (id: string) => boolean;
-  getProgress: (id: string) => string | null;
-  setHoveredId: (id: string | null) => void;
-  containerRef: RefObject<HTMLDivElement | null>;
-  nodeRefs: RefObject<Map<string, HTMLDivElement | null>>;
   planningMode: boolean;
   goalNodeId?: string | null;
   setGoalNodeId?: (id: string | null) => void;
@@ -64,8 +53,6 @@ export function SkillTree({
   treeBounds,
   visiblePaths,
   isCompleted,
-  setHoveredId,
-  containerRef,
   planningMode,
   goalNodeId,
   setGoalNodeId,
@@ -75,32 +62,34 @@ export function SkillTree({
 }: SkillTreeProps) {
   const theme = useTheme();
 
+
+  const onNavigate = (id: string) => {
+    const item = skillTree[id];
+    window.location.href = item.type === 'skill' ? `/skill/${id}` : `/concept/${id}`;
+  }
+  
   const {
     localHoveredId,
     prerequisites,
     tooltip,
+    selectedId,
     handleHoverStart,
     handleHoverEnd,
-    handleLongPressEnd,
-    getLongPressProps,
     isConnectorInHoveredPath,
-  } = useHoverState(skillTree, setHoveredId);
+    handlePointerDown,
+    handlePointerOutside,
+  } = useHoverState(skillTree, onNavigate);
 
-  const goalPrerequisites = useGoalProgress(
+  const goalPath = useGoalProgress(
     goalNodeId,
     skillTree,
     isCompleted,
     onGoalProgressChange,
   );
 
-  const handleNodeClick = (item: Module) => {
-    const path = item.type === 'skill' ? `/skill/${item.id}` : `/concept/${item.id}`;
-    window.location.href = path;
-  };
-
   return (
     <div
-      ref={containerRef}
+      onPointerDown={handlePointerOutside}
       style={{
         position: 'relative',
         width: `${treeBounds.width}px`,
@@ -116,14 +105,13 @@ export function SkillTree({
         useSvg={true}
         useCanvas={false}
         autoScale={false}
-        svgProps={{ onClick: handleLongPressEnd }}
       >
         {visiblePaths.map((connector, i) => {
           const { strokeColor, strokeWidth, opacity } = resolveConnectorStyle(
             connector,
             planningMode,
             goalNodeId,
-            goalPrerequisites,
+            goalPath,
             localHoveredId,
             isCompleted,
             skillTree,
@@ -147,14 +135,18 @@ export function SkillTree({
           const item = skillTree[positionData.id];
           if (!item) return null;
 
-          const readyToLearn = isReadyToLearn(item, isCompleted);
+          const readyToLearn = isReadyToLearn(skillTree, item.id, isCompleted);
 
           return (
             <g
               key={item.id}
               onMouseEnter={() => handleHoverStart(item.id)}
-              {...getLongPressProps(item.id)}
               onMouseLeave={handleHoverEnd}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                const isGoal = planningMode && goalNodeId === item.id;
+                handlePointerDown(item.id, e, isGoal);
+              }}
             >
               <NodeCard
                 item={item}
@@ -164,11 +156,11 @@ export function SkillTree({
                 readyToLearn={readyToLearn}
                 isPrerequisite={prerequisites.has(item.id)}
                 isSomethingHovered={localHoveredId !== null}
-                onClick={() => handleNodeClick(item)}
+                isSelected={selectedId === item.id}
                 planningMode={planningMode}
                 hasGoal={planningMode && !!goalNodeId}
                 isGoalNode={planningMode && goalNodeId === item.id}
-                isOnGoalPath={planningMode && goalPrerequisites.has(item.id)}
+                isOnGoalPath={planningMode && goalPath.has(item.id)}
                 onSetGoal={() => {
                   if (planningMode && setGoalNodeId) {
                     setGoalNodeId(goalNodeId === item.id ? null : item.id);

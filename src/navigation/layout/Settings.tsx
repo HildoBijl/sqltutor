@@ -16,7 +16,7 @@ import {
   Check,
   AdminPanelSettings,
 } from '@mui/icons-material';
-import { ColorModeContext } from '@/theme';
+import { ColorModeContext } from '@sqlvalley/ui';
 import { setAdminModeEnabled, useAdminMode } from '@/store/adminMode';
 
 const RESETTABLE_STORAGE_PREFIXES = ['sqlvalley-', 'sqltutor-'] as const;

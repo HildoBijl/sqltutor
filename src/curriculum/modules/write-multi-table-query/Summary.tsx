@@ -1,5 +1,5 @@
 import { Page, Section, Par, List, Term, Em } from '@sqlvalley/ui';
-import { ISQL } from '@sqlvalley/ui';
+import { ISQL } from '@sqlvalley/sql';
 
 export function Summary() {
   return <Page>

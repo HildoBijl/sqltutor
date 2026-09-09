@@ -1,5 +1,6 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTheme } from "@mui/material/";
+import { treeColors } from "../../../utils/graphics/treeColors";
 
 interface NodeCompletedMarkProps {
   iconSize: number;
@@ -25,7 +26,7 @@ export function NodeCompletedMark({
         justifyContent: "center",
       }}
     >
-      <CheckCircleIcon style={{ fontSize: iconSize, color: "#4CAF50" }} />
+      <CheckCircleIcon style={{ fontSize: iconSize, color: treeColors.completed }} />
     </div>
   );
 }

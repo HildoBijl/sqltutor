@@ -1,26 +1,31 @@
-import { EXERCISES_TO_COMPLETE } from '@/constants';
 import {
   getModules,
   getPrerequisites,
   type SkillTree,
 } from '@sqlvalley/skill-tree-definition';
-import type { ModuleState, SkillModuleState } from '@/store';
 
-import type { ModuleCompletion, RawModuleCompletion } from './types';
+import type {
+  ModuleCompletion,
+  ModuleProgressState,
+  RawModuleCompletion,
+} from './types';
 
-function getSkillSolvedCount(moduleState: ModuleState | undefined): number {
-  const solved = (moduleState as Partial<SkillModuleState> | undefined)?.numSolved;
+/** Exercises a learner must solve before a skill counts as mastered. */
+export const DEFAULT_EXERCISES_TO_COMPLETE = 3;
+
+function getSkillSolvedCount(moduleState: ModuleProgressState | undefined): number {
+  const solved = moduleState?.numSolved;
   return typeof solved === 'number' ? solved : 0;
 }
 
-function isUnderstood(moduleState: ModuleState | undefined): boolean {
+function isUnderstood(moduleState: ModuleProgressState | undefined): boolean {
   return moduleState?.understood === true;
 }
 
 export function getRawModuleCompletion<Id extends string>(
   skillTree: SkillTree<Id>,
-  moduleStates: Record<string, ModuleState>,
-  requiredCount: number = EXERCISES_TO_COMPLETE,
+  moduleStates: Record<string, ModuleProgressState>,
+  requiredCount: number = DEFAULT_EXERCISES_TO_COMPLETE,
 ): RawModuleCompletion<Id> {
   const completed = new Set<Id>();
   const skillProgress: Partial<Record<Id, number>> = {};
@@ -67,8 +72,8 @@ export function processModuleCompletion<Id extends string>(
 
 export function getProcessedModuleCompletion<Id extends string>(
   skillTree: SkillTree<Id>,
-  moduleStates: Record<string, ModuleState>,
-  requiredCount: number = EXERCISES_TO_COMPLETE,
+  moduleStates: Record<string, ModuleProgressState>,
+  requiredCount: number = DEFAULT_EXERCISES_TO_COMPLETE,
 ): ModuleCompletion<Id> {
   return processModuleCompletion(
     skillTree,

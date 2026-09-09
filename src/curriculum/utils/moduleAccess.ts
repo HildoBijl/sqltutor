@@ -2,7 +2,7 @@
  * Defines which module has access to which mock data table.
  */
 
-import { type TableKey, allTables } from '@/mockData';
+import { type TableKey, allTables } from '@sqlvalley/mock-data';
 import { getPrerequisites } from '@sqlvalley/skill-tree-definition';
 import { type ModuleId, skillTree } from '../skillTree';
 

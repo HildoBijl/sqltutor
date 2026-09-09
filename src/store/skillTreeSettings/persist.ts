@@ -57,6 +57,7 @@ export interface PersistedSkillTreeSettings {
   hasAccessedPlanningMode?: boolean;
   planningMode?: Record<string, boolean>;
   lastVisitedSkillTrees?: string[];
+  hasSeenSkillTreeIntro?: boolean;
 }
 
 export function partializeSkillTreeSettings(state: SkillTreeSettingsState): PersistedSkillTreeSettings {
@@ -66,6 +67,7 @@ export function partializeSkillTreeSettings(state: SkillTreeSettingsState): Pers
     hasAccessedPlanningMode: state.hasAccessedPlanningMode,
     planningMode: state.planningMode,
     lastVisitedSkillTrees: state.lastVisitedSkillTrees,
+    hasSeenSkillTreeIntro: state.hasSeenSkillTreeIntro,
   };
 }
 
@@ -83,6 +85,9 @@ export function rehydrateSkillTreeSettings(
   }
   if (typeof persisted.hasAccessedPlanningMode === 'boolean') {
     state.hasAccessedPlanningMode = persisted.hasAccessedPlanningMode;
+  }
+  if (typeof persisted.hasSeenSkillTreeIntro === 'boolean') {
+    state.hasSeenSkillTreeIntro = persisted.hasSeenSkillTreeIntro;
   }
 
   if (persisted.planningMode && typeof persisted.planningMode === 'object') {

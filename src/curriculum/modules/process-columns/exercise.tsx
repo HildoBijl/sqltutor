@@ -1,7 +1,7 @@
 import {
   buildSimpleSQLExercise,
   type SimpleSQLExerciseDefinition,
-} from '@/learning/sqlExercises';
+} from '@sqlvalley/sql';
 import type { AnyExerciseDefinition } from '@sqlvalley/exercise-engine';
 import { SqlPracticeProvider } from '@/curriculum/utils/SqlPracticeProvider';
 

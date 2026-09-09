@@ -1,5 +1,5 @@
 import { Page, Section, Par, List, Warning, Info, Term, Em, M } from '@sqlvalley/ui';
-import { ISQL } from '@sqlvalley/ui';
+import { ISQL } from '@sqlvalley/sql';
 
 import { FigureTerminology } from '../database-table/Theory'
 

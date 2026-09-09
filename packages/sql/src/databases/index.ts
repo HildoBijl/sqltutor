@@ -12,4 +12,4 @@ export {
 } from './useDatabase';
 
 // Re-export QueryResult type for convenience
-export type { QueryResult } from '@sqlvalley/ui/sql/sqljs';
+export type { QueryResult } from '../sqljs';

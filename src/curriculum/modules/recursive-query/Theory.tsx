@@ -1,7 +1,7 @@
 import { Page, Section, Par, List, Info, Warning, Quote, Term, Em, M } from '@sqlvalley/ui';
 
-import { useQueryResult } from '@sqlvalley/ui/sql/sqljs';
-import { useTheorySampleDatabase } from '@/learning/databases';
+import { useQueryResult } from '@sqlvalley/sql/sqljs';
+import { useTheorySampleDatabase } from '@sqlvalley/sql/databases';
 import { FigureSingleTable } from '@/curriculum/utils/queryFigures';
 
 export function Theory() {

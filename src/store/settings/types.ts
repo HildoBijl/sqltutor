@@ -2,7 +2,7 @@
  * Settings store types.
  */
 
-import type { DatasetSize } from '@/mockData/types';
+import type { DatasetSize } from '@sqlvalley/mock-data/types';
 
 export type Theme = 'light' | 'dark';
 

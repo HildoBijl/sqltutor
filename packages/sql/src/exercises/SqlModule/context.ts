@@ -1,5 +1,5 @@
 import { useModuleContext } from '@sqlvalley/exercise-engine';
-import type { DatasetSize } from '@/mockData';
+import type { DatasetSize } from '@sqlvalley/mock-data';
 import type { CompareOptions, SqlQueryResult } from '@sqlvalley/sql-grading';
 import type { SimpleSQLCheckResult } from '../SimpleSQLExercise/types';
 

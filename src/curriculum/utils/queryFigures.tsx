@@ -2,10 +2,11 @@ import type { ReactNode } from 'react'
 import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@sqlvalley/utils/dom';
-import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable, SQLDisplay } from '@sqlvalley/ui';
-import { useTheorySampleDatabase } from '@/learning/databases';
-import { useQueryResult } from '@sqlvalley/ui/sql/sqljs';
+import { useThemeColor } from '@sqlvalley/ui';
+import { type DrawingData, Drawing, Element, Curve, useRefWithBounds } from '@sqlvalley/ui';
+import { DataTable, SQLDisplay } from '@sqlvalley/sql';
+import { useTheorySampleDatabase } from '@sqlvalley/sql/databases';
+import { useQueryResult } from '@sqlvalley/sql/sqljs';
 
 export function FigureSingleTable({ query = '', title = '', tableWidth = 800, tableScale = 0.8 }: { query?: string, title?: ReactNode, tableWidth?: number, tableScale?: number }) {
   // Get the data.

@@ -2,10 +2,11 @@ import { type ReactNode } from 'react';
 import { Box } from '@mui/material';
 
 import { useRefWithValue } from '@sqlvalley/utils/dom';
-import { useThemeColor } from '@/theme';
-import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, DataTable, RA } from '@sqlvalley/ui';
-import { useTheorySampleDatabase } from '@/learning/databases';
-import { useQueryResult } from '@sqlvalley/ui/sql/sqljs';
+import { useThemeColor } from '@sqlvalley/ui';
+import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, RA } from '@sqlvalley/ui';
+import { DataTable } from '@sqlvalley/sql';
+import { useTheorySampleDatabase } from '@sqlvalley/sql/databases';
+import { useQueryResult } from '@sqlvalley/sql/sqljs';
 
 type FigureExampleRAQueryProps = {
   query?: ReactNode;

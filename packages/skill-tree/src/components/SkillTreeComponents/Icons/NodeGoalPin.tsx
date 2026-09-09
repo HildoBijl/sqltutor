@@ -2,6 +2,7 @@ import { useState } from "react";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import { PlayArrow } from "@mui/icons-material";
 import { useTheme } from "@mui/material/";
+import { treeColors } from "../../../utils/graphics/treeColors";
 
 interface NodeGoalPinProps {
   variant: "set" | "active" | "next-step";
@@ -30,8 +31,8 @@ export function NodeGoalPin({ variant, checkmarkSize, onSetGoal }: NodeGoalPinPr
 
   if (variant === "next-step") {
     return (
-      <div style={{ ...containerStyle, border: "1px solid", color: "#FFD700" }}>
-        <PlayArrow style={{ fontSize: checkmarkSize - 4, color: "#FFD700" }} />
+      <div style={{ ...containerStyle, border: "1px solid", color: treeColors.ready }}>
+        <PlayArrow style={{ fontSize: checkmarkSize - 4, color: treeColors.ready }} />
       </div>
     );
   }
@@ -40,7 +41,7 @@ export function NodeGoalPin({ variant, checkmarkSize, onSetGoal }: NodeGoalPinPr
 
   return (
     <div
-      onClick={(e) => {
+      onPointerDown={(e) => {
         e.stopPropagation();
         if (onSetGoal) onSetGoal();
       }}
@@ -50,8 +51,8 @@ export function NodeGoalPin({ variant, checkmarkSize, onSetGoal }: NodeGoalPinPr
         ...containerStyle,
         border: `1px solid ${
           isActive
-            ? isPinHovered ? "#616161" : "purple"
-            : isPinHovered ? "purple" : "#616161"
+            ? isPinHovered ? treeColors.icon : treeColors.goal
+            : isPinHovered ? treeColors.goal : treeColors.icon
         }`,
       }}
     >
@@ -59,8 +60,8 @@ export function NodeGoalPin({ variant, checkmarkSize, onSetGoal }: NodeGoalPinPr
         style={{
           fontSize: checkmarkSize - 4,
           color: isActive
-            ? isPinHovered ? "#9aa0a6" : "purple"
-            : isPinHovered ? "purple" : "#9aa0a6",
+            ? isPinHovered ? treeColors.neutral : treeColors.goal
+            : isPinHovered ? treeColors.goal : treeColors.neutral,
         }}
       />
     </div>

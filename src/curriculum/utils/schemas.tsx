@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { type TableKey } from '@/mockData';
+import { type TableKey } from '@sqlvalley/mock-data';
 import { List, Term, RelationName, PrimaryKey, ForeignKey } from '@sqlvalley/ui';
 
 export function SQLValleySchema({ tables = [], singular = false }: { tables: TableKey[], singular?: boolean }) {

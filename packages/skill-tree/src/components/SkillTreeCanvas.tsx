@@ -1,16 +1,16 @@
-import type { RefObject } from 'react';
-import { useState } from 'react';
 import { useTheme } from '@mui/material/';
 import type { Module } from '@sqlvalley/skill-tree-definition';
 import type { Vector } from '@sqlvalley/utils/geometry';
 import { SkillTree } from './SkillTree';
 import { PlanningModeIntro } from './SkillTreeComponents/PlanningModeIntro';
 import { PlanningProgressIndicator } from './SkillTreeComponents/PlanningProgressIndicator';
+import { SkillTreeIntro } from './SkillTreeComponents/SkillTreeIntro';
 import { TreeLegend } from './SkillTreeComponents/TreeLegend';
 import { ZoomControls } from './SkillTreeComponents/ZoomControls';
 import type { SkillTreeMemoryStoreAPI } from '../types/SkillTreeMemoryStoreAPI';
 import type { SkillTreeSettings } from '../types/SkillTreeSettings';
 import { useSkillTreeTransform } from '../utils/graphics/useSkillTreeTransform';
+import { useSkillTreeIntro } from '../utils/logic/useSkillTreeIntro';
 import { useSkillTreePlanning } from '../utils/logic/useSkillTreePlanning';
 import type { ModulePositionMeta } from '../utils/positionProcessing';
 
@@ -23,14 +23,8 @@ import type { ModulePositionMeta } from '../utils/positionProcessing';
  * @param treeBounds - The bounding box of the tree layout.
  * @param visiblePaths - Array of connector objects with points arrays and from/to node IDs.
  * @param isCompleted - Function to check if a module is completed.
- * @param getProgress - Function to get progress string for a module.
- * @param hoveredId - ID of the currently hovered node, or null if none.
- * @param setHoveredId - Function to set the hovered node ID.
- * @param containerRef - Ref to the container div for the tree.
- * @param nodeRefs - Ref to a map of node IDs to their corresponding div elements.
  */
 export interface SkillTreeCanvasProps {
-  treeId: string;
   skillTree: Record<string, Module>;
   modulePositions: Record<string, ModulePositionMeta>;
   treeBounds: {
@@ -43,26 +37,16 @@ export interface SkillTreeCanvasProps {
   };
   visiblePaths: { points: Vector[]; from: string; to: string }[];
   isCompleted?: (id: string) => boolean;
-  getProgress?: (id: string) => string | null;
-  hoveredId: string | null;
-  setHoveredId: (id: string | null) => void;
-  containerRef: RefObject<HTMLDivElement | null>;
-  nodeRefs: RefObject<Map<string, HTMLDivElement | null>>;
   settings?: SkillTreeSettings;
   memoryStoreAPI?: SkillTreeMemoryStoreAPI;
 }
 
 export function SkillTreeCanvas({
-  treeId,
   skillTree,
   modulePositions,
   treeBounds,
   visiblePaths,
   isCompleted,
-  getProgress,
-  setHoveredId,
-  containerRef,
-  nodeRefs,
   settings,
   memoryStoreAPI,
 }: SkillTreeCanvasProps) {
@@ -77,9 +61,6 @@ export function SkillTreeCanvas({
   const resolvedIsCompleted = staticMode
     ? () => false
     : (isCompleted ?? (() => false));
-  const resolvedGetProgress = staticMode ? () => null : (getProgress ?? (() => null));
-
-  const [isPanning] = useState(false);
 
   const { outerRef, transform, bind, zoomBy, reset } = useSkillTreeTransform({
     treeBounds,
@@ -96,7 +77,9 @@ export function SkillTreeCanvas({
     showPlanningModeModal,
     setShowPlanningModeModal,
     togglePlanningMode,
-  } = useSkillTreePlanning(treeId, memoryStoreAPI);
+  } = useSkillTreePlanning(memoryStoreAPI);
+
+  const { showIntro, setShowIntro, openIntro } = useSkillTreeIntro(memoryStoreAPI);
 
   const theme = useTheme();
 
@@ -126,6 +109,7 @@ export function SkillTreeCanvas({
         onTogglePlanningMode={allowPlanningMode ? togglePlanningMode : undefined}
         planningMode={allowPlanningMode ? planningMode : false}
         allowZoom={allowZoom}
+        onHelp={openIntro}
       />
       {allowPlanningMode && planningMode && (
         <PlanningProgressIndicator
@@ -146,7 +130,7 @@ export function SkillTreeCanvas({
         style={{
           width: '100%',
           height: '100%',
-          cursor: isPanning ? 'grabbing' : 'grab',
+          cursor: 'grab',
           touchAction: 'none',
         }}
       >
@@ -163,10 +147,6 @@ export function SkillTreeCanvas({
             treeBounds={treeBounds}
             visiblePaths={visiblePaths}
             isCompleted={resolvedIsCompleted}
-            getProgress={resolvedGetProgress}
-            setHoveredId={setHoveredId}
-            containerRef={containerRef}
-            nodeRefs={nodeRefs}
             planningMode={allowPlanningMode ? planningMode : false}
             goalNodeId={goalNodeId}
             setGoalNodeId={setGoalNodeId}
@@ -181,6 +161,8 @@ export function SkillTreeCanvas({
         open={showPlanningModeModal}
         onClose={() => setShowPlanningModeModal(false)}
       />
+
+      <SkillTreeIntro open={showIntro} onClose={() => setShowIntro(false)} />
     </div>
   );
 }
