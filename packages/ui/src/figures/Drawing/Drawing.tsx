@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, useRef, type CSSProperties } from 'react';
 
 import { type Vector, Rectangle } from '@sqlvalley/utils/geometry';
 import { getEventPosition, useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
@@ -75,7 +75,9 @@ export function Drawing(props: DrawingProps) {
 		contains: (point: Vector) => bounds.contains(point),
 		applyBounds: (point: Vector) => bounds.applyBounds(point),
 	}), [id, bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);
-	useImperativeHandle(mergedRef, () => drawingData, [drawingData]);
+	const imperativeDrawingData = useRef(drawingData);
+	Object.assign(imperativeDrawingData.current, drawingData);
+	useImperativeHandle(mergedRef, () => imperativeDrawingData.current, [mergedRef]);
 
 	// Render figure with SVG and Canvas properly placed.
 	return <DrawingContext.Provider value={drawingData}>
