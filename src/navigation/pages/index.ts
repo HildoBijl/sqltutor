@@ -5,4 +5,4 @@ export { default as DatalogLearningOverviewPage } from './LearningOverview/Datal
 export { default as ConceptPage } from './ConceptPage';
 export { default as SkillPage } from './SkillPage';
 export { default as PlaygroundPage } from './PlaygroundPage';
-
+export * from './LearningOverview';
