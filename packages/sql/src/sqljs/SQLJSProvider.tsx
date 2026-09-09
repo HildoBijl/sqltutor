@@ -3,12 +3,23 @@
  * Initializes SQL.js and provides the instance to child components.
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import initSqlJs from 'sql.js';
-import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import initSqlJs, { type SqlJsStatic } from 'sql.js';
+
+declare const SQLJS_WASM_BASE64: string;
+
+function decodeWasmBinary(encodedBinary: string): ArrayBuffer {
+  const binary = atob(encodedBinary);
+  const buffer = new ArrayBuffer(binary.length);
+  const bytes = new Uint8Array(buffer);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return buffer;
+}
 
 interface SQLJSContextType {
-  SQLJS: any | null;
+  SQLJS: SqlJsStatic | null;
   error: Error | null;
   isLoading: boolean;
   isReady: boolean;
@@ -30,7 +41,7 @@ interface SQLJSProviderProps {
 }
 
 export function SQLJSProvider({ children }: SQLJSProviderProps) {
-  const [SQLJS, setSQLJS] = useState<any | null>(null);
+  const [SQLJS, setSQLJS] = useState<SqlJsStatic | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,9 +52,7 @@ export function SQLJSProvider({ children }: SQLJSProviderProps) {
         setError(null);
 
         const SQLJSInstance = await initSqlJs({
-          locateFile: (file: string) => (
-            file === 'sql-wasm.wasm' ? sqlWasmUrl : `/sqljs/${file}`
-          ),
+          wasmBinary: decodeWasmBinary(SQLJS_WASM_BASE64),
         });
 
         setSQLJS(SQLJSInstance);
