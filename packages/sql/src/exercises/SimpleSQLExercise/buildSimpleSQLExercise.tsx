@@ -21,6 +21,7 @@ export function buildSimpleSQLExercise<Parameters extends Record<string, unknown
     initialInput: '',
     normalizeInput: normalizeSqlInput,
     isInputEmpty: (input) => !input.trim(),
+    getSolutionInput: (parameters) => resolveValue(spec.solution, parameters).trim(),
     validateInput: ({ input }) => {
       const validation = validateSqlInput(input);
       return {

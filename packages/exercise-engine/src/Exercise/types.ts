@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type {
   SkillId,
   StoredExerciseAction,
@@ -23,6 +24,7 @@ export interface ExerciseControls<Action extends StoredExerciseAction> {
   submitAction: (action: Action) => Promise<void>;
   setDraftInput: (draftInput: unknown) => void;
   startNewExercise: () => void;
+  adminControls?: ReactNode;
 }
 
 export interface ExerciseSkill {

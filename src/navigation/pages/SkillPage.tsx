@@ -192,10 +192,18 @@ export default function SkillPage() {
           {currentTab === 'practice' && hasInteractivePractice && !hasStaticPractice && (
             ModuleProvider ? (
               <ModuleProvider skillId={skillId ?? ''}>
-                <ExerciseManager skillId={skillId ?? ''} exercises={exerciseDefinitions ?? []} />
+                <ExerciseManager
+                  skillId={skillId ?? ''}
+                  exercises={exerciseDefinitions ?? []}
+                  showAdminControls={isAdmin}
+                />
               </ModuleProvider>
             ) : (
-              <ExerciseManager skillId={skillId ?? ''} exercises={exerciseDefinitions ?? []} />
+              <ExerciseManager
+                skillId={skillId ?? ''}
+                exercises={exerciseDefinitions ?? []}
+                showAdminControls={isAdmin}
+              />
             )
           )}
 

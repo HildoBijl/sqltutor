@@ -48,6 +48,8 @@ export interface ExerciseDefinition<
   initialState: State;
   isComplete: (state: State) => boolean;
   isSolved: (state: State) => boolean;
+  /** Optional admin helper that supplies the complete input for this exercise. */
+  getSolutionInput?: (parameters: Parameters) => unknown;
   reduce: ExerciseReducer<Parameters, Action, State>;
   Component: ComponentType;
 }

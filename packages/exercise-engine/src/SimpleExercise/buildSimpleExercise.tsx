@@ -69,6 +69,7 @@ export function buildSimpleExercise<
     initialState: emptySimpleExerciseState,
     isComplete,
     isSolved: isSimpleExerciseSolved,
+    getSolutionInput: spec.getSolutionInput,
     reduce,
     Component: () => <SimpleExerciseComponent spec={spec} />,
   };

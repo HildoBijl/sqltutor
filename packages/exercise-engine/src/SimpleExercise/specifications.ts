@@ -19,6 +19,7 @@ export interface SimpleExerciseRenderSpec<
   initialInput: Input;
   normalizeInput?: (input: Input) => string;
   isInputEmpty?: (input: Input) => boolean;
+  getSolutionInput?: (parameters: Parameters) => Input;
   Problem: ComponentType<SimpleExerciseProblemProps<Parameters>>;
   Input: ComponentType<SimpleExerciseInputProps<Parameters, Input>>;
   Solution: ComponentType<SimpleExerciseSolutionProps<Parameters>>;

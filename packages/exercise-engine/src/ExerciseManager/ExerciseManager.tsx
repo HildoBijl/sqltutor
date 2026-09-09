@@ -10,10 +10,12 @@ import { selectRandomly } from '@sqlvalley/utils/javascript';
 import { Exercise, type AnyExerciseContextValue, type AnyExerciseDefinition } from '../Exercise';
 import { useModuleContext } from '../moduleContext';
 import { useExerciseStorage } from '../storageContext';
+import { ExerciseAdminTools } from './ExerciseAdminTools';
 
 interface ExerciseManagerProps {
   skillId: string;
   exercises: ReadonlyArray<AnyExerciseDefinition>;
+  showAdminControls?: boolean;
 }
 
 function readLatestState(instance: StoredExerciseInstance): StoredExerciseState {
@@ -25,7 +27,11 @@ function readLatestState(instance: StoredExerciseInstance): StoredExerciseState 
  * Fed the definitions by the page, it keeps one active exercise in the store and
  * hands a ready-made { definition, data, controls, skill } context to a thin Exercise.
  */
-export function ExerciseManager({ skillId, exercises }: ExerciseManagerProps) {
+export function ExerciseManager({
+  skillId,
+  exercises,
+  showAdminControls = false,
+}: ExerciseManagerProps) {
   const moduleContext = useModuleContext();
   const storage = useExerciseStorage();
   const getInstanceSnapshot = useCallback(
@@ -43,6 +49,14 @@ export function ExerciseManager({ skillId, exercises }: ExerciseManagerProps) {
 
   const [pending, setPending] = useState(false);
 
+  const startExercise = useCallback((definition: AnyExerciseDefinition) => {
+    const current = storage.getInstance(skillId);
+    const parameters = definition.generateParameters(moduleContext, {
+      previousParameters: current?.parameters ?? null,
+    });
+    storage.startExercise(skillId, definition.exerciseId, definition.version, parameters);
+  }, [moduleContext, skillId, storage]);
+
   const startNewExercise = useCallback(() => {
     const current = storage.getInstance(skillId);
     const currentDefinition = current ? byId.get(current.exerciseId) : null;
@@ -51,11 +65,18 @@ export function ExerciseManager({ skillId, exercises }: ExerciseManagerProps) {
       : exercises;
     const next = selectRandomly(candidates);
     if (!next) return;
-    const parameters = next.generateParameters(moduleContext, {
-      previousParameters: current?.parameters ?? null,
-    });
-    storage.startExercise(skillId, next.exerciseId, next.version, parameters);
-  }, [byId, exercises, moduleContext, skillId, storage]);
+    startExercise(next);
+  }, [byId, exercises, skillId, startExercise, storage]);
+
+  const selectExercise = useCallback((exerciseId: string) => {
+    const definition = byId.get(exerciseId);
+    if (definition) startExercise(definition);
+  }, [byId, startExercise]);
+
+  const showSolution = useCallback(() => {
+    if (!active?.getSolutionInput || !instance) return;
+    storage.setDraftInput(skillId, active.getSolutionInput(instance.parameters));
+  }, [active, instance, skillId, storage]);
 
   const submitAction = useCallback(async (action: StoredExerciseAction) => {
     if (!active) return;
@@ -115,6 +136,22 @@ export function ExerciseManager({ skillId, exercises }: ExerciseManagerProps) {
     return <Typography color="text.secondary">Generating your next exercise...</Typography>;
   }
 
+  const exerciseOptions = exercises.map((exercise, index) => ({
+    id: exercise.exerciseId,
+    label: `${index + 1}. ${exercise.exerciseId}`,
+  }));
+
+  const adminControls = showAdminControls ? (
+    <ExerciseAdminTools
+      options={exerciseOptions}
+      selectedExerciseId={active.exerciseId}
+      disabled={pending}
+      solutionDisabled={pending || !active.getSolutionInput}
+      onExerciseSelect={selectExercise}
+      onShowSolution={showSolution}
+    />
+  ) : undefined;
+
   const value: AnyExerciseContextValue = {
     definition: active,
     data: {
@@ -124,7 +161,7 @@ export function ExerciseManager({ skillId, exercises }: ExerciseManagerProps) {
       draftInput: instance.draftInput,
       pending,
     },
-    controls: { submitAction, setDraftInput, startNewExercise },
+    controls: { submitAction, setDraftInput, startNewExercise, adminControls },
     skill: { id: skillId },
   };
 

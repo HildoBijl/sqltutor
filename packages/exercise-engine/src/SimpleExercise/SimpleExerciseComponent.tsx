@@ -32,7 +32,6 @@ export function SimpleExerciseComponent<
 
   const [feedbackCleared, setFeedbackCleared] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
-  const [solutionRevealed, setSolutionRevealed] = useState(false);
 
   const lastSubmittedInput = useMemo(() => {
     for (let i = events.length - 1; i >= 0; i -= 1) {
@@ -64,7 +63,6 @@ export function SimpleExerciseComponent<
 
   const handleGiveUp = useCallback(() => {
     setGiveUpOpen(false);
-    setSolutionRevealed(true);
     void controls.submitAction({ type: 'give-up' });
   }, [controls]);
 
@@ -97,6 +95,7 @@ export function SimpleExerciseComponent<
           onSubmit: handleSubmit,
           onGiveUp: () => setGiveUpOpen(true),
           onNext: controls.startNewExercise,
+          adminControls: controls.adminControls,
         }}
       >
         <ExerciseControls />
@@ -104,7 +103,7 @@ export function SimpleExerciseComponent<
       {Output ? (
         <Output parameters={params} input={input} result={lastResult} state={storedState} />
       ) : null}
-      {complete || solutionRevealed ? <Solution parameters={params} state={storedState} /> : null}
+      {complete ? <Solution parameters={params} state={storedState} /> : null}
       {solved && lastResult && Payoff ? <Payoff parameters={params} result={lastResult} /> : null}
       <GiveUpDialog open={giveUpOpen} onConfirm={handleGiveUp} onCancel={() => setGiveUpOpen(false)} />
     </Box>
