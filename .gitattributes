@@ -1,0 +1,14 @@
+# Store text files with Unix line endings on every platform.
+* text=auto eol=lf
+
+# Never perform line-ending conversion on binary assets.
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.webp binary
+*.wasm binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
