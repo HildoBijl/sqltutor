@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, useRef, type CSSProperties } from 'react';
 
-import { type Vector, Rectangle } from '@sqlvalley/utils/geometry';
+import { type Vector, Rectangle } from '@step-wise/geometry';
 import { getEventPosition, useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
 
 import { type FigureData, Figure } from '../Figure';
@@ -72,8 +72,8 @@ export function Drawing(props: DrawingProps) {
 		getFigureScale,
 		getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => getCoordinates(cPoint, figureRect, bounds),
 		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventPosition(event), figure?.inner && figure?.inner.getBoundingClientRect(), bounds),
-		contains: (point: Vector) => bounds.contains(point),
-		applyBounds: (point: Vector) => bounds.applyBounds(point),
+		contains: (point: Vector) => bounds.containsPoint(point),
+		applyBounds: (point: Vector) => bounds.clampPoint(point),
 	}), [id, bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);
 	const imperativeDrawingData = useRef(drawingData);
 	Object.assign(imperativeDrawingData.current, drawingData);

@@ -7,11 +7,11 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./geometry": "./src/geometry/index.ts",
     "./dom": "./src/dom/index.ts"
   },
   "dependencies": {
     "@react-hook/resize-observer": "^2.0.2",
+    "@step-wise/geometry": "^0.1.0",
     "@step-wise/js-utils": "^0.1.1"
   },
   "peerDependencies": {

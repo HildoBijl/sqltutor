@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-import { Rectangle } from '@sqlvalley/utils/geometry';
+import { Rectangle } from '@step-wise/geometry';
 
 import { type DrawingData } from '../definitions';
 

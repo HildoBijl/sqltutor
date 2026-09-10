@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Vector } from '../../geometry';
+import { Vector } from '@step-wise/geometry';
 
 import { getEventPosition, UtilKeys, getUtilKeys } from '../dom';
 

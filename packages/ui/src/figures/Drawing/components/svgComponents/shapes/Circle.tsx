@@ -1,4 +1,4 @@
-import { type VectorInput, Vector, ensureVector } from '@sqlvalley/utils';
+import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
 
 import { SvgPortal } from '../../../DrawingContext';
 
@@ -17,7 +17,7 @@ export const getDefaultCircle = (): CircleProps => ({
 
 export function Circle(props: CircleProps) {
   const { ref, center, radius, ...rest } = { ...getDefaultCircle(), ...props };
-  const c = ensureVector(center, 2);
+  const c = ensureVector(center, { dimension: 2 });
   
   return <SvgPortal>
     <circle ref={ref} cx={c.x} cy={c.y} r={radius} {...rest} />

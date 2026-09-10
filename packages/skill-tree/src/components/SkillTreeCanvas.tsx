@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material/';
 import type { Module } from '@sqlvalley/skill-tree-definition';
-import type { Vector } from '@sqlvalley/utils/geometry';
+import type { Vector } from '@step-wise/geometry';
 import { SkillTree } from './SkillTree';
 import { PlanningModeIntro } from './SkillTreeComponents/PlanningModeIntro';
 import { PlanningProgressIndicator } from './SkillTreeComponents/PlanningProgressIndicator';

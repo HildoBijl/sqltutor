@@ -96,7 +96,7 @@ export function FigureFiltering({ query = '', columnName = '' }) {
   const height = h1 + delta + h2;
 
   // Check where to position the query and where to put the arrow.
-  const arrowX = columnNameBounds?.middle.x || width;
+  const arrowX = columnNameBounds?.midpoint.x || width;
   let queryPosition, arrowPosition;
   if (arrowX > 0.75 * width) {
     queryPosition = 0; // Center
@@ -126,7 +126,7 @@ export function FigureFiltering({ query = '', columnName = '' }) {
     </> : null}
 
     {eBounds && columnNameBounds ? <>
-      <Curve points={[arrowPosition === 1 ? eBounds.rightMiddle.add([4, 0]) : eBounds.leftMiddle.add([-4, 0]), [columnNameBounds.middle.x, eBounds.middle.y], [columnNameBounds.middle.x, h1 + delta - 4]]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[arrowPosition === 1 ? eBounds.middleRight.add([4, 0]) : eBounds.middleLeft.add([-4, 0]), [columnNameBounds.midpoint.x, eBounds.midpoint.y], [columnNameBounds.midpoint.x, h1 + delta - 4]]} color={themeColor} curveDistance={60} endArrow />
     </> : null}
   </Drawing>;
 }

@@ -103,16 +103,16 @@ export function FigureDataTypeDemo() {
 
     {tableBounds && labelTextBounds && labelNumberBounds && labelDateBounds && c1Bounds && c2Bounds && c3Bounds && c4Bounds && c5Bounds && c6Bounds ? <>
       {/* Text arrows. */}
-      <Curve points={[[labelTextBounds.right + 2, labelTextBounds.middle.y + 2], [c1Bounds.left + delta + 10, labelTextBounds?.middle.y + 2], [c1Bounds.left + delta + 10, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
-      <Curve points={[[labelTextBounds.right + 2, labelTextBounds.middle.y + 2], [c6Bounds.left + delta - 8, labelTextBounds?.middle.y + 2], [c6Bounds.left + delta - 8, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelTextBounds.right + 2, labelTextBounds.midpoint.y + 2], [c1Bounds.left + delta + 10, labelTextBounds?.midpoint.y + 2], [c1Bounds.left + delta + 10, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelTextBounds.right + 2, labelTextBounds.midpoint.y + 2], [c6Bounds.left + delta - 8, labelTextBounds?.midpoint.y + 2], [c6Bounds.left + delta - 8, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
 
       {/* Number label/arrow. */}
-      <Curve points={[[labelNumberBounds.right + 2, labelNumberBounds.middle.y + 2], [c2Bounds.left + delta, labelNumberBounds?.middle.y + 2], [c2Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
-      <Curve points={[[labelNumberBounds.right + 2, labelNumberBounds.middle.y + 2], [c5Bounds.left + delta - 14, labelNumberBounds?.middle.y + 2], [c5Bounds.left + delta - 14, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelNumberBounds.right + 2, labelNumberBounds.midpoint.y + 2], [c2Bounds.left + delta, labelNumberBounds?.midpoint.y + 2], [c2Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelNumberBounds.right + 2, labelNumberBounds.midpoint.y + 2], [c5Bounds.left + delta - 14, labelNumberBounds?.midpoint.y + 2], [c5Bounds.left + delta - 14, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
 
       {/* Date label/arrow. */}
-      <Curve points={[[labelDateBounds.right + 2, labelDateBounds.middle.y + 2], [c3Bounds.left + delta, labelDateBounds?.middle.y + 2], [c3Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
-      <Curve points={[[labelDateBounds.right + 2, labelDateBounds.middle.y + 2], [c4Bounds.left + delta, labelDateBounds?.middle.y + 2], [c4Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelDateBounds.right + 2, labelDateBounds.midpoint.y + 2], [c3Bounds.left + delta, labelDateBounds?.midpoint.y + 2], [c3Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
+      <Curve points={[[labelDateBounds.right + 2, labelDateBounds.midpoint.y + 2], [c4Bounds.left + delta, labelDateBounds?.midpoint.y + 2], [c4Bounds.left + delta, tableBounds.bottom]]} color={themeColor} curveDistance={r} endArrow />
     </> : null}
   </Drawing>;
 }

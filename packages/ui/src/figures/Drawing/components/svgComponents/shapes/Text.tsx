@@ -1,4 +1,4 @@
-import { type VectorInput, Vector, ensureVector } from '@sqlvalley/utils';
+import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
 
 import { SvgPortal } from '../../../DrawingContext';
 
@@ -19,7 +19,7 @@ export const getDefaultText = (): TextProps => ({
 
 export function Text(props: TextProps) {
   const { ref, position, anchor, children, ...rest } = { ...getDefaultText(), ...props };
-  const p = ensureVector(position, 2);
+  const p = ensureVector(position, { dimension: 2 });
 
   return <SvgPortal>
     <text ref={ref} x={p.x} y={p.y} textAnchor={anchor}      {...rest}>

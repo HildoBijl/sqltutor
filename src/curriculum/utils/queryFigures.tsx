@@ -54,11 +54,11 @@ export function FigureExampleQuery({ query = '', actualQuery = '', below = false
 
   // Determine the arrow coordinates.
   const arrowPoints = eBounds && tBounds && (arrowBetween ? (
-    below ? [[Math.min(eBounds.middle.x, tBounds.middle.x), eBounds.bottom + 4], [Math.min(eBounds.middle.x, tBounds.middle.x), ty - 4]]
-      : [[eBounds.right + 4, Math.min(eBounds.middle.y, tBounds.middle.y)], [tx - 4, Math.min(eBounds.middle.y, tBounds.middle.y)]]
+    below ? [[Math.min(eBounds.midpoint.x, tBounds.midpoint.x), eBounds.bottom + 4], [Math.min(eBounds.midpoint.x, tBounds.midpoint.x), ty - 4]]
+      : [[eBounds.right + 4, Math.min(eBounds.midpoint.y, tBounds.midpoint.y)], [tx - 4, Math.min(eBounds.midpoint.y, tBounds.midpoint.y)]]
   ) : (
-    below ? [eBounds.rightMiddle.add([4, 0]), [eBounds.right + arrowRadius, eBounds.middle.y], [eBounds.right + arrowRadius, ty - 4]]
-      : [eBounds.bottomMiddle.add([0, 4]), [eBounds.middle.x, eBounds.bottom + arrowRadius], [tx - 4, eBounds.bottom + arrowRadius]]
+    below ? [eBounds.middleRight.add([4, 0]), [eBounds.right + arrowRadius, eBounds.midpoint.y], [eBounds.right + arrowRadius, ty - 4]]
+      : [eBounds.bottomMiddle.add([0, 4]), [eBounds.midpoint.x, eBounds.bottom + arrowRadius], [tx - 4, eBounds.bottom + arrowRadius]]
   ))
 
   // Determine the drawing size.

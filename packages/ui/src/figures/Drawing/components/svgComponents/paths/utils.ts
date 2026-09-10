@@ -1,12 +1,12 @@
 import { first, last, mod, repeat } from '@step-wise/js-utils';
-import { type VectorInput, Vector, ensureVectorArray, Span } from '@sqlvalley/utils';
+import { type VectorLike as VectorInput, Vector, ensureVectorArray, LineSegment } from '@step-wise/geometry';
 
 import { type ArrowHeadProps, type LineWithoutArrowsProps, type CurveWithoutArrowsProps } from './types';
 import { defaultArrowHeadPullIn } from './ArrowHead';
 
 // Make sure that the given set of points are Vectors and satisfy basic properties.
 export function ensurePathPoints(points: VectorInput[]): Vector[] {
-	const pRaw = ensureVectorArray(points, 2);
+	const pRaw = ensureVectorArray(points, { dimension: 2 });
 	const p = pRaw.filter((point, index) => index === 0 || !point.equals(points[index - 1]));
 	if (p.length < 2)
 		throw new Error(`Invalid path points: need at least two unique points.`);
@@ -129,8 +129,8 @@ export function getControlPoints(points: Vector[], close = false, curveRatio = 0
 
 		// Use ratios to find the control points.
 		return [
-			point.add(prevRelative.getProjectionOn(controlDirection).multiply(curveRatio / 2)),
-			point.add(nextRelative.getProjectionOn(controlDirection).multiply(curveRatio / 2)),
+			point.add(prevRelative.projectOnto(controlDirection).multiply(curveRatio / 2)),
+			point.add(nextRelative.projectOnto(controlDirection).multiply(curveRatio / 2)),
 		];
 	});
 }
@@ -151,14 +151,14 @@ export function processCurveArrows(
 
 	// For each arrow, determine the position/angle, and pull the line end-point into the arrow head.
 	if (startArrow) {
-		const startSpan = new Span(first(controlPoints, { offset: 1 })[0], first(points));
-		startArrow = { position: startSpan.end, angle: startSpan.angle, size, color, ...startArrow };
+		const startSpan = new LineSegment(first(controlPoints, { offset: 1 })[0], first(points));
+		startArrow = { position: startSpan.end, angle: startSpan.line.angle, size, color, ...startArrow };
 		const lineStart = startSpan.end.subtract(startSpan.vector.normalize().multiply(arrowHeadPullIn * startArrow.size!));
 		p = [lineStart, ...p.slice(1)];
 	}
 	if (endArrow) {
-		const endSpan = new Span(last(controlPoints, { offset: 1 })[1], last(points));
-		endArrow = { position: endSpan.end, angle: endSpan.angle, size, color, ...endArrow };
+		const endSpan = new LineSegment(last(controlPoints, { offset: 1 })[1], last(points));
+		endArrow = { position: endSpan.end, angle: endSpan.line.angle, size, color, ...endArrow };
 		const lineEnd = endSpan.end.subtract(endSpan.vector.normalize().multiply(arrowHeadPullIn * endArrow.size!));
 		p = [...p.slice(0, -1), lineEnd];
 	}

@@ -130,14 +130,14 @@ export function DependencyGraph() {
     <Element ref={p5Ref} position={[100, 190]}><DPGDL>E</DPGDL></Element>
 
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p5Bounds ? <>
-      <Curve points={[p3Bounds.middleTop.add([0, -2]), p1Bounds.middleBottom.add([0, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p3Bounds.topMiddle.add([0, -2]), p1Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
       <Curve points={[p3Bounds.middleRight.add([2, 0]), p4Bounds.middleLeft.add([-2, 0])]} endArrow={true} color={themeColor} />
-      <Curve points={[p4Bounds.middleTop.add([0, -2]), p2Bounds.middleBottom.add([0, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.topMiddle.add([0, -2]), p2Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
       <Curve points={[p4Bounds.bottomLeft.add([2, 0]), p5Bounds.topRight.add([-2, 0])]} endArrow={true} color={themeColor} />
       <Curve points={[p5Bounds.topLeft.add([2, 0]), p3Bounds.bottomRight.add([-2, 0])]} endArrow={true} color={themeColor} />
 
       <Element position={p3Bounds.middleRight.add(p4Bounds.middleLeft).divide(2).add([0, 10])} anchor={[0, 1]}><span style={{ color: themeColor, fontSize: '1.5em' }}>â€“</span></Element>
-      <Element position={p4Bounds.middleTop.add(p2Bounds.middleBottom).divide(2).add([-5, 6])} anchor={[1, 0]}><span style={{ color: themeColor, fontSize: '1.5em' }}>â€“</span></Element>
+      <Element position={p4Bounds.topMiddle.add(p2Bounds.bottomMiddle).divide(2).add([-5, 6])} anchor={[1, 0]}><span style={{ color: themeColor, fontSize: '1.5em' }}>â€“</span></Element>
     </> : null}
   </Drawing>;
 }

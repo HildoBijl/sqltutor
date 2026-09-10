@@ -1,5 +1,5 @@
 import type { SkillTree } from '@sqlvalley/skill-tree-definition';
-import { type VectorInput, Vector, ensureVector } from '@sqlvalley/utils/geometry';
+import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
 
 export interface ModulePositionMetaRaw {
   position: VectorInput;
@@ -54,7 +54,7 @@ export function processModulePositions<Id extends string>({
     modulePositions[id] = {
       ...positionDataRaw,
       id,
-      position: ensureVector(positionDataRaw.position, 2),
+      position: ensureVector(positionDataRaw.position, { dimension: 2 }),
       prerequisitesPathOrder: [],
       followUpsPathOrder: [],
     };

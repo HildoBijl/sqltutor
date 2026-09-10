@@ -1,4 +1,4 @@
-import { Vector, ensureVector } from '@sqlvalley/utils';
+import { Vector, ensureVector } from '@step-wise/geometry';
 
 import { SvgPortal } from '../../../DrawingContext';
 
@@ -18,7 +18,7 @@ export const defaultArrowHeadPullIn = 3; // This is the number of pixelsthat lin
 
 export function ArrowHead(props: ArrowHeadProps) {
 	const { ref, position, angle, size, color, className, style, ...rest } = { ...getDefaultArrowHead(), ...props };
-	const p = ensureVector(position, 2);
+	const p = ensureVector(position, { dimension: 2 });
 
 	return <SvgPortal>
 		<polygon ref={ref} points="0 0, -12 -6, -9 0, -12 6" className={className} style={{

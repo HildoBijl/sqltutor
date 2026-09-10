@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { Vector } from '@sqlvalley/utils/geometry';
+import { Vector } from '@step-wise/geometry';
 import { useRefWithValue, useRefWithElement } from '@sqlvalley/utils/dom';
 import { useThemeColor } from '@sqlvalley/ui';
 import { Page, Par, Section, Warning, Term, Em } from '@sqlvalley/ui';
@@ -71,8 +71,8 @@ ORDER BY ${sortColumn} DESC;`
       </Box>
     </Element>
 
-    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.leftBottom.add([-12, 8])]} color={themeColor} endArrow /> : null}
-    {sortColumnNameBounds && tBounds ? <Curve points={[[sortColumnNameBounds.left - 10, tBounds.bottom - 6], sortColumnNameBounds.leftBottom.add([-10, 12])]} color={themeColor} endArrow /> : null}
+    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.bottomLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
+    {sortColumnNameBounds && tBounds ? <Curve points={[[sortColumnNameBounds.left - 10, tBounds.bottom - 6], sortColumnNameBounds.bottomLeft.add([-10, 12])]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }
 
@@ -117,16 +117,16 @@ ORDER BY
 
     {/* First sorting arrows */}
     {ascBounds && sortColumn1NameBounds && tBounds ? <>
-      <Element position={sortColumn1NameBounds.leftTop.add([-36, -6])} anchor={[-1, 1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem' }}>Primary sorting</span></Element>
-      <Curve points={[ascBounds.topRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.leftBottom.add([-16, 8])]} color={themeColor} endArrow />
-      <Curve points={[sortColumn1NameBounds.leftBottom.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.bottom - 6]]} color={themeColor} endArrow />
+      <Element position={sortColumn1NameBounds.topLeft.add([-36, -6])} anchor={[-1, 1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem' }}>Primary sorting</span></Element>
+      <Curve points={[ascBounds.topRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.bottomLeft.add([-16, 8])]} color={themeColor} endArrow />
+      <Curve points={[sortColumn1NameBounds.bottomLeft.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.bottom - 6]]} color={themeColor} endArrow />
     </> : null}
 
     {/* Second sorting arrows */}
     {descBounds && sortColumn2NameBounds && tBounds ? <>
       <Element position={[sortColumn2NameBounds.left - 34, drawingHeight - 16]} anchor={[-1, -1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem', opacity: 0.5 }}>Secondary sorting</span></Element>
       <Curve points={[descBounds.bottomRight.add([0, 3]), [descBounds.right + 120, drawingHeight], [sortColumn2NameBounds.left - 40, drawingHeight], [sortColumn2NameBounds.left - 14, drawingHeight - 24]]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
-      <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.bottom - 6], sortColumn2NameBounds.leftBottom.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
+      <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.bottom - 6], sortColumn2NameBounds.bottomLeft.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
     </> : null}
   </Drawing>;
 }
@@ -249,7 +249,7 @@ ORDER BY ${sortColumn} ASC NULLS LAST;`
       </Box>
     </Element>
 
-    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.leftBottom.add([-12, 8])]} color={themeColor} endArrow /> : null}
-    {sortColumnNameBounds && tBounds ? <Curve points={[sortColumnNameBounds.leftBottom.add([-10, 12]), [sortColumnNameBounds.left - 10, tBounds.bottom - 6]]} color={themeColor} endArrow /> : null}
+    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.bottomLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
+    {sortColumnNameBounds && tBounds ? <Curve points={[sortColumnNameBounds.bottomLeft.add([-10, 12]), [sortColumnNameBounds.left - 10, tBounds.bottom - 6]]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }

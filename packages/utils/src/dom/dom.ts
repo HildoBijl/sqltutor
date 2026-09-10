@@ -1,4 +1,4 @@
-import { Vector } from '../geometry';
+import { Vector } from '@step-wise/geometry';
 
 // Find the coordinates (client) of a given event, as a Vector. For a touch event, the first touch is used.
 export function getEventPosition(event: MouseEvent | TouchEvent | PointerEvent): Vector | undefined {

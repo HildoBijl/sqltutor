@@ -1,7 +1,7 @@
 import { ButtonBase, useTheme } from '@mui/material/';
 import { Element, Rectangle } from '@sqlvalley/ui';
 import type { Module } from '@sqlvalley/skill-tree-definition';
-import { Vector } from '@sqlvalley/utils/geometry';
+import { Vector } from '@step-wise/geometry';
 import { NodeCompletedMark } from './Icons/NodeCompletedMark';
 import { NodeGoalPin } from './Icons/NodeGoalPin';
 import { NodeIconBadge } from './Icons/NodeIconBadge';
@@ -85,7 +85,7 @@ export function NodeCard({
   return (
     <>
       <Rectangle
-        dimensions={{ start: rectStart, end: rectEnd }}
+        dimensions={{ min: rectStart, max: rectEnd }}
         cornerRadius={cornerRadius}
         style={{
           fill: theme.palette.background.paper,
@@ -95,7 +95,7 @@ export function NodeCard({
         }}
       />
       <Rectangle
-        dimensions={{ start: rectStart, end: rectEnd }}
+        dimensions={{ min: rectStart, max: rectEnd }}
         cornerRadius={cornerRadius}
         style={{
           fill: fillColor,

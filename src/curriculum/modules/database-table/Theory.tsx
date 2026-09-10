@@ -96,15 +96,15 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
       <Curve points={[[x - 75 + r, columnNameNodeBounds.bottom + 2], [x - 75, columnNameNodeBounds.bottom + 2], [x - 75, tBounds.bottom], [x - 75 + r, tBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Column marker. */}
-      <Element position={[textNodeBounds.middle.x, y - 12]} anchor={[0, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.column}</span></Element>
+      <Element position={[textNodeBounds.midpoint.x, y - 12]} anchor={[0, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.column}</span></Element>
       <Curve points={[[textNodeBounds.left, y - 13 + r], [textNodeBounds.left, y - 13], [textNodeBounds.right, y - 13], [textNodeBounds.right, y - 13 + r]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Column names marker. */}
-      <Element position={[x - 25, columnNameNodeBounds.middle.y - 3]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.columnNames}</span></Element>
+      <Element position={[x - 25, columnNameNodeBounds.midpoint.y - 3]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.columnNames}</span></Element>
       <Curve points={[[x - 20 + r, columnNameNodeBounds.top], [x - 20, columnNameNodeBounds.top], [x - 20, columnNameNodeBounds.bottom], [x - 20 + r, columnNameNodeBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Row marker. */}
-      <Element position={[x - 25, textNodeBounds.middle.y]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.row}</span></Element>
+      <Element position={[x - 25, textNodeBounds.midpoint.y]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.row}</span></Element>
       <Curve points={[[x - 20 + r, textNodeBounds.top], [x - 20, textNodeBounds.top], [x - 20, textNodeBounds.bottom], [x - 20 + r, textNodeBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Cell marker. */}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { repeat } from '@step-wise/js-utils';
-import { Vector, type VectorInput, ensureVector, Rectangle, type RectangleInput, ensureRectangle } from '@sqlvalley/utils/geometry';
+import { Vector, type VectorLike as VectorInput, ensureVector, Rectangle, type RectangleLike as RectangleInput, ensureRectangle } from '@step-wise/geometry';
 import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement, useTextNode } from '@sqlvalley/utils/dom';
 
 import { type DrawingData } from './definitions';
@@ -24,8 +24,8 @@ export function getCoordinates(
 		return undefined;
 
 	// Check that the input is in the right dimension and format.
-	const clientCoordinatesVector = ensureVector(clientCoordinates, 2);
-	const boundsRect = ensureRectangle(figureBounds, 2);
+	const clientCoordinatesVector = ensureVector(clientCoordinates, { dimension: 2 });
+	const boundsRect = ensureRectangle(figureBounds, { dimension: 2 });
 
 	// Check edge cases.
 	if ((figureRect.width === 0 && boundsRect.width !== 0) || (figureRect.height === 0 && boundsRect.height !== 0))

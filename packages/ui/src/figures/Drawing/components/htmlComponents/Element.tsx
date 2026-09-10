@@ -1,6 +1,6 @@
 import { type Ref, type HTMLAttributes, useCallback, useLayoutEffect } from 'react';
 
-import { type VectorInput, Vector, ensureVector } from '@sqlvalley/utils/geometry';
+import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
 import { useEnsureRef, useEqualRefOnEquality, useResizeListener, notSelectable } from '@sqlvalley/utils/dom';
 
 import { useDrawingData, HtmlPortal } from '../../DrawingContext';
@@ -27,8 +27,8 @@ export const getDefaultElement = (): ElementProps => ({
 
 export function Element(props: ElementProps) {
 	const { children, position, rotate, scale, anchor, passive, behind, ref, style, ...rest } = { ...getDefaultElement(), ...props };
-	const p = useEqualRefOnEquality(ensureVector(position, 2));
-	const a = useEqualRefOnEquality(ensureVector(anchor, 2));
+	const p = useEqualRefOnEquality(ensureVector(position, { dimension: 2 }));
+	const a = useEqualRefOnEquality(ensureVector(anchor, { dimension: 2 }));
 
 	// Update element position based on current scale and transform.
 	const [mergedRef, internalRef] = useEnsureRef<HTMLDivElement>(ref);

@@ -83,7 +83,7 @@ export function FigureQueryExample() {
     </Element>
 
     {t1Bounds ? <>
-      <Curve points={[t1Bounds.middleBottom.add([0, arrowMargin]), t1Bounds.middleBottom.add([0, arrowHeight - arrowMargin])]} color={themeColor} endArrow />
+      <Curve points={[t1Bounds.bottomMiddle.add([0, arrowMargin]), t1Bounds.bottomMiddle.add([0, arrowHeight - arrowMargin])]} color={themeColor} endArrow />
       <Element position={[408, (t1Bounds?.height ?? 200) + arrowHeight / 2 - 4]} anchor={[-1, 0]}>
         <p style={{ fontSize: '0.8rem', fontStyle: 'italic', margin: 0, lineHeight: 1.4 }}>"Find the names of all employees earning<br />more than two hundred thousand per year."</p>
       </Element>

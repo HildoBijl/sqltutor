@@ -90,9 +90,9 @@ FROM employees;`
     </Element>
 
     {c1QueryBounds && c1NameBounds && c2QueryBounds && c2NameBounds && c3QueryBounds && c3NameBounds ? <>
-      <Curve points={[c1QueryBounds.topRight.add([0, 2]), [c1QueryBounds.right + 40, 0], [c1NameBounds.left - 40, 0], c1NameBounds.leftTop.add([-2, 2])]} color={themeColor} endArrow />
-      <Curve points={[c2QueryBounds.topRight.add([0, 2]), [c2QueryBounds.right + 40, 0], [c2NameBounds.left - 40, 0], c2NameBounds.leftTop.add([-2, 2])]} color={themeColor} endArrow />
-      <Curve points={[c3QueryBounds.topRight.add([0, 2]), [c3QueryBounds.right + 40, 0], [c3NameBounds.left - 40, 0], c3NameBounds.leftTop.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c1QueryBounds.topRight.add([0, 2]), [c1QueryBounds.right + 40, 0], [c1NameBounds.left - 40, 0], c1NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c2QueryBounds.topRight.add([0, 2]), [c2QueryBounds.right + 40, 0], [c2NameBounds.left - 40, 0], c2NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c3QueryBounds.topRight.add([0, 2]), [c3QueryBounds.right + 40, 0], [c3NameBounds.left - 40, 0], c3NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
     </> : null}
   </Drawing>;
 }
@@ -150,10 +150,10 @@ FROM employees;`;
     </Element>
 
     {e1Bounds && t1Bounds ? <>
-      <Curve points={[e1Bounds.bottomMiddle.add([0, 5]), [e1Bounds.middle.x, t1Bounds.middle.y + e1Bounds.height / 2], t1Bounds.leftMiddle.add([-4, e1Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[e1Bounds.bottomMiddle.add([0, 5]), [e1Bounds.midpoint.x, t1Bounds.midpoint.y + e1Bounds.height / 2], t1Bounds.middleLeft.add([-4, e1Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
     </> : null}
     {e2Bounds && t2Bounds ? <>
-      <Curve points={[e2Bounds.bottomMiddle.add([0, 5]), [e2Bounds.middle.x, t2Bounds.middle.y + e2Bounds.height / 2], t2Bounds.leftMiddle.add([-4, e2Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[e2Bounds.bottomMiddle.add([0, 5]), [e2Bounds.midpoint.x, t2Bounds.midpoint.y + e2Bounds.height / 2], t2Bounds.middleLeft.add([-4, e2Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
     </> : null}
   </Drawing>;
 }
@@ -183,6 +183,6 @@ export function FigureRenameColumns({ query = '' }) {
       </Box>
     </Element>
 
-    {eBounds && tBounds ? <Curve points={[eBounds.middleRight.add([4, 0]), [tBounds.left - 4, eBounds.middle.y]]} color={themeColor} endArrow /> : null}
+    {eBounds && tBounds ? <Curve points={[eBounds.middleRight.add([4, 0]), [tBounds.left - 4, eBounds.midpoint.y]]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }

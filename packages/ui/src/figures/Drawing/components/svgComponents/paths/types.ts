@@ -1,4 +1,4 @@
-import { type VectorInput, type Vector } from '@sqlvalley/utils';
+import { type VectorLike as VectorInput, type Vector } from '@step-wise/geometry';
 
 import { type DefaultObjectProps } from '../definitions';
 

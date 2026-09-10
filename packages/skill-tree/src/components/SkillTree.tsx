@@ -1,7 +1,7 @@
 import { Curve, Drawing } from '@sqlvalley/ui';
 import type { Module } from '@sqlvalley/skill-tree-definition';
 import { isReadyToLearn } from '@sqlvalley/skill-tree-definition';
-import type { Vector } from '@sqlvalley/utils/geometry';
+import type { Vector } from '@step-wise/geometry';
 import { useTheme } from '@mui/material/';
 import { NodeCard } from './SkillTreeComponents/NodeCard';
 import { Tooltip } from './SkillTreeComponents/Tooltip';

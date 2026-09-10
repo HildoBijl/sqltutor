@@ -1,4 +1,4 @@
-import { Vector } from '@sqlvalley/utils/geometry';
+import { Vector } from '@step-wise/geometry';
 import { cardHeight, cardWidth, treeMargin } from './settings';
 
 /*
