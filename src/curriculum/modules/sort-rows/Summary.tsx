@@ -99,7 +99,7 @@ function FigureSorting() {
 
         {/* Arrow between tables */}
         {t2Bounds ? <>
-          <Curve points={[[(t1Bounds.left + t2Bounds.left) / 2, t1Bounds.bottom + 10], [(t1Bounds.left + t2Bounds.left) / 2, t2Bounds.midpoint.y], t2Bounds.middleLeft.add([-10, 0])]} color={themeColor} endArrow />
+          <Curve points={[[(t1Bounds.left + t2Bounds.left) / 2, t1Bounds.top + 10], [(t1Bounds.left + t2Bounds.left) / 2, t2Bounds.midpoint.y], t2Bounds.middleLeft.add([-10, 0])]} color={themeColor} endArrow />
         </> : null}
       </> : null}
     </> : null}

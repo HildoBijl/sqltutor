@@ -140,8 +140,8 @@ WHERE ${addNot ? 'NOT (' : ''}${c1} = '${v1}'
     </Element> : null}
 
     {eBounds && c1QueryBounds && c1NameBounds && c2QueryBounds && c2NameBounds ? <>
-      <Curve points={[c1QueryBounds.middleRight.add([4, 0]), [c1NameBounds.midpoint.x, c1QueryBounds.midpoint.y], c1NameBounds.topMiddle.add([0, -4])]} color={themeColor} curveDistance={60} endArrow />
-      <Curve points={[[c2NameBounds.midpoint.x, eBounds.bottom - 6], c2NameBounds.topMiddle]} color={themeColor} endArrow />
+      <Curve points={[c1QueryBounds.middleRight.add([4, 0]), [c1NameBounds.midpoint.x, c1QueryBounds.midpoint.y], c1NameBounds.bottomMiddle.add([0, -4])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[[c2NameBounds.midpoint.x, eBounds.top - 6], c2NameBounds.bottomMiddle]} color={themeColor} endArrow />
     </> : null}
   </Drawing>;
 }
@@ -234,16 +234,16 @@ LIMIT 1;`);
 
     {/* Lines */}
     {aBounds && c1Bounds && c2Bounds && r1Bounds && r2Bounds && rBounds ? <>
-      <Curve points={[c1Bounds.bottomLeft.add([-4, -4]), c1Bounds.bottomLeft.add([-4, 4]), c1Bounds.bottomRight.add([4, 4]), c1Bounds.bottomRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
-      <Curve points={[c1Bounds.bottomMiddle.add([0, 4]), r1Bounds.topMiddle.add([0, -2])]} color={themeColor} endArrow />
+      <Curve points={[c1Bounds.topLeft.add([-4, -4]), c1Bounds.topLeft.add([-4, 4]), c1Bounds.topRight.add([4, 4]), c1Bounds.topRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
+      <Curve points={[c1Bounds.topMiddle.add([0, 4]), r1Bounds.bottomMiddle.add([0, -2])]} color={themeColor} endArrow />
 
-      <Curve points={[c2Bounds.bottomLeft.add([-4, -4]), c2Bounds.bottomLeft.add([-4, 4]), c2Bounds.bottomRight.add([4, 4]), c2Bounds.bottomRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
-      <Curve points={[c2Bounds.bottomMiddle.add([0, 4]), r2Bounds.topMiddle.add([0, -2])]} color={themeColor} endArrow />
+      <Curve points={[c2Bounds.topLeft.add([-4, -4]), c2Bounds.topLeft.add([-4, 4]), c2Bounds.topRight.add([4, 4]), c2Bounds.topRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
+      <Curve points={[c2Bounds.topMiddle.add([0, 4]), r2Bounds.bottomMiddle.add([0, -2])]} color={themeColor} endArrow />
 
-      <Curve points={[r1Bounds.bottomLeft.add([-4, -4]), r1Bounds.bottomLeft.add([-4, 4]), r2Bounds.bottomRight.add([4, 4]), r2Bounds.bottomRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
-      <Curve points={[[andX, r1Bounds.bottom + 4], [andX, rBounds.top - 2]]} color={themeColor} size={2} endArrow />
+      <Curve points={[r1Bounds.topLeft.add([-4, -4]), r1Bounds.topLeft.add([-4, 4]), r2Bounds.topRight.add([4, 4]), r2Bounds.topRight.add([4, -4])]} curveDistance={8} color={themeColor} size={2} />
+      <Curve points={[[andX, r1Bounds.top + 4], [andX, rBounds.bottom - 2]]} color={themeColor} size={2} endArrow />
 
-      <Curve points={[rBounds.bottomMiddle.add([0, 2]), [andX, 3.2 * lineHeight]]} color={themeColor} size={2} endArrow />
+      <Curve points={[rBounds.topMiddle.add([0, 2]), [andX, 3.2 * lineHeight]]} color={themeColor} size={2} endArrow />
     </> : null}
   </Drawing>;
 }
@@ -278,7 +278,7 @@ function FigureRewrittenQuery({ query = '' }) {
       </Box>
     </Element> : null}
 
-    {eBounds && tBounds ? <Curve points={[eBounds.middleRight.add([2, 0]), [tBounds.midpoint.x + eBounds.width / 2, eBounds.midpoint.y], [tBounds.midpoint.x + eBounds.width / 2, tBounds.top - 4]]} color={themeColor} curveDistance={40} endArrow /> : null}
+    {eBounds && tBounds ? <Curve points={[eBounds.middleRight.add([2, 0]), [tBounds.midpoint.x + eBounds.width / 2, eBounds.midpoint.y], [tBounds.midpoint.x + eBounds.width / 2, tBounds.bottom - 4]]} color={themeColor} curveDistance={40} endArrow /> : null}
   </Drawing>;
 }
 
@@ -357,8 +357,8 @@ ${query2}`}</SQLDisplay>
 
     {/* Operator arrow */}
     {t2Bounds && tBounds ? <>
-      <Curve points={[t2Bounds.bottomMiddle.add([0, 2]), tBounds.topMiddle.add([0, -2])]} color={themeColor} endArrow />
-      <Element position={[tBounds.midpoint.x + 8, (t2Bounds.bottom + tBounds.top) / 2 - 4]} anchor={[-1, 0]}><ISQL>{operator}</ISQL></Element>
+      <Curve points={[t2Bounds.topMiddle.add([0, 2]), tBounds.bottomMiddle.add([0, -2])]} color={themeColor} endArrow />
+      <Element position={[tBounds.midpoint.x + 8, (t2Bounds.top + tBounds.bottom) / 2 - 4]} anchor={[-1, 0]}><ISQL>{operator}</ISQL></Element>
     </> : null}
   </Drawing>;
 }

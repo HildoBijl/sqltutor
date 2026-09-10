@@ -71,8 +71,8 @@ WHERE NOT (status = 'paid leave' OR status = 'sick leave')
     </Element> : null}
 
     {eBounds && c1QueryBounds && c1NameBounds && c2QueryBounds && c2NameBounds ? <>
-      <Curve points={[c1QueryBounds.middleRight.add([9, 2]), [c1NameBounds.midpoint.x, c1QueryBounds.midpoint.y + 2], c1NameBounds.topMiddle.add([0, -4])]} color={themeColor} curveDistance={60} endArrow />
-      <Curve points={[[c2QueryBounds.midpoint.x + 4, c2QueryBounds.bottom + 2], [c2QueryBounds.midpoint.x + 4, eBounds.bottom + delta / 2 - 2], [c2NameBounds.midpoint.x, eBounds.bottom + delta / 2 - 2], c2NameBounds.topMiddle]} color={themeColor} curveDistance={20} endArrow />
+      <Curve points={[c1QueryBounds.middleRight.add([9, 2]), [c1NameBounds.midpoint.x, c1QueryBounds.midpoint.y + 2], c1NameBounds.bottomMiddle.add([0, -4])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[[c2QueryBounds.midpoint.x + 4, c2QueryBounds.top + 2], [c2QueryBounds.midpoint.x + 4, eBounds.top + delta / 2 - 2], [c2NameBounds.midpoint.x, eBounds.top + delta / 2 - 2], c2NameBounds.bottomMiddle]} color={themeColor} curveDistance={20} endArrow />
     </> : null}
   </Drawing>;
 }

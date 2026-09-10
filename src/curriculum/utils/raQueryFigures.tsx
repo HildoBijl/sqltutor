@@ -63,7 +63,7 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
         tx = Math.max(0, (we - wt) / 2);
         ty = he + arrowLength;
         const middleX = Math.min(eBounds.midpoint.x, tBounds.midpoint.x);
-        arrowPoints = [[middleX, eBounds.bottom + 4], [middleX, ty - 4]];
+        arrowPoints = [[middleX, eBounds.top + 4], [middleX, ty - 4]];
       } else if (arrowPos === 'topRight') {
         tx = 0;
         ty = he + delta;
@@ -75,7 +75,7 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
         ty = he + delta;
         const leftX = tBounds.left - arrowRadius;
         const middleY = tBounds.midpoint.y;
-        arrowPoints = [[leftX, eBounds.bottom + 4], [leftX, middleY], [tBounds.left - 4, middleY]];
+        arrowPoints = [[leftX, eBounds.top + 4], [leftX, middleY], [tBounds.left - 4, middleY]];
       }
     } else {
       tx = we + (arrowPos === 'between' ? arrowLength : delta);
@@ -85,8 +85,8 @@ export function FigureExampleRAQuery({ query = <></>, actualQuery = '', below = 
         arrowPoints = [[eBounds.right + 4, middleY], [tx - 4, middleY]];
       } else {
         const middleX = eBounds.midpoint.x;
-        const bottomY = eBounds.bottom + arrowRadius;
-        arrowPoints = [[middleX, eBounds.bottom + 4], [middleX, bottomY], [tx - 4, bottomY]]
+        const bottomY = eBounds.top + arrowRadius;
+        arrowPoints = [[middleX, eBounds.top + 4], [middleX, bottomY], [tx - 4, bottomY]]
       }
     }
   }

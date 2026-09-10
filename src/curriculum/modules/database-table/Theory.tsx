@@ -92,8 +92,8 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
       <Curve points={[[x, y - 40 + r], [x, y - 40], [w, y - 40], [w, y - 40 + r]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Contents marker. */}
-      <Element position={[x - 80, (columnNameNodeBounds.bottom + tBounds.bottom) / 2]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.contents}</span></Element>
-      <Curve points={[[x - 75 + r, columnNameNodeBounds.bottom + 2], [x - 75, columnNameNodeBounds.bottom + 2], [x - 75, tBounds.bottom], [x - 75 + r, tBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
+      <Element position={[x - 80, (columnNameNodeBounds.top + tBounds.top) / 2]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.contents}</span></Element>
+      <Curve points={[[x - 75 + r, columnNameNodeBounds.top + 2], [x - 75, columnNameNodeBounds.top + 2], [x - 75, tBounds.top], [x - 75 + r, tBounds.top]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Column marker. */}
       <Element position={[textNodeBounds.midpoint.x, y - 12]} anchor={[0, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.column}</span></Element>
@@ -101,14 +101,14 @@ export function FigureTerminology({ terminology }: { terminology?: { [key: strin
 
       {/* Column names marker. */}
       <Element position={[x - 25, columnNameNodeBounds.midpoint.y - 3]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.columnNames}</span></Element>
-      <Curve points={[[x - 20 + r, columnNameNodeBounds.top], [x - 20, columnNameNodeBounds.top], [x - 20, columnNameNodeBounds.bottom], [x - 20 + r, columnNameNodeBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
+      <Curve points={[[x - 20 + r, columnNameNodeBounds.bottom], [x - 20, columnNameNodeBounds.bottom], [x - 20, columnNameNodeBounds.top], [x - 20 + r, columnNameNodeBounds.top]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Row marker. */}
       <Element position={[x - 25, textNodeBounds.midpoint.y]} anchor={[1, 0]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.row}</span></Element>
-      <Curve points={[[x - 20 + r, textNodeBounds.top], [x - 20, textNodeBounds.top], [x - 20, textNodeBounds.bottom], [x - 20 + r, textNodeBounds.bottom]]} curveDistance={r} color={themeColor} size={2} />
+      <Curve points={[[x - 20 + r, textNodeBounds.bottom], [x - 20, textNodeBounds.bottom], [x - 20, textNodeBounds.top], [x - 20 + r, textNodeBounds.top]]} curveDistance={r} color={themeColor} size={2} />
 
       {/* Cell marker. */}
-      <Element position={textNodeBounds.topRight.add([-8, 3])} anchor={[1, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.cell}</span></Element>
+      <Element position={textNodeBounds.bottomRight.add([-8, 3])} anchor={[1, 1]}><span style={{ color: themeColor, fontWeight: 500, fontSize: '0.8em' }}>{terminology?.cell}</span></Element>
       <Rectangle dimensions={textNodeBounds} cornerRadius={r} style={{ stroke: themeColor, strokeWidth: 2, fill: 'none' }} />
     </> : null}
   </Drawing>;

@@ -71,8 +71,8 @@ ORDER BY ${sortColumn} DESC;`
       </Box>
     </Element>
 
-    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.bottomLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
-    {sortColumnNameBounds && tBounds ? <Curve points={[[sortColumnNameBounds.left - 10, tBounds.bottom - 6], sortColumnNameBounds.bottomLeft.add([-10, 12])]} color={themeColor} endArrow /> : null}
+    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.bottomRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.topLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
+    {sortColumnNameBounds && tBounds ? <Curve points={[[sortColumnNameBounds.left - 10, tBounds.top - 6], sortColumnNameBounds.topLeft.add([-10, 12])]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }
 
@@ -117,16 +117,16 @@ ORDER BY
 
     {/* First sorting arrows */}
     {ascBounds && sortColumn1NameBounds && tBounds ? <>
-      <Element position={sortColumn1NameBounds.topLeft.add([-36, -6])} anchor={[-1, 1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem' }}>Primary sorting</span></Element>
-      <Curve points={[ascBounds.topRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.bottomLeft.add([-16, 8])]} color={themeColor} endArrow />
-      <Curve points={[sortColumn1NameBounds.bottomLeft.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.bottom - 6]]} color={themeColor} endArrow />
+      <Element position={sortColumn1NameBounds.bottomLeft.add([-36, -6])} anchor={[-1, 1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem' }}>Primary sorting</span></Element>
+      <Curve points={[ascBounds.bottomRight.add([0, 0]), [ascBounds.right + 70, 0], [sortColumn1NameBounds.left - 30, 0], sortColumn1NameBounds.topLeft.add([-16, 8])]} color={themeColor} endArrow />
+      <Curve points={[sortColumn1NameBounds.topLeft.add([-14, 12]), [sortColumn1NameBounds.left - 14, tBounds.top - 6]]} color={themeColor} endArrow />
     </> : null}
 
     {/* Second sorting arrows */}
     {descBounds && sortColumn2NameBounds && tBounds ? <>
       <Element position={[sortColumn2NameBounds.left - 34, drawingHeight - 16]} anchor={[-1, -1]}><span style={{ fontWeight: 600, color: themeColor, fontSize: '0.7rem', opacity: 0.5 }}>Secondary sorting</span></Element>
-      <Curve points={[descBounds.bottomRight.add([0, 3]), [descBounds.right + 120, drawingHeight], [sortColumn2NameBounds.left - 40, drawingHeight], [sortColumn2NameBounds.left - 14, drawingHeight - 24]]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
-      <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.bottom - 6], sortColumn2NameBounds.bottomLeft.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
+      <Curve points={[descBounds.topRight.add([0, 3]), [descBounds.right + 120, drawingHeight], [sortColumn2NameBounds.left - 40, drawingHeight], [sortColumn2NameBounds.left - 14, drawingHeight - 24]]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
+      <Curve points={[[sortColumn2NameBounds.left - 12, tBounds.top - 6], sortColumn2NameBounds.topLeft.add([-12, 12])]} color={themeColor} endArrow style={{ opacity: 0.5 }} />
     </> : null}
   </Drawing>;
 }
@@ -153,8 +153,8 @@ LIMIT 3;`
   const [tRef, tBounds, table] = useRefWithBounds(drawingData);
   const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
-  const minY = (sortColumnNameBounds?.bottom ?? 60) + 12;
-  const maxY = (tBounds?.bottom ?? 200) - 6;
+  const minY = (sortColumnNameBounds?.top ?? 60) + 12;
+  const maxY = (tBounds?.top ?? 200) - 6;
   const avgY = (minY + maxY) / 2;
   const x = (tBounds?.left ?? 320) - 10;
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, eBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
@@ -197,7 +197,7 @@ LIMIT 3 OFFSET ${offset};`
   const [tRef, tBounds, table] = useRefWithBounds(drawingData);
   const sortColumnNameBounds = useTextNodeBounds(table, sortColumn, drawingData);
 
-  const point = tBounds && sortColumnNameBounds && new Vector(tBounds.left - 4, sortColumnNameBounds.bottom + 10);
+  const point = tBounds && sortColumnNameBounds && new Vector(tBounds.left - 4, sortColumnNameBounds.top + 10);
   return <Drawing ref={drawingRef} width={800} height={Math.max(tBounds?.height ?? 200, eBounds?.height ?? 200)} maxWidth={800} disableSVGPointerEvents>
     <Element ref={eRef} position={[0, 0]} anchor={[-1, -1]} behind>
       <SQLDisplay>{query}</SQLDisplay>
@@ -249,7 +249,7 @@ ORDER BY ${sortColumn} ASC NULLS LAST;`
       </Box>
     </Element>
 
-    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.topRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.bottomLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
-    {sortColumnNameBounds && tBounds ? <Curve points={[sortColumnNameBounds.bottomLeft.add([-10, 12]), [sortColumnNameBounds.left - 10, tBounds.bottom - 6]]} color={themeColor} endArrow /> : null}
+    {descBounds && sortColumnNameBounds ? <Curve points={[descBounds.bottomRight.add([0, 0]), [descBounds.right + 70, 0], [sortColumnNameBounds.left - 30, 0], sortColumnNameBounds.topLeft.add([-12, 8])]} color={themeColor} endArrow /> : null}
+    {sortColumnNameBounds && tBounds ? <Curve points={[sortColumnNameBounds.topLeft.add([-10, 12]), [sortColumnNameBounds.left - 10, tBounds.top - 6]]} color={themeColor} endArrow /> : null}
   </Drawing>;
 }

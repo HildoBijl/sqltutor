@@ -107,11 +107,11 @@ export function FirstDependencyGraph() {
     <Element ref={p6Ref} position={[240, 230]}><DPGDL>withNames</DPGDL></Element>
 
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p5Bounds && p6Bounds ? <>
-      <Curve points={[p4Bounds.topRight.add([2, 3]), p3Bounds.bottomLeft.add([-2, -1])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.bottomRight.add([2, 3]), p3Bounds.topLeft.add([-2, -1])]} endArrow={true} color={themeColor} />
       <Curve points={[p5Bounds.middleLeft.add([-3, 0]), p4Bounds.middleRight.add([3, 0])]} endArrow={true} color={themeColor} />
-      <Curve points={[p6Bounds.topRight.add([-1, 0]), p5Bounds.bottomLeft.add([0, -2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p6Bounds.topMiddle.add([-40, -4]), p1Bounds.bottomRight.add([0, 0])]} endArrow={true} color={themeColor} />
-      <Curve points={[p6Bounds.topMiddle.add([0, -3]), p2Bounds.bottomMiddle.add([0, 3])]} endArrow={true} color={themeColor} />
+      <Curve points={[p6Bounds.bottomRight.add([-1, 0]), p5Bounds.topLeft.add([0, -2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p6Bounds.bottomMiddle.add([-40, -4]), p1Bounds.topRight.add([0, 0])]} endArrow={true} color={themeColor} />
+      <Curve points={[p6Bounds.bottomMiddle.add([0, -3]), p2Bounds.topMiddle.add([0, 3])]} endArrow={true} color={themeColor} />
     </> : null}
   </Drawing>;
 }
@@ -138,21 +138,21 @@ export function CleanedFirstDependencyGraph({ layer = 3 }) {
     {layer >= 1 ? <>
       <Element position={[0, 100]}><strong>Layer 1:</strong></Element>
       <Element ref={p4Ref} position={[420, 100]}><DPGDL>sold</DPGDL></Element>
-      {p3Bounds && p4Bounds ? <Curve points={[p4Bounds.topMiddle.add([0, -3]), p3Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} /> : null}
+      {p3Bounds && p4Bounds ? <Curve points={[p4Bounds.bottomMiddle.add([0, -3]), p3Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} /> : null}
     </> : null}
 
     {layer >= 2 ? <>
       <Element position={[0, 180]}><strong>Layer 2:</strong></Element>
-      {p5Bounds && p4Bounds ? <Curve points={[p5Bounds.topMiddle.add([0, -3]), p4Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} /> : null}
+      {p5Bounds && p4Bounds ? <Curve points={[p5Bounds.bottomMiddle.add([0, -3]), p4Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} /> : null}
       <Element ref={p5Ref} position={[420, 180]}><DPGDL>soldAndBoughtBack</DPGDL></Element>
     </> : null}
 
     {layer >= 3 ? <>
       <Element position={[0, 260]}><strong>Layer 3:</strong></Element>
       <Element ref={p6Ref} position={[265, 260]}><DPGDL>withNames</DPGDL></Element>
-      {p6Bounds && p5Bounds ? <Curve points={[p6Bounds.topMiddle.add([30, -2]), p5Bounds.bottomLeft.add([20, 2])]} endArrow={true} color={themeColor} /> : null}
-      {p6Bounds && p1Bounds ? <Curve points={[p6Bounds.topMiddle.add([-30, -2]), p1Bounds.bottomMiddle.add([20, 2])]} endArrow={true} color={themeColor} /> : null}
-      {p6Bounds && p2Bounds ? <Curve points={[p6Bounds.topMiddle.add([0, -3]), p2Bounds.bottomMiddle.add([0, 3])]} endArrow={true} color={themeColor} /> : null}
+      {p6Bounds && p5Bounds ? <Curve points={[p6Bounds.bottomMiddle.add([30, -2]), p5Bounds.topLeft.add([20, 2])]} endArrow={true} color={themeColor} /> : null}
+      {p6Bounds && p1Bounds ? <Curve points={[p6Bounds.bottomMiddle.add([-30, -2]), p1Bounds.topMiddle.add([20, 2])]} endArrow={true} color={themeColor} /> : null}
+      {p6Bounds && p2Bounds ? <Curve points={[p6Bounds.bottomMiddle.add([0, -3]), p2Bounds.topMiddle.add([0, 3])]} endArrow={true} color={themeColor} /> : null}
     </> : null}
   </Drawing>;
 }
@@ -191,25 +191,25 @@ export function SecondDependencyGraph({ collapsed = false }) {
     </>}
 
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p8Bounds && p9Bounds ? <>
-      <Curve points={[p4Bounds.topMiddle.add([0, -2]), p1Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p4Bounds.topRight.add([0, 0]), p2Bounds.bottomLeft.add([0, 0])]} endArrow={true} color={themeColor} />
-      <Curve points={[p8Bounds.topMiddle.add([0, -2]), p2Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.bottomMiddle.add([0, -2]), p1Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.bottomRight.add([0, 0]), p2Bounds.topLeft.add([0, 0])]} endArrow={true} color={themeColor} />
+      <Curve points={[p8Bounds.bottomMiddle.add([0, -2]), p2Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
       <Curve points={[p8Bounds.middleLeft.add([-2, 0]), p4Bounds.middleRight.add([2, 0])]} endArrow={true} color={themeColor} />
-      <Curve points={[p9Bounds.topRight.add([0, 0]), p8Bounds.bottomLeft.add([0, 0])]} endArrow={true} color={themeColor} />
+      <Curve points={[p9Bounds.bottomRight.add([0, 0]), p8Bounds.topLeft.add([0, 0])]} endArrow={true} color={themeColor} />
 
       {collapsed ? <>
         {p567Bounds ? <>
-          <Curve points={[p567Bounds.topLeft.add([-2, 1]), p4Bounds.bottomRight.add([1, -2])]} endArrow={true} color={themeColor} />
+          <Curve points={[p567Bounds.bottomLeft.add([-2, 1]), p4Bounds.topRight.add([1, -2])]} endArrow={true} color={themeColor} />
           <Curve points={[p9Bounds.middleRight.add([2, 0]), p567Bounds.middleLeft.add([-2, 0])]} endArrow={true} color={themeColor} />
-          <Curve points={[p567Bounds.topMiddle.add([0, -2]), p3Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
+          <Curve points={[p567Bounds.bottomMiddle.add([0, -2]), p3Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
         </> : null}
       </> : <>
         {p5Bounds && p6Bounds && p7Bounds ? <>
-          <Curve points={[p7Bounds.topLeft.add([0, 0]), p4Bounds.bottomRight.add([0, 0])]} endArrow={true} color={themeColor} />
+          <Curve points={[p7Bounds.bottomLeft.add([0, 0]), p4Bounds.topRight.add([0, 0])]} endArrow={true} color={themeColor} />
           <Curve points={[p9Bounds.middleRight.add([2, 0]), p7Bounds.middleLeft.add([-2, 0])]} endArrow={true} color={themeColor} />
-          <Curve points={[p5Bounds.topMiddle.add([0, -2]), p3Bounds.bottomMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
-          <Curve points={[p7Bounds.topRight.add([0, 0]), p5Bounds.bottomLeft.add([0, 0])]} endArrow={true} color={themeColor} />
-          <Curve points={[p5Bounds.bottomMiddle.add([0, 2]), p6Bounds.topMiddle.add([0, -2])]} endArrow={true} color={themeColor} />
+          <Curve points={[p5Bounds.bottomMiddle.add([0, -2]), p3Bounds.topMiddle.add([0, 2])]} endArrow={true} color={themeColor} />
+          <Curve points={[p7Bounds.bottomRight.add([0, 0]), p5Bounds.topLeft.add([0, 0])]} endArrow={true} color={themeColor} />
+          <Curve points={[p5Bounds.topMiddle.add([0, 2]), p6Bounds.bottomMiddle.add([0, -2])]} endArrow={true} color={themeColor} />
           <Curve points={[p6Bounds.middleLeft.add([-2, 0]), p7Bounds.middleRight.add([2, 0])]} endArrow={true} color={themeColor} />
         </> : null}
       </>}
@@ -248,14 +248,14 @@ export function CleanedSecondDependencyGraph() {
     <Element ref={p9Ref} position={[270, 250]}><DPGDL>I</DPGDL></Element>
 
     {p1Bounds && p2Bounds && p3Bounds && p4Bounds && p567Bounds && p8Bounds && p9Bounds ? <>
-      <Curve points={[p4Bounds.topLeft.add([5, -3]), p1Bounds.bottomRight.add([-5, 3])]} endArrow={true} color={themeColor} />
-      <Curve points={[p4Bounds.topRight.add([0, -2]), p2Bounds.bottomLeft.add([0, 2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p8Bounds.topRight.add([-2, -1]), p2Bounds.bottomMiddle.add([-10, 4])]} endArrow={true} color={themeColor} />
-      <Curve points={[p8Bounds.topMiddle.add([-5, -3]), p4Bounds.bottomMiddle.add([5, 2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p567Bounds.topMiddle.add([20, -4]), p3Bounds.bottomLeft.add([10, 3])]} endArrow={true} color={themeColor} />
-      <Curve points={[p567Bounds.topLeft.add([-2, 1]), p4Bounds.bottomRight.add([1, -2])]} endArrow={true} color={themeColor} />
-      <Curve points={[p9Bounds.topLeft.add([5, -3]), p8Bounds.bottomRight.add([-5, 3])]} endArrow={true} color={themeColor} />
-      <Curve points={[p9Bounds.topRight.add([-10, -4]), p567Bounds.bottomLeft.add([10, 4])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.bottomLeft.add([5, -3]), p1Bounds.topRight.add([-5, 3])]} endArrow={true} color={themeColor} />
+      <Curve points={[p4Bounds.bottomRight.add([0, -2]), p2Bounds.topLeft.add([0, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p8Bounds.bottomRight.add([-2, -1]), p2Bounds.topMiddle.add([-10, 4])]} endArrow={true} color={themeColor} />
+      <Curve points={[p8Bounds.bottomMiddle.add([-5, -3]), p4Bounds.topMiddle.add([5, 2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p567Bounds.bottomMiddle.add([20, -4]), p3Bounds.topLeft.add([10, 3])]} endArrow={true} color={themeColor} />
+      <Curve points={[p567Bounds.bottomLeft.add([-2, 1]), p4Bounds.topRight.add([1, -2])]} endArrow={true} color={themeColor} />
+      <Curve points={[p9Bounds.bottomLeft.add([5, -3]), p8Bounds.topRight.add([-5, 3])]} endArrow={true} color={themeColor} />
+      <Curve points={[p9Bounds.bottomRight.add([-10, -4]), p567Bounds.topLeft.add([10, 4])]} endArrow={true} color={themeColor} />
     </> : null}
   </Drawing>;
 }

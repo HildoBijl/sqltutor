@@ -90,9 +90,9 @@ FROM employees;`
     </Element>
 
     {c1QueryBounds && c1NameBounds && c2QueryBounds && c2NameBounds && c3QueryBounds && c3NameBounds ? <>
-      <Curve points={[c1QueryBounds.topRight.add([0, 2]), [c1QueryBounds.right + 40, 0], [c1NameBounds.left - 40, 0], c1NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
-      <Curve points={[c2QueryBounds.topRight.add([0, 2]), [c2QueryBounds.right + 40, 0], [c2NameBounds.left - 40, 0], c2NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
-      <Curve points={[c3QueryBounds.topRight.add([0, 2]), [c3QueryBounds.right + 40, 0], [c3NameBounds.left - 40, 0], c3NameBounds.topLeft.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c1QueryBounds.bottomRight.add([0, 2]), [c1QueryBounds.right + 40, 0], [c1NameBounds.left - 40, 0], c1NameBounds.bottomLeft.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c2QueryBounds.bottomRight.add([0, 2]), [c2QueryBounds.right + 40, 0], [c2NameBounds.left - 40, 0], c2NameBounds.bottomLeft.add([-2, 2])]} color={themeColor} endArrow />
+      <Curve points={[c3QueryBounds.bottomRight.add([0, 2]), [c3QueryBounds.right + 40, 0], [c3NameBounds.left - 40, 0], c3NameBounds.bottomLeft.add([-2, 2])]} color={themeColor} endArrow />
     </> : null}
   </Drawing>;
 }
@@ -150,10 +150,10 @@ FROM employees;`;
     </Element>
 
     {e1Bounds && t1Bounds ? <>
-      <Curve points={[e1Bounds.bottomMiddle.add([0, 5]), [e1Bounds.midpoint.x, t1Bounds.midpoint.y + e1Bounds.height / 2], t1Bounds.middleLeft.add([-4, e1Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[e1Bounds.topMiddle.add([0, 5]), [e1Bounds.midpoint.x, t1Bounds.midpoint.y + e1Bounds.height / 2], t1Bounds.middleLeft.add([-4, e1Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
     </> : null}
     {e2Bounds && t2Bounds ? <>
-      <Curve points={[e2Bounds.bottomMiddle.add([0, 5]), [e2Bounds.midpoint.x, t2Bounds.midpoint.y + e2Bounds.height / 2], t2Bounds.middleLeft.add([-4, e2Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
+      <Curve points={[e2Bounds.topMiddle.add([0, 5]), [e2Bounds.midpoint.x, t2Bounds.midpoint.y + e2Bounds.height / 2], t2Bounds.middleLeft.add([-4, e2Bounds.height / 2])]} color={themeColor} curveDistance={60} endArrow />
     </> : null}
   </Drawing>;
 }
