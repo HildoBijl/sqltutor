@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useMousePosition } from "@sqlvalley/utils/dom";
+import { usePointerPosition } from '@step-wise/react-utils';
 import { useTheme } from "@mui/material/";
 
 interface TooltipProps {
@@ -8,7 +8,7 @@ interface TooltipProps {
 }
 
 export function Tooltip({ children }: TooltipProps) {
-  const mousePosition = useMousePosition();
+  const mousePosition = usePointerPosition();
   const theme = useTheme();
 
   if (!children || !mousePosition) return null;

@@ -1,8 +1,8 @@
 import { useImperativeHandle } from 'react';
 
-import { useEnsureRef, useRefWithElement } from '@sqlvalley/utils/dom';
+import { useRefWithElement } from '@sqlvalley/utils/dom';
 
-import { getDefaultFigure, FigureProps, FigureData } from './definitions';
+import { getDefaultFigure, FigureProps } from './definitions';
 
 export function Figure(props: FigureProps) {
 	const { aspectRatio, maxWidth, innerProps, ref, style, ...rest } = { ...getDefaultFigure(), ...props };
@@ -11,8 +11,7 @@ export function Figure(props: FigureProps) {
 	// Define refs and make them accessible to calling elements.
 	const [figureInnerRef, figureInner] = useRefWithElement<HTMLDivElement>();
 	const [figureOuterRef, figureOuter] = useRefWithElement<HTMLDivElement>();
-	const [mergedRef] = useEnsureRef<FigureData>(props.ref);
-	useImperativeHandle(mergedRef, () => ({
+	useImperativeHandle(ref, () => ({
 		get inner() { return figureInner },
 		get outer() { return figureOuter },
 	}), [figureInner, figureOuter]);

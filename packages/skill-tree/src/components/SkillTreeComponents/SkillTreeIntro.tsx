@@ -15,7 +15,7 @@ import {
   School,
   OutlinedFlag,
 } from "@mui/icons-material";
-import { useIsTouchDevice } from "@sqlvalley/utils/dom";
+import { useMediaQuery } from '@mui/material';
 
 interface SkillTreeIntroProps {
   open: boolean;
@@ -42,7 +42,7 @@ function Instruction({
 }
 
 export function SkillTreeIntro({ open, onClose }: SkillTreeIntroProps) {
-  const isTouch = useIsTouchDevice();
+  const isTouch = useMediaQuery('(pointer: coarse)');
 
   return (
     <Dialog

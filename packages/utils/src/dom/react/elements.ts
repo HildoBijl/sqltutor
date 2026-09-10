@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, ReactNode, isValidElement } from 'react'
-import { createPortal } from 'react-dom'
+import { useState, useCallback } from 'react'
 
 import { getTextNodes } from '../dom'
 
@@ -15,31 +14,6 @@ export function useRefWithValue<T>(): [(value: T | null) => void, T | null] {
   const [value, setValue] = useState<T | null>(null);
   const refCallback = useCallback((value: T | null) => setValue(value), []);
   return [refCallback, value];
-}
-
-// Ensure that the given parameter is a React-type element.
-export function ensureReactElement(element: ReactNode, allowString = true, allowNumber = true): ReactNode {
-  if (
-    !isValidElement(element) &&
-    (!allowString || typeof element !== 'string') &&
-    (!allowNumber || typeof element !== 'number')
-  )
-    throw new Error(`Invalid React element: expected a valid React element but received something of type "${typeof element}".`);
-  return element;
-}
-
-// Render the children inside the given target element.
-export type PortalTarget = HTMLElement | SVGSVGElement | SVGDefsElement | null | undefined;
-export interface PortalProps {
-  target: PortalTarget;
-  children: ReactNode;
-}
-export function Portal({ target, children }: PortalProps) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []); // Delay rendering until mounted to avoid SSR mismatches.
-  if (!mounted || !target)
-    return null;
-  return createPortal(children, target);
 }
 
 // From an element (a container), find the text node in it satisfying a given condition. Optionally, an offset can be given if multiple elements satisfy that condition. If the condition is a string, it finds the text node containing that string.

@@ -13,6 +13,7 @@
     "@sqlvalley/ui": "*",
     "@sqlvalley/utils": "*",
     "@step-wise/geometry": "^0.1.0",
+    "@step-wise/react-utils": "^0.1.0",
     "@use-gesture/react": "^10.3.1"
   },
   "peerDependencies": {

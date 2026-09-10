@@ -1,10 +1,9 @@
 import { useState, useCallback, useRef, useLayoutEffect } from 'react';
-import useResizeObserver from '@react-hook/resize-observer';
+import { useEventListener, useResizeObserver } from '@step-wise/react-utils';
 
-import { getWindowSize, findLayoutRoots } from '../dom';
+import { findLayoutRoots } from '../dom';
 
 import { useConsistentValue } from './consistency';
-import { useEventListener } from './events';
 
 // When the window or given element resizes, the given function is called.
 export function useResizeListener(
@@ -13,14 +12,6 @@ export function useResizeListener(
 ): void {
 	useResizeObserver(element, () => callbackFunc());
 	useEventListener("resize", () => callbackFunc(), window);
-}
-
-// Get the window size and update it when changes.
-export function useWindowSize(): { width: number; height: number } {
-	const [windowSize, setWindowSize] = useState(getWindowSize());
-	const updateWindowSize = useCallback(() => setWindowSize(getWindowSize()), []);
-	useEventListener("resize", updateWindowSize, window);
-	return windowSize;
 }
 
 // An extension of getBoundingClientRect to also work for Text nodes.

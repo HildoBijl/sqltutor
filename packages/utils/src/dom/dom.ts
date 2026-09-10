@@ -1,11 +1,3 @@
-// Find the size of the window at the current moment.
-export function getWindowSize(): { width: number; height: number } {
-	return {
-		width: window.innerWidth,
-		height: window.innerHeight,
-	};
-}
-
 // For a DOM object, set up a list of all textNodes in it.
 export function getTextNodes(element: Node | null | undefined): Text[] {
 	if (!element)

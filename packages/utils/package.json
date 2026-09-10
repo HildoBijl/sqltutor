@@ -10,10 +10,10 @@
     "./dom": "./src/dom/index.ts"
   },
   "dependencies": {
-    "@react-hook/resize-observer": "^2.0.2",
     "@step-wise/browser-utils": "^0.1.0",
     "@step-wise/geometry": "^0.1.0",
-    "@step-wise/js-utils": "^0.1.1"
+    "@step-wise/js-utils": "^0.1.1",
+    "@step-wise/react-utils": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

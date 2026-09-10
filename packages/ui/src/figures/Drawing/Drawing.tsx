@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, 
 
 import { type Vector, Rectangle } from '@step-wise/geometry';
 import { getEventClientPosition } from '@step-wise/browser-utils';
-import { useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
+import { notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
 
 import { type FigureData, Figure } from '../Figure';
 
-import { type DrawingData, type DrawingProps, getDefaultDrawing } from './definitions';
+import { type DrawingProps, getDefaultDrawing } from './definitions';
 import { DrawingContext, SvgDefsPortal } from './DrawingContext';
 import { getCoordinates } from './utils';
 
@@ -35,7 +35,6 @@ export function Drawing(props: DrawingProps) {
 
 	// Set up references.
 	const id = useId();
-	const [mergedRef] = useEnsureRef<DrawingData>(ref);
 	const [figureRef, figure] = useRefWithValue<FigureData>();
 	const [htmlContentsRef, htmlContents] = useRefWithElement<HTMLDivElement>();
 	const [svgRef, svg] = useRefWithElement<SVGSVGElement>();
@@ -78,7 +77,7 @@ export function Drawing(props: DrawingProps) {
 	}), [id, bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);
 	const imperativeDrawingData = useRef(drawingData);
 	Object.assign(imperativeDrawingData.current, drawingData);
-	useImperativeHandle(mergedRef, () => imperativeDrawingData.current, [mergedRef]);
+	useImperativeHandle(ref, () => imperativeDrawingData.current, []);
 
 	// Render figure with SVG and Canvas properly placed.
 	return <DrawingContext.Provider value={drawingData}>

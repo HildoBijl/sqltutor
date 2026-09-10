@@ -35,6 +35,7 @@ await build({
     '@lezer/*',
     '@mui/*',
     '@sqlvalley/*',
+    '@step-wise/*',
     '@uiw/*',
     'react',
     'react/*',

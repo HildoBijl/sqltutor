@@ -1,7 +1,8 @@
 import { type Ref, type HTMLAttributes, useCallback, useLayoutEffect } from 'react';
 
 import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
-import { useEnsureRef, useEqualRefOnEquality, useResizeListener, notSelectable } from '@sqlvalley/utils/dom';
+import { useForwardedRef, useStableValue } from '@step-wise/react-utils';
+import { useResizeListener, notSelectable } from '@sqlvalley/utils/dom';
 
 import { useDrawingData, HtmlPortal } from '../../DrawingContext';
 
@@ -27,11 +28,11 @@ export const getDefaultElement = (): ElementProps => ({
 
 export function Element(props: ElementProps) {
 	const { children, position, rotate, scale, anchor, passive, behind, ref, style, ...rest } = { ...getDefaultElement(), ...props };
-	const p = useEqualRefOnEquality(ensureVector(position, { dimension: 2 }));
-	const a = useEqualRefOnEquality(ensureVector(anchor, { dimension: 2 }));
+	const p = useStableValue(ensureVector(position, { dimension: 2 }), (current, previous) => current.equals(previous));
+	const a = useStableValue(ensureVector(anchor, { dimension: 2 }), (current, previous) => current.equals(previous));
 
 	// Update element position based on current scale and transform.
-	const [mergedRef, internalRef] = useEnsureRef<HTMLDivElement>(ref);
+	const internalRef = useForwardedRef(ref);
 	const { bounds, figure, getFigureScale } = useDrawingData();
 	const updateElementPosition = useCallback(() => {
 		// On no data, don't update.
@@ -57,7 +58,7 @@ export function Element(props: ElementProps) {
 
 	// Render the children inside the Drawing HTML contents container.
 	return <HtmlPortal>
-		<div ref={mergedRef} style={{
+		<div ref={internalRef} style={{
 			display: 'none', // Hide initially.
 			left: 0,
 			position: 'absolute',

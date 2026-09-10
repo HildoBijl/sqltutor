@@ -6,7 +6,8 @@ import { EditorView, keymap } from '@codemirror/view';
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { Box, Paper } from '@mui/material';
-import { useLatest, useDebounce } from '@sqlvalley/utils/dom';
+import { useLatestRef } from '@step-wise/react-utils';
+import { useDebounce } from '@sqlvalley/utils/dom';
 import { noop } from '@step-wise/js-utils';
 
 interface SQLEditorProps {
@@ -43,7 +44,7 @@ export function SQLEditor({
   completionSchema,
   completionDefaultTable,
 }: SQLEditorProps) {
-  const executeRef = useLatest(onExecute);
+  const executeRef = useLatestRef(onExecute);
 
   // Debounce the value for live execution
   const debouncedValue = useDebounce(value, liveExecutionDelay);
