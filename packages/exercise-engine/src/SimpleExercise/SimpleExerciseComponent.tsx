@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Alert, Box } from '@mui/material';
 
 import { useExercise } from '../Exercise';
+import { useModuleContext } from '../moduleContext';
 import type { SimpleExerciseReport } from './buildSimpleExercise';
 import { SimpleExerciseControlsContext } from './controlsContext';
 import { ExerciseControls } from './ExerciseControls';
@@ -28,6 +29,7 @@ export function SimpleExerciseComponent<
   CheckResult,
 >({ spec }: SimpleExerciseComponentProps<Parameters, Input, CheckResult>) {
   const { data, controls } = useExercise();
+  const moduleContext = useModuleContext();
   const { events, draftInput, pending, state } = data;
 
   const [feedbackCleared, setFeedbackCleared] = useState(false);
@@ -71,7 +73,10 @@ export function SimpleExerciseComponent<
   const solved = isSimpleExerciseSolved(storedState);
   const givenUp = isSimpleExerciseGivenUp(storedState);
   const complete = solved || givenUp;
-  const canSubmit = !complete && !pending && !(spec.isInputEmpty?.(input) ?? false);
+  const availabilityArgs = { parameters: params, input, moduleContext };
+  const canSubmit = !complete && !pending && !(spec.isInputEmpty?.(input) ?? false) &&
+    (spec.canSubmit?.(availabilityArgs) ?? true);
+  const canGiveUp = !complete && !pending && (spec.canGiveUp?.(availabilityArgs) ?? true);
   const { Prompt, Problem, Input: InputComponent, Solution, Payoff, Output } = spec;
 
   return (
@@ -91,7 +96,7 @@ export function SimpleExerciseComponent<
           solved,
           givenUp,
           canSubmit,
-          canGiveUp: !complete && !pending,
+          canGiveUp,
           onSubmit: handleSubmit,
           onGiveUp: () => setGiveUpOpen(true),
           onNext: controls.startNewExercise,

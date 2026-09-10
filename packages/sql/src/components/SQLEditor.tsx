@@ -44,15 +44,16 @@ export function SQLEditor({
   completionDefaultTable,
 }: SQLEditorProps) {
   const executeRef = useLatestRef(onExecute);
+  const liveExecuteRef = useLatestRef(onLiveExecute);
 
   // Handle live execution once the value has stopped changing for the configured delay.
   useEffect(() => {
-    if (!enableLiveExecution || !onLiveExecute)
+    if (!enableLiveExecution || !liveExecuteRef.current)
       return;
 
-    const timeout = window.setTimeout(() => onLiveExecute(value), liveExecutionDelay);
+    const timeout = window.setTimeout(() => liveExecuteRef.current?.(value), liveExecutionDelay);
     return () => window.clearTimeout(timeout);
-  }, [value, enableLiveExecution, liveExecutionDelay, onLiveExecute]);
+  }, [value, enableLiveExecution, liveExecutionDelay, liveExecuteRef]);
 
   const hasExecute = Boolean(onExecute);
 

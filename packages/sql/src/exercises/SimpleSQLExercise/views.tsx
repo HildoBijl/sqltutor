@@ -3,6 +3,7 @@ import type {
   SimpleExerciseOutputProps,
   SimpleExerciseStoredState,
 } from '@sqlvalley/exercise-engine';
+import { Alert } from '@mui/material';
 import { ExerciseDescription } from './components/ExerciseDescription';
 import { ExerciseEditor } from './components/ExerciseEditor';
 import { ExerciseResults } from './components/ExerciseResults';
@@ -18,14 +19,21 @@ export function SQLExerciseInput<Parameters extends Record<string, unknown>>({
 }: SimpleExerciseInputProps<Parameters, string>) {
   const runtime = useSqlModuleContext();
   return (
-    <ExerciseEditor
-      query={value}
-      onQueryChange={onChange}
-      onExecute={onSubmit}
-      onLiveExecute={runtime.executeLiveQuery}
-      readOnly={disabled}
-      completionSchema={runtime.completionSchema}
-    />
+    <>
+      <ExerciseEditor
+        query={value}
+        onQueryChange={onChange}
+        onExecute={onSubmit}
+        onLiveExecute={runtime.executeLiveQuery}
+        readOnly={disabled}
+        completionSchema={runtime.completionSchema}
+      />
+      {runtime.queryError ? (
+        <Alert severity="warning" sx={{ mt: 1.5 }}>
+          {runtime.queryError.message || 'Query execution failed.'}
+        </Alert>
+      ) : null}
+    </>
   );
 }
 

@@ -69,7 +69,7 @@ export function buildSimpleExercise<
     initialState: emptySimpleExerciseState,
     isComplete,
     isSolved: isSimpleExerciseSolved,
-    getSolutionInput: spec.getSolutionInput,
+    getSolutionInput: spec.getSolutionInput as AnyExerciseDefinition['getSolutionInput'],
     reduce,
     Component: () => <SimpleExerciseComponent spec={spec} />,
   };
