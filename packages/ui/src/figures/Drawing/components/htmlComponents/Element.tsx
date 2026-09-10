@@ -2,9 +2,9 @@ import { type Ref, type HTMLAttributes, useCallback, useLayoutEffect } from 'rea
 
 import { type VectorLike as VectorInput, Vector, ensureVector } from '@step-wise/geometry';
 import { useForwardedRef, useStableValue } from '@step-wise/react-utils';
-import { useResizeListener, notSelectable } from '@sqlvalley/utils/dom';
 
 import { useDrawingData, HtmlPortal } from '../../DrawingContext';
+import { notSelectable, useResizeListener } from '../../utils';
 
 export interface ElementProps extends HTMLAttributes<HTMLDivElement> {
 	position?: VectorInput;

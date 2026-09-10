@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, 
 
 import { type Vector, Rectangle } from '@step-wise/geometry';
 import { getEventClientPosition } from '@step-wise/browser-utils';
-import { notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
+import { useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
 
 import { type FigureData, Figure } from '../Figure';
 
 import { type DrawingProps, getDefaultDrawing } from './definitions';
 import { DrawingContext, SvgDefsPortal } from './DrawingContext';
-import { getCoordinates } from './utils';
+import { getCoordinates, notSelectable } from './utils';
 
 const svgStyle: CSSProperties = {
 	display: 'block',
