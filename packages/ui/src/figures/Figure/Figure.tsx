@@ -1,6 +1,6 @@
 import { useImperativeHandle } from 'react';
 
-import { useRefWithElement } from '@sqlvalley/utils/dom';
+import { useRefWithElement } from '../Drawing/utils';
 
 import { getDefaultFigure, FigureProps } from './definitions';
 

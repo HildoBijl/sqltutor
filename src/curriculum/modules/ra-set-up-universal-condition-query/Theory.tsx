@@ -1,7 +1,7 @@
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
-import { useRefWithValue } from '@sqlvalley/utils/dom';
+import { useRefWithValue } from '@sqlvalley/ui';
 import { Page, Section, Par, List, Warning, Info, Term, Em, M, BM, RA, IRA } from '@sqlvalley/ui';
 import { type DrawingData, Drawing, Element, useRefWithBounds } from '@sqlvalley/ui';
 import { useQueryResult } from '@sqlvalley/sql/sqljs';

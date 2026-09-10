@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Box } from '@mui/material';
 
-import { useRefWithValue } from '@sqlvalley/utils/dom';
+import { useRefWithValue } from '@sqlvalley/ui';
 import { useThemeColor } from '@sqlvalley/ui';
 import { type DrawingData, Drawing, Element, Curve, useRefWithBounds, RA } from '@sqlvalley/ui';
 import { DataTable } from '@sqlvalley/sql';

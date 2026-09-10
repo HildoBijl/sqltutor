@@ -3,10 +3,22 @@ import { isPlainObject, repeat } from '@step-wise/js-utils';
 import { Vector, type VectorLike as VectorInput, ensureVector, Rectangle, type RectangleLike as RectangleInput, ensureRectangle } from '@step-wise/geometry';
 import { type ModifierKeyState } from '@step-wise/browser-utils';
 import { useEventListener, usePointerState, useResizeObserver } from '@step-wise/react-utils';
-import { useRefWithElement } from '@sqlvalley/utils/dom';
-
 import { type DrawingData } from './definitions';
 import { useDrawingDataWithFallback } from './DrawingContext';
+
+// Get a tuple [ref, element]. Put the ref into a DOM object, and element will be the corresponding DOM element.
+export function useRefWithElement<T extends Element | null = Element>(): [(node: T | null) => void, T | null] {
+	const [element, setElement] = useState<T | null>(null);
+	const onRefChange = useCallback((node: T | null) => setElement(node), []);
+	return [onRefChange, element];
+}
+
+// Get a tuple [ref, value]. Put the ref into a React object, and value will be the corresponding ref's value (which could be an imperative handle or similar).
+export function useRefWithValue<T>(): [(value: T | null) => void, T | null] {
+	const [value, setValue] = useState<T | null>(null);
+	const refCallback = useCallback((value: T | null) => setValue(value), []);
+	return [refCallback, value];
+}
 
 // A macro for making an object unselectable, preventing a blue border around it.
 export const notSelectable: CSSProperties = {

@@ -7,7 +7,6 @@ import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { Box, Paper } from '@mui/material';
 import { useLatestRef } from '@step-wise/react-utils';
-import { useDebounce } from '@sqlvalley/utils/dom';
 import { noop } from '@step-wise/js-utils';
 
 interface SQLEditorProps {
@@ -46,17 +45,14 @@ export function SQLEditor({
 }: SQLEditorProps) {
   const executeRef = useLatestRef(onExecute);
 
-  // Debounce the value for live execution
-  const debouncedValue = useDebounce(value, liveExecutionDelay);
-
-  // Handle live execution when debounced value changes
+  // Handle live execution once the value has stopped changing for the configured delay.
   useEffect(() => {
-    if (!enableLiveExecution || !onLiveExecute) {
+    if (!enableLiveExecution || !onLiveExecute)
       return;
-    }
 
-    onLiveExecute(debouncedValue);
-  }, [debouncedValue, enableLiveExecution, onLiveExecute]);
+    const timeout = window.setTimeout(() => onLiveExecute(value), liveExecutionDelay);
+    return () => window.clearTimeout(timeout);
+  }, [value, enableLiveExecution, liveExecutionDelay, onLiveExecute]);
 
   const hasExecute = Boolean(onExecute);
 
