@@ -1,15 +1,14 @@
 import { useState } from 'react';
 
 import { Vector } from '@step-wise/geometry';
-
-import { getEventPosition, UtilKeys, getUtilKeys } from '../dom';
+import { getEventClientPosition, getModifierKeyState, type ModifierKeyState } from '@step-wise/browser-utils';
 
 import { useEventListener } from './events';
 
 // Type for a mouse data object.
 interface MouseData {
 	position: Vector | undefined;
-	keys: UtilKeys;
+	keys: ModifierKeyState;
 }
 
 // Track the mouse position as well as the status of various utility keys. The format is { position: new Vector(x, y), keys: { shift: true, alt: false, ctrl: false } }.
@@ -23,8 +22,8 @@ export function useMouseData(): MouseData {
 	// Track mouse events.
 	const storeData = (event: MouseEvent | TouchEvent) => {
 		setData({
-			position: getEventPosition(event),
-			keys: getUtilKeys(event),
+			position: getEventClientPosition(event),
+			keys: getModifierKeyState(event),
 		});
 	};
 	useEventListener(['mousemove', 'touchstart', 'touchmove'], storeData);
@@ -33,7 +32,7 @@ export function useMouseData(): MouseData {
 	const processKeyPress = (event: KeyboardEvent) => {
 		setData((prev) => ({
 			...prev,
-			keys: getUtilKeys(event),
+			keys: getModifierKeyState(event),
 		}));
 	};
 	useEventListener(['keydown', 'keyup'], processKeyPress);

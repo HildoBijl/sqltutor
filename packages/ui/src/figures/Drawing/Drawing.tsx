@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useImperativeHandle, useId, useRef, type CSSProperties } from 'react';
 
 import { type Vector, Rectangle } from '@step-wise/geometry';
-import { getEventPosition, useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
+import { getEventClientPosition } from '@step-wise/browser-utils';
+import { useEnsureRef, notSelectable, useRefWithElement, useRefWithValue } from '@sqlvalley/utils/dom';
 
 import { type FigureData, Figure } from '../Figure';
 
@@ -71,7 +72,7 @@ export function Drawing(props: DrawingProps) {
 		canvas,
 		getFigureScale,
 		getCoordinates: (cPoint: Vector, figureRect?: DOMRect) => getCoordinates(cPoint, figureRect, bounds),
-		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventPosition(event), figure?.inner && figure?.inner.getBoundingClientRect(), bounds),
+		getPointFromEvent: (event: MouseEvent | TouchEvent) => getCoordinates(getEventClientPosition(event), figure?.inner && figure?.inner.getBoundingClientRect(), bounds),
 		contains: (point: Vector) => bounds.containsPoint(point),
 		applyBounds: (point: Vector) => bounds.clampPoint(point),
 	}), [id, bounds, figure, svg, svgDefs, htmlContents, canvas, getFigureScale]);

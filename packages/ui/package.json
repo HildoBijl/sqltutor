@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@sqlvalley/utils": "*",
+    "@step-wise/browser-utils": "^0.1.0",
     "@step-wise/geometry": "^0.1.0",
     "@step-wise/js-utils": "^0.1.1",
     "react-katex": "^3.1.0"

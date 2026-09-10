@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { repeat } from '@step-wise/js-utils';
 import { Vector, type VectorLike as VectorInput, ensureVector, Rectangle, type RectangleLike as RectangleInput, ensureRectangle } from '@step-wise/geometry';
-import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement, useTextNode } from '@sqlvalley/utils/dom';
+import { type ModifierKeyState } from '@step-wise/browser-utils';
+import { useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement, useTextNode } from '@sqlvalley/utils/dom';
 
 import { type DrawingData } from './definitions';
 import { useDrawingDataWithFallback } from './DrawingContext';
@@ -42,7 +43,7 @@ export function getCoordinates(
 export function useDrawingMouseData(drawingData?: DrawingData | null): {
 	clientPosition?: Vector;
 	position?: Vector;
-	keys?: UtilKeys;
+	keys?: ModifierKeyState;
 } {
 	// Acquire the mouse status.
 	const { position: clientPosition, keys } = useClientMouseData();
