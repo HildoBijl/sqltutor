@@ -5,3 +5,4 @@ export * from './SimpleExercise';
 export * from './storage';
 export * from './storageContext';
 export * from './storedState';
+export * from './randomization';

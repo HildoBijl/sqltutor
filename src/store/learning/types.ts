@@ -15,6 +15,7 @@ export type ConceptModuleState = BaseModuleState;
 
 export interface SkillModuleState extends BaseModuleState {
   numSolved: number;
+  solvedExerciseIds: string[];
   exercises: StoredExerciseInstance[];
 }
 

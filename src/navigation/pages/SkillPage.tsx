@@ -89,6 +89,7 @@ export default function SkillPage() {
 
   const hasInteractivePractice = Boolean(exerciseDefinitions?.length);
   const hasPractice = hasStaticPractice || hasInteractivePractice;
+  const solvedCount = Math.max(moduleState.solvedExerciseIds?.length ?? 0, moduleState.numSolved ?? 0);
 
   const moduleStates = useLearningStore((state) => state.modules);
 
@@ -114,14 +115,13 @@ export default function SkillPage() {
   };
 
   // Show the completion dialog once, when the learner crosses the required count.
-  const prevSolvedRef = useRef(moduleState.numSolved ?? 0);
+  const prevSolvedRef = useRef(solvedCount);
   useEffect(() => {
-    const solved = moduleState.numSolved ?? 0;
     const crossed = prevSolvedRef.current < DEFAULT_EXERCISES_TO_COMPLETE &&
-      solved >= DEFAULT_EXERCISES_TO_COMPLETE;
-    prevSolvedRef.current = solved;
+      solvedCount >= DEFAULT_EXERCISES_TO_COMPLETE;
+    prevSolvedRef.current = solvedCount;
     if (crossed) setShowCompletionDialog(true);
-  }, [moduleState.numSolved]);
+  }, [solvedCount]);
 
   useEffect(() => {
     if (!summaryUnlocked && currentTab === 'summary') {
@@ -155,7 +155,7 @@ export default function SkillPage() {
   const progressInfo =
     hasInteractivePractice && currentTab === 'practice'
       ? {
-          current: moduleState.numSolved ?? 0,
+          current: solvedCount,
           required: DEFAULT_EXERCISES_TO_COMPLETE,
         }
       : undefined;

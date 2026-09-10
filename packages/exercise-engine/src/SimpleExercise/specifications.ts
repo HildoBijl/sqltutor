@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 
 import type { ExerciseId, ExerciseVersion } from '../storedState';
+import type { GenerateExerciseParametersContext } from '../Exercise';
 import type {
   SimpleExerciseCheckResult,
   SimpleExerciseInputProps,
@@ -37,7 +38,7 @@ export interface SimpleExerciseSpecification<
   version: ExerciseVersion;
   generateParameters: (
     moduleContext: unknown,
-    context?: { previousParameters?: Parameters | null },
+    context: GenerateExerciseParametersContext<Parameters>,
   ) => Parameters;
   validateInput?: (
     args: { parameters: Parameters; input: Input; moduleContext: unknown },

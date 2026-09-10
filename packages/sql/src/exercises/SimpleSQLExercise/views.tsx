@@ -3,6 +3,7 @@ import type {
   SimpleExerciseOutputProps,
   SimpleExerciseStoredState,
 } from '@sqlvalley/exercise-engine';
+import { Box, Paper, Typography } from '@mui/material';
 import { ExerciseDescription } from './components/ExerciseDescription';
 import { ExerciseEditor } from './components/ExerciseEditor';
 import { ExerciseResults } from './components/ExerciseResults';
@@ -63,6 +64,22 @@ export function createSQLProblem<Parameters extends Record<string, unknown>>(
   };
 }
 
+export function createSQLPracticeIntro<Parameters extends Record<string, unknown>>(
+  getLine: (parameters: Parameters) => string,
+) {
+  return function SQLExercisePracticeIntro({ parameters }: { parameters: Parameters }) {
+    return <ExerciseDialogueLine text={getLine(parameters)} tone="setup" />;
+  };
+}
+
+export function createSQLPayoff<Parameters extends Record<string, unknown>>(
+  getLine: (parameters: Parameters) => string,
+) {
+  return function SQLExercisePayoff({ parameters }: { parameters: Parameters }) {
+    return <ExerciseDialogueLine text={getLine(parameters)} tone="payoff" />;
+  };
+}
+
 export function createSQLSolution<Parameters extends Record<string, unknown>>(
   getSolution: (parameters: Parameters) => string,
 ) {
@@ -74,4 +91,33 @@ export function createSQLSolution<Parameters extends Record<string, unknown>>(
   }) {
     return <ExerciseSolution solution={{ query: getSolution(parameters) }} />;
   };
+}
+
+function ExerciseDialogueLine({
+  text,
+  tone,
+}: {
+  text: string;
+  tone: 'setup' | 'payoff';
+}) {
+  if (!text) return null;
+
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        mb: 2,
+        bgcolor: tone === 'payoff' ? 'rgba(46, 125, 50, 0.08)' : 'background.default',
+        borderColor: tone === 'payoff' ? 'success.light' : 'divider',
+      }}
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        <Typography variant="body2" color="text.secondary">
+          {tone === 'payoff' ? 'Resolution' : 'Context'}
+        </Typography>
+        <Typography variant="body1">{text}</Typography>
+      </Box>
+    </Paper>
+  );
 }

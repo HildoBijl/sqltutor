@@ -14,8 +14,14 @@ import type {
 export const DEFAULT_EXERCISES_TO_COMPLETE = 3;
 
 function getSkillSolvedCount(moduleState: ModuleProgressState | undefined): number {
-  const solved = moduleState?.numSolved;
-  return typeof solved === 'number' ? solved : 0;
+  const solvedExerciseIds = moduleState?.solvedExerciseIds;
+  const solvedTemplateCount = Array.isArray(solvedExerciseIds)
+    ? new Set(solvedExerciseIds).size
+    : 0;
+  const legacySolvedCount = typeof moduleState?.numSolved === 'number'
+    ? moduleState.numSolved
+    : 0;
+  return Math.max(solvedTemplateCount, legacySolvedCount);
 }
 
 function isUnderstood(moduleState: ModuleProgressState | undefined): boolean {

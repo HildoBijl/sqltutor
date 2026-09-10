@@ -11,6 +11,10 @@ export const exerciseStorage: ExerciseStorage = {
     const module = useLearningStore.getState().modules[skillId] as SkillModuleState | undefined;
     return module?.exercises?.[module.exercises.length - 1] ?? null;
   },
+  getAllInstances: (skillId) =>
+    useLearningStore.getState().getAllExerciseInstances(skillId),
+  getSolvedExerciseIds: (skillId) =>
+    useLearningStore.getState().getSolvedExerciseIds(skillId),
   subscribe: (listener) => useLearningStore.subscribe(listener),
   startExercise: (skillId, exerciseId, version, parameters) =>
     useLearningStore.getState().startNewExercise(skillId, exerciseId, version, parameters),

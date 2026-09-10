@@ -2,6 +2,7 @@
 export interface ModuleProgressState {
   understood?: boolean;
   numSolved?: number;
+  solvedExerciseIds?: readonly string[];
 }
 
 export interface RawModuleCompletion<Id extends string = string> {

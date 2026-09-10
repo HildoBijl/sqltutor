@@ -41,17 +41,6 @@ FROM contracts
 WHERE status LIKE '%sick%';
     `,
   },
-  {
-    exerciseId: 'filter-rows-gt-date',
-    version: 1,
-    generateParameters: () => ({}),
-    problem: 'Find all contracts for employees that started after 2023.',
-    solution: `
-SELECT *
-FROM contracts
-WHERE start_date > '2023-12-31';
-    `,
-  },
 ];
 
 export default function buildExercises(): AnyExerciseDefinition[] {

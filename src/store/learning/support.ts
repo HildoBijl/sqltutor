@@ -31,6 +31,7 @@ export function createModuleState(
         id,
         tab: undefined,
         numSolved: 0,
+        solvedExerciseIds: [],
         understood: undefined,
         exercises: [],
         lastAccessed: undefined,
@@ -51,6 +52,11 @@ export function coerceTimestamp(value: unknown): number | undefined {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function uniqueStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return Array.from(new Set(value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)));
 }
 
 function normalizeStoredExerciseEvent(value: unknown): StoredExerciseEvent | null {
@@ -108,6 +114,7 @@ interface LegacyModuleShape {
   lastAccessed?: unknown;
   understood?: unknown;
   numSolved?: unknown;
+  solvedExerciseIds?: unknown;
   exercises?: unknown;
 }
 
@@ -142,16 +149,27 @@ export function normalizeSkillModuleState(
   const base = createModuleState(id, 'skill') as SkillModuleState;
   const partialSkill = state as Partial<SkillModuleState> | undefined;
   const common = normalizeCommonModuleFields(id, state as LegacyModuleShape | undefined);
+  const exercises = Array.isArray(partialSkill?.exercises)
+    ? partialSkill.exercises
+      .map((exercise) => normalizeStoredExerciseInstance(exercise))
+      .filter((exercise): exercise is StoredExerciseInstance => exercise !== null)
+    : [];
+  const solvedFromEvents = exercises
+    .filter((exercise) => exercise.events.some((event) => event.resultingState.solved === true))
+    .map((exercise) => exercise.exerciseId);
+  const solvedExerciseIds = uniqueStrings(partialSkill?.solvedExerciseIds);
+  const normalizedSolvedExerciseIds = solvedExerciseIds.length > 0
+    ? solvedExerciseIds
+    : Array.from(new Set(solvedFromEvents));
 
   const normalized: SkillModuleState = {
     ...base,
     ...common,
-    numSolved: typeof partialSkill?.numSolved === 'number' ? partialSkill.numSolved : 0,
-    exercises: Array.isArray(partialSkill?.exercises)
-      ? partialSkill.exercises
-        .map((exercise) => normalizeStoredExerciseInstance(exercise))
-        .filter((exercise): exercise is StoredExerciseInstance => exercise !== null)
-      : [],
+    numSolved: normalizedSolvedExerciseIds.length > 0
+      ? normalizedSolvedExerciseIds.length
+      : typeof partialSkill?.numSolved === 'number' ? partialSkill.numSolved : 0,
+    solvedExerciseIds: normalizedSolvedExerciseIds,
+    exercises,
   };
   return normalized;
 }
@@ -160,6 +178,7 @@ function looksLikeSkillModule(state: Partial<ModuleState> & { type?: unknown }):
   return (
     state.type === 'skill' ||
     typeof (state as Partial<SkillModuleState>).numSolved === 'number' ||
+    Array.isArray((state as Partial<SkillModuleState>).solvedExerciseIds) ||
     Array.isArray((state as Partial<SkillModuleState>).exercises)
   );
 }

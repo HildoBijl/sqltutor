@@ -48,6 +48,7 @@ export interface LearningActions {
   resetModule: (id: string, type: ModuleType) => void;
   getCurrentExerciseInstance: (skillId: string) => StoredExerciseInstance | null;
   getAllExerciseInstances: (skillId: string) => StoredExerciseInstance[];
+  getSolvedExerciseIds: (skillId: string) => string[];
 }
 
 function getConceptModuleForUpdate(moduleId: string, state: LearningState): ConceptModuleState {
@@ -171,13 +172,21 @@ export function createLearningActions(
           updatedExercise,
         ];
 
+        const solvedExerciseIds = [...skillModule.solvedExerciseIds];
+        const solvedThisTemplate = solvedExerciseIds.includes(currentExercise.exerciseId);
+        const newlySolvedTemplate = increaseSolvedCounter && !solvedThisTemplate;
+        if (newlySolvedTemplate) {
+          solvedExerciseIds.push(currentExercise.exerciseId);
+        }
+
         return {
           modules: {
             ...state.modules,
             [skillId]: {
               ...skillModule,
               lastAccessed: Date.now(),
-              numSolved: increaseSolvedCounter ? skillModule.numSolved + 1 : skillModule.numSolved,
+              numSolved: solvedExerciseIds.length,
+              solvedExerciseIds,
               exercises,
             },
           },
@@ -235,6 +244,11 @@ export function createLearningActions(
     getAllExerciseInstances: (skillId) => {
       const skillModule = normalizeSkillModuleState(skillId, get().modules[skillId]);
       return [...skillModule.exercises];
+    },
+
+    getSolvedExerciseIds: (skillId) => {
+      const skillModule = normalizeSkillModuleState(skillId, get().modules[skillId]);
+      return [...skillModule.solvedExerciseIds];
     },
   };
 }

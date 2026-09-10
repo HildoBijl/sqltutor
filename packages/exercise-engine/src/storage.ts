@@ -14,6 +14,8 @@ import type {
  */
 export interface ExerciseStorage {
   getInstance(skillId: SkillId): StoredExerciseInstance | null;
+  getAllInstances?(skillId: SkillId): readonly StoredExerciseInstance[];
+  getSolvedExerciseIds?(skillId: SkillId): readonly ExerciseId[];
   subscribe(listener: () => void): () => void;
   startExercise(
     skillId: SkillId,

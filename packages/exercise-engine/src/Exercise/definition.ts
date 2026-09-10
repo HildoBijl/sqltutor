@@ -3,11 +3,21 @@ import type { ComponentType } from 'react';
 import type {
   ExerciseId,
   ExerciseVersion,
+  SkillId,
   StoredExerciseAction,
   StoredExerciseState,
 } from '../storedState';
 
 export type Awaitable<T> = T | Promise<T>;
+
+export interface GenerateExerciseParametersContext<Parameters extends Record<string, unknown>> {
+  previousParameters?: Parameters | null;
+  skillId: SkillId;
+  learnerSeed: string;
+  attemptSeed: string;
+  attemptNumber: number;
+  solvedExerciseIds: readonly ExerciseId[];
+}
 
 export interface ReduceResult<State extends StoredExerciseState> {
   state: State;
@@ -43,7 +53,7 @@ export interface ExerciseDefinition<
   version: ExerciseVersion;
   generateParameters: (
     moduleContext: unknown,
-    context?: { previousParameters?: Parameters | null },
+    context: GenerateExerciseParametersContext<Parameters>,
   ) => Parameters;
   initialState: State;
   isComplete: (state: State) => boolean;

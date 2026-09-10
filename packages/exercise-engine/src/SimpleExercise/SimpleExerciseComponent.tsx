@@ -104,8 +104,8 @@ export function SimpleExerciseComponent<
       {Output ? (
         <Output parameters={params} input={input} result={lastResult} state={storedState} />
       ) : null}
-      {complete || solutionRevealed ? <Solution parameters={params} state={storedState} /> : null}
       {solved && lastResult && Payoff ? <Payoff parameters={params} result={lastResult} /> : null}
+      {complete || solutionRevealed ? <Solution parameters={params} state={storedState} /> : null}
       <GiveUpDialog open={giveUpOpen} onConfirm={handleGiveUp} onCancel={() => setGiveUpOpen(false)} />
     </Box>
   );
