@@ -10,7 +10,7 @@
     "./storedState": "./src/storedState.ts"
   },
   "dependencies": {
-    "@sqlvalley/utils": "*"
+    "@step-wise/js-utils": "^0.1.1"
   },
   "peerDependencies": {
     "@mui/icons-material": "^6.4.7",

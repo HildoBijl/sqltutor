@@ -1,4 +1,4 @@
-import { ensureInt, compareNumbers } from '../javascript';
+import { approximatelyEqual, ensureInteger } from '@step-wise/js-utils';
 
 // A coordinate can be either an array of numbers or an object with x/y(/z) properties.
 export type CoordinatesArray = readonly number[];
@@ -105,7 +105,7 @@ export class Vector {
 	}
 
 	private ensureValidIndex(index: number): number {
-		index = ensureInt(index, true);
+		index = ensureInteger(index, { nonNegative: true });
 		if (index >= this.coordinates.length)
 			throw new RangeError(`Invalid vector index: ${index} exceeds vector dimension ${this.coordinates.length}.`);
 		return index;
@@ -147,7 +147,7 @@ export class Vector {
 	}
 
 	isZero(): boolean {
-		return compareNumbers(this.squaredMagnitude, 0);
+		return approximatelyEqual(this.squaredMagnitude, 0);
 	}
 
 	/*
@@ -192,7 +192,7 @@ export class Vector {
 	// Create a new vector that is the same as this vector, but then resized to have the given magnitude.
 	setMagnitude(magnitude: number): Vector {
 		const ownMagnitude = this.magnitude;
-		if (compareNumbers(ownMagnitude, 0))
+		if (approximatelyEqual(ownMagnitude, 0))
 			throw new Error(`Cannot set magnitude of the zero vector.`);
 		return this.multiply(magnitude / ownMagnitude);
 	}
@@ -323,26 +323,26 @@ export class Vector {
 	// Check equality for two vectors.
 	equals(vector: VectorInput): boolean {
 		const v = ensureVector(vector, this.dimension);
-		return this.dimension === v.dimension && this.coordinates.every((value, index) => compareNumbers(value, v.getCoordinate(index)));
+		return this.dimension === v.dimension && this.coordinates.every((value, index) => approximatelyEqual(value, v.getCoordinate(index)));
 	}
 
 	// Check if two vectors have equal magnitude.
 	isEqualMagnitude(vector: VectorInput): boolean {
 		const v = ensureVector(vector, this.dimension);
-		return compareNumbers(this.squaredMagnitude, v.squaredMagnitude);
+		return approximatelyEqual(this.squaredMagnitude, v.squaredMagnitude);
 	}
 
 	// Check if two vectors have equal direction. When allowReverse is set to true, then an exactly opposite direction also results in true.
 	isEqualDirection(vector: VectorInput, allowReverse = false): boolean {
 		const v = ensureVector(vector, this.dimension);
 		const dot = this.dotProduct(v);
-		return compareNumbers(allowReverse ? Math.abs(dot) : dot, this.magnitude * v.magnitude);
+		return approximatelyEqual(allowReverse ? Math.abs(dot) : dot, this.magnitude * v.magnitude);
 	}
 
 	// isPerpendicular checks if two vectors are perpendicular with respect to each other.
 	isPerpendicular(vector: VectorInput): boolean {
 		const v = ensureVector(vector, this.dimension);
-		return compareNumbers(this.dotProduct(v), 0);
+		return approximatelyEqual(this.dotProduct(v), 0);
 	}
 
 	/*
@@ -356,15 +356,15 @@ export class Vector {
 
 	// Get the zero vector for the given dimension.
 	static getZero(dimension: number): Vector {
-		dimension = ensureInt(dimension, true)
+		dimension = ensureInteger(dimension, { nonNegative: true })
 		return new Vector(Array(dimension).fill(0))
 	}
 
 	// Get the unit vector along the given axis (0 for x, 1 for y, etcetera) for the given dimension.
 	static getUnitVector(axis: number, dimension: number): Vector {
 		// Check the input.
-		axis = ensureInt(axis, true);
-		dimension = ensureInt(dimension, true, true);
+		axis = ensureInteger(axis, { nonNegative: true });
+		dimension = ensureInteger(dimension, { nonNegative: true, nonZero: true });
 		if (axis >= dimension)
 			throw new Error(`Invalid axis: cannot have an axis (${axis}) larger than or equal to the dimension (${dimension}).`);
 

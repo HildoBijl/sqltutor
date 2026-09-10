@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { repeat } from '@sqlvalley/utils/javascript';
+import { repeat } from '@step-wise/js-utils';
 import { Vector, type VectorInput, ensureVector, Rectangle, type RectangleInput, ensureRectangle } from '@sqlvalley/utils/geometry';
 import { type UtilKeys, useMouseData as useClientMouseData, useBoundingClientRect, useRefWithElement, useTextNode } from '@sqlvalley/utils/dom';
 

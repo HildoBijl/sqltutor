@@ -1,4 +1,5 @@
-import { mod, firstOf, lastOf, repeat, type VectorInput, Vector, ensureVectorArray, Span } from '@sqlvalley/utils';
+import { first, last, mod, repeat } from '@step-wise/js-utils';
+import { type VectorInput, Vector, ensureVectorArray, Span } from '@sqlvalley/utils';
 
 import { type ArrowHeadProps, type LineWithoutArrowsProps, type CurveWithoutArrowsProps } from './types';
 import { defaultArrowHeadPullIn } from './ArrowHead';
@@ -34,8 +35,8 @@ export function getCurvePathAlong(points: Vector[], close = false, curveRatio = 
 		throw new Error(`Invalid path points: need at least two unique points.`);
 
 	// Close path if needed.
-	if (close && !firstOf(points)!.equals(lastOf(points)!))
-		points = [...points, firstOf(points)!];
+	if (close && !first(points).equals(last(points)))
+		points = [...points, first(points)];
 
 	// Calculate in-between line parts.
 	const lines: [Vector, Vector][] = repeat(points.length - 1, index => {
@@ -58,12 +59,12 @@ export function getCurvePathAlong(points: Vector[], close = false, curveRatio = 
 
 	// Fix the first and last points for non-closed curves.
 	if (!close) {
-		lines[0][0] = firstOf(points)!;
-		lines[lines.length - 1][1] = lastOf(points)!;
+		lines[0][0] = first(points);
+		lines[lines.length - 1][1] = last(points);
 	}
 
 	// Construct the SVG path.
-	let svg = `M${getPointSvg(firstOf(lines)![0])}`;
+	let svg = `M${getPointSvg(first(lines)[0])}`;
 	repeat(lines.length, index => {
 		const line = lines[index];
 		const lineSvg = `L${getPointSvg(line[1])}`;
@@ -90,7 +91,7 @@ export function getCurvePathThrough(points: Vector[], close = false, curveRatio 
 	const controlPoints = getControlPoints(points, close, curveRatio, curveDistance);
 
 	// Set up the path.
-	let svg = `M${getPointSvg(firstOf(points)!)}`;
+	let svg = `M${getPointSvg(first(points))}`;
 	repeat(points.length - (close ? 0 : 1), index => {
 		const nextIndex = mod(index + 1, points.length);
 		const cp1 = controlPoints[index][1];
@@ -150,13 +151,13 @@ export function processCurveArrows(
 
 	// For each arrow, determine the position/angle, and pull the line end-point into the arrow head.
 	if (startArrow) {
-		const startSpan = new Span(firstOf(controlPoints, 1)![0], firstOf(points)!);
+		const startSpan = new Span(first(controlPoints, { offset: 1 })[0], first(points));
 		startArrow = { position: startSpan.end, angle: startSpan.angle, size, color, ...startArrow };
 		const lineStart = startSpan.end.subtract(startSpan.vector.normalize().multiply(arrowHeadPullIn * startArrow.size!));
 		p = [lineStart, ...p.slice(1)];
 	}
 	if (endArrow) {
-		const endSpan = new Span(lastOf(controlPoints, 1)![1], lastOf(points)!);
+		const endSpan = new Span(last(controlPoints, { offset: 1 })[1], last(points));
 		endArrow = { position: endSpan.end, angle: endSpan.angle, size, color, ...endArrow };
 		const lineEnd = endSpan.end.subtract(endSpan.vector.normalize().multiply(arrowHeadPullIn * endArrow.size!));
 		p = [...p.slice(0, -1), lineEnd];

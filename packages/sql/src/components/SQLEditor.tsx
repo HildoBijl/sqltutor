@@ -7,7 +7,7 @@ import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { Box, Paper } from '@mui/material';
 import { useLatest, useDebounce } from '@sqlvalley/utils/dom';
-import { noop } from '@sqlvalley/utils/javascript';
+import { noop } from '@step-wise/js-utils';
 
 interface SQLEditorProps {
   value: string;

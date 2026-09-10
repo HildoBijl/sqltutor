@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@sqlvalley/utils": "*",
+    "@step-wise/js-utils": "^0.1.1",
     "react-katex": "^3.1.0"
   },
   "peerDependencies": {

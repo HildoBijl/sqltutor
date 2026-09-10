@@ -1,4 +1,4 @@
-import { ensureInt, ensurePositive, compareNumbers, clamp, findOptimum, findOptimumIndex, repeat } from '../javascript';
+import { approximatelyEqual, clamp, ensureInteger, ensureNumber, findOptimum, findOptimumIndex, repeat } from '@step-wise/js-utils';
 import { Vector, ensureVector, type VectorInput } from './Vector';
 import { Span, ensureSpan, type SpanInput, type SpanSO } from './Span';
 import { ensureLine, Line, type LineInput } from './Line';
@@ -84,7 +84,7 @@ export class Rectangle {
 	// Give the bounds of this rectangle along a certain axis. It is sorted to ensure the lower value is mentioned first.
 	getBounds(axis: number): [number, number] {
 		// Ensure axis is valid.
-		const a = ensureInt(axis, true);
+		const a = ensureInteger(axis, { nonNegative: true });
 		if (a >= this.dimension)
 			throw new Error(`Invalid axis: ${a}. Must be between 0 and ${this.dimension - 1}.`);
 
@@ -280,7 +280,7 @@ export class Rectangle {
 		let upper: number | undefined;
 		repeat(this.dimension, axis => {
 			// Special case: if the line is parallel to this axis, check if the given coordinate falls within the rectangle.
-			if (compareNumbers(l.direction.getCoordinate(axis), 0)) {
+			if (approximatelyEqual(l.direction.getCoordinate(axis), 0)) {
 				const coord = l.start.getCoordinate(axis);
 				const [min, max] = this.getBounds(axis);
 				if (coord < min || coord > max) {
@@ -324,7 +324,7 @@ export class Rectangle {
 	// Check if a circle touches or lies within this rectangle. If 'contains' is set to true, then it requires the circle to be fully inside the rectangle.
 	touchesCircle(center: VectorInput, radius: number, contains = false): boolean {
 		const c = ensureVector(center, this.dimension);
-		const r = ensurePositive(radius);
+		const r = ensureNumber(radius, { nonNegative: true });
 		return contains
 			? this.contains(c) && this.getDistanceTo(c, true) >= r
 			: this.getDistanceTo(c) <= r;

@@ -1,4 +1,4 @@
-import { ensureInt, compareNumbers } from '../javascript';
+import { approximatelyEqual, ensureInteger } from '@step-wise/js-utils';
 
 import { Vector, type VectorInput, type VectorSO, ensureVector, isCoordinates } from './Vector';
 
@@ -148,7 +148,7 @@ export class Line {
 
 	// Check if a given point (Vector) is on the given line. 
 	containsPoint(vector: VectorInput): boolean {
-		return compareNumbers(this.getSquaredDistanceFrom(vector), 0);
+		return approximatelyEqual(this.getSquaredDistanceFrom(vector), 0);
 	}
 
 	// Take a point on a line, and find the factor such that start + factor * direction = point. If the point is not on the line, the closest point on the line is taken.
@@ -172,12 +172,12 @@ export class Line {
 	// This function is the same as getPointWithCoordinates, but then it only returns the factor of the given point.
 	getFactorOfPointWithCoordinate(axis: number, value: number): number {
 		// Check the input.
-		const a = ensureInt(axis, true);
+		const a = ensureInteger(axis, { nonNegative: true });
 		if (a >= this.dimension)
 			throw new Error(`Invalid axis: the axis (${a}) cannot be higher than or equal to the dimension (${this.dimension}) of the Line.`);
 
 		// Check if the Line is parallel to this axis.
-		if (compareNumbers(this.direction.getCoordinate(a), 0))
+		if (approximatelyEqual(this.direction.getCoordinate(a), 0))
 			throw new Error(`Invalid getPointWithCoordinate call: the line is parallel to the given axis (${a}), so no intersecting point can be computed.`);
 
 		// Find the factor by which we must multiply the direction vector.
@@ -320,7 +320,7 @@ export class Line {
 	static getAxisLineThrough(point: VectorInput, axis: number): Line {
 		// Check the input.
 		const p = ensureVector(point);
-		axis = ensureInt(axis, true);
+		axis = ensureInteger(axis, { nonNegative: true });
 		if (axis >= p.dimension)
 			throw new Error(`Invalid axis: expected a number between 0 (inclusive) and the point dimension ${p.dimension} (exclusive) but received ${axis}.`);
 

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { Alert, Typography } from '@mui/material';
+import { sample } from '@step-wise/js-utils';
 
 import type {
   StoredExerciseAction,
   StoredExerciseInstance,
   StoredExerciseState,
 } from '../storedState';
-import { selectRandomly } from '@sqlvalley/utils/javascript';
 import { Exercise, type AnyExerciseContextValue, type AnyExerciseDefinition } from '../Exercise';
 import { useModuleContext } from '../moduleContext';
 import { useExerciseStorage } from '../storageContext';
@@ -63,8 +63,8 @@ export function ExerciseManager({
     const candidates = currentDefinition && exercises.length > 1
       ? exercises.filter((exercise) => exercise.exerciseId !== currentDefinition.exerciseId)
       : exercises;
-    const next = selectRandomly(candidates);
-    if (!next) return;
+    if (candidates.length === 0) return;
+    const next = sample(candidates);
     startExercise(next);
   }, [byId, exercises, skillId, startExercise, storage]);
 
@@ -121,8 +121,7 @@ export function ExerciseManager({
     const current = storage.getInstance(skillId);
     const definition = current ? byId.get(current.exerciseId) : undefined;
     if (current && definition && definition.version === current.version) return;
-    const next = definition ?? selectRandomly(exercises);
-    if (!next) return;
+    const next = definition ?? sample(exercises);
     const parameters = next.generateParameters(moduleContext, {
       previousParameters: current?.parameters ?? null,
     });

@@ -1,4 +1,3 @@
-import { keysToObject } from '../javascript';
 import { Vector } from '../geometry';
 
 // Find the coordinates (client) of a given event, as a Vector. For a touch event, the first touch is used.
@@ -20,7 +19,11 @@ export interface UtilKeys {
 
 // Determine the status of the utility keys (shift, ctrl, alt) for an event.
 export function getUtilKeys(event: MouseEvent | TouchEvent | KeyboardEvent | PointerEvent): UtilKeys {
-	return keysToObject(['shift', 'ctrl', 'alt'], key => (event as any)[`${key}Key`]) as UtilKeys;
+	return {
+		shift: event.shiftKey,
+		ctrl: event.ctrlKey,
+		alt: event.altKey,
+	};
 }
 
 // Find the size of the window at the current moment.
